@@ -30,18 +30,7 @@ class Market(Base):
     negRisk: Mapped[bool] = mapped_column(Boolean, nullable=False)
     bestBid: Mapped[Decimal] = mapped_column(Numeric, nullable=False)
     bestAsk: Mapped[Decimal] = mapped_column(Numeric, nullable=False)
-    
-    def to_dict(self) -> dict:
-        """Convert ORM model to dict, automatically converting Decimal to float"""
-        result = {}
-        for col in self.__table__.columns:
-            value = getattr(self, col.name)
-            # Convert Decimal to float for JSON serialization
-            if isinstance(value, Decimal):
-                result[col.name] = float(value)
-            else:
-                result[col.name] = value
-        return result
+
 
 
 # Pydantic Model for validation and type safety
