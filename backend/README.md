@@ -26,7 +26,9 @@ Database Management:
 
 VPS general:
 
-- `scp .env jure@46.224.29.26:/home/jure/polyapp/backend/.env`
+```bash
+scp .env jure@46.224.29.26:/home/jure/polyapp/backend/.env
+```
 
 Workflows:
 
