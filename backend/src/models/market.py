@@ -59,10 +59,6 @@ class MarketSchema(BaseModel):
 
 
 def parse_market_from_api(market_dict: dict) -> MarketSchema | None:
-    """
-    Parse a market dict from the Polymarket API into our simplified MarketSchema.
-    Returns None if required fields are missing.
-    """
     try:
         condition_id = market_dict.get("conditionId")
         if not condition_id:
@@ -117,6 +113,6 @@ def parse_market_from_api(market_dict: dict) -> MarketSchema | None:
             bestAsk=bestAsk,
         )
     except (ValueError, KeyError, TypeError) as e:
-        # Log error but don't crash - just skip this market
+        # Log error but don't crash - just skip this item
         return None
 
