@@ -8,10 +8,15 @@
 
 Docker VPS:
 
-- `docker compose up -d`
-- `docker compose ps`
-- `docker compose logs`
-- `docker compose logs --tail 100 app`
+```bash
+docker compose up -d
+docker compose ps
+docker compose logs
+docker compose logs --tail 100 app
+
+# wipe it all and start fresh (run where docker compose file is):
+docker compose down --rmi all --volumes --remove-orphans
+```
 
 Database Management:
 
@@ -21,7 +26,7 @@ Database Management:
 
 VPS general:
 
-- `scp .env jure@46.224.29.26:/home/jure/exec-research/poly-insights-py/.env`
+- `scp .env jure@46.224.29.26:/home/jure/polyapp/backend/.env`
 
 Workflows:
 
