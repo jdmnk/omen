@@ -1,17 +1,11 @@
 from datetime import datetime
 from decimal import Decimal
 from sqlalchemy import Boolean, String, Numeric, DateTime, func
-from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column
 from pydantic import BaseModel, Field
 import json
+from src.models.base import Base
 
-
-# SQLAlchemy ORM Base
-class Base(DeclarativeBase):
-    pass
-
-
-# SQLAlchemy ORM Model
 class Market(Base):
     __tablename__ = "markets"
     
@@ -21,7 +15,6 @@ class Market(Base):
     )
     question: Mapped[str] = mapped_column(String, nullable=False)
     icon: Mapped[str] = mapped_column(String, nullable=False)
-    # comma separated list of outcomes
     outcomes: Mapped[str] = mapped_column(String, nullable=False)
     outcomePrices: Mapped[str] = mapped_column(String, nullable=False)
     slug: Mapped[str] = mapped_column(String, nullable=False, index=True)

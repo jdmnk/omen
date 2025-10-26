@@ -3,7 +3,7 @@ from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession, create_async_engin
 from sqlalchemy.dialects.postgresql import JSONB, insert as pg_insert
 from src.utils.logging_config import get_logger
 from src.settings import settings
-from src.db.models import Market, MarketSchema, parse_market_from_api
+from src.models.market import Market, MarketSchema, parse_market_from_api
 
 logger = get_logger(__name__)
 

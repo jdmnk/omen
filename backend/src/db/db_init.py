@@ -2,7 +2,7 @@ import asyncio
 import sys
 from sqlalchemy.ext.asyncio import create_async_engine
 from src.settings import settings
-from src.db.models import Base
+from src.models.market import Base
 
 
 async def drop_all_tables() -> None:

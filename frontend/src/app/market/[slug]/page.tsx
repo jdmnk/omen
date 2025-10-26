@@ -20,7 +20,7 @@ export default async function MarketPage({
     console.error(error);
   }
 
-  if (!data) {
+  if (!data?.market) {
     return <div>Market not found</div>;
   }
 
