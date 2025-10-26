@@ -27,15 +27,17 @@ export default async function MarketPage({
   const { market, positions } = data;
 
   return (
-    <div className="flex flex-col items-center h-screen gap-4 p-4 max-w-2xl mx-auto">
-      <Image src={market.icon} alt={market.question} width={100} height={100} />
-      <h1>{market.question}</h1>
-      <h2>{market.slug}</h2>
-      <div>Condition id: {market.condition_id}</div>
-      <div>
-        Clob tokens: {market.token1} {market.token2}
-      </div>
-      <div className="flex flex-col gap-2">
+    <div className="flex flex-col items-center h-screen gap-4 p-4 max-w-7xl mx-auto">
+      <div className="flex gap-2">
+        <div className="flex gap-4">
+          <Image
+            src={market.icon}
+            alt={market.question}
+            width={100}
+            height={100}
+          />
+          <h1>{market.question}</h1>
+        </div>
         <div className="flex flex-col gap-2">
           <p className="font-bold">Description</p>
           <p className="text-sm">{market.description}</p>
