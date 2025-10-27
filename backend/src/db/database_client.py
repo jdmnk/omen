@@ -159,3 +159,48 @@ class DatabaseClient:
         async with self.engine.connect() as conn:
             rows = (await conn.execute(sql)).mappings().all()
             return rows
+
+    async def autocomplete_markets(self, query: str, limit: int = 10) -> list[dict]:
+        """
+        Fuzzy autocomplete on question only using pg_trgm for performance.
+        Returns lightweight dicts: { slug, question }.
+        - For very short queries (len < 3), use prefix match on question.
+        - For len >= 3, use trigram similarity operator % and order by similarity.
+        """
+        q = (query or "").strip()
+        if not q:
+            return []
+
+        use_prefix = len(q) < 3
+
+        if use_prefix:
+            # Prefix search on normalized question
+            sql = text(
+                """
+                SELECT slug, question
+                FROM markets
+                WHERE regexp_replace(lower(question), '\\s+', ' ', 'g') LIKE :prefix
+                ORDER BY question <-> :qnorm
+                LIMIT :limit
+                """
+            )
+            params = {"prefix": f"{q.lower()}%", "qnorm": " ".join(q.lower().split()), "limit": limit}
+        else:
+            # Constrain by first 3 normalized characters to leverage prefix index, then KNN
+            sql = text(
+                """
+                WITH q AS (
+                  SELECT :qnorm AS qnorm, LEFT(:qnorm, 3) AS p3
+                )
+                SELECT m.slug, m.question
+                FROM markets m, q
+                WHERE LEFT(regexp_replace(lower(m.question), '\\s+', ' ', 'g'), 3) = q.p3
+                ORDER BY regexp_replace(lower(m.question), '\\s+', ' ', 'g') <-> q.qnorm
+                LIMIT :limit
+                """
+            )
+            params = {"qnorm": " ".join(q.lower().split()), "limit": limit}
+
+        async with self.engine.connect() as conn:
+            rows = (await conn.execute(sql, params)).mappings().all()
+            return [{"slug": r["slug"], "question": r["question"]} for r in rows]

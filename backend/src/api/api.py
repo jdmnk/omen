@@ -38,6 +38,13 @@ async def search_markets(query: str = Query(min_length=1)) -> Dict:
         raise HTTPException(status_code=404, detail="Market not found")
     return result
 
+@app.get("/markets/autocomplete")
+async def autocomplete_markets(q: str = Query(min_length=1), limit: int = 10) -> List[Dict]:
+    # hard cap to avoid excessive payloads
+    limit = max(1, min(limit, 25))
+    rows = await db.autocomplete_markets(q, limit=limit)
+    return rows
+
 @app.get("/markets/search-slug")
 async def search_markets_slug(slug: str = Query(min_length=1)) -> Dict:
     result = await db.get_market_by_slug(slug=slug)
