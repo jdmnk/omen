@@ -1,0 +1,31 @@
+# Ruff configuration for backend service
+
+extend-exclude = [
+    "__pycache__",
+]
+
+target-version = "py311"
+line-length = 100
+
+[lint]
+select = [
+    "E",      # pycodestyle errors
+    "F",      # pyflakes
+    "I",      # isort
+    "UP",     # pyupgrade
+    "RUF",    # Ruff-specific rules
+    "B",      # flake8-bugbear
+    "ASYNC",  # flake8-async
+]
+ignore = [
+    "E501",   # line length enforced by formatter / reviewed manually
+]
+
+[lint.isort]
+known-first-party = ["src"]
+combine-as-imports = true
+
+[format]
+quote-style = "double"
+indent-style = "space"
+line-ending = "lf"

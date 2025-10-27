@@ -45,3 +45,27 @@ docker compose exec app python -m src.db.db_populate
 Tasks:
 
 - implement graphql for fetching positions!
+
+## Linting (Ruff)
+
+Ruff is configured via `ruff.toml` and installed as a dev dependency.
+
+Install dev dependencies (from `backend/`):
+
+```bash
+poetry install --with dev
+```
+
+Run locally (from `backend/`):
+
+```bash
+# Lint
+poetry run ruff check .
+
+# Format
+poetry run ruff format .
+
+poetry run ruff check --fix .
+```
+
+Note: The Docker image doesn't include dev dependencies; run Ruff locally.
