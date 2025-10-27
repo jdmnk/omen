@@ -1,4 +1,4 @@
-from decimal import Decimal
+from decimal import Decimal, InvalidOperation
 from sqlalchemy import String, Numeric
 from sqlalchemy.orm import Mapped, mapped_column
 from pydantic import BaseModel
@@ -32,18 +32,29 @@ class PositionSchema(BaseModel):
 
 
 def parse_position_from_api(position_dict: dict) -> PositionSchema | None:
+    USDC_MULT = Decimal(10) ** 6
+
+    def from_usdc_decimal(value: object) -> Decimal:
+        try:
+            if value is None:
+                return Decimal(0)
+            return Decimal(str(value)) / USDC_MULT
+        except (InvalidOperation, TypeError, ValueError):
+            return Decimal(0)
+
     try:
         id = position_dict.get("id")
         if not id:
             return None
-       
-        realizedPnl = Decimal(str(position_dict.get("realizedPnl", 0)))
+
         user = position_dict.get("user", "")
         tokenId = position_dict.get("tokenId", "")
-        amount = Decimal(str(position_dict.get("amount", 0)))
-        avgPrice = Decimal(str(position_dict.get("avgPrice", 0)))
-        totalBought = Decimal(str(position_dict.get("totalBought", 0)))
-            
+
+        realizedPnl = from_usdc_decimal(position_dict.get("realizedPnl"))
+        amount = from_usdc_decimal(position_dict.get("amount"))
+        avgPrice = from_usdc_decimal(position_dict.get("avgPrice"))
+        totalBought = from_usdc_decimal(position_dict.get("totalBought"))
+
         return PositionSchema(
             id=id,
             realizedPnl=realizedPnl,
@@ -53,7 +64,6 @@ def parse_position_from_api(position_dict: dict) -> PositionSchema | None:
             avgPrice=avgPrice,
             totalBought=totalBought,
         )
-    except (ValueError, KeyError, TypeError) as e:
-        # Log error but don't crash - just skip this item
+    except (ValueError, KeyError, TypeError):
         return None
 

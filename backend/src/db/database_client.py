@@ -4,6 +4,7 @@ from sqlalchemy.dialects.postgresql import JSONB, insert as pg_insert
 from src.utils.logging_config import get_logger
 from src.settings import settings
 from src.models.market import Market, MarketSchema, parse_market_from_api
+from src.models.position import Position, PositionSchema, parse_position_from_api
 
 logger = get_logger(__name__)
 
@@ -189,3 +190,48 @@ class DatabaseClient:
         async with self.engine.connect() as conn:
             rows = (await conn.execute(sql, params)).mappings().all()
             return [{"slug": r["slug"], "question": r["question"]} for r in rows]
+
+    async def insert_positions(self, positions: list[dict], chunk_size: int = 1000) -> int:
+        """
+        Upsert positions by id.
+
+        - Parses input dicts using PositionSchema for validation
+        - Uses PostgreSQL ON CONFLICT (id) DO UPDATE to upsert
+        """
+        # Parse and validate
+        parsed_positions: list[PositionSchema] = []
+        for pos_dict in positions:
+            parsed = parse_position_from_api(pos_dict)
+            if parsed:
+                parsed_positions.append(parsed)
+
+        if not parsed_positions:
+            logger.info("No valid position rows to upsert.")
+            return 0
+
+        total_upserted = 0
+        async with self.async_session() as session:
+            for start in range(0, len(parsed_positions), chunk_size):
+                batch = parsed_positions[start : start + chunk_size]
+
+                values = [p.model_dump() for p in batch]
+
+                stmt = pg_insert(Position).values(values)
+
+                update_fields = {
+                    col: stmt.excluded[col]
+                    for col in Position.__table__.columns.keys()
+                    if col not in ["id"]
+                }
+
+                stmt = stmt.on_conflict_do_update(
+                    index_elements=["id"],
+                    set_=update_fields,
+                )
+
+                await session.execute(stmt)
+                total_upserted += len(batch)
+                await session.commit()
+
+        logger.info("Inserted/updated %d position rows into DB", total_upserted)
+        return total_upserted
