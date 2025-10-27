@@ -1,5 +1,14 @@
 import { getBaseUrl } from "@/lib/api";
 import Image from "next/image";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { TrendingUp, Calendar } from "lucide-react";
 
 type Position = {
   id: string | number;
@@ -52,67 +61,90 @@ export default async function MarketPage({
   };
 
   return (
-    <div className="min-h-screen max-w-6xl mx-auto p-6 flex flex-col gap-8">
-      <section className="grid grid-cols-1 md:grid-cols-[auto,1fr] items-start gap-6">
-        {market.icon ? (
-          <Image
-            src={market.icon}
-            alt={market.question}
-            width={96}
-            height={96}
-            className="rounded-md border"
-          />
-        ) : (
-          <div className="size-24 rounded-md border" />
-        )}
-
-        <div className="flex flex-col gap-3">
-          <h1 className="text-2xl md:text-3xl font-semibold leading-tight">
-            {market.question}
-          </h1>
-          {market.description && (
-            <div className="rounded-lg border p-4 text-sm text-zinc-600 dark:text-zinc-300">
-              {market.description}
-            </div>
-          )}
-        </div>
-      </section>
-
-      {positions && positions.length > 0 && (
-        <section className="flex flex-col gap-4">
-          <div className="flex items-center justify-between">
-            <h2 className="text-lg font-semibold">Positions</h2>
-            <span className="text-sm text-zinc-500">{positions.length}</span>
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {positions.map((position: Position) => (
-              <div
-                key={position.id}
-                className="rounded-lg border p-4 shadow-sm bg-white/60 dark:bg-zinc-900/60"
-              >
-                <div className="flex items-center justify-between">
-                  <div className="text-sm text-zinc-500">
-                    {position.outcome || position.side || "Position"}
-                  </div>
+    <div className="min-h-screen bg-linear-to-br from-background via-background to-muted/20">
+      <div className="max-w-7xl mx-auto p-6 flex flex-col gap-8">
+        <Card className="shadow-lg">
+          <CardHeader className="pb-4">
+            <div className="flex flex-col md:flex-row gap-6">
+              {market.icon ? (
+                <div className="w-24 h-24 relative shrink-0">
+                  <Image
+                    src={market.icon}
+                    alt={market.question}
+                    width={96}
+                    height={96}
+                    className="rounded-lg border shadow-sm object-contain w-full h-full"
+                  />
                 </div>
-                <div className="mt-2 flex items-baseline gap-2">
-                  <div className="text-2xl font-semibold">
-                    {formatNumber(position.amount)}
-                  </div>
-                  <div className="text-sm text-zinc-500">
-                    @ {formatNumber(position.avgPrice, 4)}
-                  </div>
+              ) : (
+                <div className="size-24 rounded-lg border bg-muted/30 flex items-center justify-center shrink-0">
+                  <TrendingUp className="h-10 w-10 text-muted-foreground/50" />
                 </div>
-                {position.createdAt && (
-                  <div className="mt-3 text-xs text-zinc-500">
-                    {new Date(position.createdAt).toLocaleString()}
-                  </div>
+              )}
+
+              <div className="flex-1 space-y-3">
+                <CardTitle className="text-2xl md:text-3xl leading-tight">
+                  {market.question}
+                </CardTitle>
+                {market.description && (
+                  <CardDescription className="text-base leading-relaxed">
+                    {market.description}
+                  </CardDescription>
                 )}
               </div>
-            ))}
-          </div>
-        </section>
-      )}
+            </div>
+          </CardHeader>
+        </Card>
+
+        {positions && positions.length > 0 && (
+          <section className="space-y-4">
+            <div className="flex items-center justify-between">
+              <h2 className="text-2xl font-semibold">Positions</h2>
+              <Badge variant="secondary" className="text-sm px-3 py-1">
+                {positions.length} total
+              </Badge>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {positions.map((position: Position) => (
+                <Card
+                  key={position.id}
+                  className="shadow-md hover:shadow-lg transition-shadow"
+                >
+                  <CardHeader className="pb-3">
+                    <div className="flex items-center justify-between">
+                      <Badge variant="outline">
+                        {position.outcome || position.side || "Position"}
+                      </Badge>
+                    </div>
+                  </CardHeader>
+                  <CardContent className="space-y-3">
+                    <div className="flex items-baseline gap-2">
+                      <div className="text-3xl font-bold">
+                        {formatNumber(position.amount)}
+                      </div>
+                      <div className="text-sm text-muted-foreground">
+                        shares
+                      </div>
+                    </div>
+                    <div className="text-sm text-muted-foreground">
+                      Avg Price:{" "}
+                      <span className="font-medium text-foreground">
+                        {formatNumber(position.avgPrice, 4)}
+                      </span>
+                    </div>
+                    {position.createdAt && (
+                      <div className="flex items-center gap-1.5 text-xs text-muted-foreground pt-2 border-t">
+                        <Calendar className="h-3 w-3" />
+                        {new Date(position.createdAt).toLocaleString()}
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </section>
+        )}
+      </div>
     </div>
   );
 }

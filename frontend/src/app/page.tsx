@@ -1,8 +1,12 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { getBaseUrl } from "@/lib/api";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { Search } from "lucide-react";
 
 export default function Home() {
   const [input, setInput] = useState<string>("");
@@ -68,61 +72,69 @@ export default function Home() {
   }, [input]);
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-6">
-      <div className="w-full max-w-xl flex flex-col gap-6">
-        <div className="text-center">
-          <h1 className="text-3xl font-semibold">Poly Insights</h1>
-          <p className="mt-1 text-sm text-zinc-500">
-            Find markets by name or slug
+    <div className="min-h-screen flex items-center justify-center p-6 bg-linear-to-br from-background via-background to-muted/20">
+      <div className="w-full max-w-2xl flex flex-col gap-8">
+        <div className="text-center space-y-2">
+          <h1 className="text-4xl md:text-5xl font-bold tracking-tight">
+            Poly Insights
+          </h1>
+          <p className="text-muted-foreground text-base">
+            Explore prediction markets by name or slug
           </p>
         </div>
 
-        <div className="relative">
-          <input
-            type="text"
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            placeholder="Search markets..."
-            className="w-full rounded-md border p-3 pr-10 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-            onKeyDown={(e) => {
-              if (e.key === "Enter") handleSearch();
-            }}
-          />
-          <button
-            onClick={() => handleSearch()}
-            className="absolute right-2 top-1/2 -translate-y-1/2 rounded-md bg-blue-600 text-white px-3 py-1 text-sm hover:bg-blue-700"
-          >
-            Go
-          </button>
-
-          {isOpen && suggestions.length > 0 && (
-            <div className="absolute z-10 mt-2 w-full rounded-md border bg-white shadow-md overflow-hidden">
-              <ul className="max-h-80 overflow-auto divide-y">
-                {suggestions.map((s) => (
-                  <li key={s.slug}>
-                    <button
-                      className="w-full text-left p-3 hover:bg-zinc-50"
-                      onClick={() => handleSearch(s.slug)}
-                    >
-                      <div className="text-sm font-medium truncate">
-                        {s.question}
-                      </div>
-                      <div className="text-xs text-zinc-500 truncate">
-                        /{s.slug}
-                      </div>
-                    </button>
-                  </li>
-                ))}
-              </ul>
+        <Card className="p-6 shadow-lg">
+          <div className="relative">
+            <div className="flex gap-2">
+              <div className="relative flex-1">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input
+                  type="text"
+                  value={input}
+                  onChange={(e) => setInput(e.target.value)}
+                  placeholder="Search markets..."
+                  className="pl-9 h-11"
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") handleSearch();
+                  }}
+                />
+              </div>
+              <Button onClick={() => handleSearch()} size="lg" className="h-11">
+                Go
+              </Button>
             </div>
-          )}
 
-          {!isLoading && input && isOpen && suggestions.length === 0 && (
-            <div className="absolute z-10 mt-2 w-full rounded-md border bg-white shadow-sm p-3 text-sm text-zinc-500">
-              No results
-            </div>
-          )}
-        </div>
+            {isOpen && suggestions.length > 0 && (
+              <Card className="absolute z-10 mt-3 w-full shadow-xl border-2">
+                <ul className="max-h-96 overflow-auto divide-y">
+                  {suggestions.map((s) => (
+                    <li key={s.slug}>
+                      <button
+                        className="w-full text-left p-4 hover:bg-accent transition-colors cursor-pointer"
+                        onClick={() => handleSearch(s.slug)}
+                      >
+                        <div className="font-medium truncate mb-1">
+                          {s.question}
+                        </div>
+                        <div className="text-xs text-muted-foreground truncate">
+                          /{s.slug}
+                        </div>
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              </Card>
+            )}
+
+            {!isLoading && input && isOpen && suggestions.length === 0 && (
+              <Card className="absolute z-10 mt-3 w-full shadow-lg">
+                <div className="p-4 text-center text-muted-foreground">
+                  No results found
+                </div>
+              </Card>
+            )}
+          </div>
+        </Card>
       </div>
     </div>
   );
