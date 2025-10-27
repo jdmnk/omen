@@ -50,12 +50,6 @@ Tasks:
 
 Ruff is configured via `ruff.toml` and installed as a dev dependency.
 
-Install dev dependencies (from `backend/`):
-
-```bash
-poetry install --with dev
-```
-
 Run locally (from `backend/`):
 
 ```bash
@@ -67,5 +61,3 @@ poetry run ruff format .
 
 poetry run ruff check --fix .
 ```
-
-Note: The Docker image doesn't include dev dependencies; run Ruff locally.
