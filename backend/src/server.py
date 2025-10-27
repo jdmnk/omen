@@ -1,6 +1,8 @@
-import uvicorn
 import multiprocessing
 import subprocess
+
+import uvicorn
+
 from src.settings import settings
 
 API_MODULE = "src.api.api:app"

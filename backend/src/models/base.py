@@ -1,8 +1,9 @@
 from __future__ import annotations
 
+from collections.abc import Iterable
 from datetime import date, datetime
 from decimal import Decimal
-from typing import Any, Iterable, Self, Type
+from typing import Any, Self
 
 from pydantic import BaseModel
 from sqlalchemy.orm import DeclarativeBase
@@ -48,7 +49,7 @@ class SerializerMixin:
             result[key] = self._serialize_value(value)
         return result
 
-    def to_schema(self, schema_type: Type[BaseModel]) -> BaseModel:
+    def to_schema(self, schema_type: type[BaseModel]) -> BaseModel:
         """Validate this ORM instance into a Pydantic model.
 
         Requires the target schema to set `model_config = ConfigDict(from_attributes=True)`

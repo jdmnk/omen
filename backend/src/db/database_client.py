@@ -1,10 +1,16 @@
-from sqlalchemy import text, bindparam, select
-from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession, create_async_engine, async_sessionmaker
-from sqlalchemy.dialects.postgresql import JSONB, insert as pg_insert
-from src.utils.logging_config import get_logger
-from src.settings import settings
+from sqlalchemy import select, text
+from sqlalchemy.dialects.postgresql import insert as pg_insert
+from sqlalchemy.ext.asyncio import (
+    AsyncEngine,
+    AsyncSession,
+    async_sessionmaker,
+    create_async_engine,
+)
+
 from src.models.market import Market, MarketSchema, parse_market_from_api
 from src.models.position import Position, PositionSchema, parse_position_from_api
+from src.settings import settings
+from src.utils.logging_config import get_logger
 
 logger = get_logger(__name__)
 

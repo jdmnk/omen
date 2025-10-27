@@ -1,6 +1,8 @@
 import asyncio
-from src.polymarket.poly_client import PolyClient
+
 from src.db.database_client import DatabaseClient
+from src.polymarket.poly_client import PolyClient
+
 
 async def main():
     poly_client = PolyClient()

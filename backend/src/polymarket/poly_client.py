@@ -1,12 +1,14 @@
 import string
+import traceback
+
+import httpx
 from py_clob_client.client import ClobClient
 from py_clob_client.clob_types import OrderBookSummary
 from py_clob_client.constants import POLYGON
-import traceback
 from py_clob_client.exceptions import PolyApiException
-from src.utils.logging_config import get_logger
-import httpx
+
 from src.settings import settings
+from src.utils.logging_config import get_logger
 from src.utils.usdc import to_usdc
 
 logger = get_logger(__name__)

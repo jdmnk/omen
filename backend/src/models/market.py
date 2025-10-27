@@ -1,10 +1,13 @@
+import json
 from datetime import datetime
 from decimal import Decimal
-from sqlalchemy import Boolean, String, Numeric, DateTime, func
-from sqlalchemy.orm import Mapped, mapped_column
+
 from pydantic import BaseModel, Field
-import json
+from sqlalchemy import Boolean, DateTime, Numeric, String, func
+from sqlalchemy.orm import Mapped, mapped_column
+
 from src.models.base import Base
+
 
 class Market(Base):
     __tablename__ = "markets"
@@ -112,7 +115,7 @@ def parse_market_from_api(market_dict: dict) -> MarketSchema | None:
             bestBid=bestBid,
             bestAsk=bestAsk,
         )
-    except (ValueError, KeyError, TypeError) as e:
+    except (ValueError, KeyError, TypeError):
         # Log error but don't crash - just skip this item
         return None
 

@@ -1,8 +1,9 @@
-from src.polymarket.poly_client import PolyClient
-from src.db.database_client import DatabaseClient
-from src.utils.logging_config import get_logger
 import asyncio
 import signal
+
+from src.db.database_client import DatabaseClient
+from src.polymarket.poly_client import PolyClient
+from src.utils.logging_config import get_logger
 
 logger = get_logger(__name__)
 

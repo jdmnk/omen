@@ -1,7 +1,8 @@
-from src.polymarket.poly_client import PolyClient
 import asyncio
+
 from src.db.database_client import DatabaseClient
-import json
+from src.polymarket.poly_client import PolyClient
+
 # just for testing
 
 async def main():

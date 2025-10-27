@@ -1,11 +1,13 @@
+from datetime import datetime
+
 from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
-from datetime import datetime
-from typing import List, Dict
-from src.db.database_client import DatabaseClient
 from py_clob_client.clob_types import OrderBookSummary
+
+from src.db.database_client import DatabaseClient
 from src.polymarket.poly_client import PolyClient
 from src.utils.logging_config import get_logger
+
 logger = get_logger(__name__)
 app = FastAPI()
 
@@ -31,7 +33,7 @@ def health():
 
 
 @app.get("/markets/search")
-async def search_markets(query: str = Query(min_length=1)) -> Dict:
+async def search_markets(query: str = Query(min_length=1)) -> dict:
     result = await db.search_markets(query=query)
 
     if result is None:
@@ -39,14 +41,14 @@ async def search_markets(query: str = Query(min_length=1)) -> Dict:
     return result
 
 @app.get("/markets/autocomplete")
-async def autocomplete_markets(q: str = Query(min_length=1), limit: int = 10) -> List[Dict]:
+async def autocomplete_markets(q: str = Query(min_length=1), limit: int = 10) -> list[dict]:
     # hard cap to avoid excessive payloads
     limit = max(1, min(limit, 25))
     rows = await db.autocomplete_markets(q, limit=limit)
     return rows
 
 @app.get("/markets/search-slug")
-async def search_markets_slug(slug: str = Query(min_length=1)) -> Dict:
+async def search_markets_slug(slug: str = Query(min_length=1)) -> dict:
     result = await db.get_market_by_slug(slug=slug)
     if result is None:
         raise HTTPException(status_code=404, detail="Market not found")
@@ -65,8 +67,8 @@ def get_market_order_book(token_id: str = Query(min_length=1)) -> OrderBookSumma
     else:
         raise HTTPException(status_code=404, detail="Order book not found")
 
-@app.get("/markets/trades", response_model=List[Dict])
-async def get_market_trades(condition_id: str = Query(min_length=1)) -> List[Dict]:
+@app.get("/markets/trades", response_model=list[dict])
+async def get_market_trades(condition_id: str = Query(min_length=1)) -> list[dict]:
     trades = await poly_client.get_market_trades([condition_id])
 
     if trades is not None and len(trades) > 0:
@@ -74,8 +76,8 @@ async def get_market_trades(condition_id: str = Query(min_length=1)) -> List[Dic
     else:
         raise HTTPException(status_code=404, detail="Trades not found")
 
-@app.get("/markets/positions", response_model=List[Dict])
-async def get_market_positions(clob_tokens: List[str] = Query(min_length=1)) -> List[Dict]:
+@app.get("/markets/positions", response_model=list[dict])
+async def get_market_positions(clob_tokens: list[str] = Query(min_length=1)) -> list[dict]:
     positions = await poly_client.get_market_positions(clob_tokens, min_amount=100)
 
     if positions is not None and len(positions) > 0:

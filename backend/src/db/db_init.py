@@ -1,10 +1,11 @@
 import asyncio
 import sys
-from sqlalchemy.ext.asyncio import create_async_engine
-from src.settings import settings
-from src.models.market import Base
-from src.models.position import Position  # ensure table is registered
+
 from sqlalchemy import text
+from sqlalchemy.ext.asyncio import create_async_engine
+
+from src.models.market import Base
+from src.settings import settings
 
 
 async def drop_all_tables() -> None:

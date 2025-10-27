@@ -1,8 +1,11 @@
 from decimal import Decimal, InvalidOperation
-from sqlalchemy import String, Numeric
-from sqlalchemy.orm import Mapped, mapped_column
+
 from pydantic import BaseModel
+from sqlalchemy import Numeric, String
+from sqlalchemy.orm import Mapped, mapped_column
+
 from src.models.base import Base
+
 
 class Position(Base):
     __tablename__ = "positions"
