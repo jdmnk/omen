@@ -78,18 +78,6 @@ class DatabaseClient:
             print(deleted)
         return deleted
 
-    async def get_all_markets(self) -> list[dict]:
-        sql = text(
-            """
-            SELECT *
-            FROM markets
-            ORDER BY data->>'createdAt' ASC
-            """
-        )
-        async with self.engine.connect() as conn:
-            rows = (await conn.execute(sql)).mappings().all()
-            return rows
-
     async def get_market_by_condition_id(self, condition_id: str) -> Market | None:
         """
         Get a market by condition_id using the ORM.
@@ -123,28 +111,6 @@ class DatabaseClient:
             
             return market_orm
 
-    async def search_markets(self, query: str) -> dict | None:
-        q = (query or "").strip()
-        if not q:
-            return None
-
-        # Simple ilike search across common name fields in the JSON
-        sql = text(
-            """
-            SELECT data
-            FROM markets
-            WHERE (data->>'question') ILIKE :pat
-               OR (data->>'market_slug') ILIKE :pat
-            ORDER BY fetched_at DESC
-            """
-        )
-
-        pattern = f"%{q}%"
-        async with self.engine.connect() as conn:
-            rows = (await conn.execute(sql, {"pat": pattern})).mappings().all()
-            if not rows:
-                return None
-            return rows[0].get("data")
 
     async def autocomplete_markets(self, query: str, limit: int = 10) -> list[dict]:
         """
