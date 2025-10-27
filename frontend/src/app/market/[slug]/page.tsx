@@ -8,7 +8,15 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { TrendingUp, Calendar } from "lucide-react";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { TrendingUp, DollarSign, Package, TrendingDown } from "lucide-react";
 
 type Position = {
   id: string | number;
@@ -60,6 +68,54 @@ export default async function MarketPage({
     return n.toLocaleString(undefined, { maximumFractionDigits });
   };
 
+  const formatCurrency = (value: number | string) => {
+    const n = typeof value === "string" ? Number(value) : value;
+    if (Number.isNaN(n)) return "$0";
+    return new Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency: "USD",
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
+    }).format(n);
+  };
+
+  const getOutcomeStyle = (outcome?: string) => {
+    const outcomeText = outcome?.toLowerCase() || "";
+    if (outcomeText.includes("yes")) {
+      return {
+        badge: "bg-emerald-500/10 text-emerald-500 border-emerald-500/20",
+        row: "bg-emerald-500/5 hover:bg-emerald-500/10",
+      };
+    }
+    if (outcomeText.includes("no")) {
+      return {
+        badge: "bg-rose-500/10 text-rose-500 border-rose-500/20",
+        row: "bg-rose-500/5 hover:bg-rose-500/10",
+      };
+    }
+    return {
+      badge: "bg-blue-500/10 text-blue-500 border-blue-500/20",
+      row: "hover:bg-muted/50",
+    };
+  };
+
+  // Calculate summary statistics
+  const totalShares = positions.reduce((sum, p) => {
+    const amount = typeof p.amount === "string" ? Number(p.amount) : p.amount;
+    return sum + (Number.isNaN(amount) ? 0 : amount);
+  }, 0);
+
+  const totalValue = positions.reduce((sum, p) => {
+    const amount = typeof p.amount === "string" ? Number(p.amount) : p.amount;
+    const price =
+      typeof p.avgPrice === "string" ? Number(p.avgPrice) : p.avgPrice;
+    return (
+      sum + (Number.isNaN(amount) || Number.isNaN(price) ? 0 : amount * price)
+    );
+  }, 0);
+
+  const avgPrice = totalShares > 0 ? totalValue / totalShares : 0;
+
   return (
     <div className="min-h-screen bg-linear-to-br from-background via-background to-muted/20">
       <div className="max-w-7xl mx-auto p-6 flex flex-col gap-8">
@@ -97,51 +153,131 @@ export default async function MarketPage({
         </Card>
 
         {positions && positions.length > 0 && (
-          <section className="space-y-4">
+          <section className="space-y-6">
             <div className="flex items-center justify-between">
               <h2 className="text-2xl font-semibold">Positions</h2>
               <Badge variant="secondary" className="text-sm px-3 py-1">
-                {positions.length} total
+                {positions.length}{" "}
+                {positions.length === 1 ? "position" : "positions"}
               </Badge>
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              {positions.map((position: Position) => (
-                <Card
-                  key={position.id}
-                  className="shadow-md hover:shadow-lg transition-shadow"
-                >
-                  <CardHeader className="pb-3">
-                    <div className="flex items-center justify-between">
-                      <Badge variant="outline">
-                        {position.outcome || position.side || "Position"}
-                      </Badge>
+
+            {/* Summary Cards */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <Card className="shadow-sm bg-linear-to-br from-card to-card/50">
+                <CardContent className="pt-6">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-sm text-muted-foreground">
+                        Total Value
+                      </p>
+                      <p className="text-2xl font-bold mt-1">
+                        {formatCurrency(totalValue)}
+                      </p>
                     </div>
-                  </CardHeader>
-                  <CardContent className="space-y-3">
-                    <div className="flex items-baseline gap-2">
-                      <div className="text-3xl font-bold">
-                        {formatNumber(position.amount)}
-                      </div>
-                      <div className="text-sm text-muted-foreground">
-                        shares
-                      </div>
+                    <div className="p-3 bg-primary/10 rounded-lg">
+                      <DollarSign className="h-6 w-6 text-primary" />
                     </div>
-                    <div className="text-sm text-muted-foreground">
-                      Avg Price:{" "}
-                      <span className="font-medium text-foreground">
-                        {formatNumber(position.avgPrice, 4)}
-                      </span>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="shadow-sm bg-linear-to-br from-card to-card/50">
+                <CardContent className="pt-6">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-sm text-muted-foreground">
+                        Total Shares
+                      </p>
+                      <p className="text-2xl font-bold mt-1">
+                        {formatNumber(totalShares)}
+                      </p>
                     </div>
-                    {position.createdAt && (
-                      <div className="flex items-center gap-1.5 text-xs text-muted-foreground pt-2 border-t">
-                        <Calendar className="h-3 w-3" />
-                        {new Date(position.createdAt).toLocaleString()}
-                      </div>
-                    )}
-                  </CardContent>
-                </Card>
-              ))}
+                    <div className="p-3 bg-blue-500/10 rounded-lg">
+                      <Package className="h-6 w-6 text-blue-500" />
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="shadow-sm bg-linear-to-br from-card to-card/50">
+                <CardContent className="pt-6">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-sm text-muted-foreground">Avg Price</p>
+                      <p className="text-2xl font-bold mt-1">
+                        {formatNumber(avgPrice, 4)}
+                      </p>
+                    </div>
+                    <div className="p-3 bg-amber-500/10 rounded-lg">
+                      <TrendingDown className="h-6 w-6 text-amber-500" />
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
             </div>
+
+            {/* Positions Table */}
+            <Card className="shadow-lg">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Outcome</TableHead>
+                    <TableHead className="text-right">Shares</TableHead>
+                    <TableHead className="text-right">Avg Price</TableHead>
+                    <TableHead className="text-right">Total Value</TableHead>
+                    <TableHead className="text-right">Date</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {positions.map((position: Position) => {
+                    const style = getOutcomeStyle(
+                      position.outcome || position.side
+                    );
+                    const posAmount =
+                      typeof position.amount === "string"
+                        ? Number(position.amount)
+                        : position.amount;
+                    const posPrice =
+                      typeof position.avgPrice === "string"
+                        ? Number(position.avgPrice)
+                        : position.avgPrice;
+                    const posValue = posAmount * posPrice;
+
+                    return (
+                      <TableRow key={position.id} className={style.row}>
+                        <TableCell>
+                          <Badge className={style.badge}>
+                            {position.outcome || position.side || "Position"}
+                          </Badge>
+                        </TableCell>
+                        <TableCell className="text-right font-semibold">
+                          {formatNumber(position.amount)}
+                        </TableCell>
+                        <TableCell className="text-right font-mono text-sm">
+                          ${formatNumber(position.avgPrice, 4)}
+                        </TableCell>
+                        <TableCell className="text-right font-semibold">
+                          {formatCurrency(posValue)}
+                        </TableCell>
+                        <TableCell className="text-right text-sm text-muted-foreground">
+                          {position.createdAt
+                            ? new Date(position.createdAt).toLocaleDateString(
+                                "en-US",
+                                {
+                                  month: "short",
+                                  day: "numeric",
+                                  year: "numeric",
+                                }
+                              )
+                            : "-"}
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })}
+                </TableBody>
+              </Table>
+            </Card>
           </section>
         )}
       </div>
