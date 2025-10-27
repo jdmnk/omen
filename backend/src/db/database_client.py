@@ -145,21 +145,6 @@ class DatabaseClient:
                 return None
             return rows[0].get("data")
 
-    '''
-    Returns a stripped down list for the search autocomplete
-    '''
-    async def get_all_markets_preview(self) -> list[dict]:
-        sql = text(
-            """
-            SELECT question_id, data->>'market_slug' AS market_slug, data->>'question' AS question
-            FROM markets
-            ORDER BY fetched_at DESC
-            """
-        )
-        async with self.engine.connect() as conn:
-            rows = (await conn.execute(sql)).mappings().all()
-            return rows
-
     async def autocomplete_markets(self, query: str, limit: int = 10) -> list[dict]:
         """
         Fuzzy autocomplete on question only using pg_trgm for performance.
