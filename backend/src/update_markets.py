@@ -7,9 +7,11 @@ from src.utils.logging_config import get_logger
 
 logger = get_logger(__name__)
 
+
 async def update_markets(poly_client: PolyClient, db_client: DatabaseClient):
     markets = await poly_client.get_active_markets()
     await db_client.insert_markets(markets)
+
 
 async def main():
     poly_client = PolyClient()
@@ -44,12 +46,13 @@ async def main():
             # exception already logged in callback
             pass
 
-    logger.info('Stopping...')
+    logger.info("Stopping...")
     for task in pending:
         task.cancel()
-    
+
     gather_set = {monitor_task, stop_task}
     await asyncio.gather(*gather_set, return_exceptions=True)
+
 
 if __name__ == "__main__":
     asyncio.run(main())

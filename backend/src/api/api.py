@@ -1,4 +1,5 @@
 from datetime import datetime
+from typing import Annotated
 
 from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
@@ -23,9 +24,11 @@ app.add_middleware(
 db = DatabaseClient()
 poly_client = PolyClient()
 
+
 @app.get("/")
 def home():
     return {"message": datetime.now().isoformat()}
+
 
 @app.get("/health")
 def health():
@@ -40,6 +43,7 @@ async def search_markets(query: str = Query(min_length=1)) -> dict:
         raise HTTPException(status_code=404, detail="Market not found")
     return result
 
+
 @app.get("/markets/autocomplete")
 async def autocomplete_markets(q: str = Query(min_length=1), limit: int = 10) -> list[dict]:
     # hard cap to avoid excessive payloads
@@ -47,17 +51,18 @@ async def autocomplete_markets(q: str = Query(min_length=1), limit: int = 10) ->
     rows = await db.autocomplete_markets(q, limit=limit)
     return rows
 
+
 @app.get("/markets/search-slug")
 async def search_markets_slug(slug: str = Query(min_length=1)) -> dict:
     result = await db.get_market_by_slug(slug=slug)
     if result is None:
         raise HTTPException(status_code=404, detail="Market not found")
 
-    positions = await poly_client.get_market_positions([result.token1, result.token2], min_amount=100)
-    return {
-        "market": result.to_dict(),
-        "positions": positions
-    }
+    positions = await poly_client.get_market_positions(
+        [result.token1, result.token2], min_amount=100
+    )
+    return {"market": result.to_dict(), "positions": positions}
+
 
 @app.get("/markets/order-book", response_model=OrderBookSummary | None)
 def get_market_order_book(token_id: str = Query(min_length=1)) -> OrderBookSummary | None:
@@ -66,6 +71,7 @@ def get_market_order_book(token_id: str = Query(min_length=1)) -> OrderBookSumma
         return order_book
     else:
         raise HTTPException(status_code=404, detail="Order book not found")
+
 
 @app.get("/markets/trades", response_model=list[dict])
 async def get_market_trades(condition_id: str = Query(min_length=1)) -> list[dict]:
@@ -76,8 +82,9 @@ async def get_market_trades(condition_id: str = Query(min_length=1)) -> list[dic
     else:
         raise HTTPException(status_code=404, detail="Trades not found")
 
+
 @app.get("/markets/positions", response_model=list[dict])
-async def get_market_positions(clob_tokens: list[str] = Query(min_length=1)) -> list[dict]:
+async def get_market_positions(clob_tokens: Annotated[list[str], Query()]) -> list[dict]:
     positions = await poly_client.get_market_positions(clob_tokens, min_amount=100)
 
     if positions is not None and len(positions) > 0:

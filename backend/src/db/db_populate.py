@@ -13,5 +13,6 @@ async def main():
     inserted_count = await db_client.insert_markets(active_markets)
     print(f"Inserted {inserted_count} active markets")
 
+
 if __name__ == "__main__":
     asyncio.run(main())

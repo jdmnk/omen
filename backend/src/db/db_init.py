@@ -14,10 +14,10 @@ async def drop_all_tables() -> None:
     WARNING: This deletes ALL data!
     """
     engine = create_async_engine(settings.database_url, pool_pre_ping=True)
-    
+
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.drop_all)
-    
+
     print("🗑️  All tables dropped.")
 
 

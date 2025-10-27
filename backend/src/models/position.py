@@ -9,7 +9,7 @@ from src.models.base import Base
 
 class Position(Base):
     __tablename__ = "positions"
-    
+
     id: Mapped[str] = mapped_column(String, primary_key=True)
     realizedPnl: Mapped[Decimal] = mapped_column(Numeric, nullable=False)
     user: Mapped[str] = mapped_column(String, nullable=False)
@@ -17,7 +17,6 @@ class Position(Base):
     amount: Mapped[Decimal] = mapped_column(Numeric, nullable=False)
     avgPrice: Mapped[Decimal] = mapped_column(Numeric, nullable=False)
     totalBought: Mapped[Decimal] = mapped_column(Numeric, nullable=False)
-
 
 
 # Pydantic Model for validation and type safety
@@ -29,7 +28,7 @@ class PositionSchema(BaseModel):
     amount: Decimal
     avgPrice: Decimal
     totalBought: Decimal
-    
+
     class Config:
         from_attributes = True
 
@@ -69,4 +68,3 @@ def parse_position_from_api(position_dict: dict) -> PositionSchema | None:
         )
     except (ValueError, KeyError, TypeError):
         return None
-

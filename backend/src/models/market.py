@@ -11,7 +11,7 @@ from src.models.base import Base
 
 class Market(Base):
     __tablename__ = "markets"
-    
+
     condition_id: Mapped[str] = mapped_column(String, primary_key=True)
     fetched_at: Mapped[datetime] = mapped_column(
         DateTime, server_default=func.now(), onupdate=func.now()
@@ -35,7 +35,6 @@ class Market(Base):
     bestAsk: Mapped[Decimal] = mapped_column(Numeric, nullable=False)
 
 
-
 # Pydantic Model for validation and type safety
 class MarketSchema(BaseModel):
     condition_id: str
@@ -56,7 +55,7 @@ class MarketSchema(BaseModel):
     negRisk: bool
     bestBid: Decimal = Field(ge=0)
     bestAsk: Decimal = Field(ge=0)
-    
+
     class Config:
         from_attributes = True
 
@@ -66,11 +65,11 @@ def parse_market_from_api(market_dict: dict) -> MarketSchema | None:
         condition_id = market_dict.get("conditionId")
         if not condition_id:
             return None
-       
+
         slug = market_dict.get("slug", "")
         if not slug:
             return None
-            
+
         # Parse clobTokenIds (format: "[token1,token2]" as string)
         clob_token_ids = market_dict.get("clobTokenIds", "")
         tokens = json.loads(clob_token_ids)
@@ -89,12 +88,12 @@ def parse_market_from_api(market_dict: dict) -> MarketSchema | None:
         volume1wk = Decimal(str(market_dict.get("volume1wk", 0)))
         volume1mo = Decimal(str(market_dict.get("volume1mo", 0)))
         volume1yr = Decimal(str(market_dict.get("volume1yr", 0)))
-        
+
         negRisk = market_dict.get("negRisk", False)
-        
+
         bestBid = Decimal(str(market_dict.get("bestBid", 0)))
         bestAsk = Decimal(str(market_dict.get("bestAsk", 0)))
-        
+
         return MarketSchema(
             condition_id=condition_id,
             question=question,
@@ -118,4 +117,3 @@ def parse_market_from_api(market_dict: dict) -> MarketSchema | None:
     except (ValueError, KeyError, TypeError):
         # Log error but don't crash - just skip this item
         return None
-

@@ -65,6 +65,7 @@ class SerializerMixin:
         filtered = {k: v for k, v in data.items() if k in allowed}
         return cls(**filtered)  # type: ignore[arg-type]
 
+
 # SQLAlchemy ORM Base with reusable serialization helpers
 class Base(SerializerMixin, DeclarativeBase):
     pass

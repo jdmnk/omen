@@ -5,6 +5,7 @@ from src.polymarket.poly_client import PolyClient
 
 # just for testing
 
+
 async def main():
     poly_client = PolyClient()
     db_client = DatabaseClient()
@@ -14,13 +15,13 @@ async def main():
 
     # await db_client.delete_all_markets()
     # await db_client.insert_markets(active_markets)
-    markets=await db_client.get_all_markets()
+    markets = await db_client.get_all_markets()
     print(len(markets))
 
     clob_tokens = markets[0]["data"]["clobTokenIds"]
-    
-    print('clob type: ' + str(type(clob_tokens)))
-    print([clob_tokens[0],clob_tokens[1]])
+
+    print("clob type: " + str(type(clob_tokens)))
+    print([clob_tokens[0], clob_tokens[1]])
     positions = await poly_client.get_market_positions(token_ids=clob_tokens)
     print(len(positions))
 
@@ -41,6 +42,7 @@ async def main():
 
     # positions = await poly_client.get_market_positions(token_ids=clob_tokens)
     # print(positions)
+
 
 if __name__ == "__main__":
     asyncio.run(main())

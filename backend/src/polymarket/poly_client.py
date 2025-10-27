@@ -19,7 +19,7 @@ GAMMA_API_HOST = "https://gamma-api.polymarket.com"
 GOLDSKY_API_HOST = "https://api.goldsky.com/api/public/project_cl6mb8i9h0003e201j6li0diw"
 GOLDSKY_API_PNL_SUBGRAPH = "/subgraphs/pnl-subgraph/0.0.14/gn"
 
-BLACKLISTED_MARKET_TAGS=[
+BLACKLISTED_MARKET_TAGS = [
     {
         "id": "620",
         "slug": "btc",
@@ -36,7 +36,7 @@ BLACKLISTED_MARKET_TAGS=[
         "id": "39",
         "slug": "ethereum",
     },
-        {
+    {
         "id": "818",
         "slug": "solana",
     },
@@ -47,13 +47,15 @@ BLACKLISTED_MARKET_TAGS=[
     {
         "id": "1312",
         "slug": "crypto-prices",
-    },      
+    },
 ]
 
-'''
+"""
 General rate limiting: 5000req / 10s
 Data API (General)	200 requests / 10s	(Throttle requests over the maximum configured rate)
-'''
+"""
+
+
 class PolyClient:
     def __init__(self):
         self.clob_client = self.get_clob_client()
@@ -64,7 +66,9 @@ class PolyClient:
         client.set_api_creds(api_creds)
         return client
 
-    async def get_active_markets(self, liquidity_num_min: int = 0, volume_num_min: int = 0, count: int | None = None) -> list[dict]:
+    async def get_active_markets(
+        self, liquidity_num_min: int = 0, volume_num_min: int = 0, count: int | None = None
+    ) -> list[dict]:
         limit = 500
         offset = 0
         all_markets = []
@@ -83,34 +87,36 @@ class PolyClient:
                         "volume_num_min": volume_num_min,
                         # order by id - newest first
                         "order": "id",
-                        "ascending": False
+                        "ascending": False,
                     }
                     response = await client.get(f"{GAMMA_API_HOST}/markets", params=params)
                     markets = response.json()
-                    
+
                     if not markets:
                         break
-                    
+
                     all_markets.extend(markets)
                     logger.info(f"Fetched {len(markets)} markets (offset: {offset})...")
-                    
+
                     if count is not None and len(all_markets) >= count:
                         break
-                    
+
                     if len(markets) < limit:
                         break
-                    
+
                     offset += limit
         except PolyApiException as exc:
             logger.error(f"get_active_markets: error fetching markets: {exc}")
             logger.error(traceback.format_exc())
             raise exc
-        
+
         logger.info(f"Finished fetching {len(all_markets)} active markets.")
 
         return all_markets
 
-    async def get_active_markets_by_events(self, exclude_tag_ids: list[int] = [], count: int | None = None) -> list[dict]:
+    async def get_active_markets_by_events(
+        self, exclude_tag_ids: list[int] | None = None, count: int | None = None
+    ) -> list[dict]:
         limit = 500
         offset = 0
         all_events = []
@@ -134,34 +140,36 @@ class PolyClient:
                         "exclude_tag_id": final_excluded_tag_ids,
                         # order by id - newest first
                         "order": "id",
-                        "ascending": False
+                        "ascending": False,
                     }
                     response = await client.get(f"{GAMMA_API_HOST}/events", params=params)
                     events = response.json()
                     if not events:
                         break
-                    
+
                     all_events.extend(events)
                     logger.info(f"Fetched {len(events)} events (offset: {offset})...")
-                    
+
                     if count is not None and len(all_events) >= count:
                         break
-                    
+
                     if len(events) < limit:
                         break
-                    
+
                     offset += limit
         except PolyApiException as exc:
             logger.error(f"get_active_markets_by_events: error fetching markets: {exc}")
             logger.error(traceback.format_exc())
             raise exc
-        
+
         markets = []
 
         for event in all_events:
             markets.extend(event["markets"])
 
-        logger.info(f"Finished fetching {len(all_events)} active events, found {len(markets)} markets")
+        logger.info(
+            f"Finished fetching {len(all_events)} active events, found {len(markets)} markets"
+        )
 
         return markets
 
@@ -171,19 +179,26 @@ class PolyClient:
             return order_book
         except PolyApiException as exc:
             if exc.status_code == 404:
-                logger.error(f"get_market_order_book: order book does not exist for token_id={token_id}")
+                logger.error(
+                    f"get_market_order_book: order book does not exist for token_id={token_id}"
+                )
                 return None
-            else:   
-                logger.error(f"get_market_order_book: error fetching order book for token_id={token_id}: {exc}")
+            else:
+                logger.error(
+                    f"get_market_order_book: error fetching order book for token_id={token_id}: {exc}"
+                )
                 logger.error(traceback.format_exc())
                 raise exc
 
-    '''
+    """
     Data API /trades: 75 requests / 10s	(Throttle requests over the maximum configured rate)
 
     Warning: 429 really fast
-    '''
-    async def get_market_trades(self, condition_ids: list[str], count: int | None = None) -> list[dict]:
+    """
+
+    async def get_market_trades(
+        self, condition_ids: list[str], count: int | None = None
+    ) -> list[dict]:
         limit = 500
         offset = 0
         all_trades = []
@@ -192,64 +207,67 @@ class PolyClient:
         async with httpx.AsyncClient() as client:
             while True:
                 params = {
-                    "market": ','.join(condition_ids), # comma separated list
+                    "market": ",".join(condition_ids),  # comma separated list
                     "limit": limit,
                     "offset": offset,
                 }
                 response = await client.get(f"{DATA_API_HOST}/trades", params=params)
                 trades = response.json()
-                
+
                 if not trades:
                     break
-                
+
                 all_trades.extend(trades)
                 total_trades += len(trades)
-        
+
                 if len(trades) < limit:
                     break
-                
+
                 offset += limit
-        
+
         return all_trades
 
-    '''
+    """
     No pagination. Artificial limit of 20 per YES/NO per market (so total 40 per market).
 
     `limit` range: 0-500
     `min_balance` range: 0-999999
-    '''
-    async def get_top_holders(self, condition_ids: list[string], min_balance: int = 1, limit: int = 500) -> list[dict]:
+    """
+
+    async def get_top_holders(
+        self, condition_ids: list[string], min_balance: int = 1, limit: int = 500
+    ) -> list[dict]:
         try:
             async with httpx.AsyncClient() as client:
                 params = {
                     "market": ",".join(condition_ids),
                     "limit": limit,
-                    "minBalance": min_balance
+                    "minBalance": min_balance,
                 }
                 response = await client.get(f"{DATA_API_HOST}/holders", params=params)
                 holders = response.json()
 
                 # this returns an array of both YES and NO, we need to aggregate them into one array
                 if len(holders) > 0:
-                    combined_holders: list[dict] = holders[0].get("holders", []) 
+                    combined_holders: list[dict] = holders[0].get("holders", [])
                     combined_holders.extend(holders[1].get("holders", []))
                     return combined_holders
-                
+
                 return []
-                
+
         except PolyApiException as exc:
             logger.error(f"get_active_markets: error fetching markets: {exc}")
             logger.error(traceback.format_exc())
             raise exc
-    
 
-    '''
+    """
     Goldsky GraphQL api.
 
     Token IDs are the CLob token IDs (YES and NO).
 
     Sorted by amount desc.
-    '''
+    """
+
     async def get_market_positions(self, token_ids: list[str], min_amount: int = 0) -> list[dict]:
         query = """
         query GetMarketHolders($first: Int!, $skip: Int!, $tokenIds: [BigInt!]!, $minAmount: BigInt!) {
@@ -278,14 +296,10 @@ class PolyClient:
             "first": 1000,
             "skip": 0,
             "tokenIds": token_ids,
-            "minAmount": to_usdc(min_amount) # for the smart contract
+            "minAmount": to_usdc(min_amount),  # for the smart contract
         }
 
-        payload = {
-            "query": query,
-            "variables": variables,
-            "operationName": "GetMarketHolders"
-        }
+        payload = {"query": query, "variables": variables, "operationName": "GetMarketHolders"}
 
         async with httpx.AsyncClient() as client:
             response = await client.post(GOLDSKY_API_HOST + GOLDSKY_API_PNL_SUBGRAPH, json=payload)
