@@ -42,7 +42,7 @@ export default function Home() {
         const res = await fetch(
           `${getBaseUrl()}/markets/autocomplete?q=${encodeURIComponent(
             q
-          )}&limit=8`,
+          )}&limit=15`,
           {
             signal: controller.signal,
             cache: "no-store",
