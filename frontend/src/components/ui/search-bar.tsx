@@ -1,10 +1,21 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Input } from "@/components/ui/input";
-import { Card } from "@/components/ui/card";
 import { Search } from "lucide-react";
 import { useMarketAutocompleteQuery } from "@/lib/queries/market-search.query";
+import { Input } from "@/components/ui/input";
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandItem,
+  CommandList,
+} from "@/components/ui/command";
+import {
+  Popover,
+  PopoverAnchor,
+  PopoverContent,
+} from "@/components/ui/popover";
 
 type SearchBarProps = {
   onSelectMarket: (slug: string) => void;
@@ -17,9 +28,9 @@ export function SearchBar({
   placeholder = "Search markets...",
   className = "",
 }: SearchBarProps) {
+  const [open, setOpen] = useState(false);
   const [input, setInput] = useState<string>("");
   const [debouncedInput, setDebouncedInput] = useState<string>("");
-  const [isOpen, setIsOpen] = useState(false);
 
   // Debounce input
   useEffect(() => {
@@ -35,67 +46,63 @@ export function SearchBar({
     debouncedInput.trim().length > 0
   );
 
-  // Open dropdown when we have suggestions
+  // Open dropdown when we have input
   useEffect(() => {
-    if (debouncedInput.trim() && suggestions.length > 0) {
-      setIsOpen(true);
-    } else {
-      setIsOpen(false);
-    }
-  }, [suggestions, debouncedInput]);
+    setOpen(input.trim().length > 0);
+  }, [input, suggestions]);
 
-  const handleSearch = (slug?: string) => {
-    const target = slug ?? input;
-    if (target) {
-      onSelectMarket(target);
-      setIsOpen(false);
-      setInput("");
-    }
+  const handleSelect = (slug: string) => {
+    onSelectMarket(slug);
+    setOpen(false);
+    setInput("");
   };
 
   return (
     <div className={`relative ${className}`}>
-      <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-      <Input
-        type="text"
-        value={input}
-        onChange={(e) => setInput(e.target.value)}
-        placeholder={placeholder}
-        className="pl-9"
-        onKeyDown={(e) => {
-          if (e.key === "Enter") handleSearch();
-        }}
-      />
-
-      {isOpen && suggestions.length > 0 && (
-        <Card className="absolute z-50 mt-2 w-full shadow-xl border-2 max-h-80 overflow-auto">
-          <ul className="divide-y">
-            {suggestions.map((s) => (
-              <li key={s.slug}>
-                <button
-                  className="w-full text-left p-3 hover:bg-accent transition-colors cursor-pointer"
-                  onClick={() => handleSearch(s.slug)}
-                >
-                  <div className="font-medium truncate text-sm">
-                    {s.question}
-                  </div>
-                  <div className="text-xs text-muted-foreground truncate">
-                    /{s.slug}
-                  </div>
-                </button>
-              </li>
-            ))}
-          </ul>
-        </Card>
-      )}
-
-      {!isLoading && input && debouncedInput && suggestions.length === 0 && (
-        <Card className="absolute z-50 mt-2 w-full shadow-lg">
-          <div className="p-3 text-center text-muted-foreground text-sm">
-            No results found
-          </div>
-        </Card>
-      )}
+      <Popover open={open} onOpenChange={setOpen}>
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none z-10" />
+        <PopoverAnchor asChild>
+          <Input
+            type="text"
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            placeholder={placeholder}
+            className="pl-9"
+          />
+        </PopoverAnchor>
+        <PopoverContent
+          className="w-(--radix-popover-trigger-width) p-0"
+          align="start"
+          onOpenAutoFocus={(e) => e.preventDefault()}
+        >
+          <Command shouldFilter={false}>
+            <CommandList>
+              {!isLoading && debouncedInput && suggestions.length === 0 && (
+                <CommandEmpty>No markets found.</CommandEmpty>
+              )}
+              {suggestions.length > 0 && (
+                <CommandGroup>
+                  {suggestions.map((s) => (
+                    <CommandItem
+                      key={s.slug}
+                      value={s.slug}
+                      onSelect={() => handleSelect(s.slug)}
+                      className="cursor-pointer"
+                    >
+                      <div className="flex flex-col gap-1 w-full">
+                        <div className="font-medium text-sm">{s.question}</div>
+                        <div className="text-xs text-muted-foreground">
+                          /{s.slug}
+                        </div>
+                      </div>
+                    </CommandItem>
+                  ))}
+                </CommandGroup>
+              )}
+            </CommandList>
+          </Command>
+        </PopoverContent>
+      </Popover>
     </div>
   );
 }
