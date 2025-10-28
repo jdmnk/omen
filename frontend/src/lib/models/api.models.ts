@@ -18,6 +18,15 @@ export type Market = {
   token2: string;
   outcomes: string; // comma separated list of outcomes
   outcomePrices: string; // comma separated list of outcome prices
+  liquidity: number;
+  volume: number;
+  volume24hr: number;
+  volume1wk: number;
+  volume1mo: number;
+  volume1yr: number;
+  negRisk: boolean;
+  bestBid: number;
+  bestAsk: number;
 };
 
 export type MarketResponse = {

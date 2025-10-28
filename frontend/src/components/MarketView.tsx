@@ -37,31 +37,9 @@ const getOutcomeStyle = (outcome: string) => {
 export async function MarketView({ data }: { data: MarketResponse }) {
   const { market, positions } = data;
 
-  // Calculate summary statistics
-  const totalShares = positions.reduce((sum, p) => {
-    const amount = typeof p.amount === "string" ? Number(p.amount) : p.amount;
-    return sum + (Number.isNaN(amount) ? 0 : amount);
-  }, 0);
-
-  const totalValue = positions.reduce((sum, p) => {
-    const amount = typeof p.amount === "string" ? Number(p.amount) : p.amount;
-    const price =
-      typeof p.avgPrice === "string" ? Number(p.avgPrice) : p.avgPrice;
-    return (
-      sum + (Number.isNaN(amount) || Number.isNaN(price) ? 0 : amount * price)
-    );
-  }, 0);
-
-  const avgPrice = totalShares > 0 ? totalValue / totalShares : 0;
-
   return (
     <>
-      <MarketInfoBar
-        market={market}
-        totalValue={positions.length > 0 ? totalValue : undefined}
-        totalShares={positions.length > 0 ? totalShares : undefined}
-        avgPrice={positions.length > 0 ? avgPrice : undefined}
-      />
+      <MarketInfoBar market={market} />
 
       <MainSharedContainer>
         <div className="grid grid-cols-1 md:grid-cols-[2fr_1fr] gap-4 h-[calc(100vh-9rem)]">
