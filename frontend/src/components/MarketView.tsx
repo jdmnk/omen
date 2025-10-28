@@ -9,10 +9,10 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { DollarSign, Package, TrendingDown } from "lucide-react";
-import { PriceChart } from "@/components/widgets/PriceChart";
 import { MarketResponse, Position } from "@/lib/models/api.models";
 import { formatNumber, formatCurrency } from "@/lib/ui/format.utils";
 import { PriceChartWidget } from "./widgets/PriceChartWidget";
+import { ExpandableText } from "@/components/ui/expandable-text";
 
 const getOutcomeStyle = (outcome?: string) => {
   const outcomeText = outcome?.toLowerCase() || "";
@@ -58,11 +58,9 @@ export async function MarketView({ data }: { data: MarketResponse }) {
     <div className="space-y-4">
       {/* Market Description (if exists) */}
       {market.description && (
-        <Card className="shadow-md">
-          <CardContent className="pt-4">
-            <p className="text-sm text-muted-foreground leading-relaxed">
-              {market.description}
-            </p>
+        <Card className="shadow-sm">
+          <CardContent className="pt-3 pb-3">
+            <ExpandableText text={market.description} maxLength={200} />
           </CardContent>
         </Card>
       )}
@@ -74,18 +72,6 @@ export async function MarketView({ data }: { data: MarketResponse }) {
         </CardHeader>
         <CardContent className="h-[calc(100%-4rem)] p-0 px-2">
           <PriceChartWidget market={market} />
-        </CardContent>
-      </Card>
-
-      {/* News Articles Module */}
-      <Card className="shadow-md h-[300px]">
-        <CardHeader className="pb-3">
-          <CardTitle className="text-base">Related News</CardTitle>
-        </CardHeader>
-        <CardContent className="h-[calc(100%-4rem)] overflow-y-auto">
-          <p className="text-sm text-muted-foreground">
-            News articles related to this market will appear here
-          </p>
         </CardContent>
       </Card>
 

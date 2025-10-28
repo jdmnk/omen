@@ -107,17 +107,6 @@ export function TerminalLayout({ children }: { children: ReactNode }) {
                 </p>
               </CardContent>
             </Card>
-
-            <Card className="shadow-md">
-              <CardHeader className="pb-3">
-                <CardTitle className="text-base">Market Info</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-sm text-muted-foreground">
-                  Additional market information
-                </p>
-              </CardContent>
-            </Card>
           </div>
         </div>
       </div>
