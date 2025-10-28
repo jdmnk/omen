@@ -9,6 +9,7 @@ import {
   ChartOptions,
   LineSeries,
 } from "lightweight-charts";
+import { Spinner } from "@/components/ui/spinner";
 
 type PriceChartProps = {
   data: ChartPoint[];
@@ -112,8 +113,11 @@ export function PriceChart({ data, error, isLoading }: PriceChartProps) {
   return (
     <div className="relative w-full h-full">
       {isLoading && (
-        <div className="absolute inset-0 flex items-center justify-center bg-background/50 backdrop-blur-sm z-10">
-          <p className="text-sm text-muted-foreground">Loading chart...</p>
+        <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-background/50 backdrop-blur-sm z-10">
+          <Spinner size="md" />
+          <p className="text-sm text-muted-foreground animate-pulse">
+            Loading chart...
+          </p>
         </div>
       )}
       <div ref={chartContainerRef} className="w-full h-full" />

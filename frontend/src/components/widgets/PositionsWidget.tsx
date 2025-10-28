@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/table";
 import { Position } from "@/lib/models/api.models";
 import { formatNumber, formatCurrency } from "@/lib/ui/format.utils";
+import { LoadingSpinner } from "@/components/ui/spinner";
 
 const getOutcomeStyle = (outcome: string) => {
   if (outcome === "yes") {
@@ -35,7 +36,13 @@ const getOutcomeStyle = (outcome: string) => {
 export function PositionsWidget({ clobTokenIds }: { clobTokenIds: string[] }) {
   const { data: positions, isLoading, error } = usePositionsQuery(clobTokenIds);
 
-  if (isLoading) return <div>Loading...</div>;
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center py-8">
+        <LoadingSpinner message="Loading positions..." size="md" />
+      </div>
+    );
+  }
   if (error) return <div>Error fetching positions</div>;
 
   return (

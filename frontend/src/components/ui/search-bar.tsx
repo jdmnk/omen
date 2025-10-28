@@ -16,6 +16,7 @@ import {
   PopoverAnchor,
   PopoverContent,
 } from "@/components/ui/popover";
+import { Spinner } from "@/components/ui/spinner";
 
 type SearchBarProps = {
   onSelectMarket: (slug: string) => void;
@@ -77,10 +78,15 @@ export function SearchBar({
         >
           <Command shouldFilter={false}>
             <CommandList>
+              {isLoading && debouncedInput && (
+                <div className="flex items-center justify-center py-6">
+                  <Spinner size="sm" />
+                </div>
+              )}
               {!isLoading && debouncedInput && suggestions.length === 0 && (
                 <CommandEmpty>No markets found.</CommandEmpty>
               )}
-              {suggestions.length > 0 && (
+              {!isLoading && suggestions.length > 0 && (
                 <CommandGroup>
                   {suggestions.map((s) => (
                     <CommandItem
