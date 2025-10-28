@@ -6,6 +6,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from py_clob_client.clob_types import OrderBookSummary
 
 from src.db.database_client import DatabaseClient
+from src.models.position import PositionSchema
 from src.polymarket.poly_client import PolyClient
 from src.utils.logging_config import get_logger
 
@@ -83,8 +84,8 @@ async def get_market_trades(condition_id: str = Query(min_length=1)) -> list[dic
         raise HTTPException(status_code=404, detail="Trades not found")
 
 
-@app.get("/markets/positions", response_model=list[dict])
-async def get_market_positions(clob_tokens: Annotated[list[str], Query()]) -> list[dict]:
+@app.get("/markets/positions", response_model=list[PositionSchema])
+async def get_market_positions(clob_tokens: Annotated[list[str], Query()]) -> list[PositionSchema]:
     positions = await poly_client.get_market_positions(clob_tokens, min_amount=100)
 
     if positions is not None and len(positions) > 0:

@@ -7,6 +7,7 @@ from py_clob_client.clob_types import OrderBookSummary
 from py_clob_client.constants import POLYGON
 from py_clob_client.exceptions import PolyApiException
 
+from src.models.position import PositionSchema, parse_position_from_api
 from src.settings import settings
 from src.utils.logging_config import get_logger
 from src.utils.usdc import to_usdc
@@ -259,7 +260,9 @@ class PolyClient:
             logger.error(traceback.format_exc())
             raise exc
 
-    async def get_market_positions(self, token_ids: list[str], min_amount: int = 0) -> list[dict]:
+    async def get_market_positions(
+        self, token_ids: list[str], min_amount: int = 0
+    ) -> list[PositionSchema]:
         """
         Goldsky GraphQL api.
 
@@ -303,4 +306,8 @@ class PolyClient:
         async with httpx.AsyncClient() as client:
             response = await client.post(GOLDSKY_API_HOST + GOLDSKY_API_PNL_SUBGRAPH, json=payload)
             data = response.json()
-            return data.get("data", {}).get("userPositions", [])
+            user_positions = data.get("data", {}).get("userPositions", [])
+            parsed_positions: list[PositionSchema] = [
+                parse_position_from_api(position) for position in user_positions
+            ]
+            return parsed_positions
