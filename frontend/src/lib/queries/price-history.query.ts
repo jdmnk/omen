@@ -19,7 +19,7 @@ export function usePriceHistoryQuery(
   fidelity: number = 60
 ) {
   const query = useQuery<PriceHistoryResponse>({
-    queryKey: ["price-history", clobTokenId, interval],
+    queryKey: ["price-history", clobTokenId, interval, fidelity],
     queryFn: async () => {
       const res = await fetch(
         `${POLYMARKET_CLOB_URL}/prices-history?market=${clobTokenId}&interval=${interval}&fidelity=${fidelity}`
