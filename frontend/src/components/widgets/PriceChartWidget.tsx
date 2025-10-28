@@ -1,6 +1,7 @@
 "use client";
 
-import { Market } from "@/lib/models/api.models";
+import { useState } from "react";
+import { Interval, Market } from "@/lib/models/api.models";
 import {
   PriceHistoryPoint,
   usePriceHistoryQuery,
@@ -15,9 +16,12 @@ const deduplicateTimeStamps = (data: PriceHistoryPoint[]) => {
 };
 
 export function PriceChartWidget({ market }: { market: Market }) {
-  const { data, isLoading, error } = usePriceHistoryQuery(market.token1, "1w");
+  const [interval, setInterval] = useState<Interval>("1w");
+  const { data, isLoading, error } = usePriceHistoryQuery(
+    market.token1,
+    interval
+  );
 
-  console.log("data", data);
   const deduplicatedChartData = deduplicateTimeStamps(data?.history || []);
   const chartData =
     deduplicatedChartData.map((item) => ({
@@ -25,5 +29,13 @@ export function PriceChartWidget({ market }: { market: Market }) {
       value: item.p,
     })) || [];
 
-  return <PriceChart data={chartData} isLoading={isLoading} error={error} />;
+  return (
+    <PriceChart
+      data={chartData}
+      interval={interval}
+      onIntervalChange={setInterval}
+      isLoading={isLoading}
+      error={error}
+    />
+  );
 }

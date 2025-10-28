@@ -1,3 +1,5 @@
+export type Interval = "1m" | "1w" | "1d" | "6h" | "1h" | "max";
+
 export type Position = {
   id: string;
   amount: number;

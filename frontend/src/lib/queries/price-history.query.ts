@@ -2,6 +2,7 @@
 
 import { useQuery } from "@tanstack/react-query";
 import { POLYMARKET_CLOB_URL } from "../api";
+import { Interval } from "../models/api.models";
 
 type PriceHistoryResponse = {
   history: PriceHistoryPoint[];
@@ -14,7 +15,7 @@ export type PriceHistoryPoint = {
 
 export function usePriceHistoryQuery(
   clobTokenId: string,
-  interval: "1m" | "1w" | "1d" | "6h" | "1h" | "max",
+  interval: Interval,
   fidelity: number = 60
 ) {
   const query = useQuery<PriceHistoryResponse>({
