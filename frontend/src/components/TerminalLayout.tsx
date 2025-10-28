@@ -29,38 +29,7 @@ export function TerminalLayout({ children }: { children: ReactNode }) {
       <MarketSearchBar onSelectMarket={handleSelectMarket} />
 
       {/* Trading Terminal Layout */}
-      <div className="container mx-auto p-4">
-        <div className="grid grid-cols-1 md:grid-cols-[2fr_1fr] gap-4 h-[calc(100vh-9rem)]">
-          {/* Left Column - Market Details (Children) */}
-          <div className="overflow-y-auto">{children}</div>
-
-          {/* Right Column - Modules */}
-          <div className="space-y-4 overflow-y-auto">
-            {/* Placeholder for additional modules */}
-            <Card className="shadow-md">
-              <CardHeader className="pb-3">
-                <CardTitle className="text-base">Watchlist</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-sm text-muted-foreground">
-                  Your saved markets will appear here
-                </p>
-              </CardContent>
-            </Card>
-
-            <Card className="shadow-md">
-              <CardHeader className="pb-3">
-                <CardTitle className="text-base">Recent Activity</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-sm text-muted-foreground">
-                  Recent trades and updates
-                </p>
-              </CardContent>
-            </Card>
-          </div>
-        </div>
-      </div>
+      <div className="container mx-auto p-4">{children}</div>
     </div>
   );
 }
