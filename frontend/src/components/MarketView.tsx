@@ -1,4 +1,3 @@
-import { getBaseUrl } from "@/lib/api";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -10,43 +9,10 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { DollarSign, Package, TrendingDown } from "lucide-react";
-
-type Position = {
-  id: string | number;
-  amount: number | string;
-  avgPrice: number | string;
-  outcome?: string;
-  side?: string;
-  createdAt?: string;
-};
-
-type Market = {
-  question: string;
-  description?: string;
-  icon?: string;
-};
-
-type MarketResponse = {
-  market: Market;
-  positions: Position[];
-};
-
-const formatNumber = (value: number | string, maximumFractionDigits = 2) => {
-  const n = typeof value === "string" ? Number(value) : value;
-  if (Number.isNaN(n)) return String(value);
-  return n.toLocaleString(undefined, { maximumFractionDigits });
-};
-
-const formatCurrency = (value: number | string) => {
-  const n = typeof value === "string" ? Number(value) : value;
-  if (Number.isNaN(n)) return "$0";
-  return new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency: "USD",
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0,
-  }).format(n);
-};
+import { PriceChart } from "@/components/PriceChart";
+import { MarketResponse, Position } from "@/lib/models/api.models";
+import { formatNumber, formatCurrency } from "@/lib/ui/format.utils";
+import { PriceChartWidget } from "./widgets/PriceChartWidget";
 
 const getOutcomeStyle = (outcome?: string) => {
   const outcomeText = outcome?.toLowerCase() || "";
@@ -68,26 +34,7 @@ const getOutcomeStyle = (outcome?: string) => {
   };
 };
 
-export async function MarketView({ slug }: { slug: string }) {
-  let data: MarketResponse | null = null;
-  try {
-    const response = await fetch(
-      `${getBaseUrl()}/markets/search-slug?slug=${slug}`,
-      { cache: "no-store" }
-    );
-    data = (await response.json()) as MarketResponse;
-  } catch (error) {
-    console.error(error);
-  }
-
-  if (!data?.market) {
-    return (
-      <div className="flex items-center justify-center h-full">
-        <div className="text-muted-foreground">Market not found</div>
-      </div>
-    );
-  }
-
+export async function MarketView({ data }: { data: MarketResponse }) {
   const { market, positions } = data;
 
   // Calculate summary statistics
@@ -121,14 +68,12 @@ export async function MarketView({ slug }: { slug: string }) {
       )}
 
       {/* Price Chart Module */}
-      <Card className="shadow-md h-[400px]">
+      <Card className="shadow-md">
         <CardHeader className="pb-3">
           <CardTitle className="text-base">Price Chart</CardTitle>
         </CardHeader>
-        <CardContent className="h-[calc(100%-4rem)] flex items-center justify-center">
-          <p className="text-sm text-muted-foreground">
-            Price chart will be displayed here
-          </p>
+        <CardContent className="h-[calc(100%-4rem)] p-0 px-2">
+          <PriceChartWidget market={market} />
         </CardContent>
       </Card>
 
