@@ -59,7 +59,7 @@ export function MarketInfoBar({ market }: MarketInfoBarProps) {
             <div className="flex items-center gap-2">
               <div>
                 <p className="text-xs text-muted-foreground">Best Bid</p>
-                <p className="text-sm font-semibold">
+                <p className="text-sm font-semibold text-green-500">
                   {formatNumber(market.bestBid, 4)}
                 </p>
               </div>
@@ -67,7 +67,7 @@ export function MarketInfoBar({ market }: MarketInfoBarProps) {
             <div className="flex items-center gap-2">
               <div>
                 <p className="text-xs text-muted-foreground">Best Ask</p>
-                <p className="text-sm font-semibold">
+                <p className="text-sm font-semibold text-red-500">
                   {formatNumber(market.bestAsk, 4)}
                 </p>
               </div>
