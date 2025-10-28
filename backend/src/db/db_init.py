@@ -34,28 +34,12 @@ async def create_all_tables() -> None:
 
         await conn.run_sync(Base.metadata.create_all)
 
-        # KNN trigram index on normalized question for ORDER BY <->
-
-        # Normalized (lower + collapsed whitespace) GiST trigram index for KNN on normalized text
+        # GiST trigram index on question for similarity search and ILIKE performance
         await conn.execute(
             text(
                 """
-                CREATE INDEX IF NOT EXISTS markets_question_norm_trgm_gist
-                ON markets USING GIST (
-                  regexp_replace(lower(question), '\\s+', ' ', 'g') gist_trgm_ops
-                )
-                """
-            )
-        )
-
-        # Btree prefix index on first 3 normalized chars to prune KNN candidate set for >=3 char queries
-        await conn.execute(
-            text(
-                """
-                CREATE INDEX IF NOT EXISTS markets_question_norm_prefix3
-                ON markets (
-                  left(regexp_replace(lower(question), '\\s+', ' ', 'g'), 3)
-                )
+                CREATE INDEX IF NOT EXISTS markets_question_trgm_gist
+                ON markets USING GIST (question gist_trgm_ops)
                 """
             )
         )
