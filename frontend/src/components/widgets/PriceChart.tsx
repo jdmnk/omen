@@ -29,9 +29,16 @@ const chartOptions: DeepPartial<ChartOptions> = {
   timeScale: {
     borderColor: "#374151",
     timeVisible: true,
+    rightBarStaysOnScroll: false,
+    fixLeftEdge: true,
+    fixRightEdge: true,
   },
   rightPriceScale: {
     borderColor: "#374151",
+    scaleMargins: {
+      top: 0.1,
+      bottom: 0.1,
+    },
   },
   handleScale: false,
   handleScroll: false,
@@ -58,8 +65,14 @@ export function PriceChart({ data, error, isLoading }: PriceChartProps) {
 
     chartRef.current = chart;
 
-    // Create line series
-    const lineSeries = chart.addSeries(LineSeries);
+    // Create line series with precision settings
+    const lineSeries = chart.addSeries(LineSeries, {
+      priceFormat: {
+        type: "price",
+        precision: 2,
+        minMove: 0.01,
+      },
+    });
     seriesRef.current = lineSeries;
 
     // Handle resize
@@ -81,8 +94,10 @@ export function PriceChart({ data, error, isLoading }: PriceChartProps) {
   }, []);
 
   useEffect(() => {
-    if (data && data.length > 0 && seriesRef.current) {
+    if (data && data.length > 0 && seriesRef.current && chartRef.current) {
       seriesRef.current.setData(data as any);
+      // Fit content to ensure data spans the full width
+      chartRef.current.timeScale().fitContent();
     }
   }, [data]);
 

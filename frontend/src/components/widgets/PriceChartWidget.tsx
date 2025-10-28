@@ -47,7 +47,7 @@ export function PriceChartWidget({ market }: { market: Market }) {
   const chartData =
     deduplicatedChartData.map((item) => ({
       time: item.t,
-      value: item.p,
+      value: item.p * 100,
     })) || [];
 
   return (
