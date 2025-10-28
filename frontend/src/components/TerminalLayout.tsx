@@ -2,8 +2,8 @@
 
 import { useState, ReactNode } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { MarketSearch } from "@/components/MarketSearch";
-import { LayoutGrid, BarChart3 } from "lucide-react";
+import { MarketSearchBar } from "@/components/MarketSearchBar";
+import { LayoutGrid } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 export function TerminalLayout({ children }: { children: ReactNode }) {
@@ -13,13 +13,13 @@ export function TerminalLayout({ children }: { children: ReactNode }) {
   const getGridCols = () => {
     switch (layoutRatio) {
       case "1:3":
-        return "md:grid-cols-[1fr_3fr]";
+        return "md:grid-cols-[3fr_1fr]";
       case "2:3":
-        return "md:grid-cols-[2fr_3fr]";
+        return "md:grid-cols-[3fr_2fr]";
       case "1:2":
-        return "md:grid-cols-[1fr_2fr]";
+        return "md:grid-cols-[2fr_1fr]";
       default:
-        return "md:grid-cols-[1fr_3fr]";
+        return "md:grid-cols-[3fr_1fr]";
     }
   };
 
@@ -46,7 +46,7 @@ export function TerminalLayout({ children }: { children: ReactNode }) {
                   : "bg-muted hover:bg-muted/80"
               }`}
             >
-              1:3
+              3:1
             </button>
             <button
               onClick={() => setLayoutRatio("2:3")}
@@ -56,7 +56,7 @@ export function TerminalLayout({ children }: { children: ReactNode }) {
                   : "bg-muted hover:bg-muted/80"
               }`}
             >
-              2:3
+              3:2
             </button>
             <button
               onClick={() => setLayoutRatio("1:2")}
@@ -66,32 +66,25 @@ export function TerminalLayout({ children }: { children: ReactNode }) {
                   : "bg-muted hover:bg-muted/80"
               }`}
             >
-              1:2
+              2:1
             </button>
           </div>
         </div>
       </header>
 
+      {/* Market Search Bar */}
+      <MarketSearchBar onSelectMarket={handleSelectMarket} />
+
       {/* Trading Terminal Layout */}
       <div className="container mx-auto p-4">
         <div
-          className={`grid grid-cols-1 ${getGridCols()} gap-4 h-[calc(100vh-5rem)]`}
+          className={`grid grid-cols-1 ${getGridCols()} gap-4 h-[calc(100vh-9rem)]`}
         >
-          {/* Left Column - Search & Modules */}
-          <div className="space-y-4 overflow-y-auto">
-            {/* Search Module */}
-            <Card className="shadow-md">
-              <CardHeader className="pb-3">
-                <CardTitle className="text-base flex items-center gap-2">
-                  <BarChart3 className="h-4 w-4" />
-                  Market Search
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <MarketSearch onSelectMarket={handleSelectMarket} />
-              </CardContent>
-            </Card>
+          {/* Left Column - Market Details (Children) */}
+          <div className="overflow-y-auto">{children}</div>
 
+          {/* Right Column - Modules */}
+          <div className="space-y-4 overflow-y-auto">
             {/* Placeholder for additional modules */}
             <Card className="shadow-md">
               <CardHeader className="pb-3">
@@ -114,10 +107,18 @@ export function TerminalLayout({ children }: { children: ReactNode }) {
                 </p>
               </CardContent>
             </Card>
-          </div>
 
-          {/* Right Column - Market Details (Children) */}
-          <div className="overflow-y-auto">{children}</div>
+            <Card className="shadow-md">
+              <CardHeader className="pb-3">
+                <CardTitle className="text-base">Market Info</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-muted-foreground">
+                  Additional market information
+                </p>
+              </CardContent>
+            </Card>
+          </div>
         </div>
       </div>
     </div>

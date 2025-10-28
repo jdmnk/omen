@@ -1,12 +1,5 @@
 import { getBaseUrl } from "@/lib/api";
-import Image from "next/image";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import {
   Table,
@@ -16,7 +9,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { TrendingUp, DollarSign, Package, TrendingDown } from "lucide-react";
+import { DollarSign, Package, TrendingDown } from "lucide-react";
 
 type Position = {
   id: string | number;
@@ -36,6 +29,43 @@ type Market = {
 type MarketResponse = {
   market: Market;
   positions: Position[];
+};
+
+const formatNumber = (value: number | string, maximumFractionDigits = 2) => {
+  const n = typeof value === "string" ? Number(value) : value;
+  if (Number.isNaN(n)) return String(value);
+  return n.toLocaleString(undefined, { maximumFractionDigits });
+};
+
+const formatCurrency = (value: number | string) => {
+  const n = typeof value === "string" ? Number(value) : value;
+  if (Number.isNaN(n)) return "$0";
+  return new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "USD",
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
+  }).format(n);
+};
+
+const getOutcomeStyle = (outcome?: string) => {
+  const outcomeText = outcome?.toLowerCase() || "";
+  if (outcomeText.includes("yes")) {
+    return {
+      badge: "bg-emerald-500/10 text-emerald-500 border-emerald-500/20",
+      row: "bg-emerald-500/5 hover:bg-emerald-500/10",
+    };
+  }
+  if (outcomeText.includes("no")) {
+    return {
+      badge: "bg-rose-500/10 text-rose-500 border-rose-500/20",
+      row: "bg-rose-500/5 hover:bg-rose-500/10",
+    };
+  }
+  return {
+    badge: "bg-blue-500/10 text-blue-500 border-blue-500/20",
+    row: "hover:bg-muted/50",
+  };
 };
 
 export async function MarketView({ slug }: { slug: string }) {
@@ -60,43 +90,6 @@ export async function MarketView({ slug }: { slug: string }) {
 
   const { market, positions } = data;
 
-  const formatNumber = (value: number | string, maximumFractionDigits = 2) => {
-    const n = typeof value === "string" ? Number(value) : value;
-    if (Number.isNaN(n)) return String(value);
-    return n.toLocaleString(undefined, { maximumFractionDigits });
-  };
-
-  const formatCurrency = (value: number | string) => {
-    const n = typeof value === "string" ? Number(value) : value;
-    if (Number.isNaN(n)) return "$0";
-    return new Intl.NumberFormat("en-US", {
-      style: "currency",
-      currency: "USD",
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0,
-    }).format(n);
-  };
-
-  const getOutcomeStyle = (outcome?: string) => {
-    const outcomeText = outcome?.toLowerCase() || "";
-    if (outcomeText.includes("yes")) {
-      return {
-        badge: "bg-emerald-500/10 text-emerald-500 border-emerald-500/20",
-        row: "bg-emerald-500/5 hover:bg-emerald-500/10",
-      };
-    }
-    if (outcomeText.includes("no")) {
-      return {
-        badge: "bg-rose-500/10 text-rose-500 border-rose-500/20",
-        row: "bg-rose-500/5 hover:bg-rose-500/10",
-      };
-    }
-    return {
-      badge: "bg-blue-500/10 text-blue-500 border-blue-500/20",
-      row: "hover:bg-muted/50",
-    };
-  };
-
   // Calculate summary statistics
   const totalShares = positions.reduce((sum, p) => {
     const amount = typeof p.amount === "string" ? Number(p.amount) : p.amount;
@@ -116,38 +109,39 @@ export async function MarketView({ slug }: { slug: string }) {
 
   return (
     <div className="space-y-4">
-      {/* Market Header */}
-      <Card className="shadow-md">
-        <CardHeader className="pb-4">
-          <div className="flex gap-4">
-            {market.icon ? (
-              <div className="w-16 h-16 relative shrink-0">
-                <Image
-                  src={market.icon}
-                  alt={market.question}
-                  width={64}
-                  height={64}
-                  className="rounded-lg border shadow-sm object-contain w-full h-full"
-                />
-              </div>
-            ) : (
-              <div className="size-16 rounded-lg border bg-muted/30 flex items-center justify-center shrink-0">
-                <TrendingUp className="h-8 w-8 text-muted-foreground/50" />
-              </div>
-            )}
+      {/* Market Description (if exists) */}
+      {market.description && (
+        <Card className="shadow-md">
+          <CardContent className="pt-4">
+            <p className="text-sm text-muted-foreground leading-relaxed">
+              {market.description}
+            </p>
+          </CardContent>
+        </Card>
+      )}
 
-            <div className="flex-1 min-w-0">
-              <CardTitle className="text-lg md:text-xl leading-tight">
-                {market.question}
-              </CardTitle>
-              {market.description && (
-                <CardDescription className="text-sm mt-2 leading-relaxed">
-                  {market.description}
-                </CardDescription>
-              )}
-            </div>
-          </div>
+      {/* Price Chart Module */}
+      <Card className="shadow-md h-[400px]">
+        <CardHeader className="pb-3">
+          <CardTitle className="text-base">Price Chart</CardTitle>
         </CardHeader>
+        <CardContent className="h-[calc(100%-4rem)] flex items-center justify-center">
+          <p className="text-sm text-muted-foreground">
+            Price chart will be displayed here
+          </p>
+        </CardContent>
+      </Card>
+
+      {/* News Articles Module */}
+      <Card className="shadow-md h-[300px]">
+        <CardHeader className="pb-3">
+          <CardTitle className="text-base">Related News</CardTitle>
+        </CardHeader>
+        <CardContent className="h-[calc(100%-4rem)] overflow-y-auto">
+          <p className="text-sm text-muted-foreground">
+            News articles related to this market will appear here
+          </p>
+        </CardContent>
       </Card>
 
       {positions && positions.length > 0 && (
