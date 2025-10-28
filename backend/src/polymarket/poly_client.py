@@ -50,13 +50,13 @@ BLACKLISTED_MARKET_TAGS = [
     },
 ]
 
-"""
-General rate limiting: 5000req / 10s
-Data API (General)	200 requests / 10s	(Throttle requests over the maximum configured rate)
-"""
-
 
 class PolyClient:
+    """
+    General rate limiting: 5000req / 10s
+    Data API (General)	200 requests / 10s	(Throttle requests over the maximum configured rate)
+    """
+
     def __init__(self):
         self.clob_client = self.get_clob_client()
 
@@ -190,15 +190,15 @@ class PolyClient:
                 logger.error(traceback.format_exc())
                 raise exc
 
-    """
-    Data API /trades: 75 requests / 10s	(Throttle requests over the maximum configured rate)
-
-    Warning: 429 really fast
-    """
-
     async def get_market_trades(
         self, condition_ids: list[str], count: int | None = None
     ) -> list[dict]:
+        """
+        Data API /trades: 75 requests / 10s	(Throttle requests over the maximum configured rate)
+
+        Warning: 429 really fast
+        """
+
         limit = 500
         offset = 0
         all_trades = []
@@ -227,16 +227,15 @@ class PolyClient:
 
         return all_trades
 
-    """
-    No pagination. Artificial limit of 20 per YES/NO per market (so total 40 per market).
-
-    `limit` range: 0-500
-    `min_balance` range: 0-999999
-    """
-
     async def get_top_holders(
         self, condition_ids: list[string], min_balance: int = 1, limit: int = 500
     ) -> list[dict]:
+        """
+        No pagination. Artificial limit of 20 per YES/NO per market (so total 40 per market).
+
+        `limit` range: 0-500
+        `min_balance` range: 0-999999
+        """
         try:
             async with httpx.AsyncClient() as client:
                 params = {
@@ -260,15 +259,15 @@ class PolyClient:
             logger.error(traceback.format_exc())
             raise exc
 
-    """
-    Goldsky GraphQL api.
-
-    Token IDs are the CLob token IDs (YES and NO).
-
-    Sorted by amount desc.
-    """
-
     async def get_market_positions(self, token_ids: list[str], min_amount: int = 0) -> list[dict]:
+        """
+        Goldsky GraphQL api.
+
+        Token IDs are the CLob token IDs (YES and NO).
+
+        Sorted by amount desc.
+        """
+
         query = """
         query GetMarketHolders($first: Int!, $skip: Int!, $tokenIds: [BigInt!]!, $minAmount: BigInt!) {
             userPositions(
