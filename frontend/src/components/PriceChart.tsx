@@ -34,6 +34,8 @@ const chartOptions: DeepPartial<ChartOptions> = {
   rightPriceScale: {
     borderColor: "#374151",
   },
+  handleScale: false,
+  handleScroll: false,
 };
 
 type ChartPoint = {
