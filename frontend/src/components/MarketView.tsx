@@ -8,7 +8,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { DollarSign, Package, TrendingDown } from "lucide-react";
 import { MarketResponse, Position } from "@/lib/models/api.models";
 import { formatNumber, formatCurrency } from "@/lib/ui/format.utils";
 import { PriceChartWidget } from "./widgets/PriceChartWidget";
@@ -16,15 +15,14 @@ import { ExpandableText } from "@/components/ui/expandable-text";
 import { MarketInfoBar } from "@/components/MarketInfoBar";
 import { MainSharedContainer } from "./layouts/MainSharedContainer";
 
-const getOutcomeStyle = (outcome?: string) => {
-  const outcomeText = outcome?.toLowerCase() || "";
-  if (outcomeText.includes("yes")) {
+const getOutcomeStyle = (outcome: string) => {
+  if (outcome === "yes") {
     return {
       badge: "bg-emerald-500/10 text-emerald-500 border-emerald-500/20",
       row: "bg-emerald-500/5 hover:bg-emerald-500/10",
     };
   }
-  if (outcomeText.includes("no")) {
+  if (outcome === "no") {
     return {
       badge: "bg-rose-500/10 text-rose-500 border-rose-500/20",
       row: "bg-rose-500/5 hover:bg-rose-500/10",
@@ -103,14 +101,14 @@ export async function MarketView({ data }: { data: MarketResponse }) {
                               Avg Price
                             </TableHead>
                             <TableHead className="text-right">Value</TableHead>
-                            <TableHead className="text-right">Date</TableHead>
                           </TableRow>
                         </TableHeader>
                         <TableBody>
                           {positions.map((position: Position) => {
-                            const style = getOutcomeStyle(
-                              position.outcome || position.side
-                            );
+                            const positionOutcome =
+                              position.tokenId === market.token1 ? "yes" : "no";
+
+                            const style = getOutcomeStyle(positionOutcome);
                             const posAmount =
                               typeof position.amount === "string"
                                 ? Number(position.amount)
@@ -125,9 +123,7 @@ export async function MarketView({ data }: { data: MarketResponse }) {
                               <TableRow key={position.id} className={style.row}>
                                 <TableCell>
                                   <Badge className={style.badge}>
-                                    {position.outcome ||
-                                      position.side ||
-                                      "Position"}
+                                    {positionOutcome}
                                   </Badge>
                                 </TableCell>
                                 <TableCell className="text-right font-semibold">
@@ -138,17 +134,6 @@ export async function MarketView({ data }: { data: MarketResponse }) {
                                 </TableCell>
                                 <TableCell className="text-right font-semibold">
                                   {formatCurrency(posValue)}
-                                </TableCell>
-                                <TableCell className="text-right text-sm text-muted-foreground">
-                                  {position.createdAt
-                                    ? new Date(
-                                        position.createdAt
-                                      ).toLocaleDateString("en-US", {
-                                        month: "short",
-                                        day: "numeric",
-                                        year: "numeric",
-                                      })
-                                    : "-"}
                                 </TableCell>
                               </TableRow>
                             );
