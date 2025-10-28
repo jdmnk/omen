@@ -31,11 +31,13 @@ export function ExpandableText({
           >
             {isExpanded ? (
               <>
-                Show less <ChevronUp className="ml-0.5 h-3 w-3" />
+                Show less
+                {/* <ChevronUp className="ml-0.5 h-3 w-3" /> */}
               </>
             ) : (
               <>
-                Read more <ChevronDown className="ml-0.5 h-3 w-3" />
+                Read more
+                {/* <ChevronDown className="ml-0.5 h-3 w-3" /> */}
               </>
             )}
           </span>

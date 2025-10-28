@@ -70,15 +70,6 @@ export async function MarketView({ data }: { data: MarketResponse }) {
           {/* Left Column - Market Details (Children) */}
           <div className="overflow-y-auto">
             <div className="space-y-4">
-              {/* Market Description (if exists) */}
-              {market.description && (
-                <Card className="shadow-sm">
-                  <CardContent className="pt-3 pb-3">
-                    <ExpandableText text={market.description} maxLength={200} />
-                  </CardContent>
-                </Card>
-              )}
-
               {/* Price Chart Module */}
               <Card className="shadow-md">
                 <CardHeader className="pb-3">
@@ -91,63 +82,6 @@ export async function MarketView({ data }: { data: MarketResponse }) {
 
               {positions && positions.length > 0 && (
                 <>
-                  {/* Summary Stats */}
-                  <div className="grid grid-cols-3 gap-3">
-                    <Card className="shadow-sm">
-                      <CardContent className="pt-4 pb-4">
-                        <div className="flex items-center gap-2">
-                          <div className="p-2 bg-primary/10 rounded-lg">
-                            <DollarSign className="h-4 w-4 text-primary" />
-                          </div>
-                          <div className="min-w-0">
-                            <p className="text-xs text-muted-foreground">
-                              Total Value
-                            </p>
-                            <p className="text-lg font-bold truncate">
-                              {formatCurrency(totalValue)}
-                            </p>
-                          </div>
-                        </div>
-                      </CardContent>
-                    </Card>
-
-                    <Card className="shadow-sm">
-                      <CardContent className="pt-4 pb-4">
-                        <div className="flex items-center gap-2">
-                          <div className="p-2 bg-blue-500/10 rounded-lg">
-                            <Package className="h-4 w-4 text-blue-500" />
-                          </div>
-                          <div className="min-w-0">
-                            <p className="text-xs text-muted-foreground">
-                              Shares
-                            </p>
-                            <p className="text-lg font-bold truncate">
-                              {formatNumber(totalShares)}
-                            </p>
-                          </div>
-                        </div>
-                      </CardContent>
-                    </Card>
-
-                    <Card className="shadow-sm">
-                      <CardContent className="pt-4 pb-4">
-                        <div className="flex items-center gap-2">
-                          <div className="p-2 bg-amber-500/10 rounded-lg">
-                            <TrendingDown className="h-4 w-4 text-amber-500" />
-                          </div>
-                          <div className="min-w-0">
-                            <p className="text-xs text-muted-foreground">
-                              Avg Price
-                            </p>
-                            <p className="text-lg font-bold truncate">
-                              {formatNumber(avgPrice, 4)}
-                            </p>
-                          </div>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  </div>
-
                   {/* Positions Table */}
                   <Card className="shadow-md">
                     <CardHeader className="pb-3">
@@ -230,6 +164,17 @@ export async function MarketView({ data }: { data: MarketResponse }) {
 
           {/* Right Column - Modules */}
           <div className="space-y-4 overflow-y-auto">
+            {market.description && (
+              <Card>
+                {/* <CardHeader className="pb-3">
+                  <CardTitle className="text-base">Description</CardTitle>
+                </CardHeader> */}
+                <CardContent className="pt-3 pb-3">
+                  <ExpandableText text={market.description} maxLength={150} />
+                </CardContent>
+              </Card>
+            )}
+
             {/* Placeholder for additional modules */}
             <Card className="shadow-md">
               <CardHeader className="pb-3">
