@@ -13,6 +13,8 @@ import { MarketResponse, Position } from "@/lib/models/api.models";
 import { formatNumber, formatCurrency } from "@/lib/ui/format.utils";
 import { PriceChartWidget } from "./widgets/PriceChartWidget";
 import { ExpandableText } from "@/components/ui/expandable-text";
+import { MarketInfoBar } from "@/components/MarketInfoBar";
+import { MainSharedContainer } from "./layouts/MainSharedContainer";
 
 const getOutcomeStyle = (outcome?: string) => {
   const outcomeText = outcome?.toLowerCase() || "";
@@ -55,189 +57,204 @@ export async function MarketView({ data }: { data: MarketResponse }) {
   const avgPrice = totalShares > 0 ? totalValue / totalShares : 0;
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-[2fr_1fr] gap-4 h-[calc(100vh-9rem)]">
-      {/* Left Column - Market Details (Children) */}
-      <div className="overflow-y-auto">
-        <div className="space-y-4">
-          {/* Market Description (if exists) */}
-          {market.description && (
-            <Card className="shadow-sm">
-              <CardContent className="pt-3 pb-3">
-                <ExpandableText text={market.description} maxLength={200} />
-              </CardContent>
-            </Card>
-          )}
+    <>
+      <MarketInfoBar
+        market={market}
+        totalValue={positions.length > 0 ? totalValue : undefined}
+        totalShares={positions.length > 0 ? totalShares : undefined}
+        avgPrice={positions.length > 0 ? avgPrice : undefined}
+      />
 
-          {/* Price Chart Module */}
-          <Card className="shadow-md">
-            <CardHeader className="pb-3">
-              <CardTitle className="text-base">Price Chart</CardTitle>
-            </CardHeader>
-            <CardContent className="h-[calc(100%-4rem)] p-0 px-2">
-              <PriceChartWidget market={market} />
-            </CardContent>
-          </Card>
-
-          {positions && positions.length > 0 && (
-            <>
-              {/* Summary Stats */}
-              <div className="grid grid-cols-3 gap-3">
+      <MainSharedContainer>
+        <div className="grid grid-cols-1 md:grid-cols-[2fr_1fr] gap-4 h-[calc(100vh-9rem)]">
+          {/* Left Column - Market Details (Children) */}
+          <div className="overflow-y-auto">
+            <div className="space-y-4">
+              {/* Market Description (if exists) */}
+              {market.description && (
                 <Card className="shadow-sm">
-                  <CardContent className="pt-4 pb-4">
-                    <div className="flex items-center gap-2">
-                      <div className="p-2 bg-primary/10 rounded-lg">
-                        <DollarSign className="h-4 w-4 text-primary" />
-                      </div>
-                      <div className="min-w-0">
-                        <p className="text-xs text-muted-foreground">
-                          Total Value
-                        </p>
-                        <p className="text-lg font-bold truncate">
-                          {formatCurrency(totalValue)}
-                        </p>
-                      </div>
-                    </div>
+                  <CardContent className="pt-3 pb-3">
+                    <ExpandableText text={market.description} maxLength={200} />
                   </CardContent>
                 </Card>
+              )}
 
-                <Card className="shadow-sm">
-                  <CardContent className="pt-4 pb-4">
-                    <div className="flex items-center gap-2">
-                      <div className="p-2 bg-blue-500/10 rounded-lg">
-                        <Package className="h-4 w-4 text-blue-500" />
-                      </div>
-                      <div className="min-w-0">
-                        <p className="text-xs text-muted-foreground">Shares</p>
-                        <p className="text-lg font-bold truncate">
-                          {formatNumber(totalShares)}
-                        </p>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-
-                <Card className="shadow-sm">
-                  <CardContent className="pt-4 pb-4">
-                    <div className="flex items-center gap-2">
-                      <div className="p-2 bg-amber-500/10 rounded-lg">
-                        <TrendingDown className="h-4 w-4 text-amber-500" />
-                      </div>
-                      <div className="min-w-0">
-                        <p className="text-xs text-muted-foreground">
-                          Avg Price
-                        </p>
-                        <p className="text-lg font-bold truncate">
-                          {formatNumber(avgPrice, 4)}
-                        </p>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              </div>
-
-              {/* Positions Table */}
+              {/* Price Chart Module */}
               <Card className="shadow-md">
                 <CardHeader className="pb-3">
-                  <div className="flex items-center justify-between">
-                    <CardTitle className="text-base">Positions</CardTitle>
-                    <Badge variant="secondary" className="text-xs">
-                      {positions.length}{" "}
-                      {positions.length === 1 ? "position" : "positions"}
-                    </Badge>
-                  </div>
+                  <CardTitle className="text-base">Price Chart</CardTitle>
                 </CardHeader>
-                <CardContent className="pt-0">
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>Outcome</TableHead>
-                        <TableHead className="text-right">Shares</TableHead>
-                        <TableHead className="text-right">Avg Price</TableHead>
-                        <TableHead className="text-right">Value</TableHead>
-                        <TableHead className="text-right">Date</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {positions.map((position: Position) => {
-                        const style = getOutcomeStyle(
-                          position.outcome || position.side
-                        );
-                        const posAmount =
-                          typeof position.amount === "string"
-                            ? Number(position.amount)
-                            : position.amount;
-                        const posPrice =
-                          typeof position.avgPrice === "string"
-                            ? Number(position.avgPrice)
-                            : position.avgPrice;
-                        const posValue = posAmount * posPrice;
-
-                        return (
-                          <TableRow key={position.id} className={style.row}>
-                            <TableCell>
-                              <Badge className={style.badge}>
-                                {position.outcome ||
-                                  position.side ||
-                                  "Position"}
-                              </Badge>
-                            </TableCell>
-                            <TableCell className="text-right font-semibold">
-                              {formatNumber(position.amount)}
-                            </TableCell>
-                            <TableCell className="text-right font-mono text-sm">
-                              ${formatNumber(position.avgPrice, 4)}
-                            </TableCell>
-                            <TableCell className="text-right font-semibold">
-                              {formatCurrency(posValue)}
-                            </TableCell>
-                            <TableCell className="text-right text-sm text-muted-foreground">
-                              {position.createdAt
-                                ? new Date(
-                                    position.createdAt
-                                  ).toLocaleDateString("en-US", {
-                                    month: "short",
-                                    day: "numeric",
-                                    year: "numeric",
-                                  })
-                                : "-"}
-                            </TableCell>
-                          </TableRow>
-                        );
-                      })}
-                    </TableBody>
-                  </Table>
+                <CardContent className="h-[calc(100%-4rem)] p-0 px-2">
+                  <PriceChartWidget market={market} />
                 </CardContent>
               </Card>
-            </>
-          )}
+
+              {positions && positions.length > 0 && (
+                <>
+                  {/* Summary Stats */}
+                  <div className="grid grid-cols-3 gap-3">
+                    <Card className="shadow-sm">
+                      <CardContent className="pt-4 pb-4">
+                        <div className="flex items-center gap-2">
+                          <div className="p-2 bg-primary/10 rounded-lg">
+                            <DollarSign className="h-4 w-4 text-primary" />
+                          </div>
+                          <div className="min-w-0">
+                            <p className="text-xs text-muted-foreground">
+                              Total Value
+                            </p>
+                            <p className="text-lg font-bold truncate">
+                              {formatCurrency(totalValue)}
+                            </p>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+
+                    <Card className="shadow-sm">
+                      <CardContent className="pt-4 pb-4">
+                        <div className="flex items-center gap-2">
+                          <div className="p-2 bg-blue-500/10 rounded-lg">
+                            <Package className="h-4 w-4 text-blue-500" />
+                          </div>
+                          <div className="min-w-0">
+                            <p className="text-xs text-muted-foreground">
+                              Shares
+                            </p>
+                            <p className="text-lg font-bold truncate">
+                              {formatNumber(totalShares)}
+                            </p>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+
+                    <Card className="shadow-sm">
+                      <CardContent className="pt-4 pb-4">
+                        <div className="flex items-center gap-2">
+                          <div className="p-2 bg-amber-500/10 rounded-lg">
+                            <TrendingDown className="h-4 w-4 text-amber-500" />
+                          </div>
+                          <div className="min-w-0">
+                            <p className="text-xs text-muted-foreground">
+                              Avg Price
+                            </p>
+                            <p className="text-lg font-bold truncate">
+                              {formatNumber(avgPrice, 4)}
+                            </p>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </div>
+
+                  {/* Positions Table */}
+                  <Card className="shadow-md">
+                    <CardHeader className="pb-3">
+                      <div className="flex items-center justify-between">
+                        <CardTitle className="text-base">Positions</CardTitle>
+                        <Badge variant="secondary" className="text-xs">
+                          {positions.length}{" "}
+                          {positions.length === 1 ? "position" : "positions"}
+                        </Badge>
+                      </div>
+                    </CardHeader>
+                    <CardContent className="pt-0">
+                      <Table>
+                        <TableHeader>
+                          <TableRow>
+                            <TableHead>Outcome</TableHead>
+                            <TableHead className="text-right">Shares</TableHead>
+                            <TableHead className="text-right">
+                              Avg Price
+                            </TableHead>
+                            <TableHead className="text-right">Value</TableHead>
+                            <TableHead className="text-right">Date</TableHead>
+                          </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                          {positions.map((position: Position) => {
+                            const style = getOutcomeStyle(
+                              position.outcome || position.side
+                            );
+                            const posAmount =
+                              typeof position.amount === "string"
+                                ? Number(position.amount)
+                                : position.amount;
+                            const posPrice =
+                              typeof position.avgPrice === "string"
+                                ? Number(position.avgPrice)
+                                : position.avgPrice;
+                            const posValue = posAmount * posPrice;
+
+                            return (
+                              <TableRow key={position.id} className={style.row}>
+                                <TableCell>
+                                  <Badge className={style.badge}>
+                                    {position.outcome ||
+                                      position.side ||
+                                      "Position"}
+                                  </Badge>
+                                </TableCell>
+                                <TableCell className="text-right font-semibold">
+                                  {formatNumber(position.amount)}
+                                </TableCell>
+                                <TableCell className="text-right font-mono text-sm">
+                                  ${formatNumber(position.avgPrice, 4)}
+                                </TableCell>
+                                <TableCell className="text-right font-semibold">
+                                  {formatCurrency(posValue)}
+                                </TableCell>
+                                <TableCell className="text-right text-sm text-muted-foreground">
+                                  {position.createdAt
+                                    ? new Date(
+                                        position.createdAt
+                                      ).toLocaleDateString("en-US", {
+                                        month: "short",
+                                        day: "numeric",
+                                        year: "numeric",
+                                      })
+                                    : "-"}
+                                </TableCell>
+                              </TableRow>
+                            );
+                          })}
+                        </TableBody>
+                      </Table>
+                    </CardContent>
+                  </Card>
+                </>
+              )}
+            </div>
+          </div>
+
+          {/* Right Column - Modules */}
+          <div className="space-y-4 overflow-y-auto">
+            {/* Placeholder for additional modules */}
+            <Card className="shadow-md">
+              <CardHeader className="pb-3">
+                <CardTitle className="text-base">Watchlist</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-muted-foreground">
+                  Your saved markets will appear here
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card className="shadow-md">
+              <CardHeader className="pb-3">
+                <CardTitle className="text-base">Recent Activity</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-muted-foreground">
+                  Recent trades and updates
+                </p>
+              </CardContent>
+            </Card>
+          </div>
         </div>
-      </div>
-
-      {/* Right Column - Modules */}
-      <div className="space-y-4 overflow-y-auto">
-        {/* Placeholder for additional modules */}
-        <Card className="shadow-md">
-          <CardHeader className="pb-3">
-            <CardTitle className="text-base">Watchlist</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-sm text-muted-foreground">
-              Your saved markets will appear here
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card className="shadow-md">
-          <CardHeader className="pb-3">
-            <CardTitle className="text-base">Recent Activity</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-sm text-muted-foreground">
-              Recent trades and updates
-            </p>
-          </CardContent>
-        </Card>
-      </div>
-    </div>
+      </MainSharedContainer>
+    </>
   );
 }
