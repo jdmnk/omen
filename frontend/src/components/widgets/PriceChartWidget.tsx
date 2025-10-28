@@ -5,7 +5,7 @@ import {
   PriceHistoryPoint,
   usePriceHistoryQuery,
 } from "@/lib/queries/price-history.query";
-import { PriceChart } from "../PriceChart";
+import { PriceChart } from "./PriceChart";
 
 const deduplicateTimeStamps = (data: PriceHistoryPoint[]) => {
   const uniqueTimeStamps = [

@@ -9,7 +9,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { DollarSign, Package, TrendingDown } from "lucide-react";
-import { PriceChart } from "@/components/PriceChart";
+import { PriceChart } from "@/components/widgets/PriceChart";
 import { MarketResponse, Position } from "@/lib/models/api.models";
 import { formatNumber, formatCurrency } from "@/lib/ui/format.utils";
 import { PriceChartWidget } from "./widgets/PriceChartWidget";

@@ -7,7 +7,7 @@ import { LayoutGrid } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 export function TerminalLayout({ children }: { children: ReactNode }) {
-  const [layoutRatio, setLayoutRatio] = useState<"1:3" | "2:3" | "1:2">("1:3");
+  const [layoutRatio, setLayoutRatio] = useState<"1:3" | "2:3" | "1:2">("1:2");
   const router = useRouter();
 
   const getGridCols = () => {
