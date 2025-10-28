@@ -310,4 +310,8 @@ class PolyClient:
             parsed_positions: list[PositionSchema] = [
                 parse_position_from_api(position) for position in user_positions
             ]
+
+            # sort by total amount desc (amount * avg price)
+            parsed_positions.sort(key=lambda x: x.amount * x.avgPrice, reverse=True)
+
             return parsed_positions
