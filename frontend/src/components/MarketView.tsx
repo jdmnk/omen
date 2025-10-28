@@ -14,28 +14,10 @@ import { PriceChartWidget } from "./widgets/PriceChartWidget";
 import { ExpandableText } from "@/components/ui/expandable-text";
 import { MarketInfoBar } from "@/components/MarketInfoBar";
 import { MainSharedContainer } from "./layouts/MainSharedContainer";
-
-const getOutcomeStyle = (outcome: string) => {
-  if (outcome === "yes") {
-    return {
-      badge: "bg-emerald-500/10 text-emerald-500 border-emerald-500/20",
-      row: "bg-emerald-500/5 hover:bg-emerald-500/10",
-    };
-  }
-  if (outcome === "no") {
-    return {
-      badge: "bg-rose-500/10 text-rose-500 border-rose-500/20",
-      row: "bg-rose-500/5 hover:bg-rose-500/10",
-    };
-  }
-  return {
-    badge: "bg-blue-500/10 text-blue-500 border-blue-500/20",
-    row: "hover:bg-muted/50",
-  };
-};
+import { PositionsWidget } from "./widgets/PositionsWidget";
 
 export async function MarketView({ data }: { data: MarketResponse }) {
-  const { market, positions } = data;
+  const { market } = data;
 
   return (
     <>
@@ -56,72 +38,7 @@ export async function MarketView({ data }: { data: MarketResponse }) {
                 </CardContent>
               </Card>
 
-              {positions && positions.length > 0 && (
-                <>
-                  {/* Positions Table */}
-                  <Card className="shadow-md">
-                    <CardHeader className="pb-3">
-                      <div className="flex items-center justify-between">
-                        <CardTitle className="text-base">Positions</CardTitle>
-                        <Badge variant="secondary" className="text-xs">
-                          {positions.length}{" "}
-                          {positions.length === 1 ? "position" : "positions"}
-                        </Badge>
-                      </div>
-                    </CardHeader>
-                    <CardContent className="pt-0">
-                      <Table>
-                        <TableHeader>
-                          <TableRow>
-                            <TableHead>Outcome</TableHead>
-                            <TableHead className="text-right">Shares</TableHead>
-                            <TableHead className="text-right">
-                              Avg Price
-                            </TableHead>
-                            <TableHead className="text-right">Value</TableHead>
-                          </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                          {positions.map((position: Position) => {
-                            const positionOutcome =
-                              position.tokenId === market.token1 ? "yes" : "no";
-
-                            const style = getOutcomeStyle(positionOutcome);
-                            const posAmount =
-                              typeof position.amount === "string"
-                                ? Number(position.amount)
-                                : position.amount;
-                            const posPrice =
-                              typeof position.avgPrice === "string"
-                                ? Number(position.avgPrice)
-                                : position.avgPrice;
-                            const posValue = posAmount * posPrice;
-
-                            return (
-                              <TableRow key={position.id} className={style.row}>
-                                <TableCell>
-                                  <Badge className={style.badge}>
-                                    {positionOutcome}
-                                  </Badge>
-                                </TableCell>
-                                <TableCell className="text-right font-semibold">
-                                  {formatNumber(position.amount)}
-                                </TableCell>
-                                <TableCell className="text-right font-mono text-sm">
-                                  ${formatNumber(position.avgPrice, 4)}
-                                </TableCell>
-                                <TableCell className="text-right font-semibold">
-                                  {formatCurrency(posValue)}
-                                </TableCell>
-                              </TableRow>
-                            );
-                          })}
-                        </TableBody>
-                      </Table>
-                    </CardContent>
-                  </Card>
-                </>
-              )}
+              <PositionsWidget clobTokenIds={[market.token1, market.token2]} />
             </div>
           </div>
 

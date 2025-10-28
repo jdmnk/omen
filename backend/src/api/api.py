@@ -59,10 +59,7 @@ async def search_markets_slug(slug: str = Query(min_length=1)) -> dict:
     if result is None:
         raise HTTPException(status_code=404, detail="Market not found")
 
-    positions = await poly_client.get_market_positions(
-        [result.token1, result.token2], min_amount=100
-    )
-    return {"market": result.to_dict(), "positions": positions}
+    return {"market": result.to_dict()}
 
 
 @app.get("/markets/order-book", response_model=OrderBookSummary | None)

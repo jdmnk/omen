@@ -51,7 +51,7 @@ export function MarketInfoBar({ market }: MarketInfoBarProps) {
               <div>
                 <p className="text-xs text-muted-foreground">Volume</p>
                 <p className="text-sm font-semibold">
-                  {formatNumber(market.volume)}
+                  {formatCurrency(market.volume)}
                 </p>
               </div>
             </div>

@@ -31,5 +31,4 @@ export type Market = {
 
 export type MarketResponse = {
   market: Market;
-  positions: Position[];
 };
