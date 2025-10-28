@@ -36,7 +36,7 @@ const deduplicateTimeStamps = (data: PriceHistoryPoint[]) => {
 };
 
 export function PriceChartWidget({ market }: { market: Market }) {
-  const [interval, setInterval] = useState<Interval>("1w");
+  const [interval, setInterval] = useState<Interval>("max");
   const { data, isLoading, error } = usePriceHistoryQuery(
     market.token1,
     interval,

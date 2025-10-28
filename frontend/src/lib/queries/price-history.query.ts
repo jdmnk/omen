@@ -16,7 +16,7 @@ export type PriceHistoryPoint = {
 export function usePriceHistoryQuery(
   clobTokenId: string,
   interval: Interval,
-  fidelity: number = 60
+  fidelity: number
 ) {
   const query = useQuery<PriceHistoryResponse>({
     queryKey: ["price-history", clobTokenId, interval, fidelity],
