@@ -1,10 +1,11 @@
 export type Position = {
-  id: string | number;
-  amount: number | string;
-  avgPrice: number | string;
-  outcome?: string;
-  side?: string;
-  createdAt?: string;
+  id: string;
+  amount: number;
+  avgPrice: number;
+  tokenId: string;
+  totalBought: number;
+  realizedPnl: number;
+  user: string;
 };
 
 export type Market = {
@@ -13,6 +14,8 @@ export type Market = {
   icon: string;
   token1: string;
   token2: string;
+  outcomes: string; // comma separated list of outcomes
+  outcomePrices: string; // comma separated list of outcome prices
 };
 
 export type MarketResponse = {
