@@ -9,7 +9,7 @@ type MarketInfoBarProps = {
 
 export function MarketInfoBar({ market }: MarketInfoBarProps) {
   return (
-    <div className="border-b bg-card/50 backdrop-blur-sm mb-4">
+    <div className="border-b bg-card/50 mb-4">
       <div className="container mx-auto px-4 py-3">
         <div className="flex items-center gap-4">
           {/* Market Icon & Title */}
