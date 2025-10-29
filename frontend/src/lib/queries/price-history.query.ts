@@ -24,8 +24,18 @@ export function usePriceHistoryQuery(
       const res = await fetch(
         `${POLYMARKET_CLOB_URL}/prices-history?market=${clobTokenId}&interval=${interval}&fidelity=${fidelity}`
       );
-      return res.json();
+
+      if (!res.ok) {
+        throw new Error(
+          `Failed to fetch price history: ${res.status} ${res.statusText}`
+        );
+      }
+
+      const data = await res.json();
+      return data;
     },
+    retry: 1,
+    staleTime: 60000, // 1 minute
   });
   return query;
 }

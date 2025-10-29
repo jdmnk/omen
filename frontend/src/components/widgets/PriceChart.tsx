@@ -129,7 +129,14 @@ export function PriceChart({ data, error, isLoading }: PriceChartProps) {
   if (error) {
     return (
       <div className="flex items-center justify-center h-full">
-        <p className="text-sm text-destructive">{error.message}</p>
+        <div className="text-center">
+          <p className="text-sm text-muted-foreground mb-1">
+            Unable to load price history
+          </p>
+          <p className="text-xs text-muted-foreground">
+            Chart data is temporarily unavailable
+          </p>
+        </div>
       </div>
     );
   }
