@@ -1,3 +1,4 @@
+import asyncio
 import string
 import traceback
 
@@ -157,7 +158,7 @@ class PolyClient:
         Warning: 429 really fast
         """
 
-        limit = 500
+        limit = 10000  # max 10000! should help with rate limits :D
         offset = 0
         all_trades: list[dict] = []
         total_trades = 0
@@ -168,6 +169,9 @@ class PolyClient:
                     "market": ",".join(condition_ids),  # comma separated list
                     "limit": limit,
                     "offset": offset,
+                    "filterType": "CASH",
+                    "filterAmount": 100,
+                    # "side": "BUY",
                 }
                 response = await client.get(f"{DATA_API_HOST}/trades", params=params)
                 trades = response.json()
@@ -182,6 +186,8 @@ class PolyClient:
                     break
 
                 offset += limit
+
+                await asyncio.sleep(0.1)
 
         # Parse raw API trades into typed TradeSchema objects
         parsed_trades = [t for t in (parse_trade_from_api(t) for t in all_trades) if t is not None]
