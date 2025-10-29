@@ -1,4 +1,5 @@
 "use client";
+import { useState } from "react";
 import { usePositionsQuery } from "@/lib/queries/positions.query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -13,7 +14,9 @@ import {
 import { Position } from "@/lib/models/api.models";
 import { formatNumber, formatCurrency } from "@/lib/ui/format.utils";
 import { LoadingSpinner } from "@/components/ui/spinner";
-import { LinkIcon } from "lucide-react";
+import { LinkIcon, ChevronDown, ChevronRight } from "lucide-react";
+import { UserPositions } from "./UserPositions";
+import { Button } from "@/components/ui/button";
 
 const getOutcomeStyle = (outcome: string) => {
   if (outcome === "yes") {
@@ -36,6 +39,19 @@ const getOutcomeStyle = (outcome: string) => {
 
 export function PositionsWidget({ clobTokenIds }: { clobTokenIds: string[] }) {
   const { data: positions, isLoading, error } = usePositionsQuery(clobTokenIds);
+  const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set());
+
+  const toggleRow = (positionId: string) => {
+    setExpandedRows((prev) => {
+      const next = new Set(prev);
+      if (next.has(positionId)) {
+        next.delete(positionId);
+      } else {
+        next.add(positionId);
+      }
+      return next;
+    });
+  };
 
   if (isLoading) {
     return (
@@ -65,6 +81,7 @@ export function PositionsWidget({ clobTokenIds }: { clobTokenIds: string[] }) {
               <Table>
                 <TableHeader>
                   <TableRow>
+                    <TableHead className="w-[40px]"></TableHead>
                     <TableHead>Outcome</TableHead>
                     <TableHead className="text-right">Shares</TableHead>
                     <TableHead className="text-right">Avg Price</TableHead>
@@ -76,7 +93,7 @@ export function PositionsWidget({ clobTokenIds }: { clobTokenIds: string[] }) {
                   {positions.map((position: Position) => {
                     const positionOutcome =
                       position.tokenId === clobTokenIds[0] ? "yes" : "no";
-
+                    const isExpanded = expandedRows.has(position.id);
                     const style = getOutcomeStyle(positionOutcome);
                     const posAmount =
                       typeof position.amount === "string"
@@ -89,32 +106,55 @@ export function PositionsWidget({ clobTokenIds }: { clobTokenIds: string[] }) {
                     const posValue = posAmount * posPrice;
 
                     return (
-                      <TableRow key={position.id} className={style.row}>
-                        <TableCell>
-                          <Badge className={style.badge}>
-                            {positionOutcome}
-                          </Badge>
-                        </TableCell>
-                        <TableCell className="text-right font-semibold">
-                          {formatNumber(position.amount)}
-                        </TableCell>
-                        <TableCell className="text-right font-mono text-sm">
-                          ${formatNumber(position.avgPrice, 4)}
-                        </TableCell>
-                        <TableCell className="text-right font-semibold">
-                          {formatCurrency(posValue)}
-                        </TableCell>
-                        <TableCell className="text-right font-semibold">
-                          <a
-                            href={`https://polymarket.com/profile/${position.user}`}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="inline-block"
-                          >
-                            <LinkIcon className="w-4 h-4" />
-                          </a>
-                        </TableCell>
-                      </TableRow>
+                      <>
+                        <TableRow key={position.id} className={style.row}>
+                          <TableCell>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => toggleRow(position.id)}
+                              className="h-6 w-6 p-0"
+                            >
+                              {isExpanded ? (
+                                <ChevronDown className="w-4 h-4" />
+                              ) : (
+                                <ChevronRight className="w-4 h-4" />
+                              )}
+                            </Button>
+                          </TableCell>
+                          <TableCell>
+                            <Badge className={style.badge}>
+                              {positionOutcome}
+                            </Badge>
+                          </TableCell>
+                          <TableCell className="text-right font-semibold">
+                            {formatNumber(position.amount)}
+                          </TableCell>
+                          <TableCell className="text-right font-mono text-sm">
+                            ${formatNumber(position.avgPrice, 4)}
+                          </TableCell>
+                          <TableCell className="text-right font-semibold">
+                            {formatCurrency(posValue)}
+                          </TableCell>
+                          <TableCell className="text-right font-semibold">
+                            <a
+                              href={`https://polymarket.com/profile/${position.user}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="inline-block hover:opacity-70 transition-opacity"
+                            >
+                              <LinkIcon className="w-4 h-4" />
+                            </a>
+                          </TableCell>
+                        </TableRow>
+                        {isExpanded && (
+                          <TableRow>
+                            <TableCell colSpan={6} className="p-0">
+                              <UserPositions userId={position.user} />
+                            </TableCell>
+                          </TableRow>
+                        )}
+                      </>
                     );
                   })}
                 </TableBody>
