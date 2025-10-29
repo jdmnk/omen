@@ -1,0 +1,7 @@
+{
+  email domajnkoj@gmail.com      # where Let's Encrypt sends expiry warnings
+}
+
+api.example.com {                # domain pointing to your VPS
+  reverse_proxy app:8000         # container-name:port
+}
