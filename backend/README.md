@@ -40,12 +40,6 @@ docker compose exec app python -m src.db.db_init --reset
 docker compose exec app python -m src.db.db_populate
 ```
 
-## TODO
-
-Tasks:
-
-- implement graphql for fetching positions!
-
 ## Linting (Ruff)
 
 Ruff is configured via `ruff.toml` and installed as a dev dependency.
@@ -61,3 +55,10 @@ poetry run ruff format .
 
 poetry run ruff check --fix .
 ```
+
+## TODO
+
+Tasks:
+
+- per user / per position: insider score / whale score
+- per market: whale interest (smart money interest)
