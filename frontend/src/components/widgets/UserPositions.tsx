@@ -97,13 +97,7 @@ export function UserPositions({ userId }: { userId: string }) {
                     </div>
                   </div>
                   <div className="flex items-center gap-2 flex-wrap">
-                    <Badge
-                      className={
-                        position.outcome.toLowerCase() === "yes"
-                          ? "bg-emerald-500/10 text-emerald-500 border-emerald-500/20"
-                          : "bg-rose-500/10 text-rose-500 border-rose-500/20"
-                      }
-                    >
+                    <Badge variant="outline" className="text-xs font-normal">
                       {position.outcome}
                     </Badge>
                     <span className="text-xs text-muted-foreground">

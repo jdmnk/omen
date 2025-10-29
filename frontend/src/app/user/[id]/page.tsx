@@ -64,7 +64,7 @@ export default function UserPage({ params }: { params: { id: string } }) {
 
   return (
     <MainSharedContainer>
-      <div className="space-y-6">
+      <div className="space-y-4">
         {/* Header */}
         <div className="flex items-center justify-between">
           <div>
@@ -84,18 +84,15 @@ export default function UserPage({ params }: { params: { id: string } }) {
         </div>
 
         {/* Summary Cards */}
-        <div className="grid gap-4 md:grid-cols-3">
+        <div className="grid gap-3 md:grid-cols-3">
           <Card>
             <CardHeader className="pb-2">
               <CardTitle className="text-sm font-medium text-muted-foreground">
                 Total Positions
               </CardTitle>
             </CardHeader>
-            <CardContent>
+            <CardContent className="pb-3">
               <div className="text-2xl font-bold">{positions.length}</div>
-              <p className="text-xs text-muted-foreground mt-1">
-                Active market positions
-              </p>
             </CardContent>
           </Card>
 
@@ -105,13 +102,10 @@ export default function UserPage({ params }: { params: { id: string } }) {
                 Total Value
               </CardTitle>
             </CardHeader>
-            <CardContent>
+            <CardContent className="pb-3">
               <div className="text-2xl font-bold">
                 {formatCurrency(totalValue)}
               </div>
-              <p className="text-xs text-muted-foreground mt-1">
-                Current portfolio value
-              </p>
             </CardContent>
           </Card>
 
@@ -121,7 +115,7 @@ export default function UserPage({ params }: { params: { id: string } }) {
                 Total PnL
               </CardTitle>
             </CardHeader>
-            <CardContent>
+            <CardContent className="pb-3">
               <div className="flex items-center gap-2">
                 <div
                   className={`text-2xl font-bold ${
@@ -151,53 +145,50 @@ export default function UserPage({ params }: { params: { id: string } }) {
 
         {/* Positions Grid */}
         <Card>
-          <CardHeader>
+          <CardHeader className="pb-3">
             <CardTitle>All Positions</CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="grid gap-3">
+          <CardContent className="pt-0">
+            <div className="grid gap-2">
               {positions.map((position) => (
                 <Link
                   key={`${position.conditionId}-${position.asset}`}
                   href={`/market/${position.slug}`}
                   className="block"
                 >
-                  <div className="border border-border rounded-lg p-4 hover:bg-muted/50 transition-colors">
-                    <div className="flex items-start justify-between gap-4">
+                  <div className="border border-border rounded-lg p-3 hover:bg-muted/50 transition-colors">
+                    <div className="flex items-start justify-between gap-3">
                       <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-3 mb-2">
+                        <div className="flex items-center gap-2 mb-1.5">
                           {position.icon && (
                             <img
                               src={position.icon}
                               alt=""
-                              className="w-6 h-6 rounded"
+                              className="w-5 h-5 rounded"
                             />
                           )}
-                          <div className="font-semibold truncate">
+                          <div className="font-semibold truncate text-sm">
                             {position.title}
                           </div>
                         </div>
-                        <div className="flex items-center gap-3 flex-wrap">
+                        <div className="flex items-center gap-2 flex-wrap">
                           <Badge
-                            className={
-                              position.outcome.toLowerCase() === "yes"
-                                ? "bg-emerald-500/10 text-emerald-500 border-emerald-500/20"
-                                : "bg-rose-500/10 text-rose-500 border-rose-500/20"
-                            }
+                            variant="outline"
+                            className="text-xs font-normal"
                           >
                             {position.outcome}
                           </Badge>
-                          <span className="text-sm text-muted-foreground">
+                          <span className="text-xs text-muted-foreground">
                             {formatNumber(position.size)} shares @ $
                             {formatNumber(position.avgPrice, 4)}
                           </span>
-                          <span className="text-sm text-muted-foreground">
+                          <span className="text-xs text-muted-foreground">
                             Current: ${formatNumber(position.curPrice, 4)}
                           </span>
                         </div>
                       </div>
                       <div className="text-right">
-                        <div className="text-lg font-bold mb-1">
+                        <div className="text-base font-bold mb-0.5">
                           {formatCurrency(position.currentValue)}
                         </div>
                         <div

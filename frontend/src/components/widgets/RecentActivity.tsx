@@ -42,7 +42,11 @@ export function RecentActivity({ trades }: { trades: Trade[] }) {
             <div className="border border-border rounded-lg p-3 hover:bg-muted/50 transition-colors">
               <div className="flex items-start justify-between gap-3">
                 <div className="flex items-start gap-2.5 flex-1 min-w-0">
-                  <div className="mt-0.5 text-muted-foreground">
+                  <div
+                    className={`mt-0.5 ${
+                      isBuy ? "text-emerald-500" : "text-rose-500"
+                    }`}
+                  >
                     {isBuy ? (
                       <ArrowUpRight className="w-4 h-4" />
                     ) : (

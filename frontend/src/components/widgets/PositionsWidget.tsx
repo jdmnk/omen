@@ -18,25 +18,6 @@ import { LinkIcon, ChevronDown, ChevronRight } from "lucide-react";
 import { UserPositions } from "./UserPositions";
 import { Button } from "@/components/ui/button";
 
-const getOutcomeStyle = (outcome: string) => {
-  if (outcome === "yes") {
-    return {
-      badge: "bg-emerald-500/10 text-emerald-500 border-emerald-500/20",
-      row: "",
-    };
-  }
-  if (outcome === "no") {
-    return {
-      badge: "bg-rose-500/10 text-rose-500 border-rose-500/20",
-      row: "",
-    };
-  }
-  return {
-    badge: "bg-blue-500/10 text-blue-500 border-blue-500/20",
-    row: "hover:bg-muted/50",
-  };
-};
-
 export function PositionsWidget({ clobTokenIds }: { clobTokenIds: string[] }) {
   const { data: positions, isLoading, error } = usePositionsQuery(clobTokenIds);
   const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set());
@@ -94,7 +75,6 @@ export function PositionsWidget({ clobTokenIds }: { clobTokenIds: string[] }) {
                     const positionOutcome =
                       position.tokenId === clobTokenIds[0] ? "yes" : "no";
                     const isExpanded = expandedRows.has(position.id);
-                    const style = getOutcomeStyle(positionOutcome);
                     const posAmount =
                       typeof position.amount === "string"
                         ? Number(position.amount)
@@ -104,10 +84,17 @@ export function PositionsWidget({ clobTokenIds }: { clobTokenIds: string[] }) {
                         ? Number(position.avgPrice)
                         : position.avgPrice;
                     const posValue = posAmount * posPrice;
+                    const outcomeStyle =
+                      positionOutcome === "yes"
+                        ? "text-emerald-500"
+                        : "text-rose-500";
 
                     return (
                       <>
-                        <TableRow key={position.id} className={style.row}>
+                        <TableRow
+                          key={position.id}
+                          className="hover:bg-muted/50"
+                        >
                           <TableCell>
                             <Button
                               variant="ghost"
@@ -123,9 +110,11 @@ export function PositionsWidget({ clobTokenIds }: { clobTokenIds: string[] }) {
                             </Button>
                           </TableCell>
                           <TableCell>
-                            <Badge className={style.badge}>
-                              {positionOutcome}
-                            </Badge>
+                            {/* <Badge variant="outline" className={badgeStyle}> */}
+                            <span className={` ${outcomeStyle}`}>
+                              {positionOutcome.toUpperCase()}
+                            </span>
+                            {/* </Badge> */}
                           </TableCell>
                           <TableCell className="text-right font-semibold">
                             {formatNumber(position.amount)}
