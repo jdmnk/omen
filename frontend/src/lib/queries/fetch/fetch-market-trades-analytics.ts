@@ -1,9 +1,9 @@
 import { getBaseUrl } from "@/lib/api";
-import { UserHoldingsSummary } from "@/lib/models/api.models";
+import { UserTradesGroup } from "@/lib/models/api.models";
 
 export async function fetchMarketTradesAnalytics(
   conditionId: string
-): Promise<UserHoldingsSummary[]> {
+): Promise<UserTradesGroup[]> {
   const base = getBaseUrl();
   const res = await fetch(
     `${base}/markets/trades/analytics?condition_id=${encodeURIComponent(

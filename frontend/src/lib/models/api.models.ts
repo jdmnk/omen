@@ -162,3 +162,13 @@ export type UserHoldingsSummary = {
   totalHoldings: number;
   markets: UserConditionStats[];
 };
+
+export type UserTradesGroup = {
+  proxyWallet: string;
+  name?: string | null;
+  pseudonym?: string | null;
+  profileImage?: string | null;
+  totalVolume: number;
+  totalNotional: number;
+  trades: Trade[];
+};

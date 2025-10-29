@@ -154,3 +154,103 @@ def aggregate_trades_by_user(trades: list[TradeSchema]) -> list[UserHoldingsSumm
     # Order users by total current holdings
     summaries.sort(key=lambda s: s.totalHoldings, reverse=True)
     return summaries
+
+
+class UserTradesGroup(BaseModel):
+    """Trades-based group per user for a single condition (market)."""
+
+    proxyWallet: str
+    name: str | None = None
+    pseudonym: str | None = None
+    profileImage: str | None = None
+
+    totalVolume: float
+    totalNotional: float
+
+    # Not returned in UI, but used for backend ordering
+    totalHoldings: float
+
+    # All trades (sorted by size desc)
+    trades: list[TradeSchema]
+
+
+def group_trades_by_user_detailed(trades: list[TradeSchema]) -> list[UserTradesGroup]:
+    """Return groups of related trades by user with per-group stats.
+
+    - Group by proxyWallet
+    - For each group compute totalVolume (sum |size|), totalNotional (sum |size|*price)
+    - Sort each group's trades by absolute size desc
+    - Order groups by current total holdings (sum of positive outcome nets), do not expose in UI
+    """
+
+    user_to_trades: dict[str, list[TradeSchema]] = {}
+    user_meta: dict[str, dict[str, str | None]] = {}
+
+    # Partition trades by wallet and capture basic metadata
+    for t in trades:
+        wallet = t.proxyWallet
+        if not wallet:
+            continue
+        user_to_trades.setdefault(wallet, []).append(t)
+        if wallet not in user_meta:
+            user_meta[wallet] = {
+                "name": t.name or None,
+                "pseudonym": t.pseudonym or None,
+                "profileImage": t.profileImage or None,
+            }
+        else:
+            meta = user_meta[wallet]
+            if (not meta.get("name")) and t.name:
+                meta["name"] = t.name
+            if (not meta.get("pseudonym")) and t.pseudonym:
+                meta["pseudonym"] = t.pseudonym
+            if (not meta.get("profileImage")) and t.profileImage:
+                meta["profileImage"] = t.profileImage
+
+    groups: list[UserTradesGroup] = []
+
+    for wallet, user_trades in user_to_trades.items():
+        # Compute stats
+        total_volume = 0.0
+        total_notional = 0.0
+
+        # Compute net holdings by outcome from available trades
+        holdings_by_outcome: dict[str, float] = {}
+
+        for tr in user_trades:
+            size = float(tr.size or 0.0)
+            price = float(tr.price or 0.0)
+            side = (tr.side or "").upper()
+            total_volume += abs(size)
+            total_notional += abs(size) * price
+
+            outcome_key = _outcome_key(tr)
+            prev = holdings_by_outcome.get(outcome_key, 0.0)
+            delta = size if side == "BUY" else -size if side == "SELL" else 0.0
+            if delta:
+                holdings_by_outcome[outcome_key] = prev + delta
+
+        total_holdings = sum(v for v in holdings_by_outcome.values() if v > 0)
+
+        # Sort trades in-place by absolute size desc
+        user_trades_sorted = sorted(
+            user_trades, key=lambda tr: abs(float(tr.size or 0.0)), reverse=True
+        )
+
+        meta = user_meta.get(wallet, {})
+        groups.append(
+            UserTradesGroup(
+                proxyWallet=wallet,
+                name=meta.get("name"),
+                pseudonym=meta.get("pseudonym"),
+                profileImage=meta.get("profileImage"),
+                totalVolume=total_volume,
+                totalNotional=total_notional,
+                totalHoldings=total_holdings,
+                trades=user_trades_sorted,
+            )
+        )
+
+    # Order groups by totalHoldings desc
+    groups.sort(key=lambda g: g.totalHoldings, reverse=True)
+    return groups

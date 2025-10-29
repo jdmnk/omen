@@ -2,10 +2,10 @@
 
 import { useQuery } from "@tanstack/react-query";
 import { fetchMarketTradesAnalytics } from "./fetch/fetch-market-trades-analytics";
-import { UserHoldingsSummary } from "../models/api.models";
+import { UserTradesGroup } from "../models/api.models";
 
 export function useTradesAnalyticsQuery(conditionId: string) {
-  return useQuery<UserHoldingsSummary[]>({
+  return useQuery<UserTradesGroup[]>({
     queryKey: ["trades-analytics", conditionId],
     queryFn: () => fetchMarketTradesAnalytics(conditionId),
     staleTime: 60000,
