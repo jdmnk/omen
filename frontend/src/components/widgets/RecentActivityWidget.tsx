@@ -37,7 +37,7 @@ export function RecentActivityWidget({
             Error loading trades
           </div>
         ) : (
-          <RecentActivity trades={trades || []} />
+          <RecentActivity trades={trades?.slice(0, 20) || []} />
         )}
       </CardContent>
     </Card>

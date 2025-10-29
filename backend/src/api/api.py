@@ -5,6 +5,10 @@ from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
 from py_clob_client.clob_types import OrderBookSummary
 
+from src.analytics.trades_analytics import (
+    UserHoldingsSummary,
+    aggregate_trades_by_user,
+)
 from src.db.database_client import DatabaseClient
 from src.models.position import PositionSchema
 from src.models.trade import TradeSchema
@@ -81,3 +85,13 @@ async def get_market_positions(clob_tokens: Annotated[list[str], Query()]) -> li
         return positions
     else:
         raise HTTPException(status_code=404, detail="Positions not found")
+
+
+@app.get("/markets/trades/analytics", response_model=list[UserHoldingsSummary])
+async def get_market_trades_analytics(
+    condition_id: str = Query(min_length=1),
+) -> list[UserHoldingsSummary]:
+    trades = await poly_client.get_market_trades([condition_id])
+    if trades is None or len(trades) == 0:
+        raise HTTPException(status_code=404, detail="Trades not found")
+    return aggregate_trades_by_user(trades)

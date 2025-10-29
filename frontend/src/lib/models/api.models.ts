@@ -140,3 +140,25 @@ export type Trade = {
   profileImageOptimized: string;
   transactionHash: string;
 };
+
+export type UserConditionStats = {
+  conditionId: string;
+  slug?: string | null;
+  title?: string | null;
+  icon?: string | null;
+  volume: number;
+  notional: number;
+  netHoldingsByOutcome: Record<string, number>;
+  totalHoldings: number;
+};
+
+export type UserHoldingsSummary = {
+  proxyWallet: string;
+  name?: string | null;
+  pseudonym?: string | null;
+  profileImage?: string | null;
+  totalVolume: number;
+  totalNotional: number;
+  totalHoldings: number;
+  markets: UserConditionStats[];
+};

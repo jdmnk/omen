@@ -6,6 +6,7 @@ import { MarketInfoBar } from "@/components/MarketInfoBar";
 import { MainSharedContainer } from "./layouts/MainSharedContainer";
 import { PositionsWidget } from "./widgets/PositionsWidget";
 import { RecentActivityWidget } from "./widgets/RecentActivityWidget";
+import { TopHoldersWidget } from "./widgets/TopHoldersWidget";
 
 export async function MarketView({ data }: { data: MarketResponse }) {
   const { market } = data;
@@ -55,6 +56,7 @@ export async function MarketView({ data }: { data: MarketResponse }) {
               </CardContent>
             </Card> */}
 
+            <TopHoldersWidget conditionId={market.condition_id} />
             <RecentActivityWidget conditionId={market.condition_id} />
           </div>
         </div>
