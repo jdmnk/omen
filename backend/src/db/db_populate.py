@@ -24,6 +24,24 @@ async def main():
     upserted_links = await db_client.insert_event_markets(events)
     print(f"Inserted/updated {upserted_links} event->market links")
 
+    # Step 5: Use DB query to find eligible markets by thresholds
+    eligible_condition_ids = await db_client.get_markets_by_volume_and_liquidity(
+        min_volume=100_000, min_liquidity=10_000
+    )
+    print(f"Eligible markets for trades fetch: {len(eligible_condition_ids)}")
+
+    # Chunk IDs to respect URL length and rate limits
+    BATCH_SIZE = 2
+    MIN_TRADE_USD = 1000
+    all_trades = []
+    for i in range(0, len(eligible_condition_ids), BATCH_SIZE):
+        batch_ids = eligible_condition_ids[i : i + BATCH_SIZE]
+        trades_batch = await poly_client.get_market_trades(batch_ids, min_amount=MIN_TRADE_USD)
+        all_trades.extend([t.model_dump() for t in trades_batch])
+
+    inserted_trades = await db_client.insert_trades(all_trades)
+    print(f"Inserted/updated {inserted_trades} trades")
+
 
 if __name__ == "__main__":
     asyncio.run(main())
