@@ -69,6 +69,59 @@ class PolyClient:
         client.set_api_creds(api_creds)
         return client
 
+    async def get_active_events(
+        self, exclude_tag_ids: list[int] | None = None, count: int | None = None
+    ) -> list[dict]:
+        """
+        Fetch active events from Gamma API, mirroring params used by get_active_markets_by_events,
+        but return the raw events payload (including markets) instead of flattening to markets.
+        """
+        limit = 500
+        offset = 0
+        all_events: list[dict] = []
+        final_excluded_tag_ids: list[int] = []
+        if exclude_tag_ids is None or len(exclude_tag_ids) == 0:
+            final_excluded_tag_ids = [tag["id"] for tag in BLACKLISTED_MARKET_TAGS]
+
+        if count is not None and count < limit:
+            limit = count
+
+        try:
+            async with httpx.AsyncClient() as client:
+                while True:
+                    params = {
+                        "closed": False,
+                        "limit": limit,
+                        "offset": offset,
+                        "include_chat": False,
+                        "include_template": False,
+                        "exclude_tag_id": final_excluded_tag_ids,
+                        "order": "id",
+                        "ascending": False,
+                    }
+                    response = await client.get(f"{GAMMA_API_HOST}/events", params=params)
+                    events = response.json()
+                    if not events:
+                        break
+
+                    all_events.extend(events)
+                    logger.info(f"Fetched {len(events)} events (offset: {offset})...")
+
+                    if count is not None and len(all_events) >= count:
+                        break
+
+                    if len(events) < limit:
+                        break
+
+                    offset += limit
+        except PolyApiException as exc:
+            logger.error(f"get_active_events: error fetching events: {exc}")
+            logger.error(traceback.format_exc())
+            raise exc
+
+        logger.info(f"Finished fetching {len(all_events)} active events")
+        return all_events
+
     async def get_active_markets_by_events(
         self, exclude_tag_ids: list[int] | None = None, count: int | None = None
     ) -> list[dict]:

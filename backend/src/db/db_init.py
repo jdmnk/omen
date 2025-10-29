@@ -5,6 +5,9 @@ from sqlalchemy import text
 from sqlalchemy.ext.asyncio import create_async_engine
 
 from src.models.market import Base
+from src.models import event as _ensure_event_model_import  # noqa: F401
+from src.models import event_market as _ensure_event_market_import  # noqa: F401
+from src.models import position as _ensure_position_model_import  # noqa: F401
 from src.settings import settings
 
 

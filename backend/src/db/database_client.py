@@ -8,6 +8,8 @@ from sqlalchemy.ext.asyncio import (
 )
 
 from src.models.market import Market, MarketSchema, parse_market_from_api
+from src.models.event import Event, EventSchema, parse_event_from_api
+from src.models.event_market import EventMarket
 from src.models.position import Position, PositionSchema, parse_position_from_api
 from src.settings import settings
 from src.utils.logging_config import get_logger
@@ -75,6 +77,96 @@ class DatabaseClient:
 
         logger.info("Inserted/updated %d market rows into DB", total_inserted)
         return total_inserted
+
+    async def insert_events(self, events: list[dict], chunk_size: int = 500) -> int:
+        """
+        Upsert events by id and store full raw payload.
+
+        Returns number of events upserted.
+        """
+        parsed_events: list[EventSchema] = []
+        for ev_dict in events:
+            parsed = parse_event_from_api(ev_dict)
+            if parsed:
+                parsed_events.append(parsed)
+
+        if not parsed_events:
+            logger.info("No valid event rows to upsert.")
+            return 0
+
+        total_upserted = 0
+        async with self.async_session() as session:
+            for start in range(0, len(parsed_events), chunk_size):
+                batch = parsed_events[start : start + chunk_size]
+
+                values = [e.model_dump() for e in batch]
+
+                stmt = pg_insert(Event).values(values)
+
+                update_fields = {
+                    col: stmt.excluded[col]
+                    for col in Event.__table__.columns.keys()
+                    if col not in ["id", "fetched_at"]
+                }
+                update_fields["fetched_at"] = text("now()")
+
+                stmt = stmt.on_conflict_do_update(
+                    index_elements=["id"],
+                    set_=update_fields,
+                )
+
+                await session.execute(stmt)
+                total_upserted += len(batch)
+                await session.commit()
+
+        logger.info("Inserted/updated %d event rows into DB", total_upserted)
+        return total_upserted
+
+    async def insert_event_markets(self, events: list[dict], chunk_size: int = 2000) -> int:
+        """
+        Create/refresh links between events and markets, preserving market order within an event.
+        """
+        mappings: list[dict] = []
+        for ev in events:
+            ev_id = ev.get("id")
+            if ev_id is None:
+                continue
+            markets = ev.get("markets", []) or []
+            for idx, mk in enumerate(markets):
+                cond_id = mk.get("conditionId") or mk.get("condition_id")
+                if not cond_id:
+                    continue
+                mappings.append(
+                    {
+                        "event_id": str(ev_id),
+                        "condition_id": str(cond_id),
+                        "position": idx,
+                    }
+                )
+
+        if not mappings:
+            logger.info("No event->market links to upsert.")
+            return 0
+
+        total_upserted = 0
+        async with self.async_session() as session:
+            for start in range(0, len(mappings), chunk_size):
+                batch = mappings[start : start + chunk_size]
+
+                stmt = pg_insert(EventMarket).values(batch)
+
+                # Update position if the link exists
+                stmt = stmt.on_conflict_do_update(
+                    index_elements=["event_id", "condition_id"],
+                    set_={"position": stmt.excluded.position},
+                )
+
+                await session.execute(stmt)
+                total_upserted += len(batch)
+                await session.commit()
+
+        logger.info("Inserted/updated %d event->market links", total_upserted)
+        return total_upserted
 
     async def delete_all_markets(self) -> int:
         sql = text("DELETE FROM markets")
