@@ -1,7 +1,7 @@
 import { DATA_API_HOST } from "@/lib/api";
 import { UserPosition } from "@/lib/models/api.models";
 
-export async function fetchPolymarketPositions(
+export async function fetchUserPositions(
   userId: string
 ): Promise<UserPosition[]> {
   const limit = 500;
