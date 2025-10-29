@@ -23,7 +23,7 @@ export function RecentActivityWidget({
     <Card className="shadow-md">
       <CardHeader className="pb-3">
         <div className="flex items-center gap-2">
-          <Activity className="w-4 h-4" />
+          {/* <Activity className="w-4 h-4" /> */}
           <CardTitle className="text-base">Recent Activity</CardTitle>
         </div>
       </CardHeader>
