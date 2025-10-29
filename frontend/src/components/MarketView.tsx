@@ -46,9 +46,6 @@ export async function MarketView({ data }: { data: MarketResponse }) {
           <div className="space-y-4 overflow-y-auto">
             {market.description && (
               <Card>
-                {/* <CardHeader className="pb-3">
-                  <CardTitle className="text-base">Description</CardTitle>
-                </CardHeader> */}
                 <CardContent className="pt-3 pb-3">
                   <ExpandableText text={market.description} maxLength={150} />
                 </CardContent>

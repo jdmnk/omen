@@ -13,18 +13,19 @@ import {
 import { Position } from "@/lib/models/api.models";
 import { formatNumber, formatCurrency } from "@/lib/ui/format.utils";
 import { LoadingSpinner } from "@/components/ui/spinner";
+import { LinkIcon } from "lucide-react";
 
 const getOutcomeStyle = (outcome: string) => {
   if (outcome === "yes") {
     return {
       badge: "bg-emerald-500/10 text-emerald-500 border-emerald-500/20",
-      row: "bg-emerald-500/5 hover:bg-emerald-500/10",
+      row: "",
     };
   }
   if (outcome === "no") {
     return {
       badge: "bg-rose-500/10 text-rose-500 border-rose-500/20",
-      row: "bg-rose-500/5 hover:bg-rose-500/10",
+      row: "",
     };
   }
   return {
@@ -68,6 +69,7 @@ export function PositionsWidget({ clobTokenIds }: { clobTokenIds: string[] }) {
                     <TableHead className="text-right">Shares</TableHead>
                     <TableHead className="text-right">Avg Price</TableHead>
                     <TableHead className="text-right">Value</TableHead>
+                    <TableHead className="text-right"></TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -101,6 +103,16 @@ export function PositionsWidget({ clobTokenIds }: { clobTokenIds: string[] }) {
                         </TableCell>
                         <TableCell className="text-right font-semibold">
                           {formatCurrency(posValue)}
+                        </TableCell>
+                        <TableCell className="text-right font-semibold">
+                          <a
+                            href={`https://polymarket.com/profile/${position.user}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-block"
+                          >
+                            <LinkIcon className="w-4 h-4" />
+                          </a>
                         </TableCell>
                       </TableRow>
                     );
