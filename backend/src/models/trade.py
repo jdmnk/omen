@@ -1,8 +1,8 @@
 from __future__ import annotations
 
-from typing import Any
-
 from pydantic import BaseModel
+
+from src.utils.parse_utils import to_float, to_int
 
 
 class TradeSchema(BaseModel):
@@ -30,24 +30,6 @@ class TradeSchema(BaseModel):
         from_attributes = True
 
 
-def _to_float(value: Any, default: float = 0.0) -> float:
-    try:
-        if value is None:
-            return default
-        return float(value)
-    except (TypeError, ValueError):
-        return default
-
-
-def _to_int(value: Any, default: int = 0) -> int:
-    try:
-        if value is None:
-            return default
-        return int(value)
-    except (TypeError, ValueError):
-        return default
-
-
 def parse_trade_from_api(trade_dict: dict) -> TradeSchema | None:
     try:
         return TradeSchema(
@@ -55,15 +37,15 @@ def parse_trade_from_api(trade_dict: dict) -> TradeSchema | None:
             side=str(trade_dict.get("side", "")),
             asset=str(trade_dict.get("asset", "")),
             conditionId=str(trade_dict.get("conditionId", "")),
-            size=_to_float(trade_dict.get("size")),
-            price=_to_float(trade_dict.get("price")),
-            timestamp=_to_int(trade_dict.get("timestamp")),
+            size=to_float(trade_dict.get("size")),
+            price=to_float(trade_dict.get("price")),
+            timestamp=to_int(trade_dict.get("timestamp")),
             title=str(trade_dict.get("title", "")),
             slug=str(trade_dict.get("slug", "")),
             icon=str(trade_dict.get("icon", "")),
             eventSlug=str(trade_dict.get("eventSlug", "")),
             outcome=str(trade_dict.get("outcome", "")),
-            outcomeIndex=_to_int(trade_dict.get("outcomeIndex")),
+            outcomeIndex=to_int(trade_dict.get("outcomeIndex")),
             name=str(trade_dict.get("name", "")),
             pseudonym=str(trade_dict.get("pseudonym", "")),
             bio=str(trade_dict.get("bio", "")),
