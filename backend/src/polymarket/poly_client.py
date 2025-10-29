@@ -67,54 +67,6 @@ class PolyClient:
         client.set_api_creds(api_creds)
         return client
 
-    async def get_active_markets(
-        self, liquidity_num_min: int = 0, volume_num_min: int = 0, count: int | None = None
-    ) -> list[dict]:
-        limit = 500
-        offset = 0
-        all_markets = []
-
-        if count is not None and count < limit:
-            limit = count
-
-        try:
-            async with httpx.AsyncClient() as client:
-                while True:
-                    params = {
-                        "closed": False,
-                        "limit": limit,
-                        "offset": offset,
-                        "liquidity_num_min": liquidity_num_min,
-                        "volume_num_min": volume_num_min,
-                        # order by id - newest first
-                        "order": "id",
-                        "ascending": False,
-                    }
-                    response = await client.get(f"{GAMMA_API_HOST}/markets", params=params)
-                    markets = response.json()
-
-                    if not markets:
-                        break
-
-                    all_markets.extend(markets)
-                    logger.info(f"Fetched {len(markets)} markets (offset: {offset})...")
-
-                    if count is not None and len(all_markets) >= count:
-                        break
-
-                    if len(markets) < limit:
-                        break
-
-                    offset += limit
-        except PolyApiException as exc:
-            logger.error(f"get_active_markets: error fetching markets: {exc}")
-            logger.error(traceback.format_exc())
-            raise exc
-
-        logger.info(f"Finished fetching {len(all_markets)} active markets.")
-
-        return all_markets
-
     async def get_active_markets_by_events(
         self, exclude_tag_ids: list[int] | None = None, count: int | None = None
     ) -> list[dict]:
