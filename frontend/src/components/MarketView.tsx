@@ -24,9 +24,9 @@ export async function MarketView({ data }: { data: MarketResponse }) {
       <MarketInfoBar market={market} />
 
       <MainSharedContainer>
-        <div className="grid grid-cols-1 md:grid-cols-[2fr_1fr] gap-4 h-[calc(100vh-9rem)]">
+        <div className="grid grid-cols-1 md:grid-cols-[2fr_1fr] gap-4">
           {/* Left Column - Market Details (Children) */}
-          <div className="overflow-y-auto">
+          <div>
             <div className="space-y-4">
               {/* Price Chart Module */}
               <Card className="shadow-md">
