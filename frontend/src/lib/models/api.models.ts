@@ -32,3 +32,110 @@ export type Market = {
 export type MarketResponse = {
   market: Market;
 };
+
+/*
+{
+  "proxyWallet": "0x56687bf447db6ffa42ffe2204a05edaa20f55839",
+  "asset": "<string>",
+  "conditionId": "0xdd22472e552920b8438158ea7238bfadfa4f736aa4cee91a6b86c39ead110917",
+  "size": 123,
+  "avgPrice": 123,
+  "initialValue": 123,
+  "currentValue": 123,
+  "cashPnl": 123,
+  "percentPnl": 123,
+  "totalBought": 123,
+  "realizedPnl": 123,
+  "percentRealizedPnl": 123,
+  "curPrice": 123,
+  "redeemable": true,
+  "mergeable": true,
+  "title": "<string>",
+  "slug": "<string>",
+  "icon": "<string>",
+  "eventSlug": "<string>",
+  "outcome": "<string>",
+  "outcomeIndex": 123,
+  "oppositeOutcome": "<string>",
+  "oppositeAsset": "<string>",
+  "endDate": "<string>",
+  "negativeRisk": true
+  }
+*/
+
+export type UserPosition = {
+  proxyWallet: string;
+  asset: string;
+  conditionId: string;
+  size: number;
+  avgPrice: number;
+  initialValue: number;
+  currentValue: number;
+  cashPnl: number;
+  percentPnl: number;
+  totalBought: number;
+  realizedPnl: number;
+  percentRealizedPnl: number;
+  curPrice: number;
+  redeemable: boolean;
+  mergeable: boolean;
+  title: string;
+  slug: string;
+  icon: string;
+  eventSlug: string;
+  outcome: string;
+  outcomeIndex: number;
+  oppositeOutcome: string;
+  oppositeAsset: string;
+  endDate: string;
+  negativeRisk: boolean;
+};
+
+/*
+https://docs.polymarket.com/api-reference/core/get-trades-for-a-user-or-markets
+
+trade:
+{
+  "proxyWallet": "0x56687bf447db6ffa42ffe2204a05edaa20f55839",
+  "side": "BUY",
+  "asset": "<string>",
+  "conditionId": "0xdd22472e552920b8438158ea7238bfadfa4f736aa4cee91a6b86c39ead110917",
+  "size": 123,
+  "price": 123,
+  "timestamp": 123,
+  "title": "<string>",
+  "slug": "<string>",
+  "icon": "<string>",
+  "eventSlug": "<string>",
+  "outcome": "<string>",
+  "outcomeIndex": 123,
+  "name": "<string>",
+  "pseudonym": "<string>",
+  "bio": "<string>",
+  "profileImage": "<string>",
+  "profileImageOptimized": "<string>",
+  "transactionHash": "<string>"
+}
+*/
+
+export type Trade = {
+  proxyWallet: string;
+  side: string;
+  asset: string;
+  conditionId: string;
+  size: number;
+  price: number;
+  timestamp: number;
+  title: string;
+  slug: string;
+  icon: string;
+  eventSlug: string;
+  outcome: string;
+  outcomeIndex: number;
+  name: string;
+  pseudonym: string;
+  bio: string;
+  profileImage: string;
+  profileImageOptimized: string;
+  transactionHash: string;
+};
