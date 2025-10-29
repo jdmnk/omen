@@ -44,7 +44,7 @@ export async function MarketView({ data }: { data: MarketResponse }) {
             )}
 
             {/* Placeholder for additional modules */}
-            <Card className="shadow-md">
+            {/* <Card className="shadow-md">
               <CardHeader className="pb-3">
                 <CardTitle className="text-base">Watchlist</CardTitle>
               </CardHeader>
@@ -53,7 +53,7 @@ export async function MarketView({ data }: { data: MarketResponse }) {
                   Your saved markets will appear here
                 </p>
               </CardContent>
-            </Card>
+            </Card> */}
 
             <RecentActivityWidget conditionId={market.condition_id} />
           </div>
