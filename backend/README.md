@@ -1,10 +1,17 @@
 ## Local dev
 
-- run: `docker compose up --build`
-- execute a specific script inside main container:
-  - update_markets: `docker compose exec app python -m src.update_markets`
-  - init db: `docker compose exec app python -m src.db.db_init`
-  - populate db: `docker compose exec app python -m src.db.db_populate`
+```bash
+# spin up services
+docker compose up --build
+
+# fresh start
+docker compose exec app python -m src.db.db_init --reset
+docker compose exec app python -m src.db.db_populate_markets
+docker compose exec app python -m src.db.db_populate_trades
+
+# update in a loop (currently unused)
+docker compose exec app python -m src.update_markets
+```
 
 Docker VPS:
 
