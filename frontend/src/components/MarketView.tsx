@@ -1,20 +1,11 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import { MarketResponse, Position } from "@/lib/models/api.models";
-import { formatNumber, formatCurrency } from "@/lib/ui/format.utils";
+import { MarketResponse } from "@/lib/models/api.models";
 import { PriceChartWidget } from "./widgets/PriceChartWidget";
 import { ExpandableText } from "@/components/ui/expandable-text";
 import { MarketInfoBar } from "@/components/MarketInfoBar";
 import { MainSharedContainer } from "./layouts/MainSharedContainer";
 import { PositionsWidget } from "./widgets/PositionsWidget";
+import { RecentActivityWidget } from "./widgets/RecentActivityWidget";
 
 export async function MarketView({ data }: { data: MarketResponse }) {
   const { market } = data;
@@ -64,16 +55,7 @@ export async function MarketView({ data }: { data: MarketResponse }) {
               </CardContent>
             </Card>
 
-            <Card className="shadow-md">
-              <CardHeader className="pb-3">
-                <CardTitle className="text-base">Recent Activity</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-sm text-muted-foreground">
-                  Recent trades and updates
-                </p>
-              </CardContent>
-            </Card>
+            <RecentActivityWidget conditionId={market.condition_id} />
           </div>
         </div>
       </MainSharedContainer>

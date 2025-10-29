@@ -11,6 +11,7 @@ export type Position = {
 };
 
 export type Market = {
+  condition_id: string;
   question: string;
   description: string;
   icon: string;
