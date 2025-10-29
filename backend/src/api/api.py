@@ -36,15 +36,6 @@ def health():
     return {"status": "ok"}
 
 
-@app.get("/markets/search")
-async def search_markets(query: str = Query(min_length=1)) -> dict:
-    result = await db.search_markets(query=query)
-
-    if result is None:
-        raise HTTPException(status_code=404, detail="Market not found")
-    return result
-
-
 @app.get("/markets/autocomplete")
 async def autocomplete_markets(q: str = Query(min_length=1), limit: int = 10) -> list[dict]:
     # hard cap to avoid excessive payloads
