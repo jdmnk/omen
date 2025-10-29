@@ -8,9 +8,14 @@ import { ExternalLink, TrendingUp, TrendingDown, Wallet } from "lucide-react";
 import Link from "next/link";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { MainSharedContainer } from "@/components/layouts/MainSharedContainer";
+import { use } from "react";
 
-export default function UserPage({ params }: { params: { id: string } }) {
-  const { id } = params;
+export default function UserPage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  const { id } = use(params);
   const { data: positions, isLoading, error } = useUserPositionsQuery(id);
 
   if (isLoading) {
