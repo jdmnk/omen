@@ -24,18 +24,18 @@ const chartOptions: DeepPartial<ChartOptions> = {
   },
   height: 350,
   grid: {
-    vertLines: { color: "#1f2937" },
-    horzLines: { color: "#1f2937" },
+    vertLines: { color: "#27272a", visible: true },
+    horzLines: { color: "#27272a", visible: true },
   },
   timeScale: {
-    borderColor: "#374151",
+    borderColor: "#3f3f46",
     timeVisible: true,
     rightBarStaysOnScroll: false,
     fixLeftEdge: true,
     fixRightEdge: true,
   },
   rightPriceScale: {
-    borderColor: "#374151",
+    borderColor: "#3f3f46",
     scaleMargins: {
       top: 0.1,
       bottom: 0.1,
@@ -43,6 +43,21 @@ const chartOptions: DeepPartial<ChartOptions> = {
   },
   handleScale: false,
   handleScroll: false,
+  crosshair: {
+    mode: 1, // Normal crosshair
+    vertLine: {
+      color: "#52525b",
+      width: 1,
+      style: 3,
+      labelBackgroundColor: "#3f3f46",
+    },
+    horzLine: {
+      color: "#52525b",
+      width: 1,
+      style: 3,
+      labelBackgroundColor: "#3f3f46",
+    },
+  },
 };
 
 type ChartPoint = {
@@ -73,6 +88,15 @@ export function PriceChart({ data, error, isLoading }: PriceChartProps) {
         precision: 2,
         minMove: 0.01,
       },
+      color: "#22d3ee", // cyan-400 - vibrant but professional
+      lineWidth: 2,
+      crosshairMarkerVisible: true,
+      crosshairMarkerRadius: 4,
+      lastValueVisible: true,
+      priceLineVisible: true,
+      priceLineColor: "#22d3ee",
+      priceLineWidth: 1,
+      priceLineStyle: 2, // dashed
     });
     seriesRef.current = lineSeries;
 
