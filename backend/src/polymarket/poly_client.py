@@ -8,6 +8,7 @@ from py_clob_client.constants import POLYGON
 from py_clob_client.exceptions import PolyApiException
 
 from src.models.position import PositionSchema, parse_position_from_api
+from src.models.trade import TradeSchema, parse_trade_from_api
 from src.settings import settings
 from src.utils.logging_config import get_logger
 from src.utils.usdc import to_usdc
@@ -149,7 +150,7 @@ class PolyClient:
 
     async def get_market_trades(
         self, condition_ids: list[str], count: int | None = None
-    ) -> list[dict]:
+    ) -> list[TradeSchema]:
         """
         Data API /trades: 75 requests / 10s	(Throttle requests over the maximum configured rate)
 
@@ -158,7 +159,7 @@ class PolyClient:
 
         limit = 500
         offset = 0
-        all_trades = []
+        all_trades: list[dict] = []
         total_trades = 0
 
         async with httpx.AsyncClient() as client:
@@ -182,7 +183,9 @@ class PolyClient:
 
                 offset += limit
 
-        return all_trades
+        # Parse raw API trades into typed TradeSchema objects
+        parsed_trades = [t for t in (parse_trade_from_api(t) for t in all_trades) if t is not None]
+        return parsed_trades
 
     async def get_top_holders(
         self, condition_ids: list[string], min_balance: int = 1, limit: int = 500

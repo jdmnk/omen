@@ -7,6 +7,7 @@ from py_clob_client.clob_types import OrderBookSummary
 
 from src.db.database_client import DatabaseClient
 from src.models.position import PositionSchema
+from src.models.trade import TradeSchema
 from src.polymarket.poly_client import PolyClient
 from src.utils.logging_config import get_logger
 
@@ -62,8 +63,8 @@ def get_market_order_book(token_id: str = Query(min_length=1)) -> OrderBookSumma
         raise HTTPException(status_code=404, detail="Order book not found")
 
 
-@app.get("/markets/trades", response_model=list[dict])
-async def get_market_trades(condition_id: str = Query(min_length=1)) -> list[dict]:
+@app.get("/markets/trades", response_model=list[TradeSchema])
+async def get_market_trades(condition_id: str = Query(min_length=1)) -> list[TradeSchema]:
     trades = await poly_client.get_market_trades([condition_id])
 
     if trades is not None and len(trades) > 0:
