@@ -118,7 +118,11 @@ class PolyClient:
         markets = []
 
         for event in all_events:
-            markets.extend(event["markets"])
+            for market in event["markets"]:
+                if market["closed"] or market["closed"] == "true":
+                    print("found a closed market in open event: ", market["question"])
+                    continue
+                markets.append(market)
 
         logger.info(
             f"Finished fetching {len(all_events)} active events, found {len(markets)} markets"
