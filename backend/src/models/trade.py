@@ -1,8 +1,41 @@
 from __future__ import annotations
 
-from pydantic import BaseModel
+from datetime import datetime
 
+from pydantic import BaseModel
+from sqlalchemy import BigInteger, DateTime, Numeric, String, func
+from sqlalchemy.orm import Mapped, mapped_column
+
+from src.models.base import Base
 from src.utils.parse_utils import to_float, to_int
+
+
+class Trade(Base):
+    __tablename__ = "trades"
+
+    transactionHash: Mapped[str] = mapped_column(String, primary_key=True)
+    fetched_at: Mapped[datetime] = mapped_column(
+        DateTime, server_default=func.now(), onupdate=func.now()
+    )
+
+    proxyWallet: Mapped[str] = mapped_column(String, nullable=False)
+    side: Mapped[str] = mapped_column(String, nullable=False)
+    asset: Mapped[str] = mapped_column(String, nullable=False)
+    conditionId: Mapped[str] = mapped_column(String, nullable=False, index=True)
+    size: Mapped[float] = mapped_column(Numeric, nullable=False)
+    price: Mapped[float] = mapped_column(Numeric, nullable=False)
+    timestamp: Mapped[int] = mapped_column(BigInteger, nullable=False, index=True)
+    title: Mapped[str] = mapped_column(String, nullable=True)
+    slug: Mapped[str] = mapped_column(String, nullable=True)
+    icon: Mapped[str] = mapped_column(String, nullable=True)
+    eventSlug: Mapped[str] = mapped_column(String, nullable=True)
+    outcome: Mapped[str] = mapped_column(String, nullable=True)
+    outcomeIndex: Mapped[int] = mapped_column(BigInteger, nullable=True)
+    name: Mapped[str] = mapped_column(String, nullable=True)
+    pseudonym: Mapped[str] = mapped_column(String, nullable=True)
+    bio: Mapped[str] = mapped_column(String, nullable=True)
+    profileImage: Mapped[str] = mapped_column(String, nullable=True)
+    profileImageOptimized: Mapped[str] = mapped_column(String, nullable=True)
 
 
 class TradeSchema(BaseModel):

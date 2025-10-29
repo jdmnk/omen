@@ -7,10 +7,11 @@ from sqlalchemy.ext.asyncio import (
     create_async_engine,
 )
 
-from src.models.market import Market, MarketSchema, parse_market_from_api
 from src.models.event import Event, EventSchema, parse_event_from_api
 from src.models.event_market import EventMarket
+from src.models.market import Market, MarketSchema, parse_market_from_api
 from src.models.position import Position, PositionSchema, parse_position_from_api
+from src.models.trade import Trade as TradeORM, TradeSchema, parse_trade_from_api
 from src.settings import settings
 from src.utils.logging_config import get_logger
 
@@ -167,6 +168,112 @@ class DatabaseClient:
 
         logger.info("Inserted/updated %d event->market links", total_upserted)
         return total_upserted
+
+    async def insert_trades(self, trades: list[dict | TradeSchema], chunk_size: int = 1000) -> int:
+        """
+        Upsert trades by deterministic id derived from transactionHash and core fields.
+        Accepts raw dicts or TradeSchema instances.
+        """
+        from decimal import Decimal
+
+        # Normalize to TradeSchema
+        parsed_trades: list[TradeSchema] = []
+        for tr in trades:
+            if isinstance(tr, TradeSchema):
+                parsed_trades.append(tr)
+            else:
+                parsed = parse_trade_from_api(tr)
+                if parsed:
+                    parsed_trades.append(parsed)
+
+        if not parsed_trades:
+            logger.info("No valid trades to upsert.")
+            return 0
+
+        # Map to ORM dicts with computed id and Decimal conversions
+        def to_row(tr: TradeSchema) -> dict:
+            return {
+                "transactionHash": tr.transactionHash,
+                "proxyWallet": tr.proxyWallet,
+                "side": tr.side,
+                "asset": tr.asset,
+                "conditionId": tr.conditionId,
+                "size": Decimal(str(tr.size or 0)),
+                "price": Decimal(str(tr.price or 0)),
+                "timestamp": int(tr.timestamp or 0),
+                "title": tr.title,
+                "slug": tr.slug,
+                "icon": tr.icon,
+                "eventSlug": tr.eventSlug,
+                "outcome": tr.outcome,
+                "outcomeIndex": int(tr.outcomeIndex or 0) if tr.outcomeIndex is not None else None,
+                "name": tr.name,
+                "pseudonym": tr.pseudonym,
+                "bio": tr.bio,
+                "profileImage": tr.profileImage,
+                "profileImageOptimized": tr.profileImageOptimized,
+            }
+
+        total_upserted = 0
+        async with self.async_session() as session:
+            for start in range(0, len(parsed_trades), chunk_size):
+                batch = parsed_trades[start : start + chunk_size]
+                values = [to_row(t) for t in batch]
+
+                stmt = pg_insert(TradeORM).values(values)
+                update_fields = {
+                    col: stmt.excluded[col]
+                    for col in TradeORM.__table__.columns.keys()
+                    if col not in ["transactionHash", "fetched_at"]
+                }
+                update_fields["fetched_at"] = text("now()")
+
+                stmt = stmt.on_conflict_do_update(
+                    index_elements=["transactionHash"], set_=update_fields
+                )
+
+                await session.execute(stmt)
+                total_upserted += len(batch)
+                await session.commit()
+
+        logger.info("Inserted/updated %d trades into DB", total_upserted)
+        return total_upserted
+
+    async def get_markets_by_volume_and_liquidity(
+        self, *, min_volume: float, min_liquidity: float, limit: int | None = None
+    ) -> list[str]:
+        """
+        Return condition_ids for markets meeting volume and liquidity thresholds.
+        """
+        sql = text(
+            """
+            SELECT condition_id
+            FROM markets
+            WHERE volume >= :min_volume
+              AND liquidity >= :min_liquidity
+            ORDER BY volume DESC
+            """
+        )
+        params: dict = {
+            "min_volume": min_volume,
+            "min_liquidity": min_liquidity,
+        }
+        if limit is not None and limit > 0:
+            sql = text(
+                """
+                SELECT condition_id
+                FROM markets
+                WHERE volume >= :min_volume
+                  AND liquidity >= :min_liquidity
+                ORDER BY volume DESC
+                LIMIT :limit
+                """
+            )
+            params["limit"] = limit
+
+        async with self.engine.connect() as conn:
+            rows = (await conn.execute(sql, params)).scalars().all()
+            return [str(r) for r in rows]
 
     async def delete_all_markets(self) -> int:
         sql = text("DELETE FROM markets")

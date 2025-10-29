@@ -203,7 +203,7 @@ class PolyClient:
                 raise exc
 
     async def get_market_trades(
-        self, condition_ids: list[str], count: int | None = None
+        self, condition_ids: list[str], min_amount: int = 100, count: int | None = None
     ) -> list[TradeSchema]:
         """
         Data API /trades: 75 requests / 10s	(Throttle requests over the maximum configured rate)
@@ -211,20 +211,27 @@ class PolyClient:
         Warning: 429 really fast
         """
 
-        limit = 10000  # max 10000! should help with rate limits :D
+        MAX_LIMIT = 10000  # API max
         offset = 0
         all_trades: list[dict] = []
         total_trades = 0
 
         async with httpx.AsyncClient() as client:
             while True:
+                # Respect count cap by shrinking page size when close to target
+                page_limit = MAX_LIMIT
+                if count is not None and count > 0:
+                    remaining = max(0, count - total_trades)
+                    if remaining == 0:
+                        break
+                    page_limit = min(MAX_LIMIT, remaining)
+
                 params = {
                     "market": ",".join(condition_ids),  # comma separated list
-                    "limit": limit,
+                    "limit": page_limit,
                     "offset": offset,
                     "filterType": "CASH",
-                    "filterAmount": 100,
-                    # "side": "BUY",
+                    "filterAmount": int(min_amount),
                 }
                 response = await client.get(f"{DATA_API_HOST}/trades", params=params)
                 trades = response.json()
@@ -235,12 +242,16 @@ class PolyClient:
                 all_trades.extend(trades)
                 total_trades += len(trades)
 
-                if len(trades) < limit:
+                if len(trades) < page_limit:
                     break
 
-                offset += limit
+                offset += page_limit
 
-                await asyncio.sleep(0.1)
+                await asyncio.sleep(0.2)
+
+        # Trim to requested count if applicable
+        if count is not None and count > 0 and len(all_trades) > count:
+            all_trades = all_trades[:count]
 
         # Parse raw API trades into typed TradeSchema objects
         parsed_trades = [t for t in (parse_trade_from_api(t) for t in all_trades) if t is not None]
