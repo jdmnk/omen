@@ -10,6 +10,7 @@ from src.analytics.trades_analytics import (
     group_trades_by_user_detailed,
 )
 from src.db.database_client import DatabaseClient
+from src.models.market import MarketSchema
 from src.models.position import PositionSchema
 from src.models.trade import TradeSchema
 from src.polymarket.poly_client import PolyClient
@@ -55,7 +56,9 @@ async def search_markets_slug(slug: str = Query(min_length=1)) -> dict:
     if result is None:
         raise HTTPException(status_code=404, detail="Market not found")
 
-    return {"market": result.to_dict()}
+    # Validate ORM into Pydantic and return; FastAPI will serialize
+    market_schema = MarketSchema.model_validate(result)
+    return {"market": market_schema}
 
 
 @app.get("/markets/order-book", response_model=OrderBookSummary | None)
