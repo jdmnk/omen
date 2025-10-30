@@ -38,7 +38,7 @@ async def main() -> None:
         # Upsert trades for this batch immediately (save-as-you-go)
         inserted = 0
         if fetched_count:
-            inserted = await db_client.insert_trades([t.model_dump() for t in trades_batch])
+            inserted = await db_client.insert_trades(trades_batch)
             total_trades_inserted += inserted
 
         total_markets_processed += len(batch_ids)

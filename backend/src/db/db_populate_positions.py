@@ -21,13 +21,13 @@ async def main() -> None:
     total_positions_inserted = 0
 
     for wallet in wallets:
-        positions = await poly_client.get_user_positions_top(wallet)
+        positions = await poly_client.get_user_positions_top(wallet, count=100)
         fetched = len(positions)
         total_positions_fetched += fetched
 
         inserted = 0
         if fetched:
-            inserted = await db_client.insert_user_positions([p.model_dump() for p in positions])
+            inserted = await db_client.insert_user_positions(positions)
             total_positions_inserted += inserted
 
         total_wallets += 1

@@ -11,11 +11,10 @@ from src.models.event import Event, EventSchema, parse_event_from_api
 from src.models.event_market import EventMarket
 from src.models.market import Market, MarketSchema, parse_market_from_api
 from src.models.position import Position, PositionSchema, parse_position_from_api
-from src.models.trade import Trade as TradeORM, TradeSchema, parse_trade_from_api
+from src.models.trade import Trade as TradeORM, TradeSchema
 from src.models.user_position import (
     UserPosition as UserPositionORM,
     UserPositionSchema,
-    parse_user_position_from_api,
 )
 from src.settings import settings
 from src.utils.logging_config import get_logger
@@ -174,56 +173,20 @@ class DatabaseClient:
         logger.info("Inserted/updated %d event->market links", total_upserted)
         return total_upserted
 
-    async def insert_trades(self, trades: list[dict | TradeSchema], chunk_size: int = 1000) -> int:
+    async def insert_trades(self, trades: list[TradeSchema], chunk_size: int = 1000) -> int:
         """
-        Upsert trades by deterministic id derived from transactionHash and core fields.
-        Accepts raw dicts or TradeSchema instances.
+        Upsert trades by transactionHash. Expects already parsed TradeSchema items.
         """
-        from decimal import Decimal
-
-        # Normalize to TradeSchema
-        parsed_trades: list[TradeSchema] = []
-        for tr in trades:
-            if isinstance(tr, TradeSchema):
-                parsed_trades.append(tr)
-            else:
-                parsed = parse_trade_from_api(tr)
-                if parsed:
-                    parsed_trades.append(parsed)
-
-        if not parsed_trades:
-            logger.info("No valid trades to upsert.")
+        if not trades:
+            logger.info("No trade rows to upsert.")
             return 0
-
-        # Map to ORM dicts with computed id and Decimal conversions
-        def to_row(tr: TradeSchema) -> dict:
-            return {
-                "transactionHash": tr.transactionHash,
-                "proxyWallet": tr.proxyWallet,
-                "side": tr.side,
-                "asset": tr.asset,
-                "conditionId": tr.conditionId,
-                "size": Decimal(str(tr.size or 0)),
-                "price": Decimal(str(tr.price or 0)),
-                "timestamp": int(tr.timestamp or 0),
-                "title": tr.title,
-                "slug": tr.slug,
-                "icon": tr.icon,
-                "eventSlug": tr.eventSlug,
-                "outcome": tr.outcome,
-                "outcomeIndex": int(tr.outcomeIndex or 0) if tr.outcomeIndex is not None else None,
-                "name": tr.name,
-                "pseudonym": tr.pseudonym,
-                "bio": tr.bio,
-                "profileImage": tr.profileImage,
-                "profileImageOptimized": tr.profileImageOptimized,
-            }
 
         total_upserted = 0
         async with self.async_session() as session:
-            for start in range(0, len(parsed_trades), chunk_size):
-                batch = parsed_trades[start : start + chunk_size]
-                values = [to_row(t) for t in batch]
+            for start in range(0, len(trades), chunk_size):
+                batch = trades[start : start + chunk_size]
+                # Use pydantic dicts directly; ORM/driver will coerce types
+                values = [t.model_dump() for t in batch]
 
                 stmt = pg_insert(TradeORM).values(values)
                 update_fields = {
@@ -281,61 +244,21 @@ class DatabaseClient:
             return [str(r) for r in rows]
 
     async def insert_user_positions(
-        self, positions: list[dict | UserPositionSchema], chunk_size: int = 1000
+        self, positions: list[UserPositionSchema], chunk_size: int = 1000
     ) -> int:
         """
         Upsert user positions by composite key (proxyWallet, asset).
-        Accepts raw dicts or UserPositionSchema instances.
+        Expects already parsed UserPositionSchema items.
         """
-        from decimal import Decimal
-
-        parsed_positions: list[UserPositionSchema] = []
-        for p in positions:
-            if isinstance(p, UserPositionSchema):
-                parsed_positions.append(p)
-            else:
-                parsed = parse_user_position_from_api(p)
-                if parsed:
-                    parsed_positions.append(parsed)
-
-        if not parsed_positions:
-            logger.info("No valid user positions to upsert.")
+        if not positions:
+            logger.info("No user positions to upsert.")
             return 0
-
-        def to_row(up: UserPositionSchema) -> dict:
-            return {
-                "proxyWallet": up.proxyWallet,
-                "asset": up.asset,
-                "conditionId": up.conditionId,
-                "size": Decimal(str(up.size or 0)),
-                "avgPrice": Decimal(str(up.avgPrice or 0)),
-                "initialValue": Decimal(str(up.initialValue or 0)),
-                "currentValue": Decimal(str(up.currentValue or 0)),
-                "cashPnl": Decimal(str(up.cashPnl or 0)),
-                "percentPnl": Decimal(str(up.percentPnl or 0)),
-                "totalBought": Decimal(str(up.totalBought or 0)),
-                "realizedPnl": Decimal(str(up.realizedPnl or 0)),
-                "percentRealizedPnl": Decimal(str(up.percentRealizedPnl or 0)),
-                "curPrice": Decimal(str(up.curPrice or 0)),
-                "redeemable": bool(up.redeemable),
-                "mergeable": bool(up.mergeable),
-                "title": up.title,
-                "slug": up.slug,
-                "icon": up.icon,
-                "eventSlug": up.eventSlug,
-                "outcome": up.outcome,
-                "outcomeIndex": int(up.outcomeIndex) if up.outcomeIndex is not None else None,
-                "oppositeOutcome": up.oppositeOutcome,
-                "oppositeAsset": up.oppositeAsset,
-                "endDate": up.endDate,
-                "negativeRisk": bool(up.negativeRisk),
-            }
 
         total_upserted = 0
         async with self.async_session() as session:
-            for start in range(0, len(parsed_positions), chunk_size):
-                batch = parsed_positions[start : start + chunk_size]
-                values = [to_row(p) for p in batch]
+            for start in range(0, len(positions), chunk_size):
+                batch = positions[start : start + chunk_size]
+                values = [p.model_dump() for p in batch]
 
                 stmt = pg_insert(UserPositionORM).values(values)
                 update_fields = {
