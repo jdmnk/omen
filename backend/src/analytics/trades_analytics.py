@@ -166,6 +166,7 @@ class UserTradesGroup(BaseModel):
 
     totalVolume: float
     totalNotional: float
+    totalUsdVolume: float
 
     # Not returned in UI, but used for backend ordering
     totalHoldings: float
@@ -178,9 +179,10 @@ def group_trades_by_user_detailed(trades: list[TradeSchema]) -> list[UserTradesG
     """Return groups of related trades by user with per-group stats.
 
     - Group by proxyWallet
-    - For each group compute totalVolume (sum |size|), totalNotional (sum |size|*price)
+    - totalVolume: sum of absolute sizes (shares)
+    - totalUsdVolume: sum of absolute size * price (USD). totalNotional kept for compatibility
     - Sort each group's trades by absolute size desc
-    - Order groups by current total holdings (sum of positive outcome nets), do not expose in UI
+    - Order groups by totalUsdVolume desc
     """
 
     user_to_trades: dict[str, list[TradeSchema]] = {}
@@ -210,25 +212,28 @@ def group_trades_by_user_detailed(trades: list[TradeSchema]) -> list[UserTradesG
     groups: list[UserTradesGroup] = []
 
     for wallet, user_trades in user_to_trades.items():
-        # Compute stats
-        total_volume = 0.0
-        total_notional = 0.0
+        # Compute totals
+        sizes_abs = [abs(float(tr.size or 0.0)) for tr in user_trades]
+        prices = [float(tr.price or 0.0) for tr in user_trades]
+        total_volume = sum(sizes_abs)
+        total_notional = sum(s * p for s, p in zip(sizes_abs, prices, strict=False))
 
-        # Compute net holdings by outcome from available trades
+        # Compute net holdings by outcome (BUY adds, SELL subtracts)
         holdings_by_outcome: dict[str, float] = {}
-
         for tr in user_trades:
-            size = float(tr.size or 0.0)
-            price = float(tr.price or 0.0)
             side = (tr.side or "").upper()
-            total_volume += abs(size)
-            total_notional += abs(size) * price
-
-            outcome_key = _outcome_key(tr)
-            prev = holdings_by_outcome.get(outcome_key, 0.0)
-            delta = size if side == "BUY" else -size if side == "SELL" else 0.0
-            if delta:
-                holdings_by_outcome[outcome_key] = prev + delta
+            signed_size = (
+                float(tr.size or 0.0)
+                if side == "BUY"
+                else -float(tr.size or 0.0)
+                if side == "SELL"
+                else 0.0
+            )
+            if signed_size:
+                outcome_key = _outcome_key(tr)
+                holdings_by_outcome[outcome_key] = (
+                    holdings_by_outcome.get(outcome_key, 0.0) + signed_size
+                )
 
         total_holdings = sum(v for v in holdings_by_outcome.values() if v > 0)
 
@@ -246,11 +251,12 @@ def group_trades_by_user_detailed(trades: list[TradeSchema]) -> list[UserTradesG
                 profileImage=meta.get("profileImage"),
                 totalVolume=total_volume,
                 totalNotional=total_notional,
+                totalUsdVolume=total_notional,
                 totalHoldings=total_holdings,
                 trades=user_trades_sorted,
             )
         )
 
-    # Order groups by totalHoldings desc
-    groups.sort(key=lambda g: g.totalHoldings, reverse=True)
+    # Order groups by totalUsdVolume desc
+    groups.sort(key=lambda g: g.totalUsdVolume, reverse=True)
     return groups

@@ -170,5 +170,6 @@ export type UserTradesGroup = {
   profileImage?: string | null;
   totalVolume: number;
   totalNotional: number;
+  totalUsdVolume: number;
   trades: Trade[];
 };

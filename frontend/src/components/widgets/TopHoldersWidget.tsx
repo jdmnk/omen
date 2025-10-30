@@ -137,7 +137,7 @@ export function TopHoldersWidget({
                       </div>
                       <div className="text-right">
                         <div className="text-sm font-semibold">
-                          {formatCurrency(u.totalVolume)}
+                          {formatCurrency(u.totalUsdVolume)}
                         </div>
                         <div className="text-xs text-muted-foreground">
                           {u.trades.length}{" "}
