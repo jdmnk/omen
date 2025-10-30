@@ -8,6 +8,7 @@ docker compose up --build
 docker compose exec app python -m src.db.db_init --reset
 docker compose exec app python -m src.db.db_populate_markets
 docker compose exec app python -m src.db.db_populate_trades
+docker compose exec app python -m src.db.db_populate_positions
 
 # update in a loop (currently unused)
 docker compose exec app python -m src.update_markets
