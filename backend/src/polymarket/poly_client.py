@@ -10,6 +10,10 @@ from py_clob_client.exceptions import PolyApiException
 
 from src.models.position import PositionSchema, parse_position_from_api
 from src.models.trade import TradeSchema, parse_trade_from_api
+from src.models.user_position import (
+    UserPositionSchema,
+    parse_user_position_from_api,
+)
 from src.settings import settings
 from src.utils.logging_config import get_logger
 from src.utils.usdc import to_usdc
@@ -344,3 +348,31 @@ class PolyClient:
             parsed_positions.sort(key=lambda x: x.amount * x.avgPrice, reverse=True)
 
             return parsed_positions
+
+    async def get_user_positions_top(
+        self, user_id: str, count: int = 100
+    ) -> list[UserPositionSchema]:
+        """
+        Fetch top N user positions from Data API (already sorted), single page.
+        """
+        limit = max(1, int(count))
+        async with httpx.AsyncClient() as client:
+            params = {
+                "user": user_id,
+                "sizeThreshold": 1,
+                "sortBy": "CURRENT",
+                "sortDirection": "DESC",
+                "limit": limit,
+                "offset": 0,
+            }
+            response = await client.get(f"{DATA_API_HOST}/positions", params=params)
+            if response.status_code != 200:
+                return []
+            data = response.json() or []
+
+        parsed: list[UserPositionSchema] = []
+        for p in data:
+            schema = parse_user_position_from_api(p)
+            if schema:
+                parsed.append(schema)
+        return parsed
