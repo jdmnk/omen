@@ -1,6 +1,7 @@
 import asyncio
 
-from src.db.database_client import DatabaseClient
+from src.db.inserts import InsertsClient
+from src.db.selects import SelectsClient
 from src.polymarket.poly_client import PolyClient
 from src.utils.logging_config import get_logger
 
@@ -9,10 +10,11 @@ logger = get_logger(__name__)
 
 async def main() -> None:
     poly_client = PolyClient()
-    db_client = DatabaseClient()
+    inserts = InsertsClient()
+    selects = SelectsClient()
 
     # Gather distinct wallets from trades
-    wallets = await db_client.get_distinct_trade_wallets()
+    wallets = await selects.get_distinct_trade_wallets()
     logger.info("Found %d unique wallets from trades", len(wallets))
 
     total_wallets = 0
@@ -26,7 +28,7 @@ async def main() -> None:
 
         inserted = 0
         if fetched:
-            inserted = await db_client.insert_user_positions(positions)
+            inserted = await inserts.insert_user_positions(positions)
             total_positions_inserted += inserted
 
         total_wallets += 1

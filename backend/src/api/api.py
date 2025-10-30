@@ -9,9 +9,14 @@ from src.analytics.trades_analytics import (
     UserTradesGroup,
     group_trades_by_user_detailed,
 )
-from src.db.database_client import DatabaseClient
-from src.models.market import MarketSchema
+from src.db.selects import SelectsClient
 from src.models.position import PositionSchema
+from src.models.public import (
+    HealthResponse,
+    MarketAutocompleteItem,
+    MarketSearchResponse,
+    MessageResponse,
+)
 from src.models.trade import TradeSchema
 from src.polymarket.poly_client import PolyClient
 from src.utils.logging_config import get_logger
@@ -28,37 +33,36 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-db = DatabaseClient()
+selects = SelectsClient()
 poly_client = PolyClient()
 
 
-@app.get("/")
-def home():
-    return {"message": datetime.now().isoformat()}
+@app.get("/", response_model=MessageResponse)
+def home() -> MessageResponse:
+    return MessageResponse(message=datetime.now().isoformat())
 
 
-@app.get("/health")
-def health():
-    return {"status": "ok"}
+@app.get("/health", response_model=HealthResponse)
+def health() -> HealthResponse:
+    return HealthResponse(status="ok")
 
 
-@app.get("/markets/autocomplete")
-async def autocomplete_markets(q: str = Query(min_length=1), limit: int = 10) -> list[dict]:
+@app.get("/markets/autocomplete", response_model=list[MarketAutocompleteItem])
+async def autocomplete_markets(
+    q: str = Query(min_length=1), limit: int = 10
+) -> list[MarketAutocompleteItem]:
     # hard cap to avoid excessive payloads
     limit = max(1, min(limit, 25))
-    rows = await db.autocomplete_markets(q, limit=limit)
-    return rows
+    return await selects.autocomplete_markets(q, limit=limit)
 
 
-@app.get("/markets/search-slug")
-async def search_markets_slug(slug: str = Query(min_length=1)) -> dict:
-    result = await db.get_market_by_slug(slug=slug)
+@app.get("/markets/search-slug", response_model=MarketSearchResponse)
+async def search_markets_slug(slug: str = Query(min_length=1)) -> MarketSearchResponse:
+    result = await selects.get_market_by_slug(slug=slug)
     if result is None:
         raise HTTPException(status_code=404, detail="Market not found")
 
-    # Validate ORM into Pydantic and return; FastAPI will serialize
-    market_schema = MarketSchema.model_validate(result)
-    return {"market": market_schema}
+    return MarketSearchResponse(market=result)
 
 
 @app.get("/markets/order-book", response_model=OrderBookSummary | None)

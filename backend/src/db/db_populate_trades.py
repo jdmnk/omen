@@ -1,6 +1,7 @@
 import asyncio
 
-from src.db.database_client import DatabaseClient
+from src.db.inserts import InsertsClient
+from src.db.selects import SelectsClient
 from src.polymarket.poly_client import PolyClient
 from src.utils.logging_config import get_logger
 
@@ -14,10 +15,11 @@ BATCH_SIZE = 4
 
 async def main() -> None:
     poly_client = PolyClient()
-    db_client = DatabaseClient()
+    inserts = InsertsClient()
+    selects = SelectsClient()
 
     # Find eligible markets (by DB query)
-    condition_ids = await db_client.get_markets_by_volume_and_liquidity(
+    condition_ids = await selects.get_markets_by_volume_and_liquidity(
         min_volume=MIN_VOLUME, min_liquidity=MIN_LIQUIDITY
     )
     logger.info("Eligible markets for trades fetch: %d", len(condition_ids))
@@ -37,7 +39,7 @@ async def main() -> None:
         # Upsert trades for this batch immediately (save-as-you-go)
         inserted = 0
         if fetched_count:
-            inserted = await db_client.insert_trades(trades_batch)
+            inserted = await inserts.insert_trades(trades_batch)
             total_trades_inserted += inserted
 
         total_markets_processed += len(batch_ids)
