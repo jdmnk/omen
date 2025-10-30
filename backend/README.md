@@ -27,9 +27,11 @@ docker compose down --rmi all --volumes --remove-orphans
 
 Database Management:
 
-- **Reset database (drop all tables & recreate)**: `docker compose exec app python -m src.db.db_init --reset`
-- **Create tables only**: `docker compose exec app python -m src.db.db_init`
-- **Check markets**: `docker compose exec db psql -U user -d mydb -c "SELECT *  FROM markets order by slug limit 1;"`
+```bash
+docker compose exec db psql -U user -d mydb -c "SELECT * FROM markets order by slug limit 1;"
+
+docker compose exec db psql -U user -d mydb -c 'SELECT COUNT(DISTINCT "proxyWallet") FROM trades;'
+```
 
 VPS general:
 
