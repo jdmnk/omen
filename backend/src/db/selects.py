@@ -56,7 +56,7 @@ class SelectsClient:
             return [str(r) for r in rows]
 
     async def get_distinct_trade_wallets(self, limit: int | None = None) -> list[str]:
-        sql = "SELECT DISTINCT proxyWallet FROM trades ORDER BY proxyWallet"
+        sql = 'SELECT DISTINCT "proxyWallet" FROM trades ORDER BY "proxyWallet"'
         params: dict | None = None
         if limit is not None and limit > 0:
             sql += " LIMIT :limit"

@@ -40,6 +40,8 @@ async def main() -> None:
             inserted,
         )
 
+        await asyncio.sleep(0.2)
+
     logger.info(
         "Done. Wallets processed: %d, Positions fetched: %d, Positions inserted: %d",
         total_wallets,
