@@ -7,15 +7,15 @@ from src.utils.logging_config import get_logger
 
 logger = get_logger(__name__)
 
+MIN_VOLUME = 100_000
+MIN_LIQUIDITY = 10_000
+MIN_TRADE_USD = 1_000
+BATCH_SIZE = 4
+
 
 async def main() -> None:
     poly_client = PolyClient()
     db_client = DatabaseClient()
-
-    MIN_VOLUME = 100_000
-    MIN_LIQUIDITY = 10_000
-    MIN_TRADE_USD = 1_000
-    BATCH_SIZE = 4
 
     # Find eligible markets (by DB query)
     condition_ids = await db_client.get_markets_by_volume_and_liquidity(
