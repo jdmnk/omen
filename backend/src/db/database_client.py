@@ -12,6 +12,11 @@ from src.models.event_market import EventMarket
 from src.models.market import Market, MarketSchema, parse_market_from_api
 from src.models.position import Position, PositionSchema, parse_position_from_api
 from src.models.trade import Trade as TradeORM, TradeSchema, parse_trade_from_api
+from src.models.user_position import (
+    UserPosition as UserPositionORM,
+    UserPositionSchema,
+    parse_user_position_from_api,
+)
 from src.settings import settings
 from src.utils.logging_config import get_logger
 
@@ -273,6 +278,92 @@ class DatabaseClient:
 
         async with self.engine.connect() as conn:
             rows = (await conn.execute(sql, params)).scalars().all()
+            return [str(r) for r in rows]
+
+    async def insert_user_positions(
+        self, positions: list[dict | UserPositionSchema], chunk_size: int = 1000
+    ) -> int:
+        """
+        Upsert user positions by composite key (proxyWallet, asset).
+        Accepts raw dicts or UserPositionSchema instances.
+        """
+        from decimal import Decimal
+
+        parsed_positions: list[UserPositionSchema] = []
+        for p in positions:
+            if isinstance(p, UserPositionSchema):
+                parsed_positions.append(p)
+            else:
+                parsed = parse_user_position_from_api(p)
+                if parsed:
+                    parsed_positions.append(parsed)
+
+        if not parsed_positions:
+            logger.info("No valid user positions to upsert.")
+            return 0
+
+        def to_row(up: UserPositionSchema) -> dict:
+            return {
+                "proxyWallet": up.proxyWallet,
+                "asset": up.asset,
+                "conditionId": up.conditionId,
+                "size": Decimal(str(up.size or 0)),
+                "avgPrice": Decimal(str(up.avgPrice or 0)),
+                "initialValue": Decimal(str(up.initialValue or 0)),
+                "currentValue": Decimal(str(up.currentValue or 0)),
+                "cashPnl": Decimal(str(up.cashPnl or 0)),
+                "percentPnl": Decimal(str(up.percentPnl or 0)),
+                "totalBought": Decimal(str(up.totalBought or 0)),
+                "realizedPnl": Decimal(str(up.realizedPnl or 0)),
+                "percentRealizedPnl": Decimal(str(up.percentRealizedPnl or 0)),
+                "curPrice": Decimal(str(up.curPrice or 0)),
+                "redeemable": bool(up.redeemable),
+                "mergeable": bool(up.mergeable),
+                "title": up.title,
+                "slug": up.slug,
+                "icon": up.icon,
+                "eventSlug": up.eventSlug,
+                "outcome": up.outcome,
+                "outcomeIndex": int(up.outcomeIndex) if up.outcomeIndex is not None else None,
+                "oppositeOutcome": up.oppositeOutcome,
+                "oppositeAsset": up.oppositeAsset,
+                "endDate": up.endDate,
+                "negativeRisk": bool(up.negativeRisk),
+            }
+
+        total_upserted = 0
+        async with self.async_session() as session:
+            for start in range(0, len(parsed_positions), chunk_size):
+                batch = parsed_positions[start : start + chunk_size]
+                values = [to_row(p) for p in batch]
+
+                stmt = pg_insert(UserPositionORM).values(values)
+                update_fields = {
+                    col: stmt.excluded[col]
+                    for col in UserPositionORM.__table__.columns.keys()
+                    if col not in ["proxyWallet", "asset", "fetched_at"]
+                }
+                update_fields["fetched_at"] = text("now()")
+
+                stmt = stmt.on_conflict_do_update(
+                    index_elements=["proxyWallet", "asset"],
+                    set_=update_fields,
+                )
+
+                await session.execute(stmt)
+                total_upserted += len(batch)
+                await session.commit()
+
+        logger.info("Inserted/updated %d user positions", total_upserted)
+        return total_upserted
+
+    async def get_distinct_trade_wallets(self, limit: int | None = None) -> list[str]:
+        sql = "SELECT DISTINCT proxyWallet FROM trades ORDER BY proxyWallet"
+        if limit is not None and limit > 0:
+            sql += " LIMIT :limit"
+        params = {"limit": limit} if limit else {}
+        async with self.engine.connect() as conn:
+            rows = (await conn.execute(text(sql), params)).scalars().all()
             return [str(r) for r in rows]
 
     async def delete_all_markets(self) -> int:

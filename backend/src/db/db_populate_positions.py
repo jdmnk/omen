@@ -1,0 +1,51 @@
+import asyncio
+
+from src.db.database_client import DatabaseClient
+from src.polymarket.poly_client import PolyClient
+from src.utils.logging_config import get_logger
+
+
+logger = get_logger(__name__)
+
+
+async def main() -> None:
+    poly_client = PolyClient()
+    db_client = DatabaseClient()
+
+    # Gather distinct wallets from trades
+    wallets = await db_client.get_distinct_trade_wallets()
+    logger.info("Found %d unique wallets from trades", len(wallets))
+
+    total_wallets = 0
+    total_positions_fetched = 0
+    total_positions_inserted = 0
+
+    for wallet in wallets:
+        positions = await poly_client.get_user_positions_top(wallet)
+        fetched = len(positions)
+        total_positions_fetched += fetched
+
+        inserted = 0
+        if fetched:
+            inserted = await db_client.insert_user_positions([p.model_dump() for p in positions])
+            total_positions_inserted += inserted
+
+        total_wallets += 1
+        logger.info(
+            "Processed wallet %d/%d | positions fetched: %d | inserted: %d",
+            total_wallets,
+            len(wallets),
+            fetched,
+            inserted,
+        )
+
+    logger.info(
+        "Done. Wallets processed: %d, Positions fetched: %d, Positions inserted: %d",
+        total_wallets,
+        total_positions_fetched,
+        total_positions_inserted,
+    )
+
+
+if __name__ == "__main__":
+    asyncio.run(main())
