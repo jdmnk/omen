@@ -4,7 +4,6 @@ from src.db.database_client import DatabaseClient
 from src.polymarket.poly_client import PolyClient
 from src.utils.logging_config import get_logger
 
-
 logger = get_logger(__name__)
 
 MIN_VOLUME = 100_000
