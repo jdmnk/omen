@@ -11,7 +11,7 @@ logger = get_logger(__name__)
 MIN_VOLUME = 20_000
 MIN_LIQUIDITY = 10_000
 BATCH_SIZE = 4
-GLOBAL_MIN_TRADE_USD = 1000
+GLOBAL_MIN_TRADE_USD = 250
 
 ABS_MIN = 250  # never flag below this
 LIQ_PCT = 0.08  # 8 % of total liquidity

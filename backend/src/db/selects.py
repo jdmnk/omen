@@ -49,18 +49,18 @@ class SelectsClient:
     async def get_markets_by_volume_and_liquidity(
         self, *, min_volume: float, min_liquidity: float, limit: int | None = None
     ) -> list[MarketSchema]:
-        base_sql = (
-            "SELECT * FROM markets WHERE volume >= :min_volume AND liquidity >= :min_liquidity "
-            "ORDER BY volume DESC"
-        )
-        params: dict = {"min_volume": min_volume, "min_liquidity": min_liquidity}
-        if limit is not None and limit > 0:
-            base_sql += " LIMIT :limit"
-            params["limit"] = limit
+        async with self.core.async_session() as session:
+            stmt = (
+                select(Market)
+                .where(Market.volume >= min_volume, Market.liquidity >= min_liquidity)
+                .order_by(Market.volume.desc())
+            )
+            if limit is not None and limit > 0:
+                stmt = stmt.limit(limit)
 
-        async with self.core.engine.connect() as conn:
-            rows = (await conn.execute(text(base_sql), params)).scalars().all()
-            return [MarketSchema.model_validate(r) for r in rows]
+            result = await session.execute(stmt)
+            markets = result.scalars().all()
+            return [MarketSchema.model_validate(m) for m in markets]
 
     async def get_distinct_trade_wallets(self, limit: int | None = None) -> list[str]:
         sql = 'SELECT DISTINCT "proxyWallet" FROM trades ORDER BY "proxyWallet"'
