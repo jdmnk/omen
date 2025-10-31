@@ -11,6 +11,13 @@ class SelectsClient:
     def __init__(self, db_core: DbCore | None = None) -> None:
         self.core = db_core or DbCore()
 
+    async def get_market_by_condition_id(self, condition_id: str) -> MarketSchema | None:
+        async with self.core.async_session() as session:
+            stmt = select(Market).where(Market.condition_id == condition_id)
+            result = await session.execute(stmt)
+            market_orm = result.scalar_one_or_none()
+            return MarketSchema.model_validate(market_orm) if market_orm else None
+
     async def get_market_by_slug(self, slug: str) -> MarketSchema | None:
         async with self.core.async_session() as session:
             stmt = select(Market).where(Market.slug == slug)
