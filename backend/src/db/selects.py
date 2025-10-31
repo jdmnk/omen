@@ -41,9 +41,9 @@ class SelectsClient:
 
     async def get_markets_by_volume_and_liquidity(
         self, *, min_volume: float, min_liquidity: float, limit: int | None = None
-    ) -> list[str]:
+    ) -> list[MarketSchema]:
         base_sql = (
-            "SELECT condition_id FROM markets WHERE volume >= :min_volume AND liquidity >= :min_liquidity "
+            "SELECT * FROM markets WHERE volume >= :min_volume AND liquidity >= :min_liquidity "
             "ORDER BY volume DESC"
         )
         params: dict = {"min_volume": min_volume, "min_liquidity": min_liquidity}
@@ -53,7 +53,7 @@ class SelectsClient:
 
         async with self.core.engine.connect() as conn:
             rows = (await conn.execute(text(base_sql), params)).scalars().all()
-            return [str(r) for r in rows]
+            return [MarketSchema.model_validate(r) for r in rows]
 
     async def get_distinct_trade_wallets(self, limit: int | None = None) -> list[str]:
         sql = 'SELECT DISTINCT "proxyWallet" FROM trades ORDER BY "proxyWallet"'
