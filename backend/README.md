@@ -29,7 +29,7 @@ docker compose down --rmi all --volumes --remove-orphans
 Database Management:
 
 ```bash
-docker compose exec db psql -U user -d mydb -c "SELECT * FROM markets order by slug limit 1;"
+docker compose exec db psql -U user -d mydb -c "SELECT count(condition_id) FROM markets;"
 
 docker compose exec db psql -U user -d mydb -c 'SELECT COUNT(DISTINCT "proxyWallet") FROM trades;'
 ```
@@ -67,6 +67,9 @@ poetry run ruff check --fix .
 ```
 
 ## TODO
+
+- make our own version of "positions" from trades (efficient)
+- this way we find
 
 Tasks:
 
