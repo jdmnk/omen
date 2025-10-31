@@ -5,6 +5,7 @@ from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
 from py_clob_client.clob_types import OrderBookSummary
 
+from src.analytics.insider_finder import find_insiders
 from src.analytics.trades_analytics import (
     UserTradesGroup,
     group_trades_by_user_detailed,
@@ -102,3 +103,8 @@ async def get_market_trades_analytics(
     if trades is None or len(trades) == 0:
         raise HTTPException(status_code=404, detail="Trades not found")
     return group_trades_by_user_detailed(trades)
+
+
+@app.get("/markets/top-holders", response_model=list[dict])
+async def get_top_holders(condition_id: str = Query(min_length=1)):
+    return await find_insiders(condition_id)
