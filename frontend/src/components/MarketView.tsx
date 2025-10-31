@@ -7,6 +7,7 @@ import { MainSharedContainer } from "./layouts/MainSharedContainer";
 import { PositionsWidget } from "./widgets/PositionsWidget";
 import { RecentActivityWidget } from "./widgets/RecentActivityWidget";
 import { TopHoldersWidget } from "./widgets/TopHoldersWidget";
+import { InsidersWidget } from "./widgets/InsidersWidget";
 
 export async function MarketView({ data }: { data: MarketResponse }) {
   const { market } = data;
@@ -36,6 +37,7 @@ export async function MarketView({ data }: { data: MarketResponse }) {
 
           {/* Right Column - Modules */}
           <div className="space-y-4 overflow-y-auto">
+            <InsidersWidget conditionId={market.condition_id} />
             {market.description && (
               <Card>
                 <CardContent className="pt-3 pb-3">
