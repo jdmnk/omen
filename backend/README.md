@@ -69,7 +69,7 @@ poetry run ruff check --fix .
 ## TODO
 
 - make our own version of "positions" from trades (efficient)
-- this way we find
+- FIGURE OUT HOW MANY TRADES WE SKIP WHEN FETCHING THEM (HOW MANY INCOMPLETE MARKETS WE HAVE WITH TOP X TRADES)
 
 Tasks:
 
