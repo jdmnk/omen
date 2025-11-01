@@ -8,10 +8,10 @@ from src.utils.logging_config import get_logger
 
 logger = get_logger(__name__)
 
-MIN_VOLUME = 20_000
+MIN_VOLUME = 10_000
 MIN_LIQUIDITY = 10_000
 BATCH_SIZE = 4
-GLOBAL_MIN_TRADE_USD = 250
+GLOBAL_MIN_TRADE_USD = 100
 
 ABS_MIN = 250  # never flag below this
 LIQ_PCT = 0.08  # 8 % of total liquidity
