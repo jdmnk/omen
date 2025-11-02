@@ -2,9 +2,11 @@ import asyncio
 import string
 import traceback
 
+from typing import Literal, TypedDict
+
 import httpx
-from py_clob_client.client import ClobClient
 from py_clob_client.clob_types import OrderBookSummary
+from py_clob_client.client import ClobClient
 from py_clob_client.constants import POLYGON
 from py_clob_client.exceptions import PolyApiException
 
@@ -127,7 +129,10 @@ class PolyClient:
         return all_events
 
     async def get_active_markets_by_events(
-        self, exclude_tag_ids: list[int] | None = None, count: int | None = None
+        self,
+        exclude_tag_ids: list[int] | None = None,
+        count: int | None = None,
+        api_params: dict | None = None,
     ) -> list[dict]:
         limit = 500
         offset = 0
@@ -154,6 +159,9 @@ class PolyClient:
                         "order": "id",
                         "ascending": False,
                     }
+                    if api_params is not None:
+                        params.update(api_params)
+
                     response = await client.get(f"{GAMMA_API_HOST}/events", params=params)
                     events = response.json()
                     if not events:
@@ -188,6 +196,43 @@ class PolyClient:
         )
 
         return markets
+
+    class _PriceRequest(TypedDict):
+        token_id: str
+        side: Literal["BUY", "SELL"]
+
+    async def get_market_prices_by_request(
+        self, requests: list[_PriceRequest]
+    ) -> dict[str, dict[str, str]]:
+        """
+        Fetch multiple market prices via CLOB POST /prices.
+
+        Docs: https://docs.polymarket.com/api-reference/pricing/get-multiple-market-prices-by-request
+
+        Request body: list of { token_id: string, side: "BUY" | "SELL" }
+        Response: { token_id: { "BUY": string, "SELL": string } }
+        """
+        if not requests:
+            return {}
+
+        try:
+            async with httpx.AsyncClient() as client:
+                response = await client.post(
+                    f"{CLOB_HOST}/prices",
+                    json=requests,
+                    headers={"Content-Type": "application/json"},
+                )
+                if response.status_code != 200:
+                    logger.error(
+                        f"get_market_prices_by_request: non-200 status {response.status_code}: {response.text}"
+                    )
+                    return {}
+                data: dict[str, dict[str, str]] = response.json() or {}
+                return data
+        except PolyApiException as exc:
+            logger.error(f"get_market_prices_by_request: error: {exc}")
+            logger.error(traceback.format_exc())
+            raise exc
 
     def get_market_order_book(self, token_id: str) -> OrderBookSummary | None:
         try:
