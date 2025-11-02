@@ -9,6 +9,6 @@ export function useTradesAnalyticsQuery(conditionId: string) {
     queryKey: ["trades-analytics", conditionId],
     queryFn: () => fetchMarketTradesAnalytics(conditionId),
     staleTime: 60000,
-    refetchInterval: 60000,
+    // refetchInterval: 60000,
   });
 }

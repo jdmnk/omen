@@ -8,6 +8,6 @@ export function useTopHoldersQuery(conditionId: string) {
     queryKey: ["top-holders", conditionId],
     queryFn: () => fetchTopHolders(conditionId),
     staleTime: 60000,
-    refetchInterval: 60000,
+    // refetchInterval: 60000,
   });
 }

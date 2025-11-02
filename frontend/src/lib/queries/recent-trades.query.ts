@@ -9,6 +9,6 @@ export function useRecentTradesQuery(conditionId: string, minAmount?: number) {
     queryKey: ["recent-trades", conditionId, minAmount],
     queryFn: () => fetchMarketRecentTrades(conditionId, minAmount),
     staleTime: 30000, // 30 seconds
-    refetchInterval: 30000, // auto-refetch every 30 seconds
+    // refetchInterval: 30000, // auto-refetch every 30 seconds
   });
 }
