@@ -9,6 +9,9 @@ from src.models.event_market import EventMarket
 from src.models.market import Market as MarketORM, MarketSchema
 from src.models.trade import Trade as TradeORM, TradeSchema
 from src.models.user_position import UserPosition as UserPositionORM, UserPositionSchema
+from src.utils.logging_config import get_logger
+
+logger = get_logger(__name__)
 
 
 class InsertsClient:
@@ -98,25 +101,30 @@ class InsertsClient:
         if not trades:
             return 0
         total = 0
-        async with self.core.async_session() as session:
-            for start in range(0, len(trades), chunk_size):
-                batch = trades[start : start + chunk_size]
-                values = [t.model_dump() for t in batch]
+        try:
+            async with self.core.async_session() as session:
+                for start in range(0, len(trades), chunk_size):
+                    batch = trades[start : start + chunk_size]
+                    values = [t.model_dump() for t in batch]
 
-                stmt = pg_insert(TradeORM).values(values)
-                update_fields = {
-                    col: stmt.excluded[col]
-                    for col in TradeORM.__table__.columns.keys()
-                    if col not in ["transactionHash", "fetched_at"]
-                }
-                update_fields["fetched_at"] = text("now()")
-                stmt = stmt.on_conflict_do_update(
-                    index_elements=["transactionHash"], set_=update_fields
-                )
+                    stmt = pg_insert(TradeORM).values(values)
+                    update_fields = {
+                        col: stmt.excluded[col]
+                        for col in TradeORM.__table__.columns.keys()
+                        if col not in ["transactionHash", "fetched_at"]
+                    }
+                    update_fields["fetched_at"] = text("now()")
+                    stmt = stmt.on_conflict_do_update(
+                        index_elements=["transactionHash"], set_=update_fields
+                    )
 
-                await session.execute(stmt)
-                total += len(batch)
-                await session.commit()
+                    await session.execute(stmt)
+                    total += len(batch)
+                    await session.commit()
+        except Exception as e:
+            logger.error("Error inserting trades %s", e)
+            raise e
+
         return total
 
     async def insert_user_positions(
