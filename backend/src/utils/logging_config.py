@@ -5,7 +5,7 @@ logging.basicConfig(
     format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
 )
 
-# Quiet noisy third‑party loggers
+# Quiet noisy third-party loggers
 # logging.getLogger("httpx").setLevel(logging.WARNING)
 # logging.getLogger("httpcore").setLevel(logging.WARNING)
 
