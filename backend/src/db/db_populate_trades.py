@@ -10,8 +10,8 @@ logger = get_logger(__name__)
 
 MIN_VOLUME = 10_000
 MIN_LIQUIDITY = 10_000
-BATCH_SIZE = 4
-GLOBAL_MIN_TRADE_USD = 100
+BATCH_SIZE = 2
+GLOBAL_MIN_TRADE_USD = 250
 
 ABS_MIN = 250  # never flag below this
 LIQ_PCT = 0.08  # 8 % of total liquidity
@@ -46,7 +46,7 @@ async def main() -> None:
 
         # Fetch trades for this batch
         trades_batch = await poly_client.get_market_trades(
-            [m.condition_id for m in batch_markets], min_amount=GLOBAL_MIN_TRADE_USD
+            [m.condition_id for m in batch_markets], min_amount=GLOBAL_MIN_TRADE_USD, count=500
         )
         fetched_count = len(trades_batch)
         total_trades_fetched += fetched_count
@@ -57,7 +57,7 @@ async def main() -> None:
             # filter trades by min alert size
             # trades_batch = [t for t in trades_batch if (t.size * t.price) >= min_alert_size(batch_markets[0])]
 
-            inserted = await inserts.insert_trades(trades_batch)
+            inserted = await inserts.insert_trades(trades_batch, 1)
             total_trades_inserted += inserted
 
         total_markets_processed += len(batch_markets)
