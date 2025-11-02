@@ -1,12 +1,11 @@
 import asyncio
 import string
 import traceback
-
 from typing import Literal, TypedDict
 
 import httpx
-from py_clob_client.clob_types import OrderBookSummary
 from py_clob_client.client import ClobClient
+from py_clob_client.clob_types import OrderBookSummary
 from py_clob_client.constants import POLYGON
 from py_clob_client.exceptions import PolyApiException
 

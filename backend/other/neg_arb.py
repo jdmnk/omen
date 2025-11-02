@@ -1,8 +1,8 @@
 import asyncio
 import json
+import logging
 
 from src.polymarket.poly_client import PolyClient
-import logging
 
 logging.getLogger("httpx").setLevel(logging.WARNING)
 logging.getLogger("httpcore").setLevel(logging.WARNING)
