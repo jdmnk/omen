@@ -215,7 +215,7 @@ class PolyClient:
         Warning: 429 really fast
         """
 
-        MAX_LIMIT = 10000  # API max
+        MAX_LIMIT = 500  # API max seems to be 500 even tho docs say 10k
         offset = 0
         all_trades: list[dict] = []
         total_trades = 0
@@ -236,6 +236,7 @@ class PolyClient:
                     "offset": offset,
                     "filterType": "CASH",
                     "filterAmount": int(min_amount),
+                    # "takerOnly": False,
                 }
                 response = await client.get(f"{DATA_API_HOST}/trades", params=params)
                 trades = response.json()
