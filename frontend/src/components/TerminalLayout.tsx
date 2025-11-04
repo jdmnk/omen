@@ -21,9 +21,7 @@ export function TerminalLayout({ children }: { children: ReactNode }) {
         >
           {/* Left sidebar */}
           <ResizablePanel defaultSize={25} minSize={10}>
-            {/* <div className="flex h-full items-center justify-center p-6"> */}
             <SearchColumn />
-            {/* </div> */}
           </ResizablePanel>
 
           {/* Main content */}

@@ -1,4 +1,4 @@
-import { SearchBar } from "./search-bar";
+import { SearchBar } from "./SearchBar";
 
 export function SearchColumn() {
   return (
