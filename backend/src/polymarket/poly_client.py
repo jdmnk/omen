@@ -1,4 +1,5 @@
 import asyncio
+import json
 import string
 import traceback
 
@@ -9,7 +10,7 @@ from py_clob_client.constants import POLYGON
 from py_clob_client.exceptions import PolyApiException
 
 from src.models.position import PositionSchema, parse_position_from_api
-from src.models.public import SearchResponse
+from src.models.public import SearchResponse, SearchMarketItem, SearchEventItem
 from src.models.trade import TradeSchema, parse_trade_from_api
 from src.models.user_position import (
     UserPositionSchema,
@@ -391,23 +392,68 @@ class PolyClient:
         """
         Search for markets, events, and profiles using Gamma API public-search endpoint.
 
-        Configured to return only active markets from events, excluding closed markets
-        and blacklisted tags.
+        Returns top 10 markets and top 10 events, sorted by volume (descending).
+        Only includes active markets and events.
         """
         try:
             async with httpx.AsyncClient() as client:
                 params = {
                     "q": query,
-                    "limit_per_type": 20,
+                    "limit_per_type": 50,
                     "keep_closed_markets": 0,
-                    "exclude_tag_id": [tag["id"] for tag in BLACKLISTED_MARKET_TAGS],
                     "search_tags": False,
                     "search_profiles": False,
+                    "sort": "volume",
+                    "ascending": False,
                 }
                 response = await client.get(f"{GAMMA_API_HOST}/public-search", params=params)
                 response.raise_for_status()
                 data = response.json()
-                return SearchResponse(**data)
+
+                # Extract and process events
+                raw_events = data.get("events", []) or []
+                active_events = [e for e in raw_events if e.get("active") and not e.get("closed")]
+
+                # Extract markets from events and flatten
+                all_markets = []
+                for event in active_events:
+                    event_markets = event.get("markets", []) or []
+                    for market in event_markets:
+                        if market.get("active") and not market.get("closed"):
+                            # Only include fields that SearchMarketItem expects
+                            market_clean = {
+                                "id": market.get("id", ""),
+                                "question": market.get("question", ""),
+                                "conditionId": market.get("conditionId", ""),
+                                "slug": market.get("slug", ""),
+                                "category": market.get("category"),
+                                "liquidity": market.get("liquidity"),
+                                "volume": market.get("volume"),
+                                "outcomePrices": ", ".join(
+                                    json.loads(market.get("outcomePrices", "[]"))
+                                ),
+                                "outcomes": ", ".join(json.loads(market.get("outcomes", "[]"))),
+                                "active": market.get("active", False),
+                                "closed": market.get("closed", False),
+                                "icon": market.get("icon"),
+                                "image": market.get("image"),
+                            }
+                            all_markets.append(market_clean)
+
+                # Sort markets by volume (descending)
+                all_markets.sort(
+                    key=lambda m: float(m.get("volume") or "0") if m.get("volume") else 0,
+                    reverse=True,
+                )
+
+                # Return all sorted results (frontend will handle top 10 and expand/collapse)
+                return SearchResponse(
+                    events=[SearchEventItem(**e) for e in active_events],
+                    markets=[SearchMarketItem(**m) for m in all_markets],
+                    tags=data.get("tags"),
+                    profiles=data.get("profiles"),
+                    pagination=data.get("pagination"),
+                )
         except Exception as exc:
             logger.error(f"search_markets: error searching markets: {exc}")
             logger.error(traceback.format_exc())

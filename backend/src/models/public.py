@@ -57,6 +57,7 @@ class SearchEventItem(BaseModel):
 
 class SearchResponse(BaseModel):
     events: list[SearchEventItem] | None = None
+    markets: list[SearchMarketItem] | None = None
     tags: list[dict] | None = None
     profiles: list[dict] | None = None
     pagination: dict | None = None
