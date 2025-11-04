@@ -7,6 +7,7 @@ import {
   ResizablePanel,
   ResizablePanelGroup,
 } from "@/components/ui/resizable";
+import { SearchColumn } from "./_new/SearchColumn";
 
 export function TerminalLayout({ children }: { children: ReactNode }) {
   return (
@@ -20,9 +21,9 @@ export function TerminalLayout({ children }: { children: ReactNode }) {
         >
           {/* Left sidebar */}
           <ResizablePanel defaultSize={25} minSize={10}>
-            <div className="flex h-full items-center justify-center p-6">
-              <span className="font-semibold">Sidebar</span>
-            </div>
+            {/* <div className="flex h-full items-center justify-center p-6"> */}
+            <SearchColumn />
+            {/* </div> */}
           </ResizablePanel>
 
           {/* Main content */}
