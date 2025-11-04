@@ -8,6 +8,8 @@ import {
   DeepPartial,
   ChartOptions,
   LineSeries,
+  LineData,
+  Time,
 } from "lightweight-charts";
 import { Spinner } from "@/components/ui/spinner";
 
@@ -120,7 +122,7 @@ export function PriceChart({ data, error, isLoading }: PriceChartProps) {
 
   useEffect(() => {
     if (data && data.length > 0 && seriesRef.current && chartRef.current) {
-      seriesRef.current.setData(data as any);
+      seriesRef.current.setData(data as LineData<Time>[]);
       // Fit content to ensure data spans the full width
       chartRef.current.timeScale().fitContent();
     }

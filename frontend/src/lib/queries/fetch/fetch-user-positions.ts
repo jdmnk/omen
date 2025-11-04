@@ -6,7 +6,7 @@ export async function fetchUserPositions(
 ): Promise<UserPosition[]> {
   const limit = 500;
   let offset = 0;
-  let allPositions = [];
+  const allPositions = [];
   while (true) {
     const url = new URL(`${DATA_API_HOST}/positions`);
     url.searchParams.set("user", userId);

@@ -1,5 +1,6 @@
 import { getBaseUrl } from "@/lib/api";
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export async function fetchTopHolders(conditionId: string): Promise<any[]> {
   const base = getBaseUrl();
   const res = await fetch(
