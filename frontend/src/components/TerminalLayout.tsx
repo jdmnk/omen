@@ -9,11 +9,9 @@ import {
 } from "@/components/ui/resizable";
 import { SearchColumn } from "./_new/SearchColumn";
 import { useMarketBySlugQuery } from "@/lib/queries/market-by-slug.query";
-import { PriceChartWidget } from "./widgets/PriceChartWidget";
+import { PriceChartWidget } from "./_new/PriceChartWidget";
 import { RecentActivityWidget } from "./widgets/RecentActivityWidget";
 import { PositionsWidget } from "./widgets/PositionsWidget";
-import { TopHoldersWidget } from "./widgets/TopHoldersWidget";
-import { InsidersWidget } from "./widgets/InsidersWidget";
 import { EmptyState, LoadingState, ErrorState } from "./_new/WidgetHelpers";
 
 export function TerminalLayout() {
