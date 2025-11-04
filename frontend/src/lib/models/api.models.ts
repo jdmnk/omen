@@ -28,6 +28,7 @@ export type Market = {
   negRisk: boolean;
   bestBid: number;
   bestAsk: number;
+  endDate: string;
 };
 
 export type MarketResponse = {
