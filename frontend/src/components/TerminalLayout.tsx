@@ -11,31 +11,30 @@ import { SearchColumn } from "./_new/SearchColumn";
 
 export function TerminalLayout({ children }: { children: ReactNode }) {
   return (
-    <div className="min-h-screen bg-background flex flex-col">
+    <div className="h-screen bg-background flex flex-col overflow-hidden">
       <Header />
 
-      <main className="h-full w-full flex-1 flex flex-col">
-        <ResizablePanelGroup
-          direction="horizontal"
-          className="h-full w-full flex-1"
-        >
+      <main className="flex-1 w-full flex flex-col overflow-hidden min-h-0">
+        <ResizablePanelGroup direction="horizontal" className="h-full w-full">
           {/* Left sidebar */}
           <ResizablePanel defaultSize={25} minSize={10}>
-            <SearchColumn />
+            <div className="h-full overflow-auto">
+              <SearchColumn />
+            </div>
           </ResizablePanel>
 
           {/* Main content */}
           <ResizableHandle withHandle />
           <ResizablePanel defaultSize={50} minSize={20}>
-            <ResizablePanelGroup direction="vertical">
+            <ResizablePanelGroup direction="vertical" className="h-full">
               <ResizablePanel defaultSize={50} minSize={20}>
-                <div className="flex h-full items-center justify-center p-6">
+                <div className="h-full overflow-auto flex items-center justify-center p-6">
                   <span className="font-semibold">Two</span>
                 </div>
               </ResizablePanel>
               <ResizableHandle withHandle />
               <ResizablePanel defaultSize={50} minSize={20}>
-                <div className="flex h-full items-center justify-center p-6">
+                <div className="h-full overflow-auto flex items-center justify-center p-6">
                   <span className="font-semibold">Three</span>
                 </div>
               </ResizablePanel>
@@ -45,7 +44,7 @@ export function TerminalLayout({ children }: { children: ReactNode }) {
           {/* Right sidebar */}
           <ResizableHandle withHandle />
           <ResizablePanel defaultSize={25} minSize={10}>
-            <div className="flex h-full items-center justify-center p-6">
+            <div className="h-full overflow-auto flex items-center justify-center p-6">
               <span className="font-semibold">Sidebar</span>
             </div>
           </ResizablePanel>

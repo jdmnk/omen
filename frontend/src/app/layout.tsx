@@ -26,9 +26,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="dark">
+    <html lang="en" className="dark h-screen">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased flex flex-col h-full`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased flex flex-col h-screen overflow-hidden`}
       >
         <ProvidersClient>
           <TerminalLayout>{children}</TerminalLayout>
