@@ -17,7 +17,7 @@ type SearchBarProps = {
   className?: string;
 };
 
-const INITIAL_LIMIT = 10;
+const INITIAL_LIMIT = 20;
 
 function parseOutcomePrice(
   outcomePrices: string | null | undefined
@@ -154,169 +154,165 @@ export function SearchBar({
           value={input}
           onChange={(e) => setInput(e.target.value)}
           placeholder={placeholder}
-          className="pl-9 border-none focus-visible:ring-0 focus-visible:ring-offset-0 shadow-none"
+          className="pl-9 border-none focus-visible:ring-0 focus-visible:ring-offset-0 shadow-none rounded-none"
         />
       </div>
 
       {/* Results below */}
       {showResults && (
-        <ScrollArea className="flex-1 mt-2">
-          <div className="space-y-4">
-            {isLoading && (
-              <div className="flex items-center justify-center py-6">
-                <Spinner size="sm" />
-              </div>
-            )}
+        <div className="space-y-4">
+          {isLoading && (
+            <div className="flex items-center justify-center py-6">
+              <Spinner size="sm" />
+            </div>
+          )}
 
-            {!isLoading && !hasResults && (
-              <div className="py-6 text-center text-sm text-muted-foreground">
-                No results found.
-              </div>
-            )}
+          {!isLoading && !hasResults && (
+            <div className="py-6 text-center text-sm text-muted-foreground">
+              No results found.
+            </div>
+          )}
 
-            {!isLoading && hasResults && (
-              <>
-                {/* Markets Section */}
-                <SearchSection
-                  title="Markets"
-                  items={markets}
-                  isExpanded={expandedMarkets}
-                  onToggle={() => setExpandedMarkets(!expandedMarkets)}
-                  emptyMessage="No markets found"
-                  renderItem={(market, index) => {
-                    const m = market as (typeof markets)[0];
-                    const odds = parseOutcomePrice(m.outcomePrices);
-                    const volume = parseVolume(m.volume);
+          {!isLoading && hasResults && (
+            <>
+              {/* Markets Section */}
+              <SearchSection
+                title="Markets"
+                items={markets}
+                isExpanded={expandedMarkets}
+                onToggle={() => setExpandedMarkets(!expandedMarkets)}
+                emptyMessage="No markets found"
+                renderItem={(market, index) => {
+                  const m = market as (typeof markets)[0];
+                  const odds = parseOutcomePrice(m.outcomePrices);
+                  const volume = parseVolume(m.volume);
 
-                    return (
-                      <button
-                        key={m.slug || index}
-                        onClick={() => handleSelectMarket(m.slug)}
-                        className={cn(
-                          "w-full text-left rounded-md px-3 py-2 text-sm",
-                          "hover:bg-accent hover:text-accent-foreground",
-                          "transition-colors cursor-pointer",
-                          "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-                        )}
-                      >
-                        <div className="flex items-start gap-3">
-                          {/* Market Image */}
-                          <div className="shrink-0">
-                            {m.displayImage ? (
-                              <div className="w-10 h-10 relative">
-                                <Image
-                                  src={m.displayImage}
-                                  alt={m.question}
-                                  width={40}
-                                  height={40}
-                                  className="rounded-md border object-contain w-full h-full"
-                                />
-                              </div>
-                            ) : (
-                              <div className="w-10 h-10 rounded-md border bg-muted/30 flex items-center justify-center">
-                                <Search className="h-5 w-5 text-muted-foreground/50" />
-                              </div>
+                  return (
+                    <button
+                      key={m.slug || index}
+                      onClick={() => handleSelectMarket(m.slug)}
+                      className={cn(
+                        "w-full text-left rounded-md px-3 py-2 text-sm",
+                        "hover:bg-accent hover:text-accent-foreground",
+                        "transition-colors cursor-pointer",
+                        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                      )}
+                    >
+                      <div className="flex items-start gap-3">
+                        {/* Market Image */}
+                        <div className="shrink-0">
+                          {m.displayImage ? (
+                            <div className="w-10 h-10 relative">
+                              <Image
+                                src={m.displayImage}
+                                alt={m.question}
+                                width={40}
+                                height={40}
+                                className="rounded-md border object-contain w-full h-full"
+                              />
+                            </div>
+                          ) : (
+                            <div className="w-10 h-10 rounded-md border bg-muted/30 flex items-center justify-center">
+                              <Search className="h-5 w-5 text-muted-foreground/50" />
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Market Info */}
+                        <div className="flex-1 min-w-0">
+                          {/* First row: Title */}
+                          <div className="font-medium truncate mb-1">
+                            {m.question}
+                          </div>
+
+                          {/* Second row: Odds, Volume */}
+                          <div className="flex items-center gap-3 text-xs text-muted-foreground">
+                            {odds !== null && (
+                              <span className="font-medium">
+                                {formatNumber(odds * 100, 1)}%
+                              </span>
+                            )}
+                            {volume > 0 && (
+                              <span>{formatCurrency(volume)} vol</span>
                             )}
                           </div>
-
-                          {/* Market Info */}
-                          <div className="flex-1 min-w-0">
-                            {/* First row: Title */}
-                            <div className="font-medium truncate mb-1">
-                              {m.question}
-                            </div>
-
-                            {/* Second row: Odds, Volume */}
-                            <div className="flex items-center gap-3 text-xs text-muted-foreground">
-                              {odds !== null && (
-                                <span className="font-medium">
-                                  {formatNumber(odds * 100, 1)}%
-                                </span>
-                              )}
-                              {volume > 0 && (
-                                <span>{formatCurrency(volume)} vol</span>
-                              )}
-                            </div>
-                          </div>
                         </div>
-                      </button>
-                    );
-                  }}
-                />
+                      </div>
+                    </button>
+                  );
+                }}
+              />
 
-                {/* Events Section */}
-                <SearchSection
-                  title="Events"
-                  items={events}
-                  isExpanded={expandedEvents}
-                  onToggle={() => setExpandedEvents(!expandedEvents)}
-                  emptyMessage="No events found"
-                  renderItem={(event, index) => {
-                    const e = event as (typeof events)[0];
-                    const volume = e.volume24hr || e.volume || 0;
+              {/* Events Section */}
+              <SearchSection
+                title="Events"
+                items={events}
+                isExpanded={expandedEvents}
+                onToggle={() => setExpandedEvents(!expandedEvents)}
+                emptyMessage="No events found"
+                renderItem={(event, index) => {
+                  const e = event as (typeof events)[0];
+                  const volume = e.volume24hr || e.volume || 0;
 
-                    return (
-                      <button
-                        key={e.slug || index}
-                        onClick={() => handleSelectEvent(e.slug)}
-                        className={cn(
-                          "w-full text-left rounded-md px-3 py-2 text-sm",
-                          "hover:bg-accent hover:text-accent-foreground",
-                          "transition-colors cursor-pointer",
-                          "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-                        )}
-                      >
-                        <div className="flex items-start gap-3">
-                          {/* Event Image */}
-                          <div className="shrink-0">
-                            {e.displayImage ? (
-                              <div className="w-10 h-10 relative">
-                                <Image
-                                  src={e.displayImage}
-                                  alt={e.title}
-                                  width={40}
-                                  height={40}
-                                  className="rounded-md border object-contain w-full h-full"
-                                />
-                              </div>
-                            ) : (
-                              <div className="w-10 h-10 rounded-md border bg-muted/30 flex items-center justify-center">
-                                <Search className="h-5 w-5 text-muted-foreground/50" />
-                              </div>
+                  return (
+                    <button
+                      key={e.slug || index}
+                      onClick={() => handleSelectEvent(e.slug)}
+                      className={cn(
+                        "w-full text-left rounded-md px-3 py-2 text-sm",
+                        "hover:bg-accent hover:text-accent-foreground",
+                        "transition-colors cursor-pointer",
+                        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                      )}
+                    >
+                      <div className="flex items-start gap-3">
+                        {/* Event Image */}
+                        <div className="shrink-0">
+                          {e.displayImage ? (
+                            <div className="w-10 h-10 relative">
+                              <Image
+                                src={e.displayImage}
+                                alt={e.title}
+                                width={40}
+                                height={40}
+                                className="rounded-md border object-contain w-full h-full"
+                              />
+                            </div>
+                          ) : (
+                            <div className="w-10 h-10 rounded-md border bg-muted/30 flex items-center justify-center">
+                              <Search className="h-5 w-5 text-muted-foreground/50" />
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Event Info */}
+                        <div className="flex-1 min-w-0">
+                          {/* First row: Title */}
+                          <div className="font-medium truncate mb-1">
+                            {e.title}
+                          </div>
+
+                          {/* Second row: Volume */}
+                          <div className="flex items-center gap-3 text-xs text-muted-foreground">
+                            {volume > 0 && (
+                              <span>{formatCurrency(volume)} 24h</span>
+                            )}
+                            {e.markets && e.markets.length > 0 && (
+                              <span className="text-muted-foreground/70">
+                                {e.markets.length}{" "}
+                                {e.markets.length === 1 ? "market" : "markets"}
+                              </span>
                             )}
                           </div>
-
-                          {/* Event Info */}
-                          <div className="flex-1 min-w-0">
-                            {/* First row: Title */}
-                            <div className="font-medium truncate mb-1">
-                              {e.title}
-                            </div>
-
-                            {/* Second row: Volume */}
-                            <div className="flex items-center gap-3 text-xs text-muted-foreground">
-                              {volume > 0 && (
-                                <span>{formatCurrency(volume)} 24h</span>
-                              )}
-                              {e.markets && e.markets.length > 0 && (
-                                <span className="text-muted-foreground/70">
-                                  {e.markets.length}{" "}
-                                  {e.markets.length === 1
-                                    ? "market"
-                                    : "markets"}
-                                </span>
-                              )}
-                            </div>
-                          </div>
                         </div>
-                      </button>
-                    );
-                  }}
-                />
-              </>
-            )}
-          </div>
-        </ScrollArea>
+                      </div>
+                    </button>
+                  );
+                }}
+              />
+            </>
+          )}
+        </div>
       )}
     </div>
   );
