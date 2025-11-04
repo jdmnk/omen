@@ -31,7 +31,7 @@ const fontSizes = {
   apple: 120,
   small: 120,
   large: 360,
-  og: 320,
+  og: 240,
 };
 
 export function generateImageMetadata() {
@@ -77,6 +77,7 @@ export default async function Icon({ id }: { id: string }) {
           width: "100%",
           height: "100%",
           display: "flex",
+          flexDirection: "column",
           alignItems: "center",
           justifyContent: "center",
           color: "white",
@@ -85,12 +86,18 @@ export default async function Icon({ id }: { id: string }) {
         }}
       >
         {id === "og" ? (
-          <>
-            <span style={{ color: "#4ade80" }}>Poly</span>
-            <span style={{ fontSize, marginLeft: "-0.1em" }}>In</span>
-          </>
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+            }}
+          >
+            <div style={{ color: "#6322FE", lineHeight: 1 }}>Omen</div>
+            <div style={{ fontSize, lineHeight: 1 }}>Insight</div>
+          </div>
         ) : (
-          <span style={{ color: "#4ade80", fontSize }}>PI</span>
+          <span style={{ color: "#6322FE", fontSize }}>O</span>
         )}
       </div>
     ),
