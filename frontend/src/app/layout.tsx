@@ -30,9 +30,7 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased flex flex-col h-screen overflow-hidden`}
       >
-        <ProvidersClient>
-          <TerminalLayout>{children}</TerminalLayout>
-        </ProvidersClient>
+        <ProvidersClient>{children}</ProvidersClient>
       </body>
     </html>
   );

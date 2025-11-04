@@ -9,10 +9,11 @@ import {
 } from "@/components/ui/resizable";
 import { SearchColumn } from "./_new/SearchColumn";
 
-export function TerminalLayout({ children }: { children: ReactNode }) {
+export function TerminalLayout({ market }: { market?: string }) {
   return (
     <div className="h-screen bg-background flex flex-col overflow-hidden">
       <Header />
+      {market}
 
       <main className="flex-1 w-full flex flex-col overflow-hidden min-h-0">
         <ResizablePanelGroup direction="horizontal" className="h-full w-full">
@@ -29,13 +30,13 @@ export function TerminalLayout({ children }: { children: ReactNode }) {
             <ResizablePanelGroup direction="vertical" className="h-full">
               <ResizablePanel defaultSize={50} minSize={20}>
                 <div className="h-full overflow-auto flex items-center justify-center p-6">
-                  <span className="font-semibold">Two</span>
+                  <span className="font-semibold">Pick your market</span>
                 </div>
               </ResizablePanel>
               <ResizableHandle withHandle />
               <ResizablePanel defaultSize={50} minSize={20}>
                 <div className="h-full overflow-auto flex items-center justify-center p-6">
-                  <span className="font-semibold">Three</span>
+                  <span className="font-semibold">Pick your market</span>
                 </div>
               </ResizablePanel>
             </ResizablePanelGroup>
@@ -45,7 +46,7 @@ export function TerminalLayout({ children }: { children: ReactNode }) {
           <ResizableHandle withHandle />
           <ResizablePanel defaultSize={25} minSize={10}>
             <div className="h-full overflow-auto flex items-center justify-center p-6">
-              <span className="font-semibold">Sidebar</span>
+              <span className="font-semibold">Pick your market</span>
             </div>
           </ResizablePanel>
         </ResizablePanelGroup>

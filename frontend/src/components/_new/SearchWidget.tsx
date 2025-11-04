@@ -9,12 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Spinner } from "@/components/ui/spinner";
 import { formatNumber, formatCurrency } from "@/lib/ui/format.utils";
 import { cn } from "@/lib/utils";
-
-type SearchBarProps = {
-  onSelectMarket: (slug: string) => void;
-  placeholder?: string;
-  className?: string;
-};
+import { useRouter } from "next/navigation";
 
 const INITIAL_LIMIT = 10;
 
@@ -94,15 +89,12 @@ function SearchSection({
   );
 }
 
-export function SearchBar({
-  onSelectMarket,
-  placeholder = "Search markets...",
-  className = "",
-}: SearchBarProps) {
+export function SearchBar() {
   const [input, setInput] = useState<string>("");
   const [debouncedInput] = useDebounce(input, 200);
   const [expandedMarkets, setExpandedMarkets] = useState(false);
   const [expandedEvents, setExpandedEvents] = useState(false);
+  const router = useRouter();
 
   const { data: searchResults, isLoading } = useMarketSearchQuery(
     debouncedInput,
@@ -124,7 +116,7 @@ export function SearchBar({
   }, [searchResults]);
 
   const handleSelectMarket = (slug: string) => {
-    onSelectMarket(slug);
+    router.push(`/market/${slug}`);
     setInput("");
   };
 
@@ -144,7 +136,7 @@ export function SearchBar({
   const hasResults = (markets.length > 0 || events.length > 0) && !isLoading;
 
   return (
-    <div className={cn("flex flex-col h-full", className)}>
+    <div className="flex flex-col h-full">
       {/* Fixed input at top */}
       <div className="relative shrink-0">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none z-10" />
@@ -152,7 +144,7 @@ export function SearchBar({
           type="text"
           value={input}
           onChange={(e) => setInput(e.target.value)}
-          placeholder={placeholder}
+          placeholder="Search markets..."
           className="pl-9 border-none focus-visible:ring-0 focus-visible:ring-offset-0 shadow-none rounded-none"
         />
       </div>
