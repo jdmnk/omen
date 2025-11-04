@@ -1,4 +1,4 @@
-import { SearchBar } from "./SearchBar";
+import { SearchBar } from "./SearchWidget";
 
 export function SearchColumn() {
   return <SearchBar onSelectMarket={() => {}} />;
