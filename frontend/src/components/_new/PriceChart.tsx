@@ -30,14 +30,14 @@ const chartOptions: DeepPartial<ChartOptions> = {
     horzLines: { color: "#27272a", visible: false },
   },
   timeScale: {
-    borderColor: "#3f3f46",
+    borderColor: "transparent",
     timeVisible: true,
     rightBarStaysOnScroll: false,
     fixLeftEdge: true,
     fixRightEdge: true,
   },
   rightPriceScale: {
-    borderColor: "#3f3f46",
+    borderColor: "transparent",
     scaleMargins: {
       top: 0.1,
       bottom: 0.1,
@@ -155,7 +155,10 @@ export function PriceChart({ data, error, isLoading }: PriceChartProps) {
           </p>
         </div>
       )}
-      <div ref={chartContainerRef} className="w-full h-full" />
+      <div
+        ref={chartContainerRef}
+        className="w-full h-full [&_*[class*='tradingview']]:hidden [&_a[href*='tradingview']]:hidden"
+      />
     </div>
   );
 }
