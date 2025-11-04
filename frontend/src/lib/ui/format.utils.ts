@@ -40,18 +40,16 @@ export function formatCompactNumber(
 
 function formatDuration(
   value: number,
-  unit: Intl.RelativeTimeFormatUnit,
-  locale = getUserLocale()
+  unit: Intl.NumberFormatOptions["unit"],
+  unitDisplay: "long" | "short" | "narrow" = "long",
+  locale: string = getUserLocale()
 ) {
-  console.log(value);
-  const rtf = new Intl.RelativeTimeFormat(locale, { numeric: "auto" });
-  // Example: parts = [{ type: "integer", value: "12" }, { type: "literal", value: " " }, { type: "unit", value: "days" }]
-  const parts = rtf.formatToParts(value, unit);
-  return parts
-    .map((p) => p.value)
-    .join("")
-    .replace(/^in\s+|ago\s*$/g, "")
-    .trim();
+  const nf = new Intl.NumberFormat(locale, {
+    style: "unit",
+    unit,
+    unitDisplay,
+  });
+  return nf.format(value);
 }
 
 export function autoFormatDuration(ms: number, locale = getUserLocale()) {
@@ -61,10 +59,9 @@ export function autoFormatDuration(ms: number, locale = getUserLocale()) {
   const days = hours / 24;
   const months = days / 30;
 
-  if (months >= 1) return formatDuration(Math.floor(months), "month", locale);
-  if (days >= 1) return formatDuration(Math.floor(days), "day", locale);
-  if (hours >= 1) return formatDuration(Math.floor(hours), "hour", locale);
-  if (minutes >= 1)
-    return formatDuration(Math.floor(minutes), "minute", locale);
-  return formatDuration(Math.floor(seconds), "second", locale);
+  if (months >= 1) return formatDuration(Math.floor(months), "month");
+  if (days >= 1) return formatDuration(Math.floor(days), "day");
+  if (hours >= 1) return formatDuration(Math.floor(hours), "hour");
+  if (minutes >= 1) return formatDuration(Math.floor(minutes), "minute");
+  return formatDuration(Math.floor(seconds), "second");
 }
