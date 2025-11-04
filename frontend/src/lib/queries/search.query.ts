@@ -38,6 +38,7 @@ type SearchEvent = {
 
 type SearchResponse = {
   events: SearchEvent[] | null;
+  markets: SearchMarket[] | null;
   tags: unknown[] | null;
   profiles: unknown[] | null;
   pagination: unknown | null;
@@ -48,7 +49,13 @@ export function useMarketSearchQuery(query: string, enabled: boolean = true) {
     queryKey: ["market-search", query],
     queryFn: async () => {
       if (!query.trim()) {
-        return { events: null, tags: null, profiles: null, pagination: null };
+        return {
+          events: null,
+          markets: null,
+          tags: null,
+          profiles: null,
+          pagination: null,
+        };
       }
 
       const res = await fetch(
@@ -63,5 +70,6 @@ export function useMarketSearchQuery(query: string, enabled: boolean = true) {
       return res.json();
     },
     enabled: enabled && query.trim().length > 0,
+    staleTime: 300000, // 5 minutes
   });
 }
