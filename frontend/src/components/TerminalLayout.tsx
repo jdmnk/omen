@@ -18,19 +18,34 @@ export function TerminalLayout({ children }: { children: ReactNode }) {
           direction="horizontal"
           className="h-full w-full flex-1"
         >
-          <ResizablePanel defaultSize={25}>
+          {/* Left sidebar */}
+          <ResizablePanel defaultSize={25} minSize={10}>
             <div className="flex h-full items-center justify-center p-6">
               <span className="font-semibold">Sidebar</span>
             </div>
           </ResizablePanel>
+
+          {/* Main content */}
           <ResizableHandle withHandle />
-          <ResizablePanel defaultSize={75}>
-            <div className="flex h-full items-center justify-center p-6">
-              <span className="font-semibold">Content</span>
-            </div>
+          <ResizablePanel defaultSize={50} minSize={20}>
+            <ResizablePanelGroup direction="vertical">
+              <ResizablePanel defaultSize={50} minSize={20}>
+                <div className="flex h-full items-center justify-center p-6">
+                  <span className="font-semibold">Two</span>
+                </div>
+              </ResizablePanel>
+              <ResizableHandle withHandle />
+              <ResizablePanel defaultSize={50} minSize={20}>
+                <div className="flex h-full items-center justify-center p-6">
+                  <span className="font-semibold">Three</span>
+                </div>
+              </ResizablePanel>
+            </ResizablePanelGroup>
           </ResizablePanel>
+
+          {/* Right sidebar */}
           <ResizableHandle withHandle />
-          <ResizablePanel defaultSize={25}>
+          <ResizablePanel defaultSize={25} minSize={10}>
             <div className="flex h-full items-center justify-center p-6">
               <span className="font-semibold">Sidebar</span>
             </div>
