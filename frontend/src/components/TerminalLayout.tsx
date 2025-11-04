@@ -77,26 +77,15 @@ export function TerminalLayout() {
           <ResizableHandle withHandle />
           <ResizablePanel defaultSize={25} minSize={10}>
             <div className="h-full overflow-auto p-6 space-y-6">
-              {!marketSlug ? (
+              {/* {!marketSlug ? (
                 <EmptyState />
               ) : isLoading ? (
                 <LoadingState />
               ) : error || !market ? (
                 <ErrorState />
               ) : (
-                (() => {
-                  const clobTokenIds = [market.token1, market.token2].filter(
-                    Boolean
-                  );
-                  return (
-                    <>
-                      {clobTokenIds.length > 0 && (
-                        <PositionsWidget clobTokenIds={clobTokenIds} />
-                      )}
-                    </>
-                  );
-                })()
-              )}
+                <PositionsWidget clobTokenIds={[market.token1, market.token2]} />
+              )} */}
             </div>
           </ResizablePanel>
         </ResizablePanelGroup>
