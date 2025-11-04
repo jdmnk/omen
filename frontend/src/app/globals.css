@@ -41,6 +41,10 @@
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
+
+  /* custom colors */
+  --color-outcome-yes: var(--outcome-yes);
+  --color-outcome-no: var(--outcome-no);
 }
 
 :root {
@@ -76,6 +80,10 @@
   --sidebar-accent-foreground: oklch(0.205 0 0);
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
+
+  /* custom colors */
+  --outcome-yes: #9bc53d;
+  --outcome-no: #ff3366;
 }
 
 .dark {
@@ -110,6 +118,10 @@
   --sidebar-accent-foreground: oklch(0.985 0 0);
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: oklch(0.556 0 0);
+
+  /* custom colors */
+  --outcome-yes: #9bc53d;
+  --outcome-no: #ff3366;
 }
 
 @layer base {
