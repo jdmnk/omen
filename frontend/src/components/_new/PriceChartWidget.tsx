@@ -67,7 +67,7 @@ export function PriceChartWidget({ market }: { market: Market }) {
 
   return (
     <div className="relative w-full flex flex-col border rounded-lg pb-2">
-      <div className="text-sm bg-muted px-4 py-2 rounded-t-lg border-b">
+      <div className="text-sm bg-muted px-4 py-2 rounded-t-lg border-b font-bold">
         {market.question}
       </div>
       <div className="flex justify-between items-center mb-4 text-sm px-4 py-2 border-b">
@@ -101,7 +101,10 @@ export function PriceChartWidget({ market }: { market: Market }) {
         {timeDelta > 0 && (
           <div>
             ends:{" "}
-            <span className="font-bold">{autoFormatDuration(timeDelta)}</span>
+            <span className="font-bold">
+              {/* {autoFormatDuration(timeDelta)} ( */}
+              {new Date(market.endDate).toLocaleDateString()}
+            </span>
           </div>
         )}
       </div>
