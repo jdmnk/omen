@@ -8,7 +8,9 @@ export function Header() {
         <div className="flex items-center gap-3">
           <Logo />
           <Link href="/">
-            <h1 className="text-lg font-bold">OMEN INSIGHT</h1>
+            <h1 className="text-xl font-bold text-[#6322FE] tracking-widest">
+              OMEN INSIGHT
+            </h1>
           </Link>
         </div>
       </div>
