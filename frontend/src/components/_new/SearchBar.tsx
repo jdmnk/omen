@@ -53,7 +53,7 @@ export function SearchBar({
           value={input}
           onChange={(e) => setInput(e.target.value)}
           placeholder={placeholder}
-          className="pl-9"
+          className="pl-9 border-none focus-visible:ring-0 focus-visible:ring-offset-0 shadow-none"
         />
       </div>
 
