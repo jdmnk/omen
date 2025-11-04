@@ -1,6 +1,6 @@
 "use client";
 
-import { ReactNode } from "react";
+import { useParams } from "next/navigation";
 import { Header } from "./_new/Header";
 import {
   ResizableHandle,
@@ -8,12 +8,29 @@ import {
   ResizablePanelGroup,
 } from "@/components/ui/resizable";
 import { SearchColumn } from "./_new/SearchColumn";
+import { useMarketBySlugQuery } from "@/lib/queries/market-by-slug.query";
+import { PriceChartWidget } from "./widgets/PriceChartWidget";
+import { RecentActivityWidget } from "./widgets/RecentActivityWidget";
+import { PositionsWidget } from "./widgets/PositionsWidget";
+import { TopHoldersWidget } from "./widgets/TopHoldersWidget";
+import { InsidersWidget } from "./widgets/InsidersWidget";
+import { EmptyState, LoadingState, ErrorState } from "./_new/WidgetHelpers";
 
-export function TerminalLayout({ market }: { market?: string }) {
+export function TerminalLayout() {
+  const params = useParams();
+  const marketSlug = params?.market as string | undefined;
+
+  const {
+    data: marketData,
+    isLoading,
+    error,
+  } = useMarketBySlugQuery(marketSlug);
+
+  const market = marketData?.market;
+
   return (
     <div className="h-screen bg-background flex flex-col overflow-hidden">
       <Header />
-      {market}
 
       <main className="flex-1 w-full flex flex-col overflow-hidden min-h-0">
         <ResizablePanelGroup direction="horizontal" className="h-full w-full">
@@ -29,14 +46,30 @@ export function TerminalLayout({ market }: { market?: string }) {
           <ResizablePanel defaultSize={50} minSize={20}>
             <ResizablePanelGroup direction="vertical" className="h-full">
               <ResizablePanel defaultSize={50} minSize={20}>
-                <div className="h-full overflow-auto flex items-center justify-center p-6">
-                  <span className="font-semibold">Pick your market</span>
+                <div className="h-full overflow-auto p-6">
+                  {!marketSlug ? (
+                    <EmptyState />
+                  ) : isLoading ? (
+                    <LoadingState />
+                  ) : error || !market ? (
+                    <ErrorState />
+                  ) : (
+                    <PriceChartWidget market={market} />
+                  )}
                 </div>
               </ResizablePanel>
               <ResizableHandle withHandle />
               <ResizablePanel defaultSize={50} minSize={20}>
-                <div className="h-full overflow-auto flex items-center justify-center p-6">
-                  <span className="font-semibold">Pick your market</span>
+                <div className="h-full overflow-auto p-6">
+                  {!marketSlug ? (
+                    <EmptyState />
+                  ) : isLoading ? (
+                    <LoadingState />
+                  ) : error || !market ? (
+                    <ErrorState />
+                  ) : (
+                    <RecentActivityWidget conditionId={market.condition_id} />
+                  )}
                 </div>
               </ResizablePanel>
             </ResizablePanelGroup>
@@ -45,8 +78,27 @@ export function TerminalLayout({ market }: { market?: string }) {
           {/* Right sidebar */}
           <ResizableHandle withHandle />
           <ResizablePanel defaultSize={25} minSize={10}>
-            <div className="h-full overflow-auto flex items-center justify-center p-6">
-              <span className="font-semibold">Pick your market</span>
+            <div className="h-full overflow-auto p-6 space-y-6">
+              {!marketSlug ? (
+                <EmptyState />
+              ) : isLoading ? (
+                <LoadingState />
+              ) : error || !market ? (
+                <ErrorState />
+              ) : (
+                (() => {
+                  const clobTokenIds = [market.token1, market.token2].filter(
+                    Boolean
+                  );
+                  return (
+                    <>
+                      {clobTokenIds.length > 0 && (
+                        <PositionsWidget clobTokenIds={clobTokenIds} />
+                      )}
+                    </>
+                  );
+                })()
+              )}
             </div>
           </ResizablePanel>
         </ResizablePanelGroup>
