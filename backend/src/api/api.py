@@ -17,6 +17,7 @@ from src.models.public import (
     MarketAutocompleteItem,
     MarketSearchResponse,
     MessageResponse,
+    SearchResponse,
 )
 from src.models.trade import TradeSchema
 from src.polymarket.poly_client import PolyClient
@@ -108,3 +109,12 @@ async def get_market_trades_analytics(
 @app.get("/markets/top-holders", response_model=list[dict])
 async def get_top_holders(condition_id: str = Query(min_length=1)):
     return await find_insiders(condition_id)
+
+
+@app.get("/markets/search", response_model=SearchResponse)
+async def search_markets(q: str = Query(min_length=1)) -> SearchResponse:
+    """
+    Search for markets using Polymarket Gamma API.
+    Returns events with their markets, filtered to only active markets.
+    """
+    return await poly_client.search_markets(q)

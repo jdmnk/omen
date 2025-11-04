@@ -9,6 +9,7 @@ from py_clob_client.constants import POLYGON
 from py_clob_client.exceptions import PolyApiException
 
 from src.models.position import PositionSchema, parse_position_from_api
+from src.models.public import SearchResponse
 from src.models.trade import TradeSchema, parse_trade_from_api
 from src.models.user_position import (
     UserPositionSchema,
@@ -385,3 +386,29 @@ class PolyClient:
             if schema:
                 parsed.append(schema)
         return parsed
+
+    async def search_markets(self, query: str) -> SearchResponse:
+        """
+        Search for markets, events, and profiles using Gamma API public-search endpoint.
+
+        Configured to return only active markets from events, excluding closed markets
+        and blacklisted tags.
+        """
+        try:
+            async with httpx.AsyncClient() as client:
+                params = {
+                    "q": query,
+                    "limit_per_type": 20,
+                    "keep_closed_markets": 0,
+                    "exclude_tag_id": [tag["id"] for tag in BLACKLISTED_MARKET_TAGS],
+                    "search_tags": False,
+                    "search_profiles": False,
+                }
+                response = await client.get(f"{GAMMA_API_HOST}/public-search", params=params)
+                response.raise_for_status()
+                data = response.json()
+                return SearchResponse(**data)
+        except Exception as exc:
+            logger.error(f"search_markets: error searching markets: {exc}")
+            logger.error(traceback.format_exc())
+            raise exc
