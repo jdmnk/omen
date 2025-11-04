@@ -437,7 +437,6 @@ class PolyClient:
                                 "closed": market.get("closed", False),
                                 "icon": market.get("icon"),
                                 "image": market.get("image"),
-                                "endDate": market.get("endDate"),
                             }
                             all_markets.append(market_clean)
 
