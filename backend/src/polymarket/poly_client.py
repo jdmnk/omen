@@ -440,7 +440,7 @@ class PolyClient:
                             }
                             all_markets.append(market_clean)
 
-                # Sort markets by volume (descending)
+                # Sort markets by volume (descending) - only events were sorted by volume
                 all_markets.sort(
                     key=lambda m: float(m.get("volume") or "0") if m.get("volume") else 0,
                     reverse=True,
