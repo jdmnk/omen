@@ -1,8 +1,9 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useMemo } from "react";
+import { useDebounce } from "use-debounce";
 import { Search } from "lucide-react";
-import { useMarketAutocompleteQuery } from "@/lib/queries/market-search.query";
+import { useMarketSearchQuery } from "@/lib/queries/search.query";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Spinner } from "@/components/ui/spinner";
@@ -20,21 +21,26 @@ export function SearchBar({
   className = "",
 }: SearchBarProps) {
   const [input, setInput] = useState<string>("");
-  const [debouncedInput, setDebouncedInput] = useState<string>("");
+  const [debouncedInput] = useDebounce(input, 200);
 
-  // Debounce input
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setDebouncedInput(input);
-    }, 200);
-
-    return () => clearTimeout(timer);
-  }, [input]);
-
-  const { data: suggestions = [], isLoading } = useMarketAutocompleteQuery(
+  const { data: searchResults, isLoading } = useMarketSearchQuery(
     debouncedInput,
     debouncedInput.trim().length > 0
   );
+
+  // Extract markets from events and flatten them
+  const markets = useMemo(() => {
+    if (!searchResults?.events) return [];
+    return searchResults.events
+      .flatMap((event) =>
+        (event.markets || []).map((market) => ({
+          ...market,
+          eventTitle: event.title,
+          eventSlug: event.slug,
+        }))
+      )
+      .filter((market) => market.active && !market.closed);
+  }, [searchResults]);
 
   const handleSelect = (slug: string) => {
     onSelectMarket(slug);
@@ -66,17 +72,17 @@ export function SearchBar({
                 <Spinner size="sm" />
               </div>
             )}
-            {!isLoading && suggestions.length === 0 && (
+            {!isLoading && markets.length === 0 && (
               <div className="py-6 text-center text-sm text-muted-foreground">
                 No markets found.
               </div>
             )}
             {!isLoading &&
-              suggestions.length > 0 &&
-              suggestions.map((s) => (
+              markets.length > 0 &&
+              markets.map((market) => (
                 <button
-                  key={s.slug}
-                  onClick={() => handleSelect(s.slug)}
+                  key={market.slug}
+                  onClick={() => handleSelect(market.slug)}
                   className={cn(
                     "w-full text-left rounded-md px-3 py-2 text-sm",
                     "hover:bg-accent hover:text-accent-foreground",
@@ -85,9 +91,9 @@ export function SearchBar({
                   )}
                 >
                   <div className="flex flex-col gap-1">
-                    <div className="font-medium">{s.question}</div>
+                    <div className="font-medium">{market.question}</div>
                     <div className="text-xs text-muted-foreground">
-                      /{s.slug}
+                      /{market.slug}
                     </div>
                   </div>
                 </button>
