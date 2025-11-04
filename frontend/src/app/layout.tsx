@@ -15,9 +15,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Poly Insights",
+  title: "Omen Insight",
   description:
-    "Poly Insights is a platform for analyzing and insights for PolyMarket.",
+    "Omen Insight is a platform for Polymarket analysis and insights",
 };
 
 export default function RootLayout({
@@ -28,7 +28,7 @@ export default function RootLayout({
   return (
     <html lang="en" className="dark">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased flex flex-col h-full`}
       >
         <ProvidersClient>
           <TerminalLayout>{children}</TerminalLayout>
