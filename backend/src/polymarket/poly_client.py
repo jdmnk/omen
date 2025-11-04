@@ -9,6 +9,7 @@ from py_clob_client.clob_types import OrderBookSummary
 from py_clob_client.constants import POLYGON
 from py_clob_client.exceptions import PolyApiException
 
+from src.models.market import MarketSchema, parse_market_from_api
 from src.models.position import PositionSchema, parse_position_from_api
 from src.models.public import SearchResponse, SearchMarketItem, SearchEventItem
 from src.models.trade import TradeSchema, parse_trade_from_api
@@ -387,6 +388,40 @@ class PolyClient:
             if schema:
                 parsed.append(schema)
         return parsed
+
+    async def get_market_by_slug(self, slug: str) -> MarketSchema | None:
+        """
+        Fetch a market by its slug from Gamma API.
+
+        Official docs: https://docs.polymarket.com/api-reference/markets/get-market-by-slug
+
+        Args:
+            slug: The market slug (e.g., "will-trump-win-2024-election")
+
+        Returns:
+            MarketSchema if found, None otherwise
+
+        Raises:
+            PolyApiException: If API request fails (non-404 errors)
+        """
+        try:
+            async with httpx.AsyncClient() as client:
+                response = await client.get(f"{GAMMA_API_HOST}/markets/slug/{slug}")
+                if response.status_code == 404:
+                    return None
+                response.raise_for_status()
+                market_dict = response.json()
+                return parse_market_from_api(market_dict)
+        except httpx.HTTPStatusError as exc:
+            if exc.response.status_code == 404:
+                return None
+            logger.error(f"get_market_by_slug: error fetching market by slug={slug}: {exc}")
+            logger.error(traceback.format_exc())
+            raise PolyApiException(f"Failed to fetch market by slug: {exc}") from exc
+        except Exception as exc:
+            logger.error(f"get_market_by_slug: unexpected error for slug={slug}: {exc}")
+            logger.error(traceback.format_exc())
+            raise exc from exc
 
     async def search_markets(self, query: str) -> SearchResponse:
         """

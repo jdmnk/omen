@@ -33,6 +33,7 @@ class Market(Base):
     negRisk: Mapped[bool] = mapped_column(Boolean, nullable=False)
     bestBid: Mapped[Decimal] = mapped_column(Numeric, nullable=False)
     bestAsk: Mapped[Decimal] = mapped_column(Numeric, nullable=False)
+    endDate: Mapped[str] = mapped_column(String, nullable=False)
 
 
 # Pydantic Model for validation and type safety
@@ -55,6 +56,7 @@ class MarketSchema(BaseModel):
     negRisk: bool
     bestBid: Decimal = Field(ge=0)
     bestAsk: Decimal = Field(ge=0)
+    endDate: str
 
     class Config:
         from_attributes = True
@@ -94,6 +96,8 @@ def parse_market_from_api(market_dict: dict) -> MarketSchema | None:
         bestBid = Decimal(str(market_dict.get("bestBid", 0)))
         bestAsk = Decimal(str(market_dict.get("bestAsk", 0)))
 
+        endDate = market_dict.get("endDate", "")
+
         return MarketSchema(
             condition_id=condition_id,
             question=question,
@@ -113,6 +117,7 @@ def parse_market_from_api(market_dict: dict) -> MarketSchema | None:
             negRisk=negRisk,
             bestBid=bestBid,
             bestAsk=bestAsk,
+            endDate=endDate,
         )
     except (ValueError, KeyError, TypeError):
         # Log error but don't crash - just skip this item

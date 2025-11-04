@@ -18,13 +18,6 @@ class SelectsClient:
             market_orm = result.scalar_one_or_none()
             return MarketSchema.model_validate(market_orm) if market_orm else None
 
-    async def get_market_by_slug(self, slug: str) -> MarketSchema | None:
-        async with self.core.async_session() as session:
-            stmt = select(Market).where(Market.slug == slug)
-            result = await session.execute(stmt)
-            market_orm = result.scalar_one_or_none()
-            return MarketSchema.model_validate(market_orm) if market_orm else None
-
     async def autocomplete_markets(
         self, query: str, limit: int = 10
     ) -> list[MarketAutocompleteItem]:

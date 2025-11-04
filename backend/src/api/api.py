@@ -60,7 +60,12 @@ async def autocomplete_markets(
 
 @app.get("/markets/search-slug", response_model=MarketSearchResponse)
 async def search_markets_slug(slug: str = Query(min_length=1)) -> MarketSearchResponse:
-    result = await selects.get_market_by_slug(slug=slug)
+    """
+    Get a market by its slug from Polymarket Gamma API.
+
+    Official docs: https://docs.polymarket.com/api-reference/markets/get-market-by-slug
+    """
+    result = await poly_client.get_market_by_slug(slug)
     if result is None:
         raise HTTPException(status_code=404, detail="Market not found")
 
