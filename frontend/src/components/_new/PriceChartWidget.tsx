@@ -66,24 +66,48 @@ export function PriceChartWidget({ market }: { market: Market }) {
   console.log(market);
 
   return (
-    <div className="relative w-full h-full flex flex-col">
-      <div className="flex justify-between items-center px-4 py-3 border mb-4 rounded-xl">
-        <div>
+    <div className="relative w-full flex flex-col border rounded-lg pb-2">
+      <div className="text-sm bg-muted px-4 py-2 rounded-t-lg border-b">
+        {market.question}
+      </div>
+      <div className="flex justify-between items-center mb-4 text-sm px-4 py-2 border-b">
+        <div className="text-outcome-yes">
           {outcomes[0].toLowerCase()}:{" "}
-          {formatNumber(Number(outcomePrices[0]) * 100)}%
+          <span className="font-bold">
+            {formatNumber(Number(outcomePrices[0]) * 100)}%
+          </span>
+        </div>
+        <div className="text-outcome-no">
+          {outcomes[1].toLowerCase()}:{" "}
+          <span className="font-bold">
+            {formatNumber(Number(outcomePrices[1]) * 100)}%
+          </span>
         </div>
         <div>
-          {outcomes[1].toLowerCase()}:{" "}
-          {formatNumber(Number(outcomePrices[1]) * 100)}%
+          s: <span className="font-bold">{formatNumber(spread)}</span>
         </div>
-        <div>s: {formatNumber(spread)}</div>
-        <div>oi: {formatCompactNumber(market.liquidity)}</div>
-        <div>vol: {formatCompactNumber(market.volume)}</div>
-        {timeDelta > 0 && <div>ends: {autoFormatDuration(timeDelta)}</div>}
+        <div>
+          oi:{" "}
+          <span className="font-bold">
+            {formatCompactNumber(market.liquidity)}
+          </span>
+        </div>
+        <div>
+          vol:{" "}
+          <span className="font-bold">
+            {formatCompactNumber(market.volume)}
+          </span>
+        </div>
+        {timeDelta > 0 && (
+          <div>
+            ends:{" "}
+            <span className="font-bold">{autoFormatDuration(timeDelta)}</span>
+          </div>
+        )}
       </div>
 
       {/* Interval Selector */}
-      <div className="flex items-center gap-1 mb-3 px-2">
+      <div className="flex items-center gap-1 mb-3 px-2 justify-end">
         {INTERVALS.map((int) => (
           <button
             key={int}
