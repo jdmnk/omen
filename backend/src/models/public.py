@@ -36,7 +36,6 @@ class SearchMarketItem(BaseModel):
     closed: bool
     icon: str | None = None
     image: str | None = None
-    endDate: str | None = None
 
 
 class SearchEventItem(BaseModel):
