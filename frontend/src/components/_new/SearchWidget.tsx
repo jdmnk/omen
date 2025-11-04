@@ -6,7 +6,6 @@ import { Search, ChevronDown, ChevronUp } from "lucide-react";
 import Image from "next/image";
 import { useMarketSearchQuery } from "@/lib/queries/search.query";
 import { Input } from "@/components/ui/input";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { Spinner } from "@/components/ui/spinner";
 import { formatNumber, formatCurrency } from "@/lib/ui/format.utils";
 import { cn } from "@/lib/utils";
@@ -17,7 +16,7 @@ type SearchBarProps = {
   className?: string;
 };
 
-const INITIAL_LIMIT = 20;
+const INITIAL_LIMIT = 10;
 
 function parseOutcomePrice(
   outcomePrices: string | null | undefined
