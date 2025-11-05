@@ -170,7 +170,7 @@ export function MarketHoldersWidget({
   };
 
   return (
-    <Card className="shadow-md pt-3">
+    <Card className="shadow-md pt-3 bg-none">
       <CardContent>
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <TabsList className="grid w-full grid-cols-5">

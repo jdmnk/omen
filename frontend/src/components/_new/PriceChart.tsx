@@ -91,15 +91,15 @@ export function PriceChart({ data, error, isLoading }: PriceChartProps) {
         precision: 2,
         minMove: 0.01,
       },
-      lineColor: "#22d3ee", // cyan-400 - vibrant but professional
-      topColor: "#22d3ee", // Start color at the line
-      bottomColor: "rgba(34, 211, 238, 0)", // Fade to transparent at bottom
+      lineColor: "#651fff", // cyan-400 - vibrant but professional
+      topColor: "#341084", // Start color at the line
+      bottomColor: "rgba(101, 15, 255, 0)", // Fade to transparent at bottom
       lineWidth: 2,
       crosshairMarkerVisible: true,
       crosshairMarkerRadius: 4,
       lastValueVisible: true,
       priceLineVisible: true,
-      priceLineColor: "#22d3ee",
+      priceLineColor: "#651fff",
       priceLineWidth: 1,
       priceLineStyle: 2, // dashed
     });

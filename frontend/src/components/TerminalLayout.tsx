@@ -76,7 +76,7 @@ export function TerminalLayout() {
           {/* Right sidebar */}
           <ResizableHandle withHandle />
           <ResizablePanel defaultSize={25} minSize={10}>
-            <div className="h-full overflow-auto p-6 space-y-6">
+            {/* <div className="h-full overflow-auto p-6 space-y-6">
               {!marketSlug ? (
                 <EmptyState />
               ) : isLoading ? (
@@ -87,7 +87,7 @@ export function TerminalLayout() {
                 // <PositionsWidget clobTokenIds={[market.token1, market.token2]} />
                 <RecentActivityWidget conditionId={market.condition_id} />
               )}
-            </div>
+            </div> */}
           </ResizablePanel>
         </ResizablePanelGroup>
       </main>
