@@ -2,18 +2,21 @@ import { DATA_API_HOST } from "@/lib/api";
 import { UserPosition } from "@/lib/models/api.models";
 
 export async function fetchUserPositions(
-  userId: string
+  userId: string,
+  count: number = 500,
+  limit: number = 500
 ): Promise<UserPosition[]> {
-  const limit = 500;
   let offset = 0;
   const allPositions = [];
-  while (true) {
+  while (allPositions.length < count) {
+    const remaining = count - allPositions.length;
+    const requestLimit = Math.min(remaining, limit);
     const url = new URL(`${DATA_API_HOST}/positions`);
     url.searchParams.set("user", userId);
     url.searchParams.set("sizeThreshold", "1");
     url.searchParams.set("sortBy", "CURRENT");
     url.searchParams.set("sortDirection", "DESC");
-    url.searchParams.set("limit", limit.toString());
+    url.searchParams.set("limit", requestLimit.toString());
     url.searchParams.set("offset", offset.toString());
     const response = await fetch(url.toString());
     if (!response.ok) {
@@ -21,8 +24,9 @@ export async function fetchUserPositions(
     }
     const data = await response.json();
     allPositions.push(...data);
-    if (data.length < limit) break;
-    offset += limit;
+    if (data.length < requestLimit) break;
+    offset += requestLimit;
+    if (allPositions.length >= count) break;
   }
-  return allPositions;
+  return allPositions.slice(0, count);
 }

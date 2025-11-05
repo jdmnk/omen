@@ -7,7 +7,7 @@ import { UserPosition } from "../models/api.models";
 export function useUserPositionsQuery(userId: string) {
   return useQuery<UserPosition[]>({
     queryKey: ["user-positions", userId],
-    queryFn: () => fetchUserPositions(userId),
+    queryFn: () => fetchUserPositions(userId, 100, 100),
     staleTime: 60000, // 1 minute
   });
 }
