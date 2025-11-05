@@ -5,3 +5,4 @@ alwaysApply: true
 - use clean and professional designs - avoid emojis and excessive color coding: for example use only one color coded element in a group, e.g. green for buy and red for sell is fine as long as there is no other conflicting colors in the same element or group of elements near by (in case of prediction markets, avoid color coding both YES/NO and BUY/SELL in same element or group of elements)
 - use Shadcn components whenever possible - we already have a lot of them in the ui folder, feel free to add more if needed
 - use Shadcn MCP if you need help with it
+- keep code and design simple and consistent with the existing codebase
