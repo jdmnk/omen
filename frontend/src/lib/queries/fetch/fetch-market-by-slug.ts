@@ -3,7 +3,7 @@ import { MarketResponse } from "@/lib/models/api.models";
 
 export async function fetchMarketBySlug(slug: string): Promise<MarketResponse> {
   const response = await fetch(
-    `${getBaseUrl()}/markets/search-slug?slug=${slug}`,
+    `${getBaseUrl()}/markets/search-slug?slug=${encodeURIComponent(slug)}`,
     { cache: "no-store" }
   );
 
