@@ -33,6 +33,14 @@ export function MarketHoldersWidget({
   // Flatten all holders from all tokens and group by outcomeIndex
   const allHolders = data?.flatMap((item) => item.holders) || [];
 
+  console.log(allHolders);
+  console.log(
+    JSON.stringify(
+      allHolders.map((h) => h.proxyWallet),
+      null
+    )
+  );
+
   const holdersByOutcome = allHolders.reduce((acc, holder) => {
     const outcomeIndex = holder.outcomeIndex;
     if (!acc[outcomeIndex]) {
