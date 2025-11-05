@@ -23,6 +23,7 @@ const chartOptions: DeepPartial<ChartOptions> = {
   layout: {
     background: { type: ColorType.Solid, color: "transparent" },
     textColor: "#9ca3af",
+    attributionLogo: false,
   },
   height: 350,
   grid: {
@@ -155,10 +156,7 @@ export function PriceChart({ data, error, isLoading }: PriceChartProps) {
           </p>
         </div>
       )}
-      <div
-        ref={chartContainerRef}
-        className="w-full h-full [&_*[class*='tradingview']]:hidden [&_a[href*='tradingview']]:hidden"
-      />
+      <div ref={chartContainerRef} className="w-full h-full" />
     </div>
   );
 }
