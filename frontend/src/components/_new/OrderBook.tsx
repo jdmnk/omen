@@ -58,25 +58,8 @@ export function OrderBook({ tokenId }: OrderBookProps) {
     );
   }
 
-  // Sort bids descending (highest first) and asks ascending (lowest first)
-  const sortedBids = [...data.bids]
-    .sort((a, b) => Number(b.price) - Number(a.price))
-    .slice(0, 50); // Show more levels for scrolling
-  const sortedAsksAscending = [...data.asks]
-    .sort((a, b) => Number(a.price) - Number(b.price))
-    .slice(0, 50); // Show more levels for scrolling
-
-  // Reverse asks so highest are closest to midpoint
-  const sortedAsks = [...sortedAsksAscending].reverse();
-
-  // Calculate best bid and ask for spread (using original sorted order)
-  const bestBid = sortedBids.length > 0 ? Number(sortedBids[0].price) : 0;
-  const bestAsk =
-    sortedAsksAscending.length > 0 ? Number(sortedAsksAscending[0].price) : 0;
-
-  const spread = bestBid > 0 && bestAsk > 0 ? bestAsk - bestBid : 0;
-  const midpointPrice =
-    bestBid > 0 && bestAsk > 0 ? (bestBid + bestAsk) / 2 : 0;
+  // Use pre-calculated values from query result
+  const { sortedBids, sortedAsks, spread, midpointPrice } = data;
 
   const LEVELS_TO_SHOW = 6;
   // Estimate: ~32px per row, ~60px for midpoint

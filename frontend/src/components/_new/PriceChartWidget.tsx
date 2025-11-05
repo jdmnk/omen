@@ -6,6 +6,7 @@ import {
   PriceHistoryPoint,
   usePriceHistoryQuery,
 } from "@/lib/queries/price-history.query";
+import { useOrderbookQuery } from "@/lib/queries/orderbook.query";
 import { PriceChart } from "./PriceChart";
 import {
   autoFormatDuration,
@@ -48,6 +49,9 @@ export function PriceChartWidget({ market }: { market: Market }) {
     INTERVAL_FIDELITY[interval]
   );
 
+  // Fetch orderbook to get live spread
+  const { data: orderbookData } = useOrderbookQuery(market.token1);
+
   const deduplicatedChartData = deduplicateTimeStamps(data?.history || []);
   const chartData =
     deduplicatedChartData.map((item) => ({
@@ -61,7 +65,10 @@ export function PriceChartWidget({ market }: { market: Market }) {
     ? new Date(market.endDate).getTime() - Date.now()
     : 0;
 
-  const spread = Math.abs(market.bestAsk - market.bestBid) * 100;
+  // Use spread from orderbook if available, otherwise fallback to market data
+  const spread = orderbookData?.spread
+    ? orderbookData.spread * 100
+    : Math.abs(market.bestAsk - market.bestBid) * 100;
 
   return (
     <div className="relative w-full flex flex-col border rounded-lg pb-2">
