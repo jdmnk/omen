@@ -10,7 +10,7 @@ from py_clob_client.constants import POLYGON
 from py_clob_client.exceptions import PolyApiException
 
 from src.models.market import MarketSchema, parse_market_from_api
-from src.models.public import SearchResponse, SearchMarketItem, SearchEventItem
+from src.models.public import SearchEventItem, SearchMarketItem, SearchResponse
 from src.models.trade import TradeSchema, parse_trade_from_api
 from src.models.user_position import (
     UserPositionSchema,
@@ -18,7 +18,6 @@ from src.models.user_position import (
 )
 from src.settings import settings
 from src.utils.logging_config import get_logger
-from src.utils.usdc import to_usdc
 
 logger = get_logger(__name__)
 

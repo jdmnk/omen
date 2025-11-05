@@ -1,6 +1,5 @@
 import httpx
 
-
 from src.models.position import PositionSchema, parse_position_from_api
 from src.utils.logging_config import get_logger
 from src.utils.usdc import to_usdc

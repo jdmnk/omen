@@ -1,14 +1,12 @@
 import asyncio
 
 from src.db.database_client import DatabaseClient
-from src.polymarket.poly_client import PolyClient
 from src.polymarket.poly_client_graphs import PolyClientGraphs
 
 # just for testing
 
 
 async def main():
-    poly_client = PolyClient()
     poly_client_graphs = PolyClientGraphs()
     db_client = DatabaseClient()
 
