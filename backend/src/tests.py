@@ -2,12 +2,14 @@ import asyncio
 
 from src.db.database_client import DatabaseClient
 from src.polymarket.poly_client import PolyClient
+from src.polymarket.poly_client_graphs import PolyClientGraphs
 
 # just for testing
 
 
 async def main():
     poly_client = PolyClient()
+    poly_client_graphs = PolyClientGraphs()
     db_client = DatabaseClient()
 
     # active_markets = await poly_client.get_active_markets_by_events()
@@ -22,7 +24,7 @@ async def main():
 
     print("clob type: " + str(type(clob_tokens)))
     print([clob_tokens[0], clob_tokens[1]])
-    positions = await poly_client.get_market_positions(token_ids=clob_tokens)
+    positions = await poly_client_graphs.get_market_positions(token_ids=clob_tokens)
     print(len(positions))
 
     # print(active_markets[0])

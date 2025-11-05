@@ -21,6 +21,7 @@ from src.models.public import (
 )
 from src.models.trade import TradeSchema
 from src.polymarket.poly_client import PolyClient
+from src.polymarket.poly_client_graphs import PolyClientGraphs
 from src.utils.logging_config import get_logger
 
 logger = get_logger(__name__)
@@ -37,6 +38,7 @@ app.add_middleware(
 
 selects = SelectsClient()
 poly_client = PolyClient()
+poly_client_graphs = PolyClientGraphs()
 
 
 @app.get("/", response_model=MessageResponse)
@@ -93,7 +95,7 @@ async def get_market_trades(condition_id: str = Query(min_length=1)) -> list[Tra
 
 @app.get("/markets/positions", response_model=list[PositionSchema])
 async def get_market_positions(clob_tokens: Annotated[list[str], Query()]) -> list[PositionSchema]:
-    positions = await poly_client.get_market_positions(clob_tokens, min_amount=100)
+    positions = await poly_client_graphs.get_market_positions(clob_tokens, min_amount=100)
 
     if positions is not None and len(positions) > 0:
         return positions

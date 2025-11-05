@@ -3,6 +3,7 @@ from pydantic import BaseModel
 from src.db.selects import SelectsClient
 from src.models.position import PositionSchema
 from src.polymarket.poly_client import PolyClient
+from src.polymarket.poly_client_graphs import PolyClientGraphs
 
 
 class Insider(BaseModel):
@@ -13,13 +14,14 @@ async def find_insiders(condition_id: str):  # -> list[Insider]:
     # first we get the market by id
     selects = SelectsClient()
     poly_client = PolyClient()
+    poly_client_graphs = PolyClientGraphs()
     market = await selects.get_market_by_condition_id(condition_id)
 
     # get top 10000 trades by size
     trades = await poly_client.get_market_trades([condition_id], count=10000)
 
     # get top 1000 positions by size (default=1000
-    positions: list[PositionSchema] = await poly_client.get_market_positions(
+    positions: list[PositionSchema] = await poly_client_graphs.get_market_positions(
         [market.token1, market.token2], min_amount=100
     )
 

@@ -10,7 +10,6 @@ from py_clob_client.constants import POLYGON
 from py_clob_client.exceptions import PolyApiException
 
 from src.models.market import MarketSchema, parse_market_from_api
-from src.models.position import PositionSchema, parse_position_from_api
 from src.models.public import SearchResponse, SearchMarketItem, SearchEventItem
 from src.models.trade import TradeSchema, parse_trade_from_api
 from src.models.user_position import (
@@ -304,62 +303,6 @@ class PolyClient:
             logger.error(f"get_active_markets: error fetching markets: {exc}")
             logger.error(traceback.format_exc())
             raise exc
-
-    async def get_market_positions(
-        self, token_ids: list[str], min_amount: int = 0
-    ) -> list[PositionSchema]:
-        """
-        Goldsky GraphQL api.
-
-        Token IDs are the CLob token IDs (YES and NO).
-
-        Sorted by amount desc.
-        """
-
-        query = """
-        query GetMarketHolders($first: Int!, $skip: Int!, $tokenIds: [BigInt!]!, $minAmount: BigInt!) {
-            userPositions(
-                first: $first
-                skip: $skip
-                orderBy: amount
-                orderDirection: desc
-                where: {
-                    tokenId_in: $tokenIds
-                    amount_gt: $minAmount
-                }
-            ) {
-                id
-                realizedPnl
-                user
-                tokenId
-                amount
-                avgPrice
-                totalBought
-            }
-        }
-        """
-
-        variables = {
-            "first": 1000,
-            "skip": 0,
-            "tokenIds": token_ids,
-            "minAmount": to_usdc(min_amount),  # for the smart contract
-        }
-
-        payload = {"query": query, "variables": variables, "operationName": "GetMarketHolders"}
-
-        async with httpx.AsyncClient() as client:
-            response = await client.post(GOLDSKY_API_HOST + GOLDSKY_API_PNL_SUBGRAPH, json=payload)
-            data = response.json()
-            user_positions = data.get("data", {}).get("userPositions", [])
-            parsed_positions: list[PositionSchema] = [
-                parse_position_from_api(position) for position in user_positions
-            ]
-
-            # sort by total amount desc (amount * avg price)
-            parsed_positions.sort(key=lambda x: x.amount * x.avgPrice, reverse=True)
-
-            return parsed_positions
 
     async def get_user_positions_top(
         self, user_id: str, count: int = 100
