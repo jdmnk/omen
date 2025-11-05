@@ -73,6 +73,65 @@ class PolyClientGraphs:
 
             return parsed_positions
 
+    async def get_user_positions(
+        self, wallet_ids: list[str], token_ids: list[str]
+    ) -> list[PositionSchema]:
+        """
+        Goldsky GraphQL api to get positions for specific users and tokens.
+
+        Args:
+            wallet_ids: List of user wallet addresses
+            token_ids: List of CLob token IDs (YES and NO tokens for the market)
+
+        Returns:
+            List of positions matching the users and tokens.
+        """
+        query = """
+        query GetUserPositions($first: Int!, $skip: Int!, $userIds: [String!]!, $tokenIds: [BigInt!]!) {
+            userPositions(
+                first: $first
+                skip: $skip
+                orderBy: amount
+                orderDirection: desc
+                where: {
+                    user_in: $userIds
+                    tokenId_in: $tokenIds
+                }
+            ) {
+                id
+                realizedPnl
+                user
+                tokenId
+                amount
+                avgPrice
+                totalBought
+            }
+        }
+        """
+
+        variables = {
+            "first": 1000,
+            "skip": 0,
+            "userIds": wallet_ids,
+            "tokenIds": token_ids,
+        }
+
+        payload = {
+            "query": query,
+            "variables": variables,
+            "operationName": "GetUserPositions",
+        }
+
+        async with httpx.AsyncClient() as client:
+            response = await client.post(GOLDSKY_API_HOST + GOLDSKY_API_PNL_SUBGRAPH, json=payload)
+            data = response.json()
+            user_positions = data.get("data", {}).get("userPositions", [])
+            parsed_positions: list[PositionSchema] = [
+                parse_position_from_api(position) for position in user_positions
+            ]
+
+            return parsed_positions
+
     async def get_wallets_info(self, wallet_ids: list[str]) -> list[WalletSchema]:
         """
         Goldsky GraphQL api for wallet information.

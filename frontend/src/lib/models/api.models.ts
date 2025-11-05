@@ -24,6 +24,9 @@ export type TopHolder = {
   walletCreatedAt: string | null;
   walletLastTransfer: string | null;
   walletBalance: number | null;
+  avgPrice?: number | null;
+  realizedPnl?: number | null;
+  totalBought?: number | null;
 };
 
 export type Market = {

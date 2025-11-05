@@ -131,8 +131,10 @@ async def search_markets(q: str = Query(min_length=1)) -> SearchResponse:
 @app.get("/markets/top-holders/with-wallet-info", response_model=list[TopHolderSchema])
 async def get_top_holders_with_wallet_info_endpoint(
     condition_id: str = Query(min_length=1),
+    token1: str = Query(min_length=1),
+    token2: str = Query(min_length=1),
 ) -> list[TopHolderSchema]:
-    holders = await get_top_holders_with_wallet_info(condition_id)
+    holders = await get_top_holders_with_wallet_info(condition_id, [token1, token2])
 
     if not holders:
         raise HTTPException(status_code=404, detail="Top holders not found")

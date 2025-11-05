@@ -10,6 +10,7 @@ import Link from "next/link";
 import { Market } from "@/lib/models/api.models";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { OrderBook } from "./OrderBook";
+import { useOrderbookQuery } from "@/lib/queries/orderbook.query";
 import { POLYMARKET_URL } from "@/lib/api";
 
 function formatAddress(addr: string) {
@@ -29,7 +30,14 @@ export function MarketHoldersWidget({
     data: topHolders,
     isLoading,
     error,
-  } = useTopHoldersWithWalletInfoQuery(market.condition_id);
+  } = useTopHoldersWithWalletInfoQuery(
+    market.condition_id,
+    market.token1,
+    market.token2
+  );
+
+  // Fetch orderbook to get live prices for PnL calculation
+  const { data: orderbookData } = useOrderbookQuery(market.token1);
 
   // TopHolders already have outcomeIndex, no transformation needed
   const holdersByOutcome = (topHolders || []).reduce((acc, holder) => {
@@ -54,11 +62,19 @@ export function MarketHoldersWidget({
   const outcome1Label = outcomes[1] || "NO";
 
   // Get current prices for each outcome
+  // Use orderbook midpoint if available, otherwise fallback to market outcomePrices
   const outcomePrices = market.outcomePrices
     .split(",")
     .map((p) => Number(p.trim()));
-  const outcome0Price = outcomePrices[0] || 0;
-  const outcome1Price = outcomePrices[1] || 0;
+
+  // If orderbook available, use midpoint for YES (outcome 0) and (1 - midpoint) for NO (outcome 1)
+  // Otherwise use market prices
+  const outcome0Price = orderbookData?.midpointPrice
+    ? orderbookData.midpointPrice
+    : outcomePrices[0] || 0;
+  const outcome1Price = orderbookData?.midpointPrice
+    ? 1 - orderbookData.midpointPrice
+    : outcomePrices[1] || 0;
 
   const renderHolderRow = (
     holder: TopHolder,
@@ -71,6 +87,34 @@ export function MarketHoldersWidget({
     // Calculate size in USD (amount shares * current price per share)
     const currentPrice = outcomeIndex === 0 ? outcome0Price : outcome1Price;
     const sharesAmount = holder.amount.toFixed(0);
+
+    // Calculate PnL using live orderbook prices and avgPrice from backend
+    // Unrealized PnL = (currentPrice - avgPrice) * amount
+    // We also have realizedPnl from backend, but unrealized is more relevant for live display
+    let pnl: number | null = null;
+    let pnlPercent: number | null = null;
+
+    if (
+      holder.avgPrice !== null &&
+      holder.avgPrice !== undefined &&
+      holder.avgPrice > 0
+    ) {
+      // Calculate unrealized PnL
+      const costBasis = holder.avgPrice * holder.amount;
+      const currentValue = currentPrice * holder.amount;
+      pnl = currentValue - costBasis;
+      pnlPercent = ((currentPrice - holder.avgPrice) / holder.avgPrice) * 100;
+    }
+
+    const pnlDisplay = pnl !== null ? formatNumber(pnl, 2) : "-";
+    const pnlColor =
+      pnl !== null
+        ? pnl > 0
+          ? "text-outcome-yes"
+          : pnl < 0
+          ? "text-outcome-no"
+          : "text-muted-foreground"
+        : "text-muted-foreground";
 
     return (
       <div
@@ -103,8 +147,20 @@ export function MarketHoldersWidget({
             {formatNumber(sharesAmount)}
           </div>
         </div>
-        <div className="w-16 text-right text-sm text-muted-foreground">
-          {/* PnL not available in Polymarket API response */}
+        <div className="w-16 text-right text-sm">
+          {pnl !== null ? (
+            <div className={pnlColor}>
+              <div>{pnlDisplay}</div>
+              {pnlPercent !== null && (
+                <div className="text-xs opacity-75">
+                  {pnlPercent > 0 ? "+" : ""}
+                  {pnlPercent.toFixed(1)}%
+                </div>
+              )}
+            </div>
+          ) : (
+            <div className="text-muted-foreground">-</div>
+          )}
         </div>
         <div className="w-16">
           {/* Tags placeholder - will be added later */}
