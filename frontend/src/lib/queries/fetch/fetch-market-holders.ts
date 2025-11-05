@@ -1,6 +1,7 @@
 import { DATA_API_HOST } from "@/lib/api";
-import { MarketHolder, MarketHoldersResponse } from "@/lib/models/api.models";
+import { MarketHoldersResponse } from "@/lib/models/api.models";
 
+// Always returns only top 20 by outcome for some reason
 export async function fetchMarketHolders(
   conditionId: string,
   limit: number = 100,
@@ -19,4 +20,3 @@ export async function fetchMarketHolders(
 
   return response.json();
 }
-

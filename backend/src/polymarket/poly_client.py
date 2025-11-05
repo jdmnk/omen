@@ -1,6 +1,5 @@
 import asyncio
 import json
-import string
 import traceback
 
 import httpx
@@ -271,20 +270,18 @@ class PolyClient:
         parsed_trades = [t for t in (parse_trade_from_api(t) for t in all_trades) if t is not None]
         return parsed_trades
 
-    async def get_top_holders(
-        self, condition_ids: list[string], min_balance: int = 1, limit: int = 500
-    ) -> list[dict]:
+    async def get_top_holders(self, condition_ids: list[str], min_balance: int = 1) -> list[dict]:
         """
         No pagination. Artificial limit of 20 per YES/NO per market (so total 40 per market).
 
-        `limit` range: 0-500
+        `limit` range: 0-500 (not respected, always returns 20/20 by outcome)
         `min_balance` range: 0-999999
         """
         try:
             async with httpx.AsyncClient() as client:
                 params = {
                     "market": ",".join(condition_ids),
-                    "limit": limit,
+                    # "limit": limit, # limit is ignored, always returns 20/20 by outcome
                     "minBalance": min_balance,
                 }
                 response = await client.get(f"{DATA_API_HOST}/holders", params=params)

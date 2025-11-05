@@ -3,8 +3,8 @@
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { LoadingSpinner } from "@/components/ui/spinner";
-import { useMarketHoldersQuery } from "@/lib/queries/market-holders.query";
-import { MarketHolder } from "@/lib/models/api.models";
+import { useTopHoldersWithWalletInfoQuery } from "@/lib/queries/top-holders-with-wallet-info.query";
+import { TopHolder } from "@/lib/models/api.models";
 import { formatCompactCurrency } from "@/lib/ui/format.utils";
 import Link from "next/link";
 import { Market } from "@/lib/models/api.models";
@@ -24,27 +24,21 @@ export function MarketHoldersWidget({
   limit?: number;
 }) {
   const [activeTab, setActiveTab] = useState("positions");
-  const { data, isLoading, error } = useMarketHoldersQuery(market.condition_id);
+  const {
+    data: topHolders,
+    isLoading,
+    error,
+  } = useTopHoldersWithWalletInfoQuery(market.condition_id);
 
-  // Flatten all holders from all tokens and group by outcomeIndex
-  const allHolders = data?.flatMap((item) => item.holders) || [];
-
-  console.log(allHolders);
-  console.log(
-    JSON.stringify(
-      allHolders.map((h) => h.proxyWallet),
-      null
-    )
-  );
-
-  const holdersByOutcome = allHolders.reduce((acc, holder) => {
+  // TopHolders already have outcomeIndex, no transformation needed
+  const holdersByOutcome = (topHolders || []).reduce((acc, holder) => {
     const outcomeIndex = holder.outcomeIndex;
     if (!acc[outcomeIndex]) {
       acc[outcomeIndex] = [];
     }
     acc[outcomeIndex].push(holder);
     return acc;
-  }, {} as Record<number, MarketHolder[]>);
+  }, {} as Record<number, TopHolder[]>);
 
   // Sort by amount descending and take top N
   const outcome0Holders = (holdersByOutcome[0] || [])
@@ -66,7 +60,7 @@ export function MarketHoldersWidget({
   const outcome1Price = outcomePrices[1] || 0;
 
   const renderHolderRow = (
-    holder: MarketHolder,
+    holder: TopHolder,
     index: number,
     outcomeIndex: number
   ) => {
@@ -107,7 +101,7 @@ export function MarketHoldersWidget({
           </div>
         </div>
         <div className="w-16 text-right text-sm text-muted-foreground">
-          {/* PnL placeholder - will be added later */}
+          {/* PnL not available in Polymarket API response */}
         </div>
         <div className="w-16">
           {/* Tags placeholder - will be added later */}

@@ -10,6 +10,22 @@ export type Position = {
   user: string;
 };
 
+export type TopHolder = {
+  proxyWallet: string;
+  bio?: string | null;
+  asset: string;
+  pseudonym?: string | null;
+  amount: number;
+  displayUsernamePublic: boolean;
+  outcomeIndex: number;
+  name?: string | null;
+  profileImage?: string | null;
+  profileImageOptimized?: string | null;
+  walletCreatedAt: string | null;
+  walletLastTransfer: string | null;
+  walletBalance: number | null;
+};
+
 export type Market = {
   condition_id: string;
   question: string;

@@ -63,8 +63,6 @@ export function PriceChartWidget({ market }: { market: Market }) {
 
   const spread = Math.abs(market.bestAsk - market.bestBid) * 100;
 
-  console.log(market);
-
   return (
     <div className="relative w-full flex flex-col border rounded-lg pb-2">
       <div className="text-sm bg-muted px-4 py-2 rounded-t-lg border-b font-bold">

@@ -61,3 +61,25 @@ class SearchResponse(BaseModel):
     tags: list[dict] | None = None
     profiles: list[dict] | None = None
     pagination: dict | None = None
+
+
+class PolymarketHolder(BaseModel):
+    """Schema for a single holder from Polymarket Data API."""
+
+    proxyWallet: str
+    bio: str | None = None
+    asset: str
+    pseudonym: str | None = None
+    amount: float
+    displayUsernamePublic: bool
+    outcomeIndex: int
+    name: str | None = None
+    profileImage: str | None = None
+    profileImageOptimized: str | None = None
+
+
+class PolymarketHoldersResponse(BaseModel):
+    """Schema for holders response from Polymarket Data API."""
+
+    token: str
+    holders: list[PolymarketHolder]
