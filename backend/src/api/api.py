@@ -6,6 +6,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from py_clob_client.clob_types import OrderBookSummary
 
 from src.analytics.insider_finder import find_insiders
+from src.analytics.top_holders_analysis import TopHolderSchema, get_top_holders_with_wallet_info
 from src.analytics.trades_analytics import (
     UserTradesGroup,
     group_trades_by_user_detailed,
@@ -125,3 +126,21 @@ async def search_markets(q: str = Query(min_length=1)) -> SearchResponse:
     Returns events with their markets, filtered to only active markets.
     """
     return await poly_client.search_markets(q)
+
+
+@app.get("/v1/top-holders", response_model=list[TopHolderSchema])
+async def get_top_holders_with_wallet_info_endpoint(
+    condition_id: str = Query(min_length=1), min_amount: int = 100
+) -> list[TopHolderSchema]:
+    """
+    Get top holders for a market enriched with wallet information.
+
+    Returns positions sorted by amount * avgPrice descending, with wallet
+    fields: walletCreatedAt, walletLastTransfer, walletBalance.
+    """
+    holders = await get_top_holders_with_wallet_info(condition_id, min_amount=min_amount)
+
+    if not holders:
+        raise HTTPException(status_code=404, detail="Top holders not found")
+
+    return holders
