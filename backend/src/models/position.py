@@ -1,10 +1,11 @@
-from decimal import Decimal, InvalidOperation
+from decimal import Decimal
 
 from pydantic import BaseModel
 from sqlalchemy import Numeric, String
 from sqlalchemy.orm import Mapped, mapped_column
 
 from src.models.base import Base
+from src.utils.usdc import from_usdc_decimal
 
 
 class Position(Base):
@@ -34,16 +35,6 @@ class PositionSchema(BaseModel):
 
 
 def parse_position_from_api(position_dict: dict) -> PositionSchema | None:
-    USDC_MULT = Decimal(10) ** 6
-
-    def from_usdc_decimal(value: object) -> Decimal:
-        try:
-            if value is None:
-                return Decimal(0)
-            return Decimal(str(value)) / USDC_MULT
-        except (InvalidOperation, TypeError, ValueError):
-            return Decimal(0)
-
     try:
         id = position_dict.get("id")
         if not id:

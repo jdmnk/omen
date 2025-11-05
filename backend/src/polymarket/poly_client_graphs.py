@@ -1,6 +1,7 @@
 import httpx
 
 from src.models.position import PositionSchema, parse_position_from_api
+from src.models.wallet import WalletSchema, parse_wallet_from_api
 from src.utils.logging_config import get_logger
 from src.utils.usdc import to_usdc
 
@@ -8,6 +9,7 @@ logger = get_logger(__name__)
 
 GOLDSKY_API_HOST = "https://api.goldsky.com/api/public/project_cl6mb8i9h0003e201j6li0diw"
 GOLDSKY_API_PNL_SUBGRAPH = "/subgraphs/pnl-subgraph/0.0.14/gn"
+GOLDSKY_API_WALLET_SUBGRAPH = "/subgraphs/wallet-subgraph/0.0.4/gn"
 
 
 class PolyClientGraphs:
@@ -70,3 +72,44 @@ class PolyClientGraphs:
             parsed_positions.sort(key=lambda x: x.amount * x.avgPrice, reverse=True)
 
             return parsed_positions
+
+    async def get_wallets_info(self, wallet_ids: list[str]) -> list[WalletSchema]:
+        """
+        Goldsky GraphQL api for wallet information.
+
+        Returns wallet details including id, signer, type, balance, lastTransfer, and createdAt.
+        """
+        query = """
+        query GetWalletsInfo($walletIds: [ID!]!) {
+            wallets(
+                where: {
+                    id_in: $walletIds
+                }
+            ) {
+                id
+                signer
+                type
+                balance
+                lastTransfer
+                createdAt
+            }
+        }
+        """
+
+        variables = {
+            "walletIds": wallet_ids,
+        }
+
+        payload = {"query": query, "variables": variables, "operationName": "GetWalletsInfo"}
+
+        async with httpx.AsyncClient() as client:
+            response = await client.post(
+                GOLDSKY_API_HOST + GOLDSKY_API_WALLET_SUBGRAPH, json=payload
+            )
+            data = response.json()
+            wallets = data.get("data", {}).get("wallets", [])
+            parsed_wallets: list[WalletSchema] = [
+                w for w in [parse_wallet_from_api(wallet) for wallet in wallets] if w is not None
+            ]
+
+            return parsed_wallets
