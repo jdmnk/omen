@@ -110,10 +110,7 @@ export function MarketHoldersWidget({
   };
 
   return (
-    <Card className="shadow-md">
-      <CardHeader className="pb-3">
-        <CardTitle className="text-base">Top Holders</CardTitle>
-      </CardHeader>
+    <Card className="shadow-md pt-3">
       <CardContent>
         <Tabs defaultValue="positions" className="w-full">
           <TabsList className="grid w-full grid-cols-5">
