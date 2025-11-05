@@ -130,25 +130,9 @@ async def search_markets(q: str = Query(min_length=1)) -> SearchResponse:
 
 @app.get("/markets/top-holders/with-wallet-info", response_model=list[TopHolderSchema])
 async def get_top_holders_with_wallet_info_endpoint(
-    condition_id: str = Query(min_length=1), min_balance: int = 1, limit: int = 500
+    condition_id: str = Query(min_length=1),
 ) -> list[TopHolderSchema]:
-    """
-    Get top holders for a market enriched with wallet information.
-
-    Uses Polymarket Data API to get top holders, then enriches them with
-    wallet data from Goldsky (walletCreatedAt, walletLastTransfer, walletBalance).
-
-    Args:
-        condition_id: Market condition ID (required)
-        min_balance: Minimum balance filter (default: 1, range: 0-999999)
-        limit: Maximum number of holders to return (default: 500, range: 0-500)
-
-    Returns:
-        List of top holders with wallet information enriched.
-    """
-    holders = await get_top_holders_with_wallet_info(
-        condition_id, min_balance=min_balance, limit=limit
-    )
+    holders = await get_top_holders_with_wallet_info(condition_id)
 
     if not holders:
         raise HTTPException(status_code=404, detail="Top holders not found")

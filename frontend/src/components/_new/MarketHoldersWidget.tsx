@@ -5,11 +5,12 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { LoadingSpinner } from "@/components/ui/spinner";
 import { useTopHoldersWithWalletInfoQuery } from "@/lib/queries/top-holders-with-wallet-info.query";
 import { TopHolder } from "@/lib/models/api.models";
-import { formatCompactCurrency } from "@/lib/ui/format.utils";
+import { formatCompactCurrency, formatNumber } from "@/lib/ui/format.utils";
 import Link from "next/link";
 import { Market } from "@/lib/models/api.models";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { OrderBook } from "./OrderBook";
+import { POLYMARKET_URL } from "@/lib/api";
 
 function formatAddress(addr: string) {
   if (!addr) return "";
@@ -69,7 +70,7 @@ export function MarketHoldersWidget({
 
     // Calculate size in USD (amount shares * current price per share)
     const currentPrice = outcomeIndex === 0 ? outcome0Price : outcome1Price;
-    const sizeValue = holder.amount * currentPrice;
+    const sizeValue = holder.amount; // * currentPrice;
 
     return (
       <div
@@ -89,16 +90,15 @@ export function MarketHoldersWidget({
             </div>
           )}
           <Link
-            href={`/user/${holder.proxyWallet}`}
+            href={`${POLYMARKET_URL}/profile/${holder.proxyWallet}`}
+            target="_blank"
             className="text-sm font-medium truncate hover:underline min-w-0"
           >
             {displayName}
           </Link>
         </div>
         <div className="text-right">
-          <div className="text-sm font-semibold">
-            {formatCompactCurrency(sizeValue)}
-          </div>
+          <div className="text-sm font-semibold">{formatNumber(sizeValue)}</div>
         </div>
         <div className="w-16 text-right text-sm text-muted-foreground">
           {/* PnL not available in Polymarket API response */}
