@@ -6,6 +6,11 @@ from src.models.wallet import WalletSchema
 from src.polymarket.poly_client import PolyClient
 from src.polymarket.poly_client_graphs import PolyClientGraphs
 
+# Blacklist of wallet addresses to exclude from top holders analysis
+BLACKLISTED_WALLETS: set[str] = {
+    "0xa5ef39c3d3e10d0b270233af41cac69796b12966",  # negrisk adapter burn address
+}
+
 
 class TopHolderSchema(PolymarketHolder):
     """Polymarket holder schema enriched with wallet information."""
@@ -14,6 +19,16 @@ class TopHolderSchema(PolymarketHolder):
     walletCreatedAt: datetime | None = None
     walletLastTransfer: datetime | None = None
     walletBalance: Decimal | None = None
+
+
+def filter_blacklisted_wallets(holders: list[dict]) -> list[dict]:
+    blacklist_normalized = {addr.lower() for addr in BLACKLISTED_WALLETS}
+
+    return [
+        h
+        for h in holders
+        if h.get("proxyWallet") and h.get("proxyWallet", "").lower() not in blacklist_normalized
+    ]
 
 
 async def get_top_holders_with_wallet_info(condition_id: str) -> list[TopHolderSchema]:
@@ -32,6 +47,12 @@ async def get_top_holders_with_wallet_info(condition_id: str) -> list[TopHolderS
 
     # Get top holders from Polymarket API
     holders = await poly_client.get_top_holders([condition_id])
+
+    if not holders:
+        return []
+
+    # Filter out blacklisted wallets
+    holders = filter_blacklisted_wallets(holders)
 
     if not holders:
         return []

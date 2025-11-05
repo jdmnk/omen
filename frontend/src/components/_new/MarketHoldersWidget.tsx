@@ -90,7 +90,8 @@ export function MarketHoldersWidget({
             </div>
           )}
           <Link
-            href={`${POLYMARKET_URL}/profile/${holder.proxyWallet}`}
+            // href={`${POLYMARKET_URL}/profile/${holder.proxyWallet}`}
+            href={`/user/${holder.proxyWallet}`}
             target="_blank"
             className="text-sm font-medium truncate hover:underline min-w-0"
           >
