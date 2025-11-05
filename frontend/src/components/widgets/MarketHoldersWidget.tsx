@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { LoadingSpinner } from "@/components/ui/spinner";
 import { useMarketHoldersQuery } from "@/lib/queries/market-holders.query";
@@ -8,6 +9,7 @@ import { formatCompactCurrency } from "@/lib/ui/format.utils";
 import Link from "next/link";
 import { Market } from "@/lib/models/api.models";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { OrderBook } from "./OrderBook";
 
 function formatAddress(addr: string) {
   if (!addr) return "";
@@ -21,6 +23,7 @@ export function MarketHoldersWidget({
   market: Market;
   limit?: number;
 }) {
+  const [activeTab, setActiveTab] = useState("positions");
   const { data, isLoading, error } = useMarketHoldersQuery(
     market.condition_id,
     100, // Request enough to get top holders for both outcomes
@@ -112,13 +115,11 @@ export function MarketHoldersWidget({
   return (
     <Card className="shadow-md pt-3">
       <CardContent>
-        <Tabs defaultValue="positions" className="w-full">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <TabsList className="grid w-full grid-cols-5">
             <TabsTrigger value="positions">1 POSITIONS</TabsTrigger>
             <TabsTrigger value="rules">2 RULES</TabsTrigger>
-            <TabsTrigger value="book" disabled>
-              3 BOOK
-            </TabsTrigger>
+            <TabsTrigger value="book">3 BOOK</TabsTrigger>
             <TabsTrigger value="news" disabled>
               4 NEWS
             </TabsTrigger>
@@ -204,6 +205,10 @@ export function MarketHoldersWidget({
                 </div>
               </div>
             </div>
+          </TabsContent>
+
+          <TabsContent value="book" className="mt-4">
+            {activeTab === "book" && <OrderBook tokenId={market.token1} />}
           </TabsContent>
         </Tabs>
       </CardContent>
