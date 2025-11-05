@@ -174,3 +174,46 @@ export type UserTradesGroup = {
   totalUsdVolume: number;
   trades: Trade[];
 };
+
+/*
+https://docs.polymarket.com/api-reference/core/get-top-holders-for-markets
+
+Response:
+[
+  {
+    "token": "<string>",
+    "holders": [
+      {
+        "proxyWallet": "0x56687bf447db6ffa42ffe2204a05edaa20f55839",
+        "bio": "<string>",
+        "asset": "<string>",
+        "pseudonym": "<string>",
+        "amount": 123,
+        "displayUsernamePublic": true,
+        "outcomeIndex": 123,
+        "name": "<string>",
+        "profileImage": "<string>",
+        "profileImageOptimized": "<string>"
+      }
+    ]
+  }
+]
+*/
+
+export type MarketHolder = {
+  proxyWallet: string;
+  bio?: string;
+  asset: string;
+  pseudonym?: string;
+  amount: number;
+  displayUsernamePublic: boolean;
+  outcomeIndex: number;
+  name?: string;
+  profileImage?: string;
+  profileImageOptimized?: string;
+};
+
+export type MarketHoldersResponse = Array<{
+  token: string;
+  holders: MarketHolder[];
+}>;

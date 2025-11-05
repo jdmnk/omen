@@ -38,6 +38,22 @@ export function formatCompactNumber(
   }).format(value);
 }
 
+export function formatCompactCurrency(
+  value: number | string,
+  locale: string = getUserLocale()
+): string {
+  const n = typeof value === "string" ? Number(value) : value;
+  if (Number.isNaN(n)) return "$0";
+
+  if (n >= 1000000) {
+    return `$${(n / 1000000).toFixed(2)}m`;
+  }
+  if (n >= 1000) {
+    return `$${(n / 1000).toFixed(2)}k`;
+  }
+  return formatCurrency(n, locale);
+}
+
 function formatDuration(
   value: number,
   unit: Intl.NumberFormatOptions["unit"],

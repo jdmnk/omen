@@ -11,8 +11,8 @@ import { SearchColumn } from "./_new/SearchColumn";
 import { useMarketBySlugQuery } from "@/lib/queries/market-by-slug.query";
 import { PriceChartWidget } from "./_new/PriceChartWidget";
 import { RecentActivityWidget } from "./widgets/RecentActivityWidget";
-import { PositionsWidget } from "./widgets/PositionsWidget";
 import { EmptyState, LoadingState, ErrorState } from "./_new/WidgetHelpers";
+import { MarketHoldersWidget } from "./widgets/MarketHoldersWidget";
 
 export function TerminalLayout() {
   const params = useParams();
@@ -66,7 +66,7 @@ export function TerminalLayout() {
                   ) : error || !market ? (
                     <ErrorState />
                   ) : (
-                    <RecentActivityWidget conditionId={market.condition_id} />
+                    <MarketHoldersWidget market={market} />
                   )}
                 </div>
               </ResizablePanel>
