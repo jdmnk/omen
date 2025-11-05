@@ -14,4 +14,3 @@ export async function fetchMarketBySlug(slug: string): Promise<MarketResponse> {
   const data = (await response.json()) as MarketResponse;
   return data;
 }
-
