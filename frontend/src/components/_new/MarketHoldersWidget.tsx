@@ -1,11 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { LoadingSpinner } from "@/components/ui/spinner";
 import { useTopHoldersWithWalletInfoQuery } from "@/lib/queries/top-holders-with-wallet-info.query";
 import { TopHolder } from "@/lib/models/api.models";
-import { formatCompactCurrency, formatNumber } from "@/lib/ui/format.utils";
+import { formatNumber } from "@/lib/ui/format.utils";
 import Link from "next/link";
 import { Market } from "@/lib/models/api.models";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
@@ -90,8 +90,8 @@ export function MarketHoldersWidget({
             </div>
           )}
           <Link
-            // href={`${POLYMARKET_URL}/profile/${holder.proxyWallet}`}
-            href={`/user/${holder.proxyWallet}`}
+            href={`${POLYMARKET_URL}/profile/${holder.proxyWallet}`}
+            // href={`/user/${holder.proxyWallet}`}
             target="_blank"
             className="text-sm font-medium truncate hover:underline min-w-0"
           >
