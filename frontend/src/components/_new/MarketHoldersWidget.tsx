@@ -70,7 +70,7 @@ export function MarketHoldersWidget({
 
     // Calculate size in USD (amount shares * current price per share)
     const currentPrice = outcomeIndex === 0 ? outcome0Price : outcome1Price;
-    const sizeValue = holder.amount; // * currentPrice;
+    const sharesAmount = holder.amount.toFixed(0);
 
     return (
       <div
@@ -99,7 +99,9 @@ export function MarketHoldersWidget({
           </Link>
         </div>
         <div className="text-right">
-          <div className="text-sm font-semibold">{formatNumber(sizeValue)}</div>
+          <div className="text-sm font-semibold">
+            {formatNumber(sharesAmount)}
+          </div>
         </div>
         <div className="w-16 text-right text-sm text-muted-foreground">
           {/* PnL not available in Polymarket API response */}
