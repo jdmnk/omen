@@ -6,7 +6,7 @@ import { MarketHoldersResponse } from "@/lib/models/api.models";
 
 export function useMarketHoldersQuery(
   conditionId: string,
-  limit: number = 100,
+  limit: number = 40,
   minBalance: number = 1
 ) {
   return useQuery<MarketHoldersResponse>({
@@ -16,4 +16,3 @@ export function useMarketHoldersQuery(
     staleTime: 60000, // 1 minute
   });
 }
-

@@ -24,11 +24,7 @@ export function MarketHoldersWidget({
   limit?: number;
 }) {
   const [activeTab, setActiveTab] = useState("positions");
-  const { data, isLoading, error } = useMarketHoldersQuery(
-    market.condition_id,
-    100, // Request enough to get top holders for both outcomes
-    1
-  );
+  const { data, isLoading, error } = useMarketHoldersQuery(market.condition_id);
 
   // Flatten all holders from all tokens and group by outcomeIndex
   const allHolders = data?.flatMap((item) => item.holders) || [];
