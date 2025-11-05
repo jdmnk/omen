@@ -7,6 +7,7 @@ import { MarketHolder } from "@/lib/models/api.models";
 import { formatCompactCurrency } from "@/lib/ui/format.utils";
 import Link from "next/link";
 import { Market } from "@/lib/models/api.models";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 
 function formatAddress(addr: string) {
   if (!addr) return "";
@@ -114,69 +115,100 @@ export function MarketHoldersWidget({
         <CardTitle className="text-base">Top Holders</CardTitle>
       </CardHeader>
       <CardContent>
-        {isLoading ? (
-          <div className="flex items-center justify-center py-8">
-            <LoadingSpinner message="Loading holders..." size="sm" />
-          </div>
-        ) : error ? (
-          <div className="text-center py-8 text-destructive text-sm">
-            Error loading holders
-          </div>
-        ) : outcome0Holders.length === 0 && outcome1Holders.length === 0 ? (
-          <div className="text-center py-6 text-sm text-muted-foreground">
-            No holder data
-          </div>
-        ) : (
-          <div className="grid grid-cols-2 gap-4">
-            {/* Outcome 0 Column */}
-            <div className="flex flex-col">
-              <div className="text-sm font-semibold mb-3 pb-2 border-b border-border">
-                {outcome0Label} Trader
-              </div>
-              <div className="flex items-center gap-3 text-xs text-muted-foreground mb-2 pb-1 border-b border-border/50">
-                <div className="flex-1">Trader</div>
-                <div className="text-right">~Size</div>
-                <div className="w-16 text-right">~PnL</div>
-                <div className="w-16">Tags</div>
-              </div>
-              <div className="space-y-0">
-                {outcome0Holders.length === 0 ? (
-                  <div className="text-center py-6 text-sm text-muted-foreground">
-                    No holders
-                  </div>
-                ) : (
-                  outcome0Holders.map((holder, index) =>
-                    renderHolderRow(holder, index, 0)
-                  )
-                )}
-              </div>
-            </div>
+        <Tabs defaultValue="positions" className="w-full">
+          <TabsList className="grid w-full grid-cols-5">
+            <TabsTrigger value="positions">1 POSITIONS</TabsTrigger>
+            <TabsTrigger value="rules">2 RULES</TabsTrigger>
+            <TabsTrigger value="book" disabled>
+              3 BOOK
+            </TabsTrigger>
+            <TabsTrigger value="news" disabled>
+              4 NEWS
+            </TabsTrigger>
+            <TabsTrigger value="trades" disabled>
+              5 LIVE TRADES
+            </TabsTrigger>
+          </TabsList>
 
-            {/* Outcome 1 Column */}
-            <div className="flex flex-col">
-              <div className="text-sm font-semibold mb-3 pb-2 border-b border-border">
-                {outcome1Label} Trader
+          <TabsContent value="positions" className="mt-4">
+            {isLoading ? (
+              <div className="flex items-center justify-center py-8">
+                <LoadingSpinner message="Loading holders..." size="sm" />
               </div>
-              <div className="flex items-center gap-3 text-xs text-muted-foreground mb-2 pb-1 border-b border-border/50">
-                <div className="flex-1">Trader</div>
-                <div className="text-right">~Size</div>
-                <div className="w-16 text-right">~PnL</div>
-                <div className="w-16">Tags</div>
+            ) : error ? (
+              <div className="text-center py-8 text-destructive text-sm">
+                Error loading holders
               </div>
-              <div className="space-y-0">
-                {outcome1Holders.length === 0 ? (
-                  <div className="text-center py-6 text-sm text-muted-foreground">
-                    No holders
+            ) : outcome0Holders.length === 0 && outcome1Holders.length === 0 ? (
+              <div className="text-center py-6 text-sm text-muted-foreground">
+                No holder data
+              </div>
+            ) : (
+              <div className="grid grid-cols-2 gap-4">
+                {/* Outcome 0 Column */}
+                <div className="flex flex-col">
+                  <div className="text-sm font-semibold mb-3 pb-2 border-b border-border">
+                    {outcome0Label} Trader
                   </div>
-                ) : (
-                  outcome1Holders.map((holder, index) =>
-                    renderHolderRow(holder, index, 1)
-                  )
-                )}
+                  <div className="flex items-center gap-3 text-xs text-muted-foreground mb-2 pb-1 border-b border-border/50">
+                    <div className="flex-1">Trader</div>
+                    <div className="text-right">~Size</div>
+                    <div className="w-16 text-right">~PnL</div>
+                    <div className="w-16">Tags</div>
+                  </div>
+                  <div className="space-y-0">
+                    {outcome0Holders.length === 0 ? (
+                      <div className="text-center py-6 text-sm text-muted-foreground">
+                        No holders
+                      </div>
+                    ) : (
+                      outcome0Holders.map((holder, index) =>
+                        renderHolderRow(holder, index, 0)
+                      )
+                    )}
+                  </div>
+                </div>
+
+                {/* Outcome 1 Column */}
+                <div className="flex flex-col">
+                  <div className="text-sm font-semibold mb-3 pb-2 border-b border-border">
+                    {outcome1Label} Trader
+                  </div>
+                  <div className="flex items-center gap-3 text-xs text-muted-foreground mb-2 pb-1 border-b border-border/50">
+                    <div className="flex-1">Trader</div>
+                    <div className="text-right">~Size</div>
+                    <div className="w-16 text-right">~PnL</div>
+                    <div className="w-16">Tags</div>
+                  </div>
+                  <div className="space-y-0">
+                    {outcome1Holders.length === 0 ? (
+                      <div className="text-center py-6 text-sm text-muted-foreground">
+                        No holders
+                      </div>
+                    ) : (
+                      outcome1Holders.map((holder, index) =>
+                        renderHolderRow(holder, index, 1)
+                      )
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
+          </TabsContent>
+
+          <TabsContent value="rules" className="mt-4">
+            <div className="space-y-4">
+              <div>
+                <h3 className="text-sm font-semibold mb-2">
+                  Market Description
+                </h3>
+                <div className="text-sm text-muted-foreground whitespace-pre-wrap">
+                  {market.description || "No description available."}
+                </div>
               </div>
             </div>
-          </div>
-        )}
+          </TabsContent>
+        </Tabs>
       </CardContent>
     </Card>
   );
