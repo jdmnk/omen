@@ -64,7 +64,8 @@ class PolyClient:
     """
 
     def __init__(self):
-        self.clob_client = self.get_clob_client()
+        # self.clob_client = self.get_clob_client()
+        pass
 
     def get_clob_client(self) -> ClobClient:
         client = ClobClient(CLOB_HOST, key=settings.polymarket_private_key, chain_id=POLYGON)
