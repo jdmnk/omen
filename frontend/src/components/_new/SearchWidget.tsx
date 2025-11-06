@@ -89,7 +89,7 @@ function SearchSection({
   );
 }
 
-export function SearchBar() {
+export function SearchWidget() {
   const [input, setInput] = useState<string>("");
   const [debouncedInput] = useDebounce(input, 200);
   const [expandedMarkets, setExpandedMarkets] = useState(false);

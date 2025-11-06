@@ -7,7 +7,7 @@ import {
   ResizablePanel,
   ResizablePanelGroup,
 } from "@/components/ui/resizable";
-import { SearchColumn } from "./_new/SearchColumn";
+import { SearchWidget } from "./_new/SearchWidget";
 import { useMarketBySlugQuery } from "@/lib/queries/market-by-slug.query";
 import { PriceChartWidget } from "./_new/PriceChartWidget";
 import { EmptyState, LoadingState, ErrorState } from "./_new/WidgetHelpers";
@@ -34,7 +34,7 @@ export function TerminalLayout() {
           {/* Left sidebar */}
           <ResizablePanel defaultSize={25} minSize={10}>
             <div className="h-full overflow-auto">
-              <SearchColumn />
+              <SearchWidget />
             </div>
           </ResizablePanel>
 
