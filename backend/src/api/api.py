@@ -1,5 +1,4 @@
 from datetime import datetime
-from typing import Annotated
 
 from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
@@ -10,7 +9,6 @@ from src.analytics.trades_analytics import (
     group_trades_by_user_detailed,
 )
 from src.db.selects import SelectsClient
-from src.models.position import PositionSchema
 from src.models.public import (
     HealthResponse,
     MarketAutocompleteItem,
@@ -81,16 +79,6 @@ async def get_market_trades(condition_id: str = Query(min_length=1)) -> list[Tra
         return trades
     else:
         raise HTTPException(status_code=404, detail="Trades not found")
-
-
-@app.get("/markets/positions", response_model=list[PositionSchema])
-async def get_market_positions(clob_tokens: Annotated[list[str], Query()]) -> list[PositionSchema]:
-    positions = await poly_client_graphs.get_market_positions(clob_tokens, min_amount=100)
-
-    if positions is not None and len(positions) > 0:
-        return positions
-    else:
-        raise HTTPException(status_code=404, detail="Positions not found")
 
 
 @app.get("/markets/trades/analytics", response_model=list[UserTradesGroup])
