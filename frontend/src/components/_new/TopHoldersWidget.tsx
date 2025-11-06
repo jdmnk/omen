@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { LoadingSpinner } from "@/components/ui/spinner";
 import { useTopHoldersQuery } from "@/lib/queries/top-holders.query";
@@ -13,6 +13,7 @@ import { OrderBook } from "./OrderBook";
 import { useOrderbookQuery } from "@/lib/queries/orderbook.query";
 import { POLYMARKET_URL } from "@/lib/api";
 import { useTopHoldersPositionsQuery } from "@/lib/queries/top-holders-positions.query";
+import { generateHolderTagsMap } from "@/lib/utils/holder-tags.utils";
 
 function formatAddress(addr: string) {
   if (!addr) return "";
@@ -38,17 +39,18 @@ export function TopHoldersWidget({
     100
   );
 
-  console.log(topHoldersPositions);
-  console.log(topHolders);
-  console.log(
-    JSON.stringify(
-      topHolders?.map((h) => h.proxyWallet),
-      null
-    )
-  );
-
   // Fetch orderbook to get live prices for PnL calculation
   const { data: orderbookData } = useOrderbookQuery(market.token1);
+
+  // Generate tags for all holders
+  const holderTagsMap = useMemo(() => {
+    if (!topHolders) return {};
+    return generateHolderTagsMap(
+      topHolders,
+      topHoldersPositions,
+      market.token1
+    );
+  }, [topHolders, topHoldersPositions, market.token1]);
 
   // TopHolders already have outcomeIndex, no transformation needed
   const holdersByOutcome = (topHolders || []).reduce((acc, holder) => {
@@ -174,7 +176,20 @@ export function TopHoldersWidget({
           )}
         </div>
         <div className="w-16">
-          {/* Tags placeholder - will be added later */}
+          <div className="flex flex-col gap-1.5">
+            {holderTagsMap[holder.proxyWallet]?.map((tag, tagIndex) => {
+              const Icon = tag.icon;
+              return (
+                <div
+                  key={tagIndex}
+                  title={tag.label}
+                  className="flex items-center justify-center w-5 h-5 rounded border border-border/50 bg-muted/50 hover:bg-muted transition-colors cursor-help"
+                >
+                  <Icon className="w-3 h-3 text-muted-foreground" />
+                </div>
+              );
+            })}
+          </div>
         </div>
       </div>
     );
