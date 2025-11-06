@@ -120,15 +120,7 @@ export function SearchBar() {
   };
 
   const handleSelectEvent = (slug: string) => {
-    // For now, navigate to first market if available, otherwise just use slug
-    // TODO: Create event page route if needed
-    const event = events.find((e) => e.slug === slug);
-    if (event?.markets && event.markets.length > 0) {
-      handleSelectMarket(event.markets[0].slug);
-    } else {
-      // Fallback: navigate to market page with event slug (might not work)
-      handleSelectMarket(slug);
-    }
+    // TODO: Implement event page route
   };
 
   const showResults = debouncedInput.trim().length > 0;
