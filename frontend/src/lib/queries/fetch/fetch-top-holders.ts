@@ -1,17 +1,21 @@
 import { getBaseUrl } from "@/lib/api";
+import { TopHolder } from "@/lib/models/api.models";
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export async function fetchTopHolders(conditionId: string): Promise<any[]> {
+export async function fetchTopHolders(
+  conditionId: string,
+  token1: string,
+  token2: string
+): Promise<TopHolder[]> {
   const base = getBaseUrl();
-  const res = await fetch(
-    `${base}/markets/top-holders?condition_id=${encodeURIComponent(
-      conditionId
-    )}`,
-    { cache: "no-store" }
-  );
+  const url = new URL(`${base}/markets/top-holders`);
+  url.searchParams.set("condition_id", conditionId);
+  url.searchParams.set("token1", token1);
+  url.searchParams.set("token2", token2);
+
+  const res = await fetch(url.toString(), { cache: "no-store" });
 
   if (!res.ok) {
-    throw new Error("Failed to fetch top holders");
+    throw new Error("Failed to fetch top holders with wallet info");
   }
 
   return res.json();

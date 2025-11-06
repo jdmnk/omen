@@ -114,11 +114,6 @@ async def get_market_trades_analytics(
     return group_trades_by_user_detailed(trades)
 
 
-@app.get("/markets/top-holders", response_model=list[dict])
-async def get_top_holders(condition_id: str = Query(min_length=1)):
-    return await find_insiders(condition_id)
-
-
 @app.get("/markets/search", response_model=SearchResponse)
 async def search_markets(q: str = Query(min_length=1)) -> SearchResponse:
     """
@@ -128,7 +123,7 @@ async def search_markets(q: str = Query(min_length=1)) -> SearchResponse:
     return await poly_client.search_markets(q)
 
 
-@app.get("/markets/top-holders/with-wallet-info", response_model=list[TopHolderSchema])
+@app.get("/markets/top-holders", response_model=list[TopHolderSchema])
 async def get_top_holders_with_wallet_info_endpoint(
     condition_id: str = Query(min_length=1),
     token1: str = Query(min_length=1),

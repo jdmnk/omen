@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { LoadingSpinner } from "@/components/ui/spinner";
-import { useTopHoldersWithWalletInfoQuery } from "@/lib/queries/top-holders-with-wallet-info.query";
+import { useTopHoldersQuery } from "@/lib/queries/top-holders.query";
 import { TopHolder } from "@/lib/models/api.models";
 import { formatNumber } from "@/lib/ui/format.utils";
 import Link from "next/link";
@@ -30,11 +30,7 @@ export function MarketHoldersWidget({
     data: topHolders,
     isLoading,
     error,
-  } = useTopHoldersWithWalletInfoQuery(
-    market.condition_id,
-    market.token1,
-    market.token2
-  );
+  } = useTopHoldersQuery(market.condition_id, market.token1, market.token2);
 
   // Fetch orderbook to get live prices for PnL calculation
   const { data: orderbookData } = useOrderbookQuery(market.token1);
