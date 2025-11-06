@@ -116,7 +116,7 @@ export function SearchBar() {
   }, [searchResults]);
 
   const handleSelectMarket = (slug: string) => {
-    router.push(`/${slug}`);
+    router.push(`/market/${slug}`);
   };
 
   const handleSelectEvent = (slug: string) => {

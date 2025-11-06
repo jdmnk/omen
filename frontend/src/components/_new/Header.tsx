@@ -5,14 +5,14 @@ export function Header() {
   return (
     <header className="border-b">
       <div className="px-4 h-14 flex items-center justify-between gap-4">
-        <div className="flex items-center gap-3">
-          <Logo />
-          <Link href="/">
+        <Link href="/">
+          <div className="flex items-center gap-3">
+            <Logo />
             <h1 className="text-xl font-bold text-[#6322FE] tracking-widest">
               OMEN INSIGHT
             </h1>
-          </Link>
-        </div>
+          </div>
+        </Link>
       </div>
     </header>
   );

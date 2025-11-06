@@ -10,13 +10,12 @@ import {
 import { SearchColumn } from "./_new/SearchColumn";
 import { useMarketBySlugQuery } from "@/lib/queries/market-by-slug.query";
 import { PriceChartWidget } from "./_new/PriceChartWidget";
-import { RecentActivityWidget } from "./widgets/RecentActivityWidget";
 import { EmptyState, LoadingState, ErrorState } from "./_new/WidgetHelpers";
 import { TopHoldersWidget } from "./_new/TopHoldersWidget";
 
 export function TerminalLayout() {
   const params = useParams();
-  const marketSlug = params?.market as string | undefined;
+  const marketSlug = params?.slug as string | undefined;
 
   const {
     data: marketData,
