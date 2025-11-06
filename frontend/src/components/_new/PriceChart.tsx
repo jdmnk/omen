@@ -25,7 +25,6 @@ const chartOptions: DeepPartial<ChartOptions> = {
     textColor: "#9ca3af",
     attributionLogo: false,
   },
-  height: 350,
   grid: {
     vertLines: { color: "#27272a", visible: false },
     horzLines: { color: "#27272a", visible: false },
@@ -76,10 +75,15 @@ export function PriceChart({ data, error, isLoading }: PriceChartProps) {
   useEffect(() => {
     if (!chartContainerRef.current) return;
 
+    // Get initial dimensions, fallback to reasonable defaults if 0
+    const initialWidth = chartContainerRef.current.clientWidth || 800;
+    const initialHeight = chartContainerRef.current.clientHeight || 400;
+
     // Create chart
     const chart = createChart(chartContainerRef.current, {
       ...chartOptions,
-      width: chartContainerRef.current.clientWidth,
+      width: initialWidth,
+      height: initialHeight,
     });
 
     chartRef.current = chart;
@@ -105,18 +109,30 @@ export function PriceChart({ data, error, isLoading }: PriceChartProps) {
     });
     seriesRef.current = lineSeries;
 
-    // Handle resize
+    // Handle resize using ResizeObserver to detect container size changes
     const handleResize = () => {
       if (chartContainerRef.current && chartRef.current) {
-        chartRef.current.applyOptions({
-          width: chartContainerRef.current.clientWidth,
-        });
+        const width = chartContainerRef.current.clientWidth;
+        const height = chartContainerRef.current.clientHeight;
+        // Only update if we have valid dimensions
+        if (width > 0 && height > 0) {
+          chartRef.current.applyOptions({
+            width,
+            height,
+          });
+        }
       }
     };
 
+    // Use ResizeObserver to watch for container size changes
+    const resizeObserver = new ResizeObserver(handleResize);
+    resizeObserver.observe(chartContainerRef.current);
+
+    // Also listen to window resize as fallback
     window.addEventListener("resize", handleResize);
 
     return () => {
+      resizeObserver.disconnect();
       window.removeEventListener("resize", handleResize);
       chart.remove();
       seriesRef.current = null;

@@ -71,7 +71,7 @@ export function PriceChartWidget({ market }: { market: Market }) {
     : Math.abs(market.bestAsk - market.bestBid) * 100;
 
   return (
-    <div className="relative w-full flex flex-col border rounded-lg pb-2">
+    <div className="relative w-full h-full flex flex-col border rounded-lg pb-2">
       <div className="text-sm bg-muted px-4 py-2 rounded-t-lg border-b font-bold">
         {market.question}
       </div>
@@ -133,7 +133,7 @@ export function PriceChartWidget({ market }: { market: Market }) {
       </div>
 
       {/* Chart */}
-      <div className="flex-1 w-full">
+      <div className="flex-1 w-full min-h-0">
         <PriceChart data={chartData} isLoading={isLoading} error={error} />
       </div>
     </div>
