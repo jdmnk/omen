@@ -172,3 +172,57 @@ class PolyClientGraphs:
             ]
 
             return parsed_wallets
+
+    async def get_user_positions_multiple_markets(
+        self, wallet_ids: list[str], token_ids: list[str], min_amount: int = 0
+    ) -> list[PositionSchema]:
+        query = """
+        query GetUserPositionsMultipleMarkets($first: Int!, $skip: Int!, $userIds: [String!]!, $tokenIds: [BigInt!]!, $minAmount: BigInt!) {
+            userPositions(
+                first: $first
+                skip: $skip
+                orderBy: amount
+                orderDirection: desc
+                where: {
+                    tokenId_in: $tokenIds
+                    amount_gt: $minAmount
+                    user_in: $userIds
+                }
+            ) {
+                id
+                realizedPnl
+                user
+                tokenId
+                amount
+                avgPrice
+                totalBought
+            }
+        }
+        """
+
+        variables = {
+            "first": 1000,
+            "skip": 0,
+            "userIds": wallet_ids,
+            "tokenIds": token_ids,
+            "minAmount": to_usdc(min_amount),  # for the smart contract
+        }
+
+        payload = {
+            "query": query,
+            "variables": variables,
+            "operationName": "GetUserPositionsMultipleMarkets",
+        }
+
+        async with httpx.AsyncClient() as client:
+            response = await client.post(GOLDSKY_API_HOST + GOLDSKY_API_PNL_SUBGRAPH, json=payload)
+            data = response.json()
+            user_positions = data.get("data", {}).get("userPositions", [])
+            parsed_positions: list[PositionSchema] = [
+                parse_position_from_api(position) for position in user_positions
+            ]
+
+            # sort by total amount desc (amount * avg price)
+            parsed_positions.sort(key=lambda x: x.amount * x.avgPrice, reverse=True)
+
+            return parsed_positions
