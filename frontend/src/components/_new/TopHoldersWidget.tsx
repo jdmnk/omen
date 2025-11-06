@@ -12,6 +12,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { OrderBook } from "./OrderBook";
 import { useOrderbookQuery } from "@/lib/queries/orderbook.query";
 import { POLYMARKET_URL } from "@/lib/api";
+import { useTopHoldersPositionsQuery } from "@/lib/queries/top-holders-positions.query";
 
 function formatAddress(addr: string) {
   if (!addr) return "";
@@ -31,6 +32,11 @@ export function TopHoldersWidget({
     isLoading,
     error,
   } = useTopHoldersQuery(market.condition_id, market.token1, market.token2);
+
+  const { data: topHoldersPositions } = useTopHoldersPositionsQuery(
+    topHolders?.map((h) => h.proxyWallet),
+    100
+  );
 
   console.log(topHolders);
   console.log(
