@@ -1,7 +1,7 @@
 import httpx
 
 from src.models.graph.position import PositionSchema, parse_position_from_api
-from src.models.wallet import WalletSchema, parse_wallet_from_api
+from src.models.graph.wallet import WalletSchema, parse_wallet_from_api
 from src.utils.logging_config import get_logger
 from src.utils.usdc import to_usdc
 
