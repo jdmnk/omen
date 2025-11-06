@@ -18,7 +18,7 @@ function formatAddress(addr: string) {
   return `${addr.slice(0, 6)}…${addr.slice(-4)}`;
 }
 
-export function MarketHoldersWidget({
+export function TopHoldersWidget({
   market,
   limit = 20,
 }: {
