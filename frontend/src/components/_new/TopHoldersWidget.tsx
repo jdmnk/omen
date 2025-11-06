@@ -118,7 +118,7 @@ export function TopHoldersWidget({
         className="flex items-center gap-3 py-2 border-b border-border/50 last:border-0"
       >
         <div className="flex items-center gap-2.5 flex-1 min-w-0">
-          {holder.profileImage || holder.profileImageOptimized ? (
+          {holder.profileImageOptimized || holder.profileImage ? (
             <img
               src={holder.profileImageOptimized || holder.profileImage || ""}
               alt=""
