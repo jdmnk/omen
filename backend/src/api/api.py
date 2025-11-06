@@ -3,9 +3,7 @@ from typing import Annotated
 
 from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
-from py_clob_client.clob_types import OrderBookSummary
 
-from src.analytics.insider_finder import find_insiders
 from src.analytics.top_holders_analysis import TopHolderSchema, get_top_holders_with_wallet_info
 from src.analytics.trades_analytics import (
     UserTradesGroup,
@@ -73,15 +71,6 @@ async def search_markets_slug(slug: str = Query(min_length=1)) -> MarketSearchRe
         raise HTTPException(status_code=404, detail="Market not found")
 
     return MarketSearchResponse(market=result)
-
-
-@app.get("/markets/order-book", response_model=OrderBookSummary | None)
-def get_market_order_book(token_id: str = Query(min_length=1)) -> OrderBookSummary | None:
-    order_book = poly_client.get_market_order_book(token_id)
-    if order_book is not None:
-        return order_book
-    else:
-        raise HTTPException(status_code=404, detail="Order book not found")
 
 
 @app.get("/markets/trades", response_model=list[TradeSchema])

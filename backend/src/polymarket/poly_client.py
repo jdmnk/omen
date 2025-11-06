@@ -4,7 +4,6 @@ import traceback
 
 import httpx
 from py_clob_client.client import ClobClient
-from py_clob_client.clob_types import OrderBookSummary
 from py_clob_client.constants import POLYGON
 from py_clob_client.exceptions import PolyApiException
 
@@ -194,25 +193,6 @@ class PolyClient:
         )
 
         return markets
-
-    # Pricing and multi-book helpers moved to src.polymarket.poly_client_prices
-
-    def get_market_order_book(self, token_id: str) -> OrderBookSummary | None:
-        try:
-            order_book = self.clob_client.get_order_book(token_id)
-            return order_book
-        except PolyApiException as exc:
-            if exc.status_code == 404:
-                logger.error(
-                    f"get_market_order_book: order book does not exist for token_id={token_id}"
-                )
-                return None
-            else:
-                logger.error(
-                    f"get_market_order_book: error fetching order book for token_id={token_id}: {exc}"
-                )
-                logger.error(traceback.format_exc())
-                raise exc
 
     async def get_market_trades(
         self, condition_ids: list[str], min_amount: int = 100, count: int | None = None
