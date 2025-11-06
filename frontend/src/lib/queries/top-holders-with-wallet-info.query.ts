@@ -13,6 +13,7 @@ export function useTopHoldersWithWalletInfoQuery(
     queryKey: ["top-holders-with-wallet-info", conditionId, token1, token2],
     queryFn: () => fetchTopHoldersWithWalletInfo(conditionId, token1, token2),
     enabled: !!conditionId && !!token1 && !!token2,
-    staleTime: 60000, // 1 minute
+    staleTime: 120000, // 2 minutes
+    retry: 3,
   });
 }
