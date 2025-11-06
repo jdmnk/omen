@@ -1,7 +1,7 @@
 from datetime import datetime
 from decimal import Decimal
 
-from src.models.position import PositionSchema
+from src.models.graph.position import PositionSchema
 from src.models.public import PolymarketHolder
 from src.models.wallet import WalletSchema
 from src.polymarket.poly_client import PolyClient
