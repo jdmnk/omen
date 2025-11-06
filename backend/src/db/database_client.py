@@ -9,8 +9,8 @@ from sqlalchemy.ext.asyncio import (
 
 from src.models.event import Event, EventSchema, parse_event_from_api
 from src.models.event_market import EventMarket
-from src.models.market import Market, MarketSchema, parse_market_from_api
 from src.models.graph.position import Position, PositionSchema, parse_position_from_api
+from src.models.market import Market, MarketSchema, parse_market_from_api
 from src.models.trade import Trade as TradeORM, TradeSchema
 from src.models.user_position import (
     UserPosition as UserPositionORM,
