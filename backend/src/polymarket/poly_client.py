@@ -377,7 +377,7 @@ class PolyClient:
                     "keep_closed_markets": 0,
                     "search_tags": False,
                     "search_profiles": False,
-                    "sort": "volume",
+                    # "sort": "volume",
                     "ascending": False,
                 }
                 response = await client.get(f"{GAMMA_API_HOST}/public-search", params=params)
@@ -415,10 +415,10 @@ class PolyClient:
                             all_markets.append(market_clean)
 
                 # Sort markets by volume (descending) - only events were sorted by volume
-                all_markets.sort(
-                    key=lambda m: float(m.get("volume") or "0") if m.get("volume") else 0,
-                    reverse=True,
-                )
+                # all_markets.sort(
+                #     key=lambda m: float(m.get("volume") or "0") if m.get("volume") else 0,
+                #     reverse=True,
+                # )
 
                 # Return all sorted results (frontend will handle top 10 and expand/collapse)
                 return SearchResponse(
