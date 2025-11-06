@@ -24,6 +24,7 @@ export function TerminalLayout() {
   } = useMarketBySlugQuery(marketSlug);
 
   const market = marketData?.market;
+  console.log(market);
 
   return (
     <div className="h-screen bg-background flex flex-col overflow-hidden">

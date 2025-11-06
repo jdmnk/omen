@@ -32,6 +32,14 @@ export function TopHoldersWidget({
     error,
   } = useTopHoldersQuery(market.condition_id, market.token1, market.token2);
 
+  console.log(topHolders);
+  console.log(
+    JSON.stringify(
+      topHolders?.map((h) => h.proxyWallet),
+      null
+    )
+  );
+
   // Fetch orderbook to get live prices for PnL calculation
   const { data: orderbookData } = useOrderbookQuery(market.token1);
 
