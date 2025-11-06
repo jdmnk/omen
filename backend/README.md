@@ -24,6 +24,9 @@ docker compose logs --tail 100 app
 
 # wipe it all and start fresh (run where docker compose file is):
 docker compose down --rmi all --volumes --remove-orphans
+
+# rebuild/redeploy app
+git pull && docker compose up -d --build --no-deps app
 ```
 
 Database Management:
