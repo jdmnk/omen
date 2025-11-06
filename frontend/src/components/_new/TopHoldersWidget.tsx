@@ -38,6 +38,7 @@ export function TopHoldersWidget({
     100
   );
 
+  console.log(topHoldersPositions);
   console.log(topHolders);
   console.log(
     JSON.stringify(

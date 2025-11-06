@@ -2,7 +2,7 @@
 
 import { useQuery } from "@tanstack/react-query";
 import { fetchTopHoldersPositions } from "./fetch/fetch-top-holders-positions";
-import { TopHolder, UserPosition } from "@/lib/models/api.models";
+import { UserPosition } from "@/lib/models/api.models";
 
 export function useTopHoldersPositionsQuery(
   wallets: string[] | undefined,
