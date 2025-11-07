@@ -14,23 +14,13 @@ export function OrderBook({ tokenId }: OrderBookProps) {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const midpointRef = useRef<HTMLDivElement>(null);
 
-  // Scroll to show 6 levels on each side on mount and when data changes
+  // Scroll to center the spread/midpoint when data loads
   useEffect(() => {
-    if (scrollContainerRef.current && midpointRef.current && data) {
-      const container = scrollContainerRef.current;
-      const midpoint = midpointRef.current;
-
-      // Calculate scroll position to show 6 levels above and below midpoint
-      // We'll estimate row height (approximately 32px with padding)
-      const rowHeight = 32;
-      const levelsToShow = 6;
-      const offsetToShow = levelsToShow * rowHeight;
-
-      // Position scroll so midpoint is visible with 6 levels above it
-      const midpointTop = midpoint.offsetTop;
-      const scrollPosition = midpointTop - offsetToShow;
-
-      container.scrollTop = Math.max(0, scrollPosition);
+    if (midpointRef.current && data) {
+      midpointRef.current.scrollIntoView({
+        behavior: "auto",
+        block: "center",
+      });
     }
   }, [data]);
 
@@ -61,11 +51,6 @@ export function OrderBook({ tokenId }: OrderBookProps) {
   // Use pre-calculated values from query result
   const { sortedBids, sortedAsks, spread, midpointPrice } = data;
 
-  const LEVELS_TO_SHOW = 6;
-  // Estimate: ~32px per row, ~60px for midpoint
-  // Show 6 asks + midpoint + 6 bids = 6*32 + 60 + 6*32 = 252px
-  const visibleHeight = LEVELS_TO_SHOW * 32 + 60 + LEVELS_TO_SHOW * 32;
-
   return (
     <div className="flex flex-col px-3">
       {/* Header */}
@@ -75,12 +60,8 @@ export function OrderBook({ tokenId }: OrderBookProps) {
         <div className="text-right">Total</div>
       </div>
 
-      {/* Scrollable container - shows exactly 6 levels + midpoint */}
-      <div
-        ref={scrollContainerRef}
-        className="overflow-y-auto py-2"
-        // style={{ height: `${visibleHeight}px` }}
-      >
+      {/* Scrollable container */}
+      <div ref={scrollContainerRef} className="overflow-y-auto py-2">
         <div className="flex flex-col">
           {/* Asks (Sell orders) - shown above midpoint */}
           <div className="space-y-0">
