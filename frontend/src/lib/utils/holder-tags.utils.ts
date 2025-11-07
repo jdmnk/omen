@@ -92,7 +92,7 @@ function getPositionTags(
   if (otherPositions.length > 0 && otherPositions.length < 5) {
     tags.push({
       category: "positions",
-      label: "has few other positions",
+      label: "Has few other positions",
       icon: "expert",
     });
   }
@@ -117,7 +117,8 @@ function getPositionTags(
     if (rank >= 0 && rank < 3) {
       tags.push({
         category: "positions",
-        label: "this is one of his largest positions",
+        label:
+          "This trader's wallet shows characteristics that might indicate insider knowledge.",
         icon: "insider",
       });
     }
@@ -207,7 +208,8 @@ function getTraderTypeTags(
         ) {
           tags.push({
             category: "trader-type",
-            label: "High Confidence",
+            label:
+              "This position is notably larger than the usual position size of this trader.",
             icon: "high-confidence",
           });
         }

@@ -18,6 +18,12 @@ import type { HolderTagIcon } from "@/lib/utils/holder-tags.utils";
 import { formatAddress } from "@/lib/ui/format.utils";
 import { cn } from "@/lib/utils";
 import { Command } from "lucide-react";
+import {
+  TooltipProvider,
+  TooltipTrigger,
+  TooltipContent,
+} from "@/components/ui/tooltip";
+import * as TooltipPrimitive from "@radix-ui/react-tooltip";
 
 const HOLDER_ROW_GRID_CLASSES =
   "grid grid-cols-[24px_auto_40px_40px_80px] items-center gap-3";
@@ -243,9 +249,16 @@ export function TopHoldersWidget({
           <div className="flex gap-1">
             {holderTagsMap[holder.proxyWallet]?.map((tag, tagIndex) => {
               return (
-                <div key={tagIndex} title={tag.label} className="cursor-help">
-                  <HolderTagIcon icon={tag.icon} />
-                </div>
+                <TooltipPrimitive.Root key={tagIndex}>
+                  <TooltipTrigger asChild>
+                    <div className="cursor-help">
+                      <HolderTagIcon icon={tag.icon} />
+                    </div>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>{tag.label}</p>
+                  </TooltipContent>
+                </TooltipPrimitive.Root>
               );
             })}
           </div>
@@ -255,74 +268,78 @@ export function TopHoldersWidget({
   };
 
   return (
-    <Card>
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="px-3 pt-2">
-          <TabsTrigger value="positions">
-            <TabItemContent label="1 POSITIONS" />
-          </TabsTrigger>
-          <TabsTrigger value="rules">
-            <TabItemContent label="2 RULES" />
-          </TabsTrigger>
-          <TabsTrigger value="book">
-            <TabItemContent label="3 BOOK" />
-          </TabsTrigger>
-          <TabsTrigger value="news" disabled>
-            <TabItemContent label="4 NEWS" />
-          </TabsTrigger>
-          <TabsTrigger value="trades" disabled>
-            <TabItemContent label="5 LIVE TRADES" />
-          </TabsTrigger>
-        </TabsList>
+    <TooltipProvider delayDuration={0}>
+      <Card>
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+          <TabsList className="px-3 pt-2">
+            <TabsTrigger value="positions">
+              <TabItemContent label="1 POSITIONS" />
+            </TabsTrigger>
+            <TabsTrigger value="rules">
+              <TabItemContent label="2 RULES" />
+            </TabsTrigger>
+            <TabsTrigger value="book">
+              <TabItemContent label="3 BOOK" />
+            </TabsTrigger>
+            <TabsTrigger value="news" disabled>
+              <TabItemContent label="4 NEWS" />
+            </TabsTrigger>
+            <TabsTrigger value="trades" disabled>
+              <TabItemContent label="5 LIVE TRADES" />
+            </TabsTrigger>
+          </TabsList>
 
-        <TabsContent value="positions">
-          {isLoading ? (
-            <div className="flex items-center justify-center py-8">
-              <LoadingSpinner message="Loading holders..." size="sm" />
-            </div>
-          ) : error ? (
-            <div className="text-center py-8 text-destructive text-sm">
-              Error loading holders
-            </div>
-          ) : outcome0Holders.length === 0 && outcome1Holders.length === 0 ? (
-            <div className="text-center py-6 text-sm text-muted-foreground">
-              No holder data
-            </div>
-          ) : (
-            <div className="grid grid-cols-2">
-              <OutcomeColumn
-                label={outcome0Label}
-                bgColor="bg-outcome-yes-muted"
-                holders={outcome0Holders}
-                renderHolderRow={renderHolderRow}
-                outcomeIndex={0}
-              />
-              <OutcomeColumn
-                label={outcome1Label}
-                bgColor="bg-outcome-no-muted"
-                holders={outcome1Holders}
-                renderHolderRow={renderHolderRow}
-                outcomeIndex={1}
-              />
-            </div>
-          )}
-        </TabsContent>
+          <TabsContent value="positions">
+            {isLoading ? (
+              <div className="flex items-center justify-center py-8">
+                <LoadingSpinner message="Loading holders..." size="sm" />
+              </div>
+            ) : error ? (
+              <div className="text-center py-8 text-destructive text-sm">
+                Error loading holders
+              </div>
+            ) : outcome0Holders.length === 0 && outcome1Holders.length === 0 ? (
+              <div className="text-center py-6 text-sm text-muted-foreground">
+                No holder data
+              </div>
+            ) : (
+              <div className="grid grid-cols-2">
+                <OutcomeColumn
+                  label={outcome0Label}
+                  bgColor="bg-outcome-yes-muted"
+                  holders={outcome0Holders}
+                  renderHolderRow={renderHolderRow}
+                  outcomeIndex={0}
+                />
+                <OutcomeColumn
+                  label={outcome1Label}
+                  bgColor="bg-outcome-no-muted"
+                  holders={outcome1Holders}
+                  renderHolderRow={renderHolderRow}
+                  outcomeIndex={1}
+                />
+              </div>
+            )}
+          </TabsContent>
 
-        <TabsContent value="rules">
-          <div className="space-y-4">
-            <div>
-              <h3 className="text-sm font-semibold mb-2">Market Description</h3>
-              <div className="text-sm text-muted-foreground whitespace-pre-wrap">
-                {market.description || "No description available."}
+          <TabsContent value="rules">
+            <div className="space-y-4">
+              <div>
+                <h3 className="text-sm font-semibold mb-2">
+                  Market Description
+                </h3>
+                <div className="text-sm text-muted-foreground whitespace-pre-wrap">
+                  {market.description || "No description available."}
+                </div>
               </div>
             </div>
-          </div>
-        </TabsContent>
+          </TabsContent>
 
-        <TabsContent value="book">
-          {activeTab === "book" && <OrderBook tokenId={market.token1} />}
-        </TabsContent>
-      </Tabs>
-    </Card>
+          <TabsContent value="book">
+            {activeTab === "book" && <OrderBook tokenId={market.token1} />}
+          </TabsContent>
+        </Tabs>
+      </Card>
+    </TooltipProvider>
   );
 }
