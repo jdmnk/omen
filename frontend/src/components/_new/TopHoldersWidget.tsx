@@ -19,7 +19,7 @@ import { cn } from "@/lib/utils";
 import { Command } from "lucide-react";
 
 const HOLDER_ROW_GRID_CLASSES =
-  "grid grid-cols-[24px_1fr_auto_auto_auto] items-center gap-3";
+  "grid grid-cols-[24px_auto_40px_40px_80px] items-center gap-3";
 
 function TabItemContent({ label }: { label: string }) {
   return (
@@ -48,7 +48,7 @@ function OutcomeColumn({
   outcomeIndex: number;
 }) {
   return (
-    <div className={cn("flex flex-col", bgColor)}>
+    <div className={cn("flex flex-col px-3 py-3", bgColor)}>
       <div
         className={cn(
           HOLDER_ROW_GRID_CLASSES,
@@ -57,8 +57,8 @@ function OutcomeColumn({
       >
         <div className="text-center">{label.toUpperCase()}</div>
         <div className="">Trader</div>
-        <div className="text-right">~Size</div>
-        <div className="text-right">~PnL</div>
+        <div className="">~Size</div>
+        <div className="">~PnL</div>
         <div className="">Tags</div>
       </div>
       <div className="space-y-0">
@@ -190,7 +190,7 @@ export function TopHoldersWidget({
         key={`${holder.proxyWallet}-${holder.outcomeIndex}-${index}`}
         className={cn(
           HOLDER_ROW_GRID_CLASSES,
-          "py-2 border-b border-border/50 last:border-0"
+          "py-2 border-b border-border/50 last:border-0 text-xs"
         )}
       >
         <div className="flex items-center justify-center">
@@ -211,17 +211,15 @@ export function TopHoldersWidget({
             href={`${POLYMARKET_URL}/profile/${holder.proxyWallet}`}
             // href={`/user/${holder.proxyWallet}`}
             target="_blank"
-            className="text-sm font-medium truncate hover:underline min-w-0"
+            className="truncate hover:underline min-w-0"
           >
             {displayName}
           </Link>
         </div>
-        <div className="text-right">
-          <div className="text-sm font-semibold">
-            {formatNumber(sharesAmount)}
-          </div>
+        <div className="">
+          <div className="font-semibold">{formatNumber(sharesAmount)}</div>
         </div>
-        <div className="text-right text-sm">
+        <div className="">
           {pnl !== null ? (
             <div className={pnlColor}>
               <div>{pnlDisplay}</div>
@@ -237,7 +235,7 @@ export function TopHoldersWidget({
           )}
         </div>
         <div>
-          <div className="flex flex-col gap-1.5">
+          <div className="flex gap-1">
             {holderTagsMap[holder.proxyWallet]?.map((tag, tagIndex) => {
               const Icon = tag.icon;
               return (
@@ -291,17 +289,17 @@ export function TopHoldersWidget({
               No holder data
             </div>
           ) : (
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-2">
               <OutcomeColumn
                 label={outcome0Label}
-                bgColor="bg-outcome-yes/5"
+                bgColor="bg-outcome-yes-muted"
                 holders={outcome0Holders}
                 renderHolderRow={renderHolderRow}
                 outcomeIndex={0}
               />
               <OutcomeColumn
                 label={outcome1Label}
-                bgColor="bg-outcome-no/5"
+                bgColor="bg-outcome-no-muted"
                 holders={outcome1Holders}
                 renderHolderRow={renderHolderRow}
                 outcomeIndex={1}

@@ -44,7 +44,9 @@
 
   /* custom colors */
   --color-outcome-yes: var(--outcome-yes);
+  --color-outcome-yes-muted: var(--outcome-yes-muted);
   --color-outcome-no: var(--outcome-no);
+  --color-outcome-no-muted: var(--outcome-no-muted);
   --color-outcome-neutral: var(--outcome-neutral);
   --color-brand-background: var(--brand-background);
   --color-brand-foreground: var(--brand-foreground);
@@ -89,7 +91,9 @@
 
   /* custom colors */
   --outcome-yes: #9bc53d;
+  --outcome-yes-muted: #9bc53d14;
   --outcome-no: #ff3366;
+  --outcome-no-muted: #ff33660d;
   --outcome-neutral: #ff7f11;
   --brand-background: #110928;
   --brand-foreground: #8778ae;
