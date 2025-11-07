@@ -58,7 +58,7 @@ export function TerminalLayout() {
               </ResizablePanel>
               {/* <ResizableHandle withHandle /> */}
               <ResizablePanel defaultSize={60} minSize={20}>
-                <div className="h-full overflow-auto pt-3 px-6">
+                <div className="h-full pt-3 px-6 flex flex-col min-h-0">
                   {!marketSlug ? (
                     <EmptyState />
                   ) : isLoading ? (
