@@ -223,8 +223,38 @@ export function SearchWidget({ currentMarket }: { currentMarket?: Market }) {
     router.push(`/market/${slug}`);
   };
 
-  const handleSelectEvent = (slug: string) => {
-    // TODO: Implement event page route
+  const handleSelectEvent = (event: (typeof events)[0]) => {
+    if (!event.markets || event.markets.length === 0) {
+      console.warn(`Event ${event.slug} has no markets`);
+      return;
+    }
+
+    // Create a set of market slugs from direct market results for quick lookup
+    const directMarketSlugs = new Set(markets.map((m) => m.slug));
+
+    // Try to find a market from the event that also appears in direct market results
+    const matchingMarket = event.markets.find((eventMarket) =>
+      directMarketSlugs.has(eventMarket.slug)
+    );
+
+    if (matchingMarket) {
+      // Found a match in direct results, navigate to it
+      handleSelectMarket(matchingMarket.slug);
+      return;
+    }
+
+    // No match found, find the market with the most volume
+    const marketWithMostVolume = event.markets.reduce((max, current) => {
+      const currentVolume = parseVolume(current.volume || "0");
+      const maxVolume = parseVolume(max.volume || "0");
+      return currentVolume > maxVolume ? current : max;
+    });
+
+    console.warn(
+      `No matching market found in direct results for event ${event.slug}, navigating to market with highest volume: ${marketWithMostVolume.slug}`
+    );
+
+    handleSelectMarket(marketWithMostVolume.slug);
   };
 
   const showResults = debouncedInput.trim().length > 0;
@@ -412,7 +442,7 @@ export function SearchWidget({ currentMarket }: { currentMarket?: Market }) {
                     <SearchResultItem
                       title={e.title}
                       image={e.displayImage}
-                      onClick={() => handleSelectEvent(e.slug)}
+                      onClick={() => handleSelectEvent(e)}
                       leftValue={
                         e.markets && e.markets.length > 0 ? (
                           <span className="text-outcome-neutral">
