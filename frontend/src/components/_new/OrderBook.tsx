@@ -118,7 +118,7 @@ export function OrderBook({ tokenId }: OrderBookProps) {
                       />
                     </div>
                     {/* Content */}
-                    <div className="relative text-left text-rose-500 font-medium">
+                    <div className="relative text-left text-rose-500 font-medium pl-1">
                       {formatNumber(price, 1)}
                     </div>
                     <div className="relative text-right">
@@ -193,7 +193,7 @@ export function OrderBook({ tokenId }: OrderBookProps) {
                       />
                     </div>
                     {/* Content */}
-                    <div className="relative text-left text-emerald-500 font-medium">
+                    <div className="relative text-left text-emerald-500 font-medium pl-1">
                       {formatNumber(price, 1)}
                     </div>
                     <div className="relative text-right">
