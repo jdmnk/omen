@@ -1,9 +1,18 @@
 import { TopHolder, UserPosition } from "@/lib/models/api.models";
 import { LucideIcon } from "lucide-react";
-import { Sparkles, Clock, History, Layers, TrendingUp } from "lucide-react";
+import {
+  Sparkles,
+  Clock,
+  History,
+  Layers,
+  TrendingUp,
+  Trophy,
+  CircleDollarSign,
+  Zap,
+} from "lucide-react";
 
 export type HolderTag = {
-  category: "positions" | "wallet-age";
+  category: "positions" | "wallet-age" | "trader-type";
   label: string;
   icon: LucideIcon;
 };
@@ -122,6 +131,104 @@ function getPositionTags(
 }
 
 /**
+ * Gets trader-type tags based on profitability, wallet size, and position characteristics
+ */
+function getTraderTypeTags(
+  holder: TopHolder,
+  allPositions: UserPosition[] | undefined
+): HolderTag[] {
+  const tags: HolderTag[] = [];
+
+  // Top Trader: Check if they have strong overall P&L
+  if (holder.realizedPnl !== null && holder.realizedPnl !== undefined) {
+    // Consider top trader if realized PnL is significantly positive (e.g., > $10k)
+    if (holder.realizedPnl > 10000) {
+      tags.push({
+        category: "trader-type",
+        label: "Top Trader",
+        icon: Trophy,
+      });
+    }
+  } else if (allPositions && allPositions.length > 0) {
+    // Calculate total realized PnL from all positions
+    const totalRealizedPnl = allPositions.reduce(
+      (sum, pos) => sum + (pos.realizedPnl || 0),
+      0
+    );
+    if (totalRealizedPnl > 10000) {
+      tags.push({
+        category: "trader-type",
+        label: "Top Trader",
+        icon: Trophy,
+      });
+    }
+  }
+
+  // Whale: Check wallet balance or total position sizes
+  if (holder.walletBalance !== null && holder.walletBalance !== undefined) {
+    // Consider whale if wallet balance is very high (e.g., > $100k)
+    if (holder.walletBalance > 100000) {
+      tags.push({
+        category: "trader-type",
+        label: "Whale",
+        icon: CircleDollarSign,
+      });
+    }
+  } else if (allPositions && allPositions.length > 0) {
+    // Calculate total position value
+    const totalPositionValue = allPositions.reduce(
+      (sum, pos) => sum + pos.currentValue,
+      0
+    );
+    if (totalPositionValue > 100000) {
+      tags.push({
+        category: "trader-type",
+        label: "Whale",
+        icon: CircleDollarSign,
+      });
+    }
+  }
+
+  // High Confidence: Position is notably larger than usual position size
+  if (allPositions && allPositions.length > 1) {
+    const currentPosition = allPositions.find(
+      (pos) => pos.asset === holder.asset
+    );
+    if (currentPosition) {
+      // Calculate average position value (excluding current position)
+      const otherPositions = allPositions.filter(
+        (pos) => pos.asset !== holder.asset
+      );
+      if (otherPositions.length > 0) {
+        const avgPositionValue =
+          otherPositions.reduce((sum, pos) => sum + pos.currentValue, 0) /
+          otherPositions.length;
+
+        // If current position is 2x or more than average, it's high confidence
+        if (
+          currentPosition.currentValue > avgPositionValue * 2 &&
+          avgPositionValue > 0
+        ) {
+          tags.push({
+            category: "trader-type",
+            label: "High Confidence",
+            icon: Zap,
+          });
+        }
+      }
+    }
+  }
+
+  // Potential Insider: This is tricky - we could use heuristics like:
+  // - Very early entry into markets
+  // - High success rate
+  // - Large positions in specific markets
+  // For now, we'll skip this as it requires more sophisticated analysis
+
+  return tags;
+}
+
+/**
  * Generates tags for a holder based on their wallet age and positions
  */
 export function generateHolderTags(
@@ -136,6 +243,9 @@ export function generateHolderTags(
 
   // Add position tags
   tags.push(...getPositionTags(holder, allPositions, currentMarketTokenId));
+
+  // Add trader type tags
+  tags.push(...getTraderTypeTags(holder, allPositions));
 
   return tags;
 }
