@@ -124,7 +124,7 @@ export function OrderBook({ tokenId }: OrderBookProps) {
                     <div className="relative text-right">
                       {formatNumber(size, 1)}
                     </div>
-                    <div className="relative text-right text-muted-foreground">
+                    <div className="relative text-right text-muted-foreground pr-1">
                       {formatCurrency(cumulativeTotal, 1)}
                     </div>
                   </div>
@@ -199,8 +199,8 @@ export function OrderBook({ tokenId }: OrderBookProps) {
                     <div className="relative text-right">
                       {formatNumber(size, 2)}
                     </div>
-                    <div className="relative text-right text-muted-foreground">
-                      {formatNumber(cumulativeTotal, 2)}
+                    <div className="relative text-right text-muted-foreground pr-1">
+                      {formatCurrency(cumulativeTotal, 1)}
                     </div>
                   </div>
                 );
