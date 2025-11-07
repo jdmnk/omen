@@ -75,7 +75,7 @@ export function TerminalLayout() {
             <div className="h-full overflow-auto border-t border-b border-l border-brand-stroke rounded-l-brand">
               <div className="flex flex-col h-full rounded-brand">
                 <div className="flex-1 flex items-center justify-center">
-                  <p className="text-brand-foreground italic">
+                  <p className="text-brand-foreground italic text-sm">
                     Trading coming soon!
                   </p>
                 </div>
