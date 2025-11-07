@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import React, { useState, useMemo } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { LoadingSpinner } from "@/components/ui/spinner";
 import { useTopHoldersQuery } from "@/lib/queries/top-holders.query";
@@ -15,13 +15,62 @@ import { POLYMARKET_URL } from "@/lib/api";
 import { useTopHoldersPositionsQuery } from "@/lib/queries/top-holders-positions.query";
 import { generateHolderTagsMap } from "@/lib/utils/holder-tags.utils";
 import { formatAddress } from "@/lib/ui/format.utils";
+import { cn } from "@/lib/utils";
 import { Command } from "lucide-react";
+
+const HOLDER_ROW_GRID_CLASSES =
+  "grid grid-cols-[1fr_auto_auto_auto] items-center gap-3";
 
 function TabItemContent({ label }: { label: string }) {
   return (
     <div className="flex items-center gap-2">
       <Command className="w-2 h-2" />
       <span>{label}</span>
+    </div>
+  );
+}
+
+function OutcomeColumn({
+  label,
+  bgColor,
+  holders,
+  renderHolderRow,
+  outcomeIndex,
+}: {
+  label: string;
+  bgColor: string;
+  holders: TopHolder[];
+  renderHolderRow: (
+    holder: TopHolder,
+    index: number,
+    outcomeIndex: number
+  ) => React.ReactElement;
+  outcomeIndex: number;
+}) {
+  return (
+    <div className={cn("flex flex-col", bgColor)}>
+      <div
+        className={cn(
+          HOLDER_ROW_GRID_CLASSES,
+          "text-xs text-brand-foreground font-bold"
+        )}
+      >
+        <div className="">{label.toUpperCase()}</div>
+        <div className="text-right">~Size</div>
+        <div className="text-right">~PnL</div>
+        <div className="">Tags</div>
+      </div>
+      <div className="space-y-0">
+        {holders.length === 0 ? (
+          <div className="text-center py-6 text-sm text-muted-foreground">
+            No holders
+          </div>
+        ) : (
+          holders.map((holder, index) =>
+            renderHolderRow(holder, index, outcomeIndex)
+          )
+        )}
+      </div>
     </div>
   );
 }
@@ -138,9 +187,12 @@ export function TopHoldersWidget({
     return (
       <div
         key={`${holder.proxyWallet}-${holder.outcomeIndex}-${index}`}
-        className="flex items-center gap-3 py-2 border-b border-border/50 last:border-0"
+        className={cn(
+          HOLDER_ROW_GRID_CLASSES,
+          "py-2 border-b border-border/50 last:border-0"
+        )}
       >
-        <div className="flex items-center gap-2.5 flex-1 min-w-0">
+        <div className="flex items-center gap-2.5 min-w-0">
           {holder.profileImageOptimized || holder.profileImage ? (
             <img
               src={holder.profileImageOptimized || holder.profileImage || ""}
@@ -166,7 +218,7 @@ export function TopHoldersWidget({
             {formatNumber(sharesAmount)}
           </div>
         </div>
-        <div className="w-16 text-right text-sm">
+        <div className="text-right text-sm">
           {pnl !== null ? (
             <div className={pnlColor}>
               <div>{pnlDisplay}</div>
@@ -181,7 +233,7 @@ export function TopHoldersWidget({
             <div className="text-muted-foreground">-</div>
           )}
         </div>
-        <div className="w-16">
+        <div>
           <div className="flex flex-col gap-1.5">
             {holderTagsMap[holder.proxyWallet]?.map((tag, tagIndex) => {
               const Icon = tag.icon;
@@ -237,50 +289,20 @@ export function TopHoldersWidget({
             </div>
           ) : (
             <div className="grid grid-cols-2 gap-4">
-              {/* Outcome 0 Column */}
-              <div className="flex flex-col">
-                <div className="grid grid-cols-4 items-center gap-3 text-xs text-brand-foreground font-bold">
-                  <div className="">{outcome0Label.toUpperCase()} Trader</div>
-                  <div className="text-right">~Size</div>
-                  <div className="text-right">~PnL</div>
-                  <div className="">Tags</div>
-                </div>
-                <div className="space-y-0">
-                  {outcome0Holders.length === 0 ? (
-                    <div className="text-center py-6 text-sm text-muted-foreground">
-                      No holders
-                    </div>
-                  ) : (
-                    outcome0Holders.map((holder, index) =>
-                      renderHolderRow(holder, index, 0)
-                    )
-                  )}
-                </div>
-              </div>
-
-              {/* Outcome 1 Column */}
-              <div className="flex flex-col">
-                <div className="text-sm font-semibold mb-3 pb-2 border-b border-border">
-                  {outcome1Label} Trader
-                </div>
-                <div className="flex items-center gap-3 text-xs text-muted-foreground mb-2 pb-1 border-b border-border/50">
-                  <div className="flex-1">Trader</div>
-                  <div className="text-right">~Size</div>
-                  <div className="w-16 text-right">~PnL</div>
-                  <div className="w-16">Tags</div>
-                </div>
-                <div className="space-y-0">
-                  {outcome1Holders.length === 0 ? (
-                    <div className="text-center py-6 text-sm text-muted-foreground">
-                      No holders
-                    </div>
-                  ) : (
-                    outcome1Holders.map((holder, index) =>
-                      renderHolderRow(holder, index, 1)
-                    )
-                  )}
-                </div>
-              </div>
+              <OutcomeColumn
+                label={`${outcome0Label} Trader`}
+                bgColor="bg-outcome-yes/5"
+                holders={outcome0Holders}
+                renderHolderRow={renderHolderRow}
+                outcomeIndex={0}
+              />
+              <OutcomeColumn
+                label={`${outcome1Label} Trader`}
+                bgColor="bg-outcome-no/5"
+                holders={outcome1Holders}
+                renderHolderRow={renderHolderRow}
+                outcomeIndex={1}
+              />
             </div>
           )}
         </TabsContent>
