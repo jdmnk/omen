@@ -120,11 +120,11 @@ export function PriceChartWidget({ market }: { market: Market }) {
             onClick={() => setInterval(int)}
             disabled={isLoading}
             className={cn(
-              "px-3 py-1 text-xs rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer",
-              "hover:bg-brand-background border border-brand-stroke",
+              "px-2.5 py-0.5 text-xs rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer",
+              "border border-brand-stroke",
               interval === int
                 ? "bg-brand-highlight text-secondary-foreground"
-                : "bg-brand-background text-brand-foreground hover:bg-brand-background/80"
+                : "bg-brand-background text-brand-foreground hover:bg-brand-highlight/50"
             )}
           >
             {INTERVAL_LABELS[int]}
