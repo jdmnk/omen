@@ -75,7 +75,7 @@ export function TerminalLayout() {
 
           {/* Right sidebar */}
           {/* <ResizableHandle withHandle /> */}
-          <ResizablePanel defaultSize={25} minSize={10}>
+          <ResizablePanel defaultSize={15} minSize={10}>
             {/* <div className="h-full overflow-auto p-6 space-y-6">
               {!marketSlug ? (
                 <EmptyState />
