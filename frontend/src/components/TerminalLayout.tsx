@@ -71,19 +71,16 @@ export function TerminalLayout() {
 
           {/* Right sidebar */}
           {/* <ResizableHandle withHandle /> */}
-          <ResizablePanel defaultSize={15} minSize={10}>
-            {/* <div className="h-full overflow-auto p-6 space-y-6">
-              {!marketSlug ? (
-                <EmptyState />
-              ) : isLoading ? (
-                <LoadingState />
-              ) : error || !market ? (
-                <ErrorState />
-              ) : (
-                // <PositionsWidget clobTokenIds={[market.token1, market.token2]} />
-                <RecentActivityWidget conditionId={market.condition_id} />
-              )}
-            </div> */}
+          <ResizablePanel defaultSize={25} minSize={10}>
+            <div className="h-full overflow-auto border-t border-b border-l border-brand-stroke rounded-l-brand">
+              <div className="flex flex-col h-full rounded-brand">
+                <div className="flex-1 flex items-center justify-center">
+                  <p className="text-brand-foreground italic">
+                    Trading coming soon!
+                  </p>
+                </div>
+              </div>
+            </div>
           </ResizablePanel>
         </ResizablePanelGroup>
       </main>
