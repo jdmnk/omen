@@ -45,6 +45,9 @@
   /* custom colors */
   --color-outcome-yes: var(--outcome-yes);
   --color-outcome-no: var(--outcome-no);
+  --color-brand-background: var(--brand-background);
+  --color-brand-foreground: var(--brand-foreground);
+  --color-brand-border: var(--brand-border);
 }
 
 :root {
@@ -84,10 +87,13 @@
   /* custom colors */
   --outcome-yes: #9bc53d;
   --outcome-no: #ff3366;
+  --brand-background: #110928;
+  --brand-foreground: #8778ae;
+  --brand-border: #382e52;
 }
 
 .dark {
-  --background: oklch(0.145 0 0);
+  --background: #020402;
   --foreground: oklch(0.985 0 0);
   --card: oklch(0.205 0 0);
   --card-foreground: oklch(0.985 0 0);
@@ -118,10 +124,6 @@
   --sidebar-accent-foreground: oklch(0.985 0 0);
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: oklch(0.556 0 0);
-
-  /* custom colors */
-  --outcome-yes: #9bc53d;
-  --outcome-no: #ff3366;
 }
 
 @layer base {
