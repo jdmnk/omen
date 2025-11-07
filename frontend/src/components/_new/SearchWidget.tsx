@@ -22,20 +22,25 @@ function SearchResultItem({
   onClick,
   leftValue,
   rightValue,
+  disabled,
 }: {
   title: string;
   image?: string | null;
   onClick: () => void;
   leftValue?: React.ReactNode;
   rightValue?: React.ReactNode;
+  disabled?: boolean;
 }) {
   return (
     <button
-      onClick={onClick}
+      onClick={disabled ? undefined : onClick}
+      disabled={disabled}
       className={cn(
         "w-full text-left px-3 py-2 text-xs",
-        "hover:bg-brand-background",
-        "transition-colors cursor-pointer",
+        "transition-colors",
+        disabled
+          ? "cursor-not-allowed opacity-50"
+          : "hover:bg-brand-background cursor-pointer",
         "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
       )}
     >
@@ -170,9 +175,11 @@ export function SearchWidget({ currentMarket }: { currentMarket?: Market }) {
   }, [searchResults]);
 
   // Parse event markets from the raw event data
-  const eventMarkets = useMemo(() => {
-    if (!eventData?.raw?.markets) return [];
-    return eventData.raw.markets
+  const { activeEventMarkets, closedEventMarkets } = useMemo(() => {
+    if (!eventData?.raw?.markets)
+      return { activeEventMarkets: [], closedEventMarkets: [] };
+
+    const activeMarkets = eventData.raw.markets
       .filter((m: any) => !m.closed && m.active)
       .map((market: any) => ({
         id: market.id,
@@ -185,8 +192,32 @@ export function SearchWidget({ currentMarket }: { currentMarket?: Market }) {
         outcomePrices: market.outcomePrices,
         volume: market.volume,
         odds: market.bestAsk - market.bestBid,
+        closed: false,
       }));
+
+    const closedMarkets = eventData.raw.markets
+      .filter((m: any) => m.closed || !m.active)
+      .map((market: any) => ({
+        id: market.id,
+        question: market.groupItemTitle,
+        conditionId: market.conditionId,
+        slug: market.slug,
+        icon: market.icon,
+        image: market.image,
+        displayImage: market.image || market.icon,
+        outcomePrices: market.outcomePrices,
+        volume: market.volume,
+        odds: market.bestAsk - market.bestBid,
+        closed: true,
+      }));
+
+    return {
+      activeEventMarkets: activeMarkets,
+      closedEventMarkets: closedMarkets,
+    };
   }, [eventData]);
+
+  const eventMarkets = activeEventMarkets;
 
   const handleSelectMarket = (slug: string) => {
     router.push(`/market/${slug}`);
@@ -257,6 +288,53 @@ export function SearchWidget({ currentMarket }: { currentMarket?: Market }) {
               );
             }}
           />
+
+          {/* Closed Markets Section (shown when expanded) */}
+          {expandedEventMarkets && closedEventMarkets.length > 0 && (
+            <div>
+              <div className="px-3 py-1 text-xs text-muted-foreground">
+                Closed Markets ({closedEventMarkets.length})
+              </div>
+              <div className="space-y-1">
+                {closedEventMarkets.map(
+                  (market: (typeof closedEventMarkets)[0], index: number) => {
+                    const volume = parseVolume(market.volume);
+                    const odds = market.odds || 0;
+
+                    return (
+                      <SearchResultItem
+                        key={market.id || index}
+                        title={market.question}
+                        image={market.displayImage}
+                        onClick={() => handleSelectMarket(market.slug)}
+                        disabled={true}
+                        leftValue={
+                          odds > 0 ? (
+                            <span className="text-outcome-neutral">
+                              p{" "}
+                              <span className="font-bold">
+                                {formatNumber(odds * 100, 1)}%
+                              </span>
+                            </span>
+                          ) : undefined
+                        }
+                        rightValue={
+                          volume > 0 ? (
+                            <span>
+                              vol{" "}
+                              <span className="font-bold">
+                                {formatCompactCurrency(volume, 0)}
+                              </span>
+                            </span>
+                          ) : undefined
+                        }
+                      />
+                    );
+                  }
+                )}
+              </div>
+            </div>
+          )}
         </div>
       )}
 
