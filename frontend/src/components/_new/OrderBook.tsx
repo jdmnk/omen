@@ -44,7 +44,7 @@ export function OrderBook({ tokenId }: OrderBookProps) {
 
   if (error) {
     return (
-      <div className="flex items-center justify-center h-full text-destructive text-sm">
+      <div className="flex items-center justify-center h-full text-destructive text-xs">
         Error loading orderbook
       </div>
     );
@@ -52,7 +52,7 @@ export function OrderBook({ tokenId }: OrderBookProps) {
 
   if (!data) {
     return (
-      <div className="flex items-center justify-center h-full text-sm text-muted-foreground">
+      <div className="flex items-center justify-center h-full text-xs text-muted-foreground">
         No orderbook data
       </div>
     );
@@ -67,9 +67,9 @@ export function OrderBook({ tokenId }: OrderBookProps) {
   const visibleHeight = LEVELS_TO_SHOW * 32 + 60 + LEVELS_TO_SHOW * 32;
 
   return (
-    <div className="flex flex-col">
+    <div className="flex flex-col px-3">
       {/* Header */}
-      <div className="grid grid-cols-3 gap-4 text-xs text-muted-foreground pb-2 border-b border-border shrink-0">
+      <div className="sticky top-0 bg-background z-10 grid grid-cols-3 gap-4 text-xs text-muted-foreground pb-2 border-b border-border shrink-0">
         <div className="text-left">Price</div>
         <div className="text-right">Size</div>
         <div className="text-right">Total</div>
@@ -78,14 +78,14 @@ export function OrderBook({ tokenId }: OrderBookProps) {
       {/* Scrollable container - shows exactly 6 levels + midpoint */}
       <div
         ref={scrollContainerRef}
-        className="overflow-y-auto"
-        style={{ height: `${visibleHeight}px` }}
+        className="overflow-y-auto py-2"
+        // style={{ height: `${visibleHeight}px` }}
       >
         <div className="flex flex-col">
           {/* Asks (Sell orders) - shown above midpoint */}
           <div className="space-y-0">
             {sortedAsks.length === 0 ? (
-              <div className="text-center py-4 text-sm text-muted-foreground">
+              <div className="text-center py-4 text-xs text-muted-foreground">
                 No asks
               </div>
             ) : (
@@ -104,7 +104,7 @@ export function OrderBook({ tokenId }: OrderBookProps) {
                 return (
                   <div
                     key={`ask-${index}`}
-                    className="grid grid-cols-3 gap-4 py-1 text-sm hover:bg-muted/50 transition-colors"
+                    className="grid grid-cols-3 gap-4 py-1 text-xs hover:bg-muted/50 transition-colors"
                   >
                     <div className="text-left text-rose-500 font-medium">
                       {formatNumber(price, 4)}
@@ -125,7 +125,7 @@ export function OrderBook({ tokenId }: OrderBookProps) {
               ref={midpointRef}
               className="py-1 border-y border-border bg-muted/30 shrink-0"
             >
-              <div className="grid grid-cols-3 gap-4 text-sm">
+              <div className="grid grid-cols-3 gap-4 text-xs">
                 <div className="text-left font-semibold">
                   {formatNumber(midpointPrice, 4)}
                 </div>
@@ -140,7 +140,7 @@ export function OrderBook({ tokenId }: OrderBookProps) {
           {/* Bids (Buy orders) - shown below midpoint */}
           <div className="space-y-0">
             {sortedBids.length === 0 ? (
-              <div className="text-center py-4 text-sm text-muted-foreground">
+              <div className="text-center py-4 text-xs text-muted-foreground">
                 No bids
               </div>
             ) : (
@@ -159,7 +159,7 @@ export function OrderBook({ tokenId }: OrderBookProps) {
                 return (
                   <div
                     key={`bid-${index}`}
-                    className="grid grid-cols-3 gap-4 py-1 text-sm hover:bg-muted/50 transition-colors"
+                    className="grid grid-cols-3 gap-4 py-1 text-xs hover:bg-muted/50 transition-colors"
                   >
                     <div className="text-left text-emerald-500 font-medium">
                       {formatNumber(price, 4)}
