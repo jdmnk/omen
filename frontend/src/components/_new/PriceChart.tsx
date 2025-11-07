@@ -95,7 +95,7 @@ export function PriceChart({ data, error, isLoading }: PriceChartProps) {
         precision: 2,
         minMove: 0.01,
       },
-      lineColor: "#651fff", // cyan-400 - vibrant but professional
+      lineColor: "var(--brand-highlight)",
       topColor: "#341084", // Start color at the line
       bottomColor: "rgba(101, 15, 255, 0)", // Fade to transparent at bottom
       lineWidth: 2,

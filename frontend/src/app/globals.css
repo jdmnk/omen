@@ -48,6 +48,7 @@
   --color-outcome-neutral: var(--outcome-neutral);
   --color-brand-background: var(--brand-background);
   --color-brand-foreground: var(--brand-foreground);
+  --color-brand-highlight: var(--brand-highlight);
   --color-brand-stroke: var(--brand-stroke);
   --radius-brand: var(--brand-radius);
 }
@@ -93,6 +94,7 @@
   --brand-background: #110928;
   --brand-foreground: #8778ae;
   --brand-stroke: #382e52;
+  --brand-highlight: #651fff;
 
   /* custom other variables */
   --brand-radius: var(--radius);

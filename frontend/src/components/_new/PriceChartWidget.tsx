@@ -13,6 +13,7 @@ import {
   formatCompactNumber,
   formatNumber,
 } from "@/lib/ui/format.utils";
+import { cn } from "@/lib/utils";
 
 const INTERVALS: Interval[] = ["1h", "6h", "1d", "1w", "1m", "max"];
 
@@ -71,11 +72,11 @@ export function PriceChartWidget({ market }: { market: Market }) {
     : Math.abs(market.bestAsk - market.bestBid) * 100;
 
   return (
-    <div className="relative w-full h-full flex flex-col border rounded-lg pb-2">
-      <div className="text-sm bg-muted px-4 py-2 rounded-t-lg border-b font-bold">
+    <div className="relative w-full h-full flex flex-col border border-brand-stroke rounded-brand pb-2">
+      <div className="text-sm bg-brand-background px-4 py-2 rounded-t-brand border-b border-brand-stroke font-bold">
         {market.question}
       </div>
-      <div className="flex justify-between items-center mb-4 text-sm px-4 py-2 border-b">
+      <div className="flex justify-between items-center mb-4 text-sm px-4 py-2 border-b border-brand-stroke bg-brand-background">
         <div className="text-outcome-yes">
           {outcomes[0].toLowerCase()}:{" "}
           <span className="font-bold">
@@ -121,11 +122,13 @@ export function PriceChartWidget({ market }: { market: Market }) {
             key={int}
             onClick={() => setInterval(int)}
             disabled={isLoading}
-            className={`px-3 py-1 text-xs font-medium rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${
+            className={cn(
+              "px-3 py-1 text-xs font-medium rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer",
+              "hover:bg-brand-background border border-brand-stroke",
               interval === int
-                ? "bg-primary text-primary-foreground"
-                : "bg-secondary text-secondary-foreground hover:bg-secondary/80"
-            }`}
+                ? "bg-brand-highlight text-secondary-foreground"
+                : "bg-brand-background text-brand-foreground hover:bg-brand-background/80"
+            )}
           >
             {INTERVAL_LABELS[int]}
           </button>
