@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from pydantic import BaseModel
 
+from src.models.event import EventSchema
 from src.models.market import MarketSchema
 
 
@@ -20,6 +21,10 @@ class MarketAutocompleteItem(BaseModel):
 
 class MarketSearchResponse(BaseModel):
     market: MarketSchema
+
+
+class EventResponse(BaseModel):
+    event: EventSchema
 
 
 class SearchMarketItem(BaseModel):

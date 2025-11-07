@@ -236,3 +236,17 @@ export type MarketHoldersResponse = Array<{
   token: string;
   holders: MarketHolder[];
 }>;
+
+/*
+https://docs.polymarket.com/api-reference/events/get-event-by-id
+
+Event response from backend - wraps the raw event data from Polymarket Gamma API
+*/
+
+export type Event = {
+  id: string;
+  slug: string;
+  title: string;
+  closed: boolean;
+  raw: Record<string, any>;
+};

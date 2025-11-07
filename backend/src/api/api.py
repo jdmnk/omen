@@ -10,6 +10,7 @@ from src.analytics.trades_analytics import (
 )
 from src.db.selects import SelectsClient
 from src.models.public import (
+    EventResponse,
     HealthResponse,
     MarketAutocompleteItem,
     MarketSearchResponse,
@@ -112,3 +113,17 @@ async def get_top_holders_with_wallet_info_endpoint(
         raise HTTPException(status_code=404, detail="Top holders not found")
 
     return holders
+
+
+@app.get("/events/{event_id}", response_model=EventResponse)
+async def get_event_by_id(event_id: str) -> EventResponse:
+    """
+    Get an event by its ID from Polymarket Gamma API.
+
+    Official docs: https://docs.polymarket.com/api-reference/events/get-event-by-id
+    """
+    result = await poly_client.get_event_by_id(event_id)
+    if result is None:
+        raise HTTPException(status_code=404, detail="Event not found")
+
+    return EventResponse(event=result)

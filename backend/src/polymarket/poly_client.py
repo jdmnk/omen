@@ -7,6 +7,7 @@ from py_clob_client.client import ClobClient
 from py_clob_client.constants import POLYGON
 from py_clob_client.exceptions import PolyApiException
 
+from src.models.event import EventSchema, parse_event_from_api
 from src.models.market import MarketSchema, parse_market_from_api
 from src.models.public import SearchEventItem, SearchMarketItem, SearchResponse
 from src.models.trade import TradeSchema, parse_trade_from_api
@@ -340,6 +341,40 @@ class PolyClient:
             raise PolyApiException(f"Failed to fetch market by slug: {exc}") from exc
         except Exception as exc:
             logger.error(f"get_market_by_slug: unexpected error for slug={slug}: {exc}")
+            logger.error(traceback.format_exc())
+            raise exc from exc
+
+    async def get_event_by_id(self, event_id: str) -> EventSchema | None:
+        """
+        Fetch an event by its ID from Gamma API.
+
+        Official docs: https://docs.polymarket.com/api-reference/events/get-event-by-id
+
+        Args:
+            event_id: The event ID
+
+        Returns:
+            EventSchema if found, None otherwise
+
+        Raises:
+            PolyApiException: If API request fails (non-404 errors)
+        """
+        try:
+            async with httpx.AsyncClient() as client:
+                response = await client.get(f"{GAMMA_API_HOST}/events/{event_id}")
+                if response.status_code == 404:
+                    return None
+                response.raise_for_status()
+                event_dict = response.json()
+                return parse_event_from_api(event_dict)
+        except httpx.HTTPStatusError as exc:
+            if exc.response.status_code == 404:
+                return None
+            logger.error(f"get_event_by_id: error fetching event by id={event_id}: {exc}")
+            logger.error(traceback.format_exc())
+            raise PolyApiException(f"Failed to fetch event by id: {exc}") from exc
+        except Exception as exc:
+            logger.error(f"get_event_by_id: unexpected error for id={event_id}: {exc}")
             logger.error(traceback.format_exc())
             raise exc from exc
 
