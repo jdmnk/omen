@@ -135,7 +135,7 @@
     @apply border-border outline-ring/50;
     /* Firefox scrollbar styles */
     scrollbar-width: thin;
-    scrollbar-color: oklch(0.922 0 0) transparent;
+    scrollbar-color: var(--brand-stroke) transparent;
   }
   body {
     @apply bg-background text-foreground;
@@ -152,26 +152,26 @@
   }
 
   *::-webkit-scrollbar-thumb {
-    background-color: oklch(0.922 0 0);
+    background-color: var(--brand-stroke);
     border-radius: 5px;
     border: 2px solid transparent;
     background-clip: padding-box;
   }
 
   *::-webkit-scrollbar-thumb:hover {
-    background-color: oklch(0.8 0 0);
+    background-color: var(--brand-foreground);
   }
 
   /* Dark mode scrollbar */
   .dark * {
-    scrollbar-color: oklch(1 0 0 / 20%) transparent;
+    scrollbar-color: var(--brand-stroke) transparent;
   }
 
   .dark *::-webkit-scrollbar-thumb {
-    background-color: oklch(1 0 0 / 20%);
+    background-color: var(--brand-stroke);
   }
 
   .dark *::-webkit-scrollbar-thumb:hover {
-    background-color: oklch(1 0 0 / 30%);
+    background-color: var(--brand-foreground);
   }
 }
