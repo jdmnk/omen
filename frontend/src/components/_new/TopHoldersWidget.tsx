@@ -5,7 +5,10 @@ import { Card } from "@/components/ui/card";
 import { LoadingSpinner } from "@/components/ui/spinner";
 import { useTopHoldersQuery } from "@/lib/queries/top-holders.query";
 import { TopHolder } from "@/lib/models/api.models";
-import { formatCurrency, formatNumber } from "@/lib/ui/format.utils";
+import {
+  formatCompactCurrency,
+  formatCompactNumber,
+} from "@/lib/ui/format.utils";
 import Link from "next/link";
 import { Market } from "@/lib/models/api.models";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
@@ -27,7 +30,7 @@ import * as TooltipPrimitive from "@radix-ui/react-tooltip";
 import Image from "next/image";
 
 const HOLDER_ROW_GRID_CLASSES =
-  "grid grid-cols-[24px_auto_40px_40px_80px] items-center gap-3";
+  "grid grid-cols-[24px_auto_2.5rem_6rem_4.5rem] items-center gap-3";
 
 function HolderTagIcon({ icon }: { icon: HolderTagIcon }) {
   const iconPath = `/icons/${icon}.svg`;
@@ -231,12 +234,14 @@ export function TopHoldersWidget({
           </Link>
         </div>
         <div className="">
-          <div className="font-semibold">{formatNumber(sharesAmount)}</div>
+          <div className="font-semibold">
+            {formatCompactNumber(+sharesAmount, 1)}
+          </div>
         </div>
         <div className="">
           {pnl !== null ? (
-            <div className={pnlColor}>
-              <div>{formatCurrency(pnl)}</div>
+            <div className={cn("flex items-center gap-1", pnlColor)}>
+              <div>{formatCompactCurrency(pnl, 1)}</div>
               {pnlPercent !== null && (
                 <div className="text-xs opacity-75">
                   {pnlPercent > 0 ? "+" : ""}
