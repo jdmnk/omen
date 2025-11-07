@@ -8,12 +8,9 @@ import {
 } from "@/lib/queries/price-history.query";
 import { useOrderbookQuery } from "@/lib/queries/orderbook.query";
 import { PriceChart } from "./PriceChart";
-import {
-  autoFormatDuration,
-  formatCompactNumber,
-  formatNumber,
-} from "@/lib/ui/format.utils";
+import { formatCompactNumber, formatNumber } from "@/lib/ui/format.utils";
 import { cn } from "@/lib/utils";
+import { Card } from "../ui/card";
 
 const INTERVALS: Interval[] = ["1h", "6h", "1d", "1w", "1m", "max"];
 
@@ -72,7 +69,7 @@ export function PriceChartWidget({ market }: { market: Market }) {
     : Math.abs(market.bestAsk - market.bestBid) * 100;
 
   return (
-    <div className="relative w-full h-full flex flex-col border border-brand-stroke rounded-brand pb-2">
+    <Card className="relative w-full h-full flex flex-col pb-2">
       <div className="text-xs bg-brand-background px-3 py-2 rounded-t-brand border-b border-brand-stroke font-bold">
         {market.question}
       </div>
@@ -139,6 +136,6 @@ export function PriceChartWidget({ market }: { market: Market }) {
       <div className="flex-1 w-full min-h-0">
         <PriceChart data={chartData} isLoading={isLoading} error={error} />
       </div>
-    </div>
+    </Card>
   );
 }
