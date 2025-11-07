@@ -40,18 +40,20 @@ export function formatCompactNumber(
 
 export function formatCompactCurrency(
   value: number | string,
+  maxDecimals = 2,
   locale: string = getUserLocale()
 ): string {
   const n = typeof value === "string" ? Number(value) : value;
   if (Number.isNaN(n)) return "$0";
 
-  if (n >= 1000000) {
-    return `$${(n / 1000000).toFixed(2)}m`;
-  }
-  if (n >= 1000) {
-    return `$${(n / 1000).toFixed(2)}k`;
-  }
-  return formatCurrency(n, locale);
+  return new Intl.NumberFormat(locale, {
+    style: "currency",
+    currency: "USD",
+    notation: "compact",
+    compactDisplay: "short",
+    minimumFractionDigits: 0,
+    maximumFractionDigits: maxDecimals,
+  }).format(n);
 }
 
 function formatDuration(
