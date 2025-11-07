@@ -139,7 +139,7 @@ export function SearchWidget({ currentMarket }: { currentMarket?: Market }) {
   const [debouncedInput] = useDebounce(input, 200);
   const [expandedMarkets, setExpandedMarkets] = useState(false);
   const [expandedEvents, setExpandedEvents] = useState(false);
-  const [expandedEventMarkets, setExpandedEventMarkets] = useState(false);
+  const [expandedEventMarkets, setExpandedEventMarkets] = useState(true);
   const router = useRouter();
 
   // Get event ID from current market
@@ -171,10 +171,10 @@ export function SearchWidget({ currentMarket }: { currentMarket?: Market }) {
   const eventMarkets = useMemo(() => {
     if (!eventData?.raw?.markets) return [];
     return eventData.raw.markets
-      .filter((m: any) => m.active && !m.closed)
+      .filter((m: any) => !m.closed && m.active)
       .map((market: any) => ({
         id: market.id,
-        question: market.question,
+        question: market.groupItemTitle,
         conditionId: market.conditionId,
         slug: market.slug,
         icon: market.icon,
@@ -182,6 +182,7 @@ export function SearchWidget({ currentMarket }: { currentMarket?: Market }) {
         displayImage: market.image || market.icon,
         outcomePrices: market.outcomePrices,
         volume: market.volume,
+        odds: market.bestAsk - market.bestBid,
       }));
   }, [eventData]);
 
@@ -222,8 +223,8 @@ export function SearchWidget({ currentMarket }: { currentMarket?: Market }) {
             emptyMessage="No markets in this event"
             renderItem={(market, index) => {
               const m = market as (typeof eventMarkets)[0];
-              const odds = parseOutcomePrice(m.outcomePrices);
               const volume = parseVolume(m.volume);
+              const odds = m.odds || 0;
 
               return (
                 <SearchResultItem
@@ -231,7 +232,7 @@ export function SearchWidget({ currentMarket }: { currentMarket?: Market }) {
                   image={m.displayImage}
                   onClick={() => handleSelectMarket(m.slug)}
                   leftValue={
-                    odds !== null ? (
+                    odds > 0 ? (
                       <span className="text-outcome-neutral">
                         p{" "}
                         <span className="font-bold">
