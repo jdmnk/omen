@@ -145,6 +145,7 @@ export function SearchWidget({ currentMarket }: { currentMarket?: Market }) {
   const [expandedMarkets, setExpandedMarkets] = useState(false);
   const [expandedEvents, setExpandedEvents] = useState(false);
   const [expandedEventMarkets, setExpandedEventMarkets] = useState(true);
+  const [expandedClosedMarkets, setExpandedClosedMarkets] = useState(true);
   const router = useRouter();
 
   // Get event ID from current market
@@ -321,38 +322,37 @@ export function SearchWidget({ currentMarket }: { currentMarket?: Market }) {
 
           {/* Closed Markets Section (shown when expanded) */}
           {expandedEventMarkets && closedEventMarkets.length > 0 && (
-            <div>
-              <div className="px-3 py-1 text-xs text-muted-foreground">
-                Closed Markets ({closedEventMarkets.length})
-              </div>
-              <div className="space-y-1">
-                {closedEventMarkets.map(
-                  (market: (typeof closedEventMarkets)[0], index: number) => {
-                    const volume = parseVolume(market.volume);
+            <SearchSection
+              title="Closed Markets"
+              items={closedEventMarkets}
+              isExpanded={expandedClosedMarkets}
+              onToggle={() => setExpandedClosedMarkets(!expandedClosedMarkets)}
+              emptyMessage="No closed markets"
+              renderItem={(market, index) => {
+                const m = market as (typeof closedEventMarkets)[0];
+                const volume = parseVolume(m.volume);
 
-                    return (
-                      <SearchResultItem
-                        key={market.id || index}
-                        title={market.question}
-                        image={market.displayImage}
-                        onClick={() => handleSelectMarket(market.slug)}
-                        disabled={true}
-                        leftValue={
-                          volume > 0 ? (
-                            <span>
-                              vol{" "}
-                              <span className="font-bold">
-                                {formatCompactCurrency(volume, 0)}
-                              </span>
-                            </span>
-                          ) : undefined
-                        }
-                      />
-                    );
-                  }
-                )}
-              </div>
-            </div>
+                return (
+                  <SearchResultItem
+                    key={m.id || index}
+                    title={m.question}
+                    image={m.displayImage}
+                    onClick={() => handleSelectMarket(m.slug)}
+                    disabled={true}
+                    leftValue={
+                      volume > 0 ? (
+                        <span>
+                          vol{" "}
+                          <span className="font-bold">
+                            {formatCompactCurrency(volume, 0)}
+                          </span>
+                        </span>
+                      ) : undefined
+                    }
+                  />
+                );
+              }}
+            />
           )}
         </div>
       )}
