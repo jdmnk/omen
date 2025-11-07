@@ -24,6 +24,7 @@ import {
   TooltipContent,
 } from "@/components/ui/tooltip";
 import * as TooltipPrimitive from "@radix-ui/react-tooltip";
+import Image from "next/image";
 
 const HOLDER_ROW_GRID_CLASSES =
   "grid grid-cols-[24px_auto_40px_40px_80px] items-center gap-3";
@@ -206,10 +207,12 @@ export function TopHoldersWidget({
       >
         <div className="flex items-center justify-center">
           {holder.profileImageOptimized || holder.profileImage ? (
-            <img
+            <Image
               src={holder.profileImageOptimized || holder.profileImage || ""}
               alt=""
-              className="w-6 h-6 rounded-full shrink-0"
+              width={24}
+              height={24}
+              className="w-6 h-6 rounded-full shrink-0 object-cover"
             />
           ) : (
             <div className="w-6 h-6 rounded-full bg-muted flex items-center justify-center text-xs font-medium shrink-0">
