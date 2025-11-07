@@ -5,12 +5,14 @@ import { useDebounce } from "use-debounce";
 import { Search, ChevronDown, ChevronUp } from "lucide-react";
 import Image from "next/image";
 import { useMarketSearchQuery } from "@/lib/queries/search.query";
+import { useEventByIdQuery } from "@/lib/queries/event-by-id.query";
 import { Input } from "@/components/ui/input";
 import { Spinner } from "@/components/ui/spinner";
 import { formatNumber, formatCompactCurrency } from "@/lib/ui/format.utils";
 import { cn } from "@/lib/utils";
 import { useRouter } from "next/navigation";
 import { parseOutcomePrice, parseVolume } from "@/lib/api-parse.utils";
+import { Market } from "@/lib/models/api.models";
 
 const INITIAL_LIMIT = 10;
 
@@ -132,12 +134,19 @@ function SearchSection({
   );
 }
 
-export function SearchWidget() {
+export function SearchWidget({ currentMarket }: { currentMarket?: Market }) {
   const [input, setInput] = useState<string>("");
   const [debouncedInput] = useDebounce(input, 200);
   const [expandedMarkets, setExpandedMarkets] = useState(false);
   const [expandedEvents, setExpandedEvents] = useState(false);
+  const [expandedEventMarkets, setExpandedEventMarkets] = useState(false);
   const router = useRouter();
+
+  // Get event ID from current market
+  const eventId = currentMarket?.events?.[0]?.id;
+
+  // Fetch event data
+  const { data: eventData } = useEventByIdQuery(eventId);
 
   const { data: searchResults, isLoading } = useMarketSearchQuery(
     debouncedInput,
@@ -158,6 +167,24 @@ export function SearchWidget() {
     }));
   }, [searchResults]);
 
+  // Parse event markets from the raw event data
+  const eventMarkets = useMemo(() => {
+    if (!eventData?.raw?.markets) return [];
+    return eventData.raw.markets
+      .filter((m: any) => m.active && !m.closed)
+      .map((market: any) => ({
+        id: market.id,
+        question: market.question,
+        conditionId: market.conditionId,
+        slug: market.slug,
+        icon: market.icon,
+        image: market.image,
+        displayImage: market.image || market.icon,
+        outcomePrices: market.outcomePrices,
+        volume: market.volume,
+      }));
+  }, [eventData]);
+
   const handleSelectMarket = (slug: string) => {
     router.push(`/market/${slug}`);
   };
@@ -168,6 +195,7 @@ export function SearchWidget() {
 
   const showResults = debouncedInput.trim().length > 0;
   const hasResults = (markets.length > 0 || events.length > 0) && !isLoading;
+  const showEventMarkets = !showResults && eventMarkets.length > 0;
 
   return (
     <div className="flex flex-col h-full rounded-brand">
@@ -183,7 +211,53 @@ export function SearchWidget() {
         />
       </div>
 
-      {/* Results below */}
+      {/* Event Markets Section (shown when NOT searching) */}
+      {showEventMarkets && (
+        <div className="space-y-4">
+          <SearchSection
+            title={eventData?.title || "Event Markets"}
+            items={eventMarkets}
+            isExpanded={expandedEventMarkets}
+            onToggle={() => setExpandedEventMarkets(!expandedEventMarkets)}
+            emptyMessage="No markets in this event"
+            renderItem={(market, index) => {
+              const m = market as (typeof eventMarkets)[0];
+              const odds = parseOutcomePrice(m.outcomePrices);
+              const volume = parseVolume(m.volume);
+
+              return (
+                <SearchResultItem
+                  title={m.question}
+                  image={m.displayImage}
+                  onClick={() => handleSelectMarket(m.slug)}
+                  leftValue={
+                    odds !== null ? (
+                      <span className="text-outcome-neutral">
+                        p{" "}
+                        <span className="font-bold">
+                          {formatNumber(odds * 100, 1)}%
+                        </span>
+                      </span>
+                    ) : undefined
+                  }
+                  rightValue={
+                    volume > 0 ? (
+                      <span>
+                        vol{" "}
+                        <span className="font-bold">
+                          {formatCompactCurrency(volume, 0)}
+                        </span>
+                      </span>
+                    ) : undefined
+                  }
+                />
+              );
+            }}
+          />
+        </div>
+      )}
+
+      {/* Results below (shown when searching) */}
       {showResults && (
         <div className="space-y-4">
           {isLoading && (

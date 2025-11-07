@@ -29,6 +29,13 @@ export type TopHolder = {
   totalBought?: number | null;
 };
 
+export type MarketEvent = {
+  id: string;
+  slug: string;
+  title: string;
+  [key: string]: any; // other event properties we don't need to type
+};
+
 export type Market = {
   condition_id: string;
   question: string;
@@ -48,6 +55,7 @@ export type Market = {
   bestBid: number;
   bestAsk: number;
   endDate: string;
+  events?: MarketEvent[]; // events array from Polymarket API
 };
 
 export type MarketResponse = {

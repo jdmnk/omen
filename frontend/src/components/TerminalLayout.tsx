@@ -2,11 +2,7 @@
 
 import { useParams } from "next/navigation";
 import { Header } from "./_new/Header";
-import {
-  ResizableHandle,
-  ResizablePanel,
-  ResizablePanelGroup,
-} from "@/components/ui/resizable";
+import { ResizablePanel, ResizablePanelGroup } from "@/components/ui/resizable";
 import { SearchWidget } from "./_new/SearchWidget";
 import { useMarketBySlugQuery } from "@/lib/queries/market-by-slug.query";
 import { PriceChartWidget } from "./_new/PriceChartWidget";
@@ -35,7 +31,7 @@ export function TerminalLayout() {
           {/* Left sidebar */}
           <ResizablePanel defaultSize={25} minSize={10}>
             <div className="h-full overflow-auto border-t border-b border-r border-brand-stroke rounded-r-brand">
-              <SearchWidget />
+              <SearchWidget currentMarket={market} />
             </div>
           </ResizablePanel>
 

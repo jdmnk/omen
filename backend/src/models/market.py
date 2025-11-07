@@ -57,6 +57,7 @@ class MarketSchema(BaseModel):
     bestBid: Decimal = Field(ge=0)
     bestAsk: Decimal = Field(ge=0)
     endDate: str
+    events: list[dict] | None = None
 
     class Config:
         from_attributes = True
@@ -97,6 +98,7 @@ def parse_market_from_api(market_dict: dict) -> MarketSchema | None:
         bestAsk = Decimal(str(market_dict.get("bestAsk", 0)))
 
         endDate = market_dict.get("endDate", "")
+        events = market_dict.get("events", [])
 
         return MarketSchema(
             condition_id=condition_id,
@@ -118,6 +120,7 @@ def parse_market_from_api(market_dict: dict) -> MarketSchema | None:
             bestBid=bestBid,
             bestAsk=bestAsk,
             endDate=endDate,
+            events=events,
         )
     except (ValueError, KeyError, TypeError):
         # Log error but don't crash - just skip this item
