@@ -51,6 +51,21 @@ export function OrderBook({ tokenId }: OrderBookProps) {
   // Use pre-calculated values from query result
   const { sortedBids, sortedAsks, spread, midpointPrice } = data;
 
+  // Calculate cumulative sizes for progress bars (ever-increasing from midpoint)
+  const cumulativeAskSizes = sortedAsks.map((_, index) =>
+    sortedAsks.slice(index).reduce((sum, a) => sum + Number(a.size), 0)
+  );
+  const cumulativeBidSizes = sortedBids.map((_, index) =>
+    sortedBids.slice(0, index + 1).reduce((sum, b) => sum + Number(b.size), 0)
+  );
+
+  // Find maximum cumulative size for progress bar scaling
+  const maxCumulativeSize = Math.max(
+    ...cumulativeAskSizes,
+    ...cumulativeBidSizes,
+    0
+  );
+
   return (
     <div className="flex flex-col px-3">
       {/* Header */}
@@ -73,6 +88,11 @@ export function OrderBook({ tokenId }: OrderBookProps) {
               sortedAsks.map((ask, index) => {
                 const price = Number(ask.price) * 100;
                 const size = Number(ask.size);
+                const cumulativeSize = cumulativeAskSizes[index];
+                const sizePercentage =
+                  maxCumulativeSize > 0
+                    ? (cumulativeSize / maxCumulativeSize) * 100
+                    : 0;
 
                 // Calculate cumulative total from this level down to midpoint
                 const cumulativeTotal = sortedAsks
@@ -85,13 +105,26 @@ export function OrderBook({ tokenId }: OrderBookProps) {
                 return (
                   <div
                     key={`ask-${index}`}
-                    className="grid grid-cols-3 gap-4 py-1 text-xs hover:bg-muted/50 transition-colors"
+                    className="relative grid grid-cols-3 gap-4 py-1 text-xs hover:bg-muted/50 transition-colors"
                   >
-                    <div className="text-left text-rose-500 font-medium">
+                    {/* Progress bar - aligned left for asks */}
+                    <div
+                      className="absolute inset-0 flex justify-start pointer-events-none"
+                      style={{ zIndex: 0 }}
+                    >
+                      <div
+                        className="h-full bg-rose-500/20"
+                        style={{ width: `${sizePercentage}%` }}
+                      />
+                    </div>
+                    {/* Content */}
+                    <div className="relative text-left text-rose-500 font-medium">
                       {formatNumber(price, 1)}
                     </div>
-                    <div className="text-right">{formatNumber(size, 1)}</div>
-                    <div className="text-right text-muted-foreground">
+                    <div className="relative text-right">
+                      {formatNumber(size, 1)}
+                    </div>
+                    <div className="relative text-right text-muted-foreground">
                       {formatCurrency(cumulativeTotal, 1)}
                     </div>
                   </div>
@@ -130,6 +163,11 @@ export function OrderBook({ tokenId }: OrderBookProps) {
               sortedBids.map((bid, index) => {
                 const price = Number(bid.price) * 100;
                 const size = Number(bid.size);
+                const cumulativeSize = cumulativeBidSizes[index];
+                const sizePercentage =
+                  maxCumulativeSize > 0
+                    ? (cumulativeSize / maxCumulativeSize) * 100
+                    : 0;
 
                 // Calculate cumulative total from this level up to midpoint
                 const cumulativeTotal = sortedBids
@@ -142,13 +180,26 @@ export function OrderBook({ tokenId }: OrderBookProps) {
                 return (
                   <div
                     key={`bid-${index}`}
-                    className="grid grid-cols-3 gap-4 py-1 text-xs hover:bg-muted/50 transition-colors"
+                    className="relative grid grid-cols-3 gap-4 py-1 text-xs hover:bg-muted/50 transition-colors"
                   >
-                    <div className="text-left text-emerald-500 font-medium">
+                    {/* Progress bar - aligned left for bids */}
+                    <div
+                      className="absolute inset-0 flex justify-start pointer-events-none"
+                      style={{ zIndex: 0 }}
+                    >
+                      <div
+                        className="h-full bg-emerald-500/20"
+                        style={{ width: `${sizePercentage}%` }}
+                      />
+                    </div>
+                    {/* Content */}
+                    <div className="relative text-left text-emerald-500 font-medium">
                       {formatNumber(price, 1)}
                     </div>
-                    <div className="text-right">{formatNumber(size, 2)}</div>
-                    <div className="text-right text-muted-foreground">
+                    <div className="relative text-right">
+                      {formatNumber(size, 2)}
+                    </div>
+                    <div className="relative text-right text-muted-foreground">
                       {formatNumber(cumulativeTotal, 2)}
                     </div>
                   </div>
