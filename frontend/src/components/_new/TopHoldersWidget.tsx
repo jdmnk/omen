@@ -220,12 +220,12 @@ export function TopHoldersWidget({
             </div>
           )}
         </div>
-        <div className="min-w-0">
+        <div className="min-w-0 overflow-hidden">
           <Link
             href={`${POLYMARKET_URL}/profile/${holder.proxyWallet}`}
             // href={`/user/${holder.proxyWallet}`}
             target="_blank"
-            className="truncate hover:underline min-w-0"
+            className="block truncate hover:underline"
           >
             {displayName}
           </Link>
