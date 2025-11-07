@@ -73,10 +73,10 @@ export function PriceChartWidget({ market }: { market: Market }) {
 
   return (
     <div className="relative w-full h-full flex flex-col border border-brand-stroke rounded-brand pb-2">
-      <div className="text-sm bg-brand-background px-4 py-2 rounded-t-brand border-b border-brand-stroke font-bold">
+      <div className="text-xs bg-brand-background px-3 py-2 rounded-t-brand border-b border-brand-stroke font-bold">
         {market.question}
       </div>
-      <div className="flex justify-between items-center mb-4 text-sm px-4 py-2 border-b border-brand-stroke bg-brand-background">
+      <div className="flex items-center gap-12 mb-4 text-xs px-3 py-2 border-b border-brand-stroke bg-brand-background">
         <div className="text-outcome-yes">
           {outcomes[0].toLowerCase()}:{" "}
           <span className="font-bold">
@@ -123,7 +123,7 @@ export function PriceChartWidget({ market }: { market: Market }) {
             onClick={() => setInterval(int)}
             disabled={isLoading}
             className={cn(
-              "px-3 py-1 text-xs font-medium rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer",
+              "px-3 py-1 text-xs rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer",
               "hover:bg-brand-background border border-brand-stroke",
               interval === int
                 ? "bg-brand-highlight text-secondary-foreground"
