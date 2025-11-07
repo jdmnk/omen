@@ -83,3 +83,8 @@ export function autoFormatDuration(ms: number, locale = getUserLocale()) {
   if (minutes >= 1) return formatDuration(Math.floor(minutes), "minute");
   return formatDuration(Math.floor(seconds), "second");
 }
+
+export function formatAddress(addr: string) {
+  if (!addr) return "";
+  return `${addr.slice(0, 6)}…${addr.slice(-4)}`;
+}
