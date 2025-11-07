@@ -6,3 +6,4 @@ alwaysApply: true
 - use Shadcn components whenever possible - we already have a lot of them in the ui folder, feel free to add more if needed
 - use Shadcn MCP if you need help with it
 - keep code and design simple and consistent with the existing codebase
+- when adding Tailwind classes together always use the `cn` util
