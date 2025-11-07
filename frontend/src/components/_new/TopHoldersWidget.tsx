@@ -277,9 +277,13 @@ export function TopHoldersWidget({
 
   return (
     <TooltipProvider delayDuration={0}>
-      <Card>
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="px-3 pt-2">
+      <Card className="h-full flex flex-col">
+        <Tabs
+          value={activeTab}
+          onValueChange={setActiveTab}
+          className="w-full flex flex-col h-full min-h-0"
+        >
+          <TabsList className="px-3 pt-2 shrink-0">
             <TabsTrigger value="positions">
               <TabItemContent label="1 POSITIONS" />
             </TabsTrigger>
@@ -297,7 +301,10 @@ export function TopHoldersWidget({
             </TabsTrigger>
           </TabsList>
 
-          <TabsContent value="positions">
+          <TabsContent
+            value="positions"
+            className="flex-1 overflow-auto min-h-0 mt-0"
+          >
             {isLoading ? (
               <div className="flex items-center justify-center py-8">
                 <LoadingSpinner message="Loading holders..." size="sm" />
@@ -330,10 +337,13 @@ export function TopHoldersWidget({
             )}
           </TabsContent>
 
-          <TabsContent value="rules">
-            <div className="space-y-4">
+          <TabsContent
+            value="rules"
+            className="flex-1 overflow-auto min-h-0 mt-0"
+          >
+            <div className="space-y-4 p-4">
               <div>
-                <h3 className="text-sm font-semibold mb-2">
+                <h3 className="text-sm font-semibold mb-3">
                   Market Description
                 </h3>
                 <div className="text-sm text-muted-foreground whitespace-pre-wrap">
@@ -343,7 +353,10 @@ export function TopHoldersWidget({
             </div>
           </TabsContent>
 
-          <TabsContent value="book">
+          <TabsContent
+            value="book"
+            className="flex-1 overflow-auto min-h-0 mt-0"
+          >
             {activeTab === "book" && <OrderBook tokenId={market.token1} />}
           </TabsContent>
         </Tabs>
