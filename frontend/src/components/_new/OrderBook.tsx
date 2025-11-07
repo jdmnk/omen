@@ -71,7 +71,7 @@ export function OrderBook({ tokenId }: OrderBookProps) {
               </div>
             ) : (
               sortedAsks.map((ask, index) => {
-                const price = Number(ask.price);
+                const price = Number(ask.price) * 100;
                 const size = Number(ask.size);
 
                 // Calculate cumulative total from this level down to midpoint
@@ -88,7 +88,7 @@ export function OrderBook({ tokenId }: OrderBookProps) {
                     className="grid grid-cols-3 gap-4 py-1 text-xs hover:bg-muted/50 transition-colors"
                   >
                     <div className="text-left text-rose-500 font-medium">
-                      {formatNumber(price, 4)}
+                      {formatNumber(price, 1)}
                     </div>
                     <div className="text-right">{formatNumber(size, 1)}</div>
                     <div className="text-right text-muted-foreground">
@@ -106,13 +106,15 @@ export function OrderBook({ tokenId }: OrderBookProps) {
               ref={midpointRef}
               className="py-1 border-y border-border bg-muted/30 shrink-0"
             >
-              <div className="grid grid-cols-3 gap-4 text-xs">
-                <div className="text-left font-semibold">
-                  {formatNumber(midpointPrice, 4)}
+              <div className="grid grid-cols-2 text-xs">
+                <div className="font-bold">
+                  {formatNumber(midpointPrice * 100, 1)}
                 </div>
-                <div className="text-right text-muted-foreground">Spread</div>
-                <div className="text-right font-semibold">
-                  {formatNumber(spread, 4)}
+                <div className="">
+                  <span className="pr-2">Spread</span>
+                  <span className="font-bold">
+                    {formatNumber(spread * 100, 1)}
+                  </span>
                 </div>
               </div>
             </div>
@@ -126,7 +128,7 @@ export function OrderBook({ tokenId }: OrderBookProps) {
               </div>
             ) : (
               sortedBids.map((bid, index) => {
-                const price = Number(bid.price);
+                const price = Number(bid.price) * 100;
                 const size = Number(bid.size);
 
                 // Calculate cumulative total from this level up to midpoint
@@ -143,7 +145,7 @@ export function OrderBook({ tokenId }: OrderBookProps) {
                     className="grid grid-cols-3 gap-4 py-1 text-xs hover:bg-muted/50 transition-colors"
                   >
                     <div className="text-left text-emerald-500 font-medium">
-                      {formatNumber(price, 4)}
+                      {formatNumber(price, 1)}
                     </div>
                     <div className="text-right">{formatNumber(size, 2)}</div>
                     <div className="text-right text-muted-foreground">
