@@ -31,7 +31,7 @@ function SearchResultItem({
     <button
       onClick={onClick}
       className={cn(
-        "w-full text-left px-3 py-2 text-sm",
+        "w-full text-left px-3 py-2 text-xs",
         "hover:bg-brand-background",
         "transition-colors cursor-pointer",
         "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
