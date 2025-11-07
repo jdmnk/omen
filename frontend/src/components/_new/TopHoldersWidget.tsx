@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useMemo } from "react";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card } from "@/components/ui/card";
 import { LoadingSpinner } from "@/components/ui/spinner";
 import { useTopHoldersQuery } from "@/lib/queries/top-holders.query";
 import { TopHolder } from "@/lib/models/api.models";
@@ -14,12 +14,18 @@ import { useOrderbookQuery } from "@/lib/queries/orderbook.query";
 import { POLYMARKET_URL } from "@/lib/api";
 import { useTopHoldersPositionsQuery } from "@/lib/queries/top-holders-positions.query";
 import { generateHolderTagsMap } from "@/lib/utils/holder-tags.utils";
+import type { HolderTagIcon } from "@/lib/utils/holder-tags.utils";
 import { formatAddress } from "@/lib/ui/format.utils";
 import { cn } from "@/lib/utils";
 import { Command } from "lucide-react";
 
 const HOLDER_ROW_GRID_CLASSES =
   "grid grid-cols-[24px_auto_40px_40px_80px] items-center gap-3";
+
+function HolderTagIcon({ icon }: { icon: HolderTagIcon }) {
+  const iconPath = `/icons/${icon}.svg`;
+  return <img src={iconPath} alt="" className="w-4 h-4" />;
+}
 
 function TabItemContent({ label }: { label: string }) {
   return (
@@ -237,14 +243,9 @@ export function TopHoldersWidget({
         <div>
           <div className="flex gap-1">
             {holderTagsMap[holder.proxyWallet]?.map((tag, tagIndex) => {
-              const Icon = tag.icon;
               return (
-                <div
-                  key={tagIndex}
-                  title={tag.label}
-                  className="flex items-center justify-center w-5 h-5 rounded border border-border/50 bg-muted/50 hover:bg-muted transition-colors cursor-help"
-                >
-                  <Icon className="w-3 h-3 text-muted-foreground" />
+                <div key={tagIndex} title={tag.label} className="cursor-help">
+                  <HolderTagIcon icon={tag.icon} />
                 </div>
               );
             })}

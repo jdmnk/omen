@@ -1,20 +1,16 @@
 import { TopHolder, UserPosition } from "@/lib/models/api.models";
-import { LucideIcon } from "lucide-react";
-import {
-  Sparkles,
-  Clock,
-  History,
-  Layers,
-  TrendingUp,
-  Trophy,
-  CircleDollarSign,
-  Zap,
-} from "lucide-react";
+
+export type HolderTagIcon =
+  | "expert"
+  | "high-confidence"
+  | "insider"
+  | "top-trader"
+  | "whale";
 
 export type HolderTag = {
   category: "positions" | "wallet-age" | "trader-type";
   label: string;
-  icon: LucideIcon;
+  icon: HolderTagIcon;
 };
 
 /**
@@ -54,19 +50,19 @@ function getWalletAgeTags(walletCreatedAt: string | null): HolderTag[] {
     tags.push({
       category: "wallet-age",
       label: "new wallet",
-      icon: Sparkles,
+      icon: "expert",
     });
   } else if (ageDays < 365) {
     tags.push({
       category: "wallet-age",
       label: "mid old wallet",
-      icon: Clock,
+      icon: "expert",
     });
   } else {
     tags.push({
       category: "wallet-age",
       label: "very old wallet",
-      icon: History,
+      icon: "expert",
     });
   }
 
@@ -97,7 +93,7 @@ function getPositionTags(
     tags.push({
       category: "positions",
       label: "has few other positions",
-      icon: Layers,
+      icon: "expert",
     });
   }
 
@@ -122,7 +118,7 @@ function getPositionTags(
       tags.push({
         category: "positions",
         label: "this is one of his largest positions",
-        icon: TrendingUp,
+        icon: "insider",
       });
     }
   }
@@ -146,7 +142,7 @@ function getTraderTypeTags(
       tags.push({
         category: "trader-type",
         label: "Top Trader",
-        icon: Trophy,
+        icon: "top-trader",
       });
     }
   } else if (allPositions && allPositions.length > 0) {
@@ -159,7 +155,7 @@ function getTraderTypeTags(
       tags.push({
         category: "trader-type",
         label: "Top Trader",
-        icon: Trophy,
+        icon: "top-trader",
       });
     }
   }
@@ -171,7 +167,7 @@ function getTraderTypeTags(
       tags.push({
         category: "trader-type",
         label: "Whale",
-        icon: CircleDollarSign,
+        icon: "whale",
       });
     }
   } else if (allPositions && allPositions.length > 0) {
@@ -184,7 +180,7 @@ function getTraderTypeTags(
       tags.push({
         category: "trader-type",
         label: "Whale",
-        icon: CircleDollarSign,
+        icon: "whale",
       });
     }
   }
@@ -212,7 +208,7 @@ function getTraderTypeTags(
           tags.push({
             category: "trader-type",
             label: "High Confidence",
-            icon: Zap,
+            icon: "high-confidence",
           });
         }
       }
@@ -239,7 +235,7 @@ export function generateHolderTags(
   const tags: HolderTag[] = [];
 
   // Add wallet age tags
-  tags.push(...getWalletAgeTags(holder.walletCreatedAt));
+  //   tags.push(...getWalletAgeTags(holder.walletCreatedAt));
 
   // Add position tags
   tags.push(...getPositionTags(holder, allPositions, currentMarketTokenId));
