@@ -329,7 +329,6 @@ export function SearchWidget({ currentMarket }: { currentMarket?: Market }) {
                 {closedEventMarkets.map(
                   (market: (typeof closedEventMarkets)[0], index: number) => {
                     const volume = parseVolume(market.volume);
-                    const odds = market.odds || 0;
 
                     return (
                       <SearchResultItem
@@ -339,16 +338,6 @@ export function SearchWidget({ currentMarket }: { currentMarket?: Market }) {
                         onClick={() => handleSelectMarket(market.slug)}
                         disabled={true}
                         leftValue={
-                          odds > 0 ? (
-                            <span className="text-outcome-neutral">
-                              p{" "}
-                              <span className="font-bold">
-                                {formatNumber(odds * 100, 1)}%
-                              </span>
-                            </span>
-                          ) : undefined
-                        }
-                        rightValue={
                           volume > 0 ? (
                             <span>
                               vol{" "}
