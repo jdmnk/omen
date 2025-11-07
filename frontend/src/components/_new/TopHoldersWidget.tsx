@@ -8,6 +8,7 @@ import { TopHolder } from "@/lib/models/api.models";
 import {
   formatCompactCurrency,
   formatCompactNumber,
+  formatNumber,
 } from "@/lib/ui/format.utils";
 import Link from "next/link";
 import { Market } from "@/lib/models/api.models";
@@ -37,10 +38,13 @@ function HolderTagIcon({ icon }: { icon: HolderTagIcon }) {
   return <img src={iconPath} alt="" className="w-4 h-4" />;
 }
 
-function TabItemContent({ label }: { label: string }) {
+function TabItemContent({ label, number }: { label: string; number: number }) {
   return (
-    <div className="flex items-center gap-2">
-      <Command className="w-2 h-2" />
+    <div className="flex items-center gap-1">
+      <span className="flex items-center">
+        <Command className="size-3" />
+        {number}
+      </span>
       <span>{label}</span>
     </div>
   );
@@ -245,7 +249,7 @@ export function TopHoldersWidget({
               {pnlPercent !== null && (
                 <div className="text-xs opacity-75">
                   {pnlPercent > 0 ? "+" : ""}
-                  {pnlPercent.toFixed(1)}%
+                  {formatNumber(pnlPercent, 1)}%
                 </div>
               )}
             </div>
@@ -285,19 +289,19 @@ export function TopHoldersWidget({
         >
           <TabsList className="px-3 pt-2 shrink-0">
             <TabsTrigger value="positions">
-              <TabItemContent label="1 POSITIONS" />
+              <TabItemContent number={1} label="POSITIONS" />
             </TabsTrigger>
             <TabsTrigger value="rules">
-              <TabItemContent label="2 RULES" />
+              <TabItemContent number={2} label="RULES" />
             </TabsTrigger>
             <TabsTrigger value="book">
-              <TabItemContent label="3 BOOK" />
+              <TabItemContent number={3} label="BOOK" />
             </TabsTrigger>
             <TabsTrigger value="news" disabled>
-              <TabItemContent label="4 NEWS" />
+              <TabItemContent number={4} label="NEWS" />
             </TabsTrigger>
             <TabsTrigger value="trades" disabled>
-              <TabItemContent label="5 LIVE TRADES" />
+              <TabItemContent number={5} label="LIVE TRADES" />
             </TabsTrigger>
           </TabsList>
 
@@ -321,14 +325,14 @@ export function TopHoldersWidget({
               <div className="grid grid-cols-2">
                 <OutcomeColumn
                   label={outcome0Label}
-                  bgColor="bg-outcome-yes-muted"
+                  bgColor=""
                   holders={outcome0Holders}
                   renderHolderRow={renderHolderRow}
                   outcomeIndex={0}
                 />
                 <OutcomeColumn
                   label={outcome1Label}
-                  bgColor="bg-outcome-no-muted"
+                  bgColor=""
                   holders={outcome1Holders}
                   renderHolderRow={renderHolderRow}
                   outcomeIndex={1}
