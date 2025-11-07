@@ -3,7 +3,7 @@
 import { useEffect, useRef } from "react";
 import { LoadingSpinner } from "@/components/ui/spinner";
 import { useOrderbookQuery } from "@/lib/queries/orderbook.query";
-import { formatNumber } from "@/lib/ui/format.utils";
+import { formatCurrency, formatNumber } from "@/lib/ui/format.utils";
 
 type OrderBookProps = {
   tokenId: string;
@@ -90,9 +90,9 @@ export function OrderBook({ tokenId }: OrderBookProps) {
                     <div className="text-left text-rose-500 font-medium">
                       {formatNumber(price, 4)}
                     </div>
-                    <div className="text-right">{formatNumber(size, 2)}</div>
+                    <div className="text-right">{formatNumber(size, 1)}</div>
                     <div className="text-right text-muted-foreground">
-                      {formatNumber(cumulativeTotal, 2)}
+                      {formatCurrency(cumulativeTotal, 1)}
                     </div>
                   </div>
                 );

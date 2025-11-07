@@ -16,6 +16,7 @@ export function formatNumber(
 
 export function formatCurrency(
   value: number | string,
+  maximumFractionDigits = 2,
   locale: string = getUserLocale()
 ) {
   const n = typeof value === "string" ? Number(value) : value;
@@ -24,7 +25,7 @@ export function formatCurrency(
     style: "currency",
     currency: "USD",
     minimumFractionDigits: 0,
-    maximumFractionDigits: 0,
+    maximumFractionDigits: maximumFractionDigits,
   }).format(n);
 }
 
