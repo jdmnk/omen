@@ -3,7 +3,7 @@ import { Logo } from "./Logo";
 
 export function Header() {
   return (
-    <header className="border-b">
+    <header className="">
       <div className="px-3 py-3 flex items-center">
         <Link href="/">
           <div className="flex items-center gap-3">

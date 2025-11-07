@@ -47,7 +47,8 @@
   --color-outcome-no: var(--outcome-no);
   --color-brand-background: var(--brand-background);
   --color-brand-foreground: var(--brand-foreground);
-  --color-brand-border: var(--brand-border);
+  --color-brand-stroke: var(--brand-stroke);
+  --radius-brand: var(--brand-radius);
 }
 
 :root {
@@ -89,7 +90,10 @@
   --outcome-no: #ff3366;
   --brand-background: #110928;
   --brand-foreground: #8778ae;
-  --brand-border: #382e52;
+  --brand-stroke: #382e52;
+
+  /* custom other variables */
+  --brand-radius: var(--radius);
 }
 
 .dark {

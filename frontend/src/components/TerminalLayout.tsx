@@ -30,21 +30,21 @@ export function TerminalLayout() {
     <div className="h-screen bg-background flex flex-col overflow-hidden">
       <Header />
 
-      <main className="flex-1 w-full flex flex-col overflow-hidden min-h-0">
+      <main className="flex-1 w-full flex flex-col overflow-hidden min-h-0 mx-auto pb-6">
         <ResizablePanelGroup direction="horizontal" className="h-full w-full">
           {/* Left sidebar */}
           <ResizablePanel defaultSize={25} minSize={10}>
-            <div className="h-full overflow-auto">
+            <div className="h-full overflow-auto border-t border-b border-r border-brand-stroke rounded-r-brand">
               <SearchWidget />
             </div>
           </ResizablePanel>
 
           {/* Main content */}
-          <ResizableHandle withHandle />
+          {/* <ResizableHandle withHandle /> */}
           <ResizablePanel defaultSize={50} minSize={20}>
             <ResizablePanelGroup direction="vertical" className="h-full">
-              <ResizablePanel defaultSize={50} minSize={20}>
-                <div className="h-full overflow-auto p-6">
+              <ResizablePanel defaultSize={40} minSize={20}>
+                <div className="h-full px-6 pb-3">
                   {!marketSlug ? (
                     <EmptyState />
                   ) : isLoading ? (
@@ -56,9 +56,9 @@ export function TerminalLayout() {
                   )}
                 </div>
               </ResizablePanel>
-              <ResizableHandle withHandle />
-              <ResizablePanel defaultSize={50} minSize={20}>
-                <div className="h-full overflow-auto p-6">
+              {/* <ResizableHandle withHandle /> */}
+              <ResizablePanel defaultSize={60} minSize={20}>
+                <div className="h-full overflow-auto pt-3 px-6">
                   {!marketSlug ? (
                     <EmptyState />
                   ) : isLoading ? (
@@ -74,7 +74,7 @@ export function TerminalLayout() {
           </ResizablePanel>
 
           {/* Right sidebar */}
-          <ResizableHandle withHandle />
+          {/* <ResizableHandle withHandle /> */}
           <ResizablePanel defaultSize={25} minSize={10}>
             {/* <div className="h-full overflow-auto p-6 space-y-6">
               {!marketSlug ? (

@@ -53,11 +53,11 @@ function SearchSection({
   const hasMore = items.length > INITIAL_LIMIT;
 
   return (
-    <div className="space-y-2">
+    <div>
       {/* Section Header */}
       <button
         onClick={onToggle}
-        className="w-full flex items-center justify-between px-3 py-2 text-sm font-semibold text-muted-foreground hover:text-foreground transition-colors"
+        className="w-full flex items-center justify-between px-3 py-1 text-xs text-brand-foreground hover:text-brand-foreground/80 transition-colors cursor-pointer"
       >
         <span>
           {title} ({items.length})
@@ -127,16 +127,16 @@ export function SearchWidget() {
   const hasResults = (markets.length > 0 || events.length > 0) && !isLoading;
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col h-full rounded-brand">
       {/* Fixed input at top */}
       <div className="relative shrink-0">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none z-10" />
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-brand-foreground pointer-events-none z-10" />
         <Input
           type="text"
           value={input}
           onChange={(e) => setInput(e.target.value)}
           placeholder="Search markets..."
-          className="pl-9 border-none focus-visible:ring-0 focus-visible:ring-offset-0 shadow-none rounded-none"
+          className="pl-9"
         />
       </div>
 
@@ -190,7 +190,7 @@ export function SearchWidget() {
                                 alt={m.question}
                                 width={40}
                                 height={40}
-                                className="rounded-md border object-contain w-full h-full"
+                                className="rounded-sm border border-brand-stroke object-contain w-full h-full"
                               />
                             </div>
                           ) : (
