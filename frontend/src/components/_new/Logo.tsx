@@ -1,3 +1,5 @@
+import Image from "next/image";
+
 export function Logo() {
   return (
     <div
@@ -7,26 +9,7 @@ export function Logo() {
         alignItems: "center",
       }}
     >
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-        }}
-      >
-        {/* A simple purple circle with only border */}
-        <div
-          style={{
-            width: "32px",
-            height: "32px",
-            border: "3px solid #6322FE",
-            borderRadius: "50%",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-        />
-      </div>
+      <Image src="/logo.svg" alt="Logo" width={37} height={37} />
     </div>
   );
 }
