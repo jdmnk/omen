@@ -12,7 +12,7 @@ export function useTopHoldersPositionsQuery(
     queryKey: ["top-holders-positions", wallets?.join(","), positionsPerHolder],
     queryFn: () => fetchTopHoldersPositions(wallets!, positionsPerHolder),
     enabled: !!wallets && wallets.length > 0,
-    staleTime: 120000, // 2 minutes
-    retry: 2,
+    staleTime: 10 * 60 * 1000, // 10 minutes
+    retry: 0, // dont wanna retry not so spam the api
   });
 }
