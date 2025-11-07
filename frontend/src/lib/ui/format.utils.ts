@@ -30,11 +30,13 @@ export function formatCurrency(
 
 export function formatCompactNumber(
   value: number,
+  maxDecimals = 2,
   locale: string = getUserLocale()
 ): string {
   return Intl.NumberFormat(locale, {
     notation: "compact",
     compactDisplay: "short",
+    maximumFractionDigits: maxDecimals,
   }).format(value);
 }
 
