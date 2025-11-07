@@ -5,7 +5,7 @@ import { Card } from "@/components/ui/card";
 import { LoadingSpinner } from "@/components/ui/spinner";
 import { useTopHoldersQuery } from "@/lib/queries/top-holders.query";
 import { TopHolder } from "@/lib/models/api.models";
-import { formatNumber } from "@/lib/ui/format.utils";
+import { formatCurrency, formatNumber } from "@/lib/ui/format.utils";
 import Link from "next/link";
 import { Market } from "@/lib/models/api.models";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
@@ -181,7 +181,6 @@ export function TopHoldersWidget({
       pnlPercent = ((currentPrice - holder.avgPrice) / holder.avgPrice) * 100;
     }
 
-    const pnlDisplay = pnl !== null ? formatNumber(pnl, 2) : "-";
     const pnlColor =
       pnl !== null
         ? pnl > 0
@@ -228,7 +227,7 @@ export function TopHoldersWidget({
         <div className="">
           {pnl !== null ? (
             <div className={pnlColor}>
-              <div>{pnlDisplay}</div>
+              <div>{formatCurrency(pnl)}</div>
               {pnlPercent !== null && (
                 <div className="text-xs opacity-75">
                   {pnlPercent > 0 ? "+" : ""}
