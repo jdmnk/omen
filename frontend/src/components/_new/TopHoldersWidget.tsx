@@ -19,7 +19,7 @@ import { cn } from "@/lib/utils";
 import { Command } from "lucide-react";
 
 const HOLDER_ROW_GRID_CLASSES =
-  "grid grid-cols-[1fr_auto_auto_auto] items-center gap-3";
+  "grid grid-cols-[24px_1fr_auto_auto_auto] items-center gap-3";
 
 function TabItemContent({ label }: { label: string }) {
   return (
@@ -55,7 +55,8 @@ function OutcomeColumn({
           "text-xs text-brand-foreground font-bold"
         )}
       >
-        <div className="">{label.toUpperCase()}</div>
+        <div className="text-center">{label.toUpperCase()}</div>
+        <div className="">Trader</div>
         <div className="text-right">~Size</div>
         <div className="text-right">~PnL</div>
         <div className="">Tags</div>
@@ -192,18 +193,20 @@ export function TopHoldersWidget({
           "py-2 border-b border-border/50 last:border-0"
         )}
       >
-        <div className="flex items-center gap-2.5 min-w-0">
+        <div className="flex items-center justify-center">
           {holder.profileImageOptimized || holder.profileImage ? (
             <img
               src={holder.profileImageOptimized || holder.profileImage || ""}
               alt=""
-              className="w-8 h-8 rounded-full shrink-0"
+              className="w-6 h-6 rounded-full shrink-0"
             />
           ) : (
-            <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center text-xs font-medium shrink-0">
+            <div className="w-6 h-6 rounded-full bg-muted flex items-center justify-center text-xs font-medium shrink-0">
               {displayName.charAt(0).toUpperCase()}
             </div>
           )}
+        </div>
+        <div className="min-w-0">
           <Link
             href={`${POLYMARKET_URL}/profile/${holder.proxyWallet}`}
             // href={`/user/${holder.proxyWallet}`}
@@ -290,14 +293,14 @@ export function TopHoldersWidget({
           ) : (
             <div className="grid grid-cols-2 gap-4">
               <OutcomeColumn
-                label={`${outcome0Label} Trader`}
+                label={outcome0Label}
                 bgColor="bg-outcome-yes/5"
                 holders={outcome0Holders}
                 renderHolderRow={renderHolderRow}
                 outcomeIndex={0}
               />
               <OutcomeColumn
-                label={`${outcome1Label} Trader`}
+                label={outcome1Label}
                 bgColor="bg-outcome-no/5"
                 holders={outcome1Holders}
                 renderHolderRow={renderHolderRow}
