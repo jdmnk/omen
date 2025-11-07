@@ -31,8 +31,8 @@ function SearchResultItem({
     <button
       onClick={onClick}
       className={cn(
-        "w-full text-left rounded-md px-3 py-2 text-sm",
-        "hover:bg-accent hover:text-accent-foreground",
+        "w-full text-left px-3 py-2 text-sm",
+        "hover:bg-brand-background",
         "transition-colors cursor-pointer",
         "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
       )}
@@ -64,9 +64,9 @@ function SearchResultItem({
 
           {/* Second row: Left and right values */}
           {(leftValue || rightValue) && (
-            <div className="flex items-center gap-3 text-xs text-muted-foreground">
-              {leftValue}
-              {rightValue}
+            <div className="grid items-center gap-3 text-xs text-muted-foreground w-full grid-cols-[80px_1fr]">
+              <div>{leftValue}</div>
+              <div>{rightValue}</div>
             </div>
           )}
         </div>
@@ -219,14 +219,22 @@ export function SearchWidget() {
                       onClick={() => handleSelectMarket(m.slug)}
                       leftValue={
                         odds !== null ? (
-                          <span className="font-medium">
-                            {formatNumber(odds * 100, 1)}%
+                          <span className="text-outcome-neutral">
+                            p{" "}
+                            <span className="font-bold">
+                              {formatNumber(odds * 100, 1)}%
+                            </span>
                           </span>
                         ) : undefined
                       }
                       rightValue={
                         volume > 0 ? (
-                          <span>vol: {formatCompactCurrency(volume, 0)}</span>
+                          <span>
+                            vol{" "}
+                            <span className="font-bold">
+                              {formatCompactCurrency(volume, 0)}
+                            </span>
+                          </span>
                         ) : undefined
                       }
                     />
@@ -251,15 +259,22 @@ export function SearchWidget() {
                       image={e.displayImage}
                       onClick={() => handleSelectEvent(e.slug)}
                       leftValue={
-                        volume > 0 ? (
-                          <span>vol: {formatCompactCurrency(volume, 0)}</span>
+                        e.markets && e.markets.length > 0 ? (
+                          <span className="text-outcome-neutral">
+                            {e.markets.length === 1 ? "market" : "markets"}{" "}
+                            <span className="font-bold">
+                              {e.markets.length}
+                            </span>
+                          </span>
                         ) : undefined
                       }
                       rightValue={
-                        e.markets && e.markets.length > 0 ? (
-                          <span className="text-muted-foreground/70">
-                            {e.markets.length}{" "}
-                            {e.markets.length === 1 ? "market" : "markets"}
+                        volume > 0 ? (
+                          <span>
+                            vol{" "}
+                            <span className="font-bold">
+                              {formatCompactCurrency(volume, 0)}
+                            </span>
                           </span>
                         ) : undefined
                       }

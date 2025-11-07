@@ -45,6 +45,7 @@
   /* custom colors */
   --color-outcome-yes: var(--outcome-yes);
   --color-outcome-no: var(--outcome-no);
+  --color-outcome-neutral: var(--outcome-neutral);
   --color-brand-background: var(--brand-background);
   --color-brand-foreground: var(--brand-foreground);
   --color-brand-stroke: var(--brand-stroke);
@@ -88,6 +89,7 @@
   /* custom colors */
   --outcome-yes: #9bc53d;
   --outcome-no: #ff3366;
+  --outcome-neutral: #ff7f11;
   --brand-background: #110928;
   --brand-foreground: #8778ae;
   --brand-stroke: #382e52;
