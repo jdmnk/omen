@@ -161,10 +161,12 @@ export function SearchWidget({ currentMarket }: { currentMarket?: Market }) {
   }, [searchResults]);
 
   const events = useMemo(() => {
-    return (searchResults?.events || []).map((event) => ({
-      ...event,
-      displayImage: event.image || event.icon,
-    }));
+    return (searchResults?.events || [])
+      .filter((event) => !event.markets || event.markets.length !== 1)
+      .map((event) => ({
+        ...event,
+        displayImage: event.image || event.icon,
+      }));
   }, [searchResults]);
 
   // Parse event markets from the raw event data
