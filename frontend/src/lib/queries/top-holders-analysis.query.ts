@@ -13,7 +13,7 @@ export function useTopHoldersAnalysisQuery(
     queryKey: ["top-holders-analysis", conditionId, token1, token2],
     queryFn: async () => {
       const base = getBaseUrl();
-      const url = new URL(`${base}/markets/top-holders`);
+      const url = new URL(`${base}/markets/top-holders-analysis`);
       url.searchParams.set("condition_id", conditionId);
       url.searchParams.set("token1", token1);
       url.searchParams.set("token2", token2);

@@ -50,12 +50,12 @@ export interface paths {
             cookie?: never;
         };
         /**
-         * Search Markets Slug
+         * Get Market By Slug Endpoint
          * @description Get a market by its slug from Polymarket Gamma API.
          *
          *     Official docs: https://docs.polymarket.com/api-reference/markets/get-market-by-slug
          */
-        get: operations["search_markets_slug_markets_search_slug_get"];
+        get: operations["get_market_by_slug_endpoint_markets_search_slug_get"];
         put?: never;
         post?: never;
         delete?: never;
@@ -71,8 +71,8 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Get Market Trades */
-        get: operations["get_market_trades_markets_trades_get"];
+        /** Get Market Trades Endpoint */
+        get: operations["get_market_trades_endpoint_markets_trades_get"];
         put?: never;
         post?: never;
         delete?: never;
@@ -89,11 +89,11 @@ export interface paths {
             cookie?: never;
         };
         /**
-         * Search Markets
+         * Get Search Markets Endpoint
          * @description Search for markets using Polymarket Gamma API.
          *     Returns events with their markets, filtered to only active markets.
          */
-        get: operations["search_markets_markets_search_get"];
+        get: operations["get_search_markets_endpoint_markets_search_get"];
         put?: never;
         post?: never;
         delete?: never;
@@ -102,15 +102,15 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/markets/top-holders": {
+    "/markets/top-holders-analysis": {
         parameters: {
             query?: never;
             header?: never;
             path?: never;
             cookie?: never;
         };
-        /** Get Top Holders With Wallet Info Endpoint */
-        get: operations["get_top_holders_with_wallet_info_endpoint_markets_top_holders_get"];
+        /** Get Top Holders Analysis Endpoint */
+        get: operations["get_top_holders_analysis_endpoint_markets_top_holders_analysis_get"];
         put?: never;
         post?: never;
         delete?: never;
@@ -127,12 +127,12 @@ export interface paths {
             cookie?: never;
         };
         /**
-         * Get Event By Id
+         * Get Event By Id Endpoint
          * @description Get an event by its ID from Polymarket Gamma API.
          *
          *     Official docs: https://docs.polymarket.com/api-reference/events/get-event-by-id
          */
-        get: operations["get_event_by_id_events__event_id__get"];
+        get: operations["get_event_by_id_endpoint_events__event_id__get"];
         put?: never;
         post?: never;
         delete?: never;
@@ -166,7 +166,7 @@ export interface components {
             endDate: string;
         };
         /** Event */
-        "Event-Input": {
+        Event: {
             /** Id */
             id: string;
             /** Slug */
@@ -177,26 +177,6 @@ export interface components {
             closed: boolean;
             /** Markets */
             markets?: components["schemas"]["Market"][] | null;
-        };
-        /** Event */
-        "Event-Output": {
-            /** Id */
-            id: string;
-            /** Slug */
-            slug: string;
-            /** Title */
-            title: string;
-            /** Closed */
-            closed: boolean;
-            /** Markets */
-            markets?: components["schemas"]["Market"][] | null;
-        };
-        /**
-         * EventResponse
-         * @description Wrapper response for single event.
-         */
-        EventResponse: {
-            event: components["schemas"]["Event-Output"];
         };
         /** HTTPValidationError */
         HTTPValidationError: {
@@ -280,13 +260,6 @@ export interface components {
             id: string;
             /** Slug */
             slug: string;
-        };
-        /**
-         * MarketSearchResponse
-         * @description Wrapper response for single market.
-         */
-        MarketSearchResponse: {
-            market: components["schemas"]["Market"];
         };
         /**
          * MessageResponse
@@ -521,7 +494,7 @@ export interface operations {
             };
         };
     };
-    search_markets_slug_markets_search_slug_get: {
+    get_market_by_slug_endpoint_markets_search_slug_get: {
         parameters: {
             query: {
                 slug: string;
@@ -538,7 +511,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["MarketSearchResponse"];
+                    "application/json": components["schemas"]["Market"];
                 };
             };
             /** @description Validation Error */
@@ -552,7 +525,7 @@ export interface operations {
             };
         };
     };
-    get_market_trades_markets_trades_get: {
+    get_market_trades_endpoint_markets_trades_get: {
         parameters: {
             query: {
                 condition_id: string;
@@ -583,7 +556,7 @@ export interface operations {
             };
         };
     };
-    search_markets_markets_search_get: {
+    get_search_markets_endpoint_markets_search_get: {
         parameters: {
             query: {
                 q: string;
@@ -614,7 +587,7 @@ export interface operations {
             };
         };
     };
-    get_top_holders_with_wallet_info_endpoint_markets_top_holders_get: {
+    get_top_holders_analysis_endpoint_markets_top_holders_analysis_get: {
         parameters: {
             query: {
                 condition_id: string;
@@ -647,7 +620,7 @@ export interface operations {
             };
         };
     };
-    get_event_by_id_events__event_id__get: {
+    get_event_by_id_endpoint_events__event_id__get: {
         parameters: {
             query?: never;
             header?: never;
@@ -664,7 +637,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["EventResponse"];
+                    "application/json": components["schemas"]["Event"];
                 };
             };
             /** @description Validation Error */
@@ -683,14 +656,11 @@ export interface operations {
 
 // Clean type exports (no need to access via components["schemas"])
 export type ClobReward = components["schemas"]["ClobReward"];
-export type EventInput = components["schemas"]["Event-Input"];
-export type Event = components["schemas"]["Event-Output"];
-export type EventResponse = components["schemas"]["EventResponse"];
+export type Event = components["schemas"]["Event"];
 export type HTTPValidationError = components["schemas"]["HTTPValidationError"];
 export type HealthResponse = components["schemas"]["HealthResponse"];
 export type Market = components["schemas"]["Market"];
 export type MarketEvent = components["schemas"]["MarketEvent"];
-export type MarketSearchResponse = components["schemas"]["MarketSearchResponse"];
 export type MessageResponse = components["schemas"]["MessageResponse"];
 export type SearchEventItem = components["schemas"]["SearchEventItem"];
 export type SearchMarketItem = components["schemas"]["SearchMarketItem"];

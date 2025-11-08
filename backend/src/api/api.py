@@ -83,12 +83,26 @@ async def get_top_holders_analysis_endpoint(
     token1: str = Query(min_length=1),
     token2: str = Query(min_length=1),
 ) -> list[TopHolderAnalysis]:
-    holders = await get_top_holders_analysis(condition_id, [token1, token2])
+    logger.info(
+        f"Top holders analysis request: condition_id={condition_id}, token1={token1}, token2={token2}"
+    )
 
-    if not holders:
-        raise HTTPException(status_code=404, detail="Top holders not found")
+    try:
+        holders = await get_top_holders_analysis(condition_id, [token1, token2])
 
-    return holders
+        if not holders:
+            logger.warning(
+                f"No holders found for condition_id={condition_id}, token1={token1}, token2={token2}"
+            )
+            raise HTTPException(status_code=404, detail="Top holders not found")
+
+        logger.info(f"Returning {len(holders)} holders")
+        return holders
+    except HTTPException:
+        raise
+    except Exception as exc:
+        logger.error(f"Error in top holders analysis endpoint: {exc!s}", exc_info=True)
+        raise HTTPException(status_code=500, detail=f"Internal server error: {exc!s}") from exc
 
 
 @app.get("/events/{event_id}", response_model=Event)
