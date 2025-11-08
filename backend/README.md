@@ -68,13 +68,3 @@ poetry run ruff format .
 
 poetry run ruff check --fix .
 ```
-
-## TODO
-
-- make our own version of "positions" from trades (efficient)
-- FIGURE OUT HOW MANY TRADES WE SKIP WHEN FETCHING THEM (HOW MANY INCOMPLETE MARKETS WE HAVE WITH TOP X TRADES)
-
-Tasks:
-
-- per user / per position: insider score / whale score
-- per market: whale interest (smart money interest)
