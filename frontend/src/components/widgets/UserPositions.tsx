@@ -90,7 +90,9 @@ export function UserPositions({ userId }: { userId: string }) {
                       <Image
                         src={position.icon}
                         alt=""
-                        className="w-4 h-4 rounded"
+                        width={16}
+                        height={16}
+                        className="rounded"
                       />
                     )}
                     <div className="text-sm font-medium truncate">
