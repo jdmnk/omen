@@ -4,7 +4,7 @@ from sqlalchemy import select, text
 
 from src.db.db_core import DbCore
 from src.models.market import MarketDB, Market
-from src.models.public import MarketAutocompleteItem
+from src.models.responses import MarketAutocompleteItem
 
 
 class SelectsClient:

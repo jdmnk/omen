@@ -9,14 +9,14 @@ from src.analytics.trades_analytics import (
     group_trades_by_user_detailed,
 )
 from src.db.selects import SelectsClient
-from src.models.public import (
+from src.models.responses import (
     EventResponse,
     HealthResponse,
     MarketAutocompleteItem,
     MarketSearchResponse,
     MessageResponse,
-    SearchResponse,
 )
+from src.models.search import SearchResponse
 from src.models.trade import Trade
 from src.polymarket.poly_client import PolyClient
 from src.polymarket.poly_client_graphs import PolyClientGraphs

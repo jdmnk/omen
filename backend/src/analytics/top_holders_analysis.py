@@ -2,7 +2,7 @@ from datetime import datetime
 
 from src.models.graph.position import Position
 from src.models.graph.wallet import Wallet
-from src.models.public import PolymarketHolder
+from src.models.polymarket import PolymarketHolder
 from src.polymarket.poly_client import PolyClient
 from src.polymarket.poly_client_graphs import PolyClientGraphs
 

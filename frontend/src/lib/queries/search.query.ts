@@ -2,47 +2,7 @@
 
 import { useQuery } from "@tanstack/react-query";
 import { getBaseUrl } from "../api";
-
-type SearchMarket = {
-  id: string;
-  question: string;
-  conditionId: string;
-  slug: string;
-  category?: string | null;
-  liquidity?: string | null;
-  volume?: string | null;
-  outcomePrices?: string | null;
-  outcomes?: string | null;
-  active: boolean;
-  closed: boolean;
-  icon?: string | null;
-  image?: string | null;
-};
-
-type SearchEvent = {
-  id: string;
-  ticker: string;
-  slug: string;
-  title: string;
-  subtitle?: string | null;
-  description?: string | null;
-  image?: string | null;
-  icon?: string | null;
-  active: boolean;
-  closed: boolean;
-  liquidity?: number | null;
-  volume?: number | null;
-  volume24hr?: number | null;
-  markets?: SearchMarket[] | null;
-};
-
-type SearchResponse = {
-  events: SearchEvent[] | null;
-  markets: SearchMarket[] | null;
-  tags: unknown[] | null;
-  profiles: unknown[] | null;
-  pagination: unknown | null;
-};
+import type { SearchResponse } from "../models/api.models";
 
 export function useMarketSearchQuery(query: string, enabled: boolean = true) {
   return useQuery<SearchResponse>({

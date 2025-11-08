@@ -9,7 +9,7 @@ from py_clob_client.exceptions import PolyApiException
 
 from src.models.event import Event, parse_event_from_api
 from src.models.market import Market, parse_market_from_api
-from src.models.public import SearchEventItem, SearchMarketItem, SearchResponse
+from src.models.search import SearchEventItem, SearchMarketItem, SearchResponse
 from src.models.trade import Trade, parse_trade_from_api
 from src.models.user_position import UserPosition, parse_user_position_from_api
 from src.settings import settings

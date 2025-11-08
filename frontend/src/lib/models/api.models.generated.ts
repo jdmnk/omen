@@ -214,7 +214,10 @@ export interface components {
                 [key: string]: unknown;
             };
         };
-        /** EventResponse */
+        /**
+         * EventResponse
+         * @description Wrapper response for single event.
+         */
         EventResponse: {
             event: components["schemas"]["Event"];
         };
@@ -223,7 +226,10 @@ export interface components {
             /** Detail */
             detail?: components["schemas"]["ValidationError"][];
         };
-        /** HealthResponse */
+        /**
+         * HealthResponse
+         * @description Health check response.
+         */
         HealthResponse: {
             /** Status */
             status: string;
@@ -285,23 +291,35 @@ export interface components {
             /** Feesenabled */
             feesEnabled?: boolean | null;
         };
-        /** MarketAutocompleteItem */
+        /**
+         * MarketAutocompleteItem
+         * @description Market autocomplete item for typeahead.
+         */
         MarketAutocompleteItem: {
             /** Slug */
             slug: string;
             /** Question */
             question: string;
         };
-        /** MarketSearchResponse */
+        /**
+         * MarketSearchResponse
+         * @description Wrapper response for single market.
+         */
         MarketSearchResponse: {
             market: components["schemas"]["Market"];
         };
-        /** MessageResponse */
+        /**
+         * MessageResponse
+         * @description Generic message response.
+         */
         MessageResponse: {
             /** Message */
             message: string;
         };
-        /** SearchEventItem */
+        /**
+         * SearchEventItem
+         * @description Lightweight event data from search API.
+         */
         SearchEventItem: {
             /** Id */
             id: string;
@@ -332,7 +350,10 @@ export interface components {
             /** Markets */
             markets?: components["schemas"]["SearchMarketItem"][] | null;
         };
-        /** SearchMarketItem */
+        /**
+         * SearchMarketItem
+         * @description Lightweight market data from search API.
+         */
         SearchMarketItem: {
             /** Id */
             id: string;
@@ -361,7 +382,10 @@ export interface components {
             /** Image */
             image?: string | null;
         };
-        /** SearchResponse */
+        /**
+         * SearchResponse
+         * @description Response from Polymarket search API.
+         */
         SearchResponse: {
             /** Events */
             events?: components["schemas"]["SearchEventItem"][] | null;
