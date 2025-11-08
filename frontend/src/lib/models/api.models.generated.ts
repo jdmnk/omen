@@ -183,7 +183,7 @@ export interface components {
          * ClobReward
          * @description Schema for a single CLOB reward configuration.
          */
-        "ClobReward-Input": {
+        ClobReward: {
             /** Id */
             id: string;
             /** Conditionid */
@@ -191,29 +191,9 @@ export interface components {
             /** Assetaddress */
             assetAddress: string;
             /** Rewardsamount */
-            rewardsAmount: number | string;
+            rewardsAmount: number;
             /** Rewardsdailyrate */
-            rewardsDailyRate: number | string;
-            /** Startdate */
-            startDate: string;
-            /** Enddate */
-            endDate: string;
-        };
-        /**
-         * ClobReward
-         * @description Schema for a single CLOB reward configuration.
-         */
-        "ClobReward-Output": {
-            /** Id */
-            id: string;
-            /** Conditionid */
-            conditionId: string;
-            /** Assetaddress */
-            assetAddress: string;
-            /** Rewardsamount */
-            rewardsAmount: string;
-            /** Rewardsdailyrate */
-            rewardsDailyRate: string;
+            rewardsDailyRate: number;
             /** Startdate */
             startDate: string;
             /** Enddate */
@@ -249,7 +229,7 @@ export interface components {
             status: string;
         };
         /** Market */
-        "Market-Input": {
+        Market: {
             /** Condition Id */
             condition_id: string;
             /** Question */
@@ -269,23 +249,23 @@ export interface components {
             /** Description */
             description: string;
             /** Liquidity */
-            liquidity: number | string;
+            liquidity: number;
             /** Volume */
-            volume: number | string;
+            volume: number;
             /** Volume24Hr */
-            volume24hr: number | string;
+            volume24hr: number;
             /** Volume1Wk */
-            volume1wk: number | string;
+            volume1wk: number;
             /** Volume1Mo */
-            volume1mo: number | string;
+            volume1mo: number;
             /** Volume1Yr */
-            volume1yr: number | string;
+            volume1yr: number;
             /** Negrisk */
             negRisk: boolean;
             /** Bestbid */
-            bestBid: number | string;
+            bestBid: number;
             /** Bestask */
-            bestAsk: number | string;
+            bestAsk: number;
             /** Enddate */
             endDate: string;
             /** Events */
@@ -293,70 +273,13 @@ export interface components {
                 [key: string]: unknown;
             }[] | null;
             /** Umareward */
-            umaReward?: number | string | null;
+            umaReward?: number | null;
             /** Clobrewards */
-            clobRewards?: components["schemas"]["ClobReward-Input"][] | null;
+            clobRewards?: components["schemas"]["ClobReward"][] | null;
             /** Rewardsminsize */
-            rewardsMinSize?: number | string | null;
+            rewardsMinSize?: number | null;
             /** Rewardsmaxspread */
-            rewardsMaxSpread?: number | string | null;
-            /** Holdingrewardsenabled */
-            holdingRewardsEnabled?: boolean | null;
-            /** Feesenabled */
-            feesEnabled?: boolean | null;
-        };
-        /** Market */
-        "Market-Output": {
-            /** Condition Id */
-            condition_id: string;
-            /** Question */
-            question: string;
-            /** Icon */
-            icon: string;
-            /** Outcomes */
-            outcomes: string;
-            /** Outcomeprices */
-            outcomePrices: string;
-            /** Slug */
-            slug: string;
-            /** Token1 */
-            token1: string;
-            /** Token2 */
-            token2: string;
-            /** Description */
-            description: string;
-            /** Liquidity */
-            liquidity: string;
-            /** Volume */
-            volume: string;
-            /** Volume24Hr */
-            volume24hr: string;
-            /** Volume1Wk */
-            volume1wk: string;
-            /** Volume1Mo */
-            volume1mo: string;
-            /** Volume1Yr */
-            volume1yr: string;
-            /** Negrisk */
-            negRisk: boolean;
-            /** Bestbid */
-            bestBid: string;
-            /** Bestask */
-            bestAsk: string;
-            /** Enddate */
-            endDate: string;
-            /** Events */
-            events?: {
-                [key: string]: unknown;
-            }[] | null;
-            /** Umareward */
-            umaReward?: string | null;
-            /** Clobrewards */
-            clobRewards?: components["schemas"]["ClobReward-Output"][] | null;
-            /** Rewardsminsize */
-            rewardsMinSize?: string | null;
-            /** Rewardsmaxspread */
-            rewardsMaxSpread?: string | null;
+            rewardsMaxSpread?: number | null;
             /** Holdingrewardsenabled */
             holdingRewardsEnabled?: boolean | null;
             /** Feesenabled */
@@ -371,7 +294,7 @@ export interface components {
         };
         /** MarketSearchResponse */
         MarketSearchResponse: {
-            market: components["schemas"]["Market-Output"];
+            market: components["schemas"]["Market"];
         };
         /** MessageResponse */
         MessageResponse: {
@@ -880,14 +803,12 @@ export interface operations {
 
 
 // Clean type exports (no need to access via components["schemas"])
-export type ClobRewardInput = components["schemas"]["ClobReward-Input"];
-export type ClobReward = components["schemas"]["ClobReward-Output"];
+export type ClobReward = components["schemas"]["ClobReward"];
 export type Event = components["schemas"]["Event"];
 export type EventResponse = components["schemas"]["EventResponse"];
 export type HTTPValidationError = components["schemas"]["HTTPValidationError"];
 export type HealthResponse = components["schemas"]["HealthResponse"];
-export type MarketInput = components["schemas"]["Market-Input"];
-export type Market = components["schemas"]["Market-Output"];
+export type Market = components["schemas"]["Market"];
 export type MarketAutocompleteItem = components["schemas"]["MarketAutocompleteItem"];
 export type MarketSearchResponse = components["schemas"]["MarketSearchResponse"];
 export type MessageResponse = components["schemas"]["MessageResponse"];

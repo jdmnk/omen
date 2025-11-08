@@ -15,8 +15,8 @@ class ClobReward(BaseModel):
     id: str
     conditionId: str
     assetAddress: str
-    rewardsAmount: Decimal
-    rewardsDailyRate: Decimal
+    rewardsAmount: float
+    rewardsDailyRate: float
     startDate: str
     endDate: str
 
@@ -61,22 +61,22 @@ class Market(BaseModel):
     token1: str
     token2: str
     description: str
-    liquidity: Decimal = Field(ge=0)
-    volume: Decimal = Field(ge=0)
-    volume24hr: Decimal = Field(ge=0)
-    volume1wk: Decimal = Field(ge=0)
-    volume1mo: Decimal = Field(ge=0)
-    volume1yr: Decimal = Field(ge=0)
+    liquidity: float = Field(ge=0)
+    volume: float = Field(ge=0)
+    volume24hr: float = Field(ge=0)
+    volume1wk: float = Field(ge=0)
+    volume1mo: float = Field(ge=0)
+    volume1yr: float = Field(ge=0)
     negRisk: bool
-    bestBid: Decimal = Field(ge=0)
-    bestAsk: Decimal = Field(ge=0)
+    bestBid: float = Field(ge=0, le=1)
+    bestAsk: float = Field(ge=0, le=1)
     endDate: str
     events: list[dict] | None = None
     # Reward-related fields
-    umaReward: Decimal | None = None
+    umaReward: float | None = None
     clobRewards: list[ClobReward] | None = None
-    rewardsMinSize: Decimal | None = None
-    rewardsMaxSpread: Decimal | None = None
+    rewardsMinSize: float | None = None
+    rewardsMaxSpread: float | None = None
     holdingRewardsEnabled: bool | None = None
     feesEnabled: bool | None = None
 
@@ -106,17 +106,17 @@ def parse_market_from_api(market_dict: dict) -> Market | None:
         outcomePrices = ",".join(json.loads(market_dict.get("outcomePrices", "[]")))
 
         # Get numeric fields with defaults
-        liquidity = Decimal(str(market_dict.get("liquidityNum") or 0))
-        volume = Decimal(str(market_dict.get("volumeNum") or market_dict.get("volume") or 0))
-        volume24hr = Decimal(str(market_dict.get("volume24hr", 0)))
-        volume1wk = Decimal(str(market_dict.get("volume1wk", 0)))
-        volume1mo = Decimal(str(market_dict.get("volume1mo", 0)))
-        volume1yr = Decimal(str(market_dict.get("volume1yr", 0)))
+        liquidity = float(market_dict.get("liquidityNum") or 0)
+        volume = float(market_dict.get("volumeNum") or market_dict.get("volume") or 0)
+        volume24hr = float(market_dict.get("volume24hr", 0))
+        volume1wk = float(market_dict.get("volume1wk", 0))
+        volume1mo = float(market_dict.get("volume1mo", 0))
+        volume1yr = float(market_dict.get("volume1yr", 0))
 
         negRisk = market_dict.get("negRisk", False)
 
-        bestBid = Decimal(str(market_dict.get("bestBid", 0)))
-        bestAsk = Decimal(str(market_dict.get("bestAsk", 0)))
+        bestBid = float(market_dict.get("bestBid", 0))
+        bestAsk = float(market_dict.get("bestAsk", 0))
 
         endDate = market_dict.get("endDate", "")
         events = market_dict.get("events", [])
@@ -124,7 +124,7 @@ def parse_market_from_api(market_dict: dict) -> Market | None:
         # Parse reward-related fields
         uma_reward = None
         if market_dict.get("umaReward") is not None:
-            uma_reward = Decimal(str(market_dict.get("umaReward", 0)))
+            uma_reward = float(market_dict.get("umaReward", 0))
 
         clob_rewards = None
         if market_dict.get("clobRewards"):
@@ -134,8 +134,8 @@ def parse_market_from_api(market_dict: dict) -> Market | None:
                         id=str(r.get("id", "")),
                         conditionId=str(r.get("conditionId", "")),
                         assetAddress=str(r.get("assetAddress", "")),
-                        rewardsAmount=Decimal(str(r.get("rewardsAmount", 0))),
-                        rewardsDailyRate=Decimal(str(r.get("rewardsDailyRate", 0))),
+                        rewardsAmount=float(r.get("rewardsAmount", 0)),
+                        rewardsDailyRate=float(r.get("rewardsDailyRate", 0)),
                         startDate=str(r.get("startDate", "")),
                         endDate=str(r.get("endDate", "")),
                     )
@@ -146,11 +146,11 @@ def parse_market_from_api(market_dict: dict) -> Market | None:
 
         rewards_min_size = None
         if market_dict.get("rewardsMinSize") is not None:
-            rewards_min_size = Decimal(str(market_dict.get("rewardsMinSize", 0)))
+            rewards_min_size = float(market_dict.get("rewardsMinSize", 0))
 
         rewards_max_spread = None
         if market_dict.get("rewardsMaxSpread") is not None:
-            rewards_max_spread = Decimal(str(market_dict.get("rewardsMaxSpread", 0)))
+            rewards_max_spread = float(market_dict.get("rewardsMaxSpread", 0))
 
         holding_rewards_enabled = market_dict.get("holdingRewardsEnabled")
         fees_enabled = market_dict.get("feesEnabled")

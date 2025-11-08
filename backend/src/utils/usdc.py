@@ -1,7 +1,28 @@
-from decimal import Decimal, InvalidOperation
-
 USDC_DECIMALS = 6
 USDC_DECIMALS_MULT = 10**USDC_DECIMALS
+
+
+def from_usdc_float(usdc_units: int | str | None) -> float:
+    """
+    Convert USDC from on-chain units (6 decimals) to a float value.
+
+    Args:
+        usdc_units: Value in USDC's smallest unit (1 USDC = 1,000,000 units)
+
+    Returns:
+        Float representation of the USDC value
+
+    Examples:
+        1_000_000 -> 1.0
+        100_000_000 -> 100.0
+        0 -> 0.0
+    """
+    if usdc_units is None:
+        return 0.0
+    try:
+        return float(usdc_units) / USDC_DECIMALS_MULT
+    except (ValueError, TypeError):
+        return 0.0
 
 
 def to_usdc(value: float) -> str:
@@ -11,13 +32,3 @@ def to_usdc(value: float) -> str:
         return str(scaled)  # Return as string for GraphQL
     except (ValueError, TypeError):
         raise ValueError(f"Invalid value for conversion: {value}") from None
-
-
-def from_usdc_decimal(value: object) -> Decimal:
-    """Convert scaled integer (from API) to Decimal. Returns Decimal(0) if value is None or invalid."""
-    try:
-        if value is None:
-            return Decimal(0)
-        return Decimal(str(value)) / Decimal(USDC_DECIMALS_MULT)
-    except (InvalidOperation, TypeError, ValueError):
-        return Decimal(0)
