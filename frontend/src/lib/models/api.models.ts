@@ -36,6 +36,16 @@ export type MarketEvent = {
   [key: string]: any; // other event properties we don't need to type
 };
 
+export type ClobReward = {
+  id: string;
+  conditionId: string;
+  assetAddress: string;
+  rewardsAmount: number;
+  rewardsDailyRate: number;
+  startDate: string;
+  endDate: string;
+};
+
 export type Market = {
   condition_id: string;
   question: string;
@@ -56,6 +66,13 @@ export type Market = {
   bestAsk: number;
   endDate: string;
   events?: MarketEvent[]; // events array from Polymarket API
+  // Reward-related fields
+  umaReward?: number | null;
+  clobRewards?: ClobReward[] | null;
+  rewardsMinSize?: number | null;
+  rewardsMaxSpread?: number | null;
+  holdingRewardsEnabled?: boolean | null;
+  feesEnabled?: boolean | null;
 };
 
 export type MarketResponse = {

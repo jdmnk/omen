@@ -9,6 +9,17 @@ from sqlalchemy.orm import Mapped, mapped_column
 from src.models.base import Base
 
 
+class ClobReward(BaseModel):
+    """Schema for a single CLOB reward configuration."""
+    id: str
+    conditionId: str
+    assetAddress: str
+    rewardsAmount: Decimal
+    rewardsDailyRate: Decimal
+    startDate: str
+    endDate: str
+
+
 class Market(Base):
     __tablename__ = "markets"
 
@@ -58,6 +69,13 @@ class MarketSchema(BaseModel):
     bestAsk: Decimal = Field(ge=0)
     endDate: str
     events: list[dict] | None = None
+    # Reward-related fields
+    umaReward: Decimal | None = None
+    clobRewards: list[ClobReward] | None = None
+    rewardsMinSize: Decimal | None = None
+    rewardsMaxSpread: Decimal | None = None
+    holdingRewardsEnabled: bool | None = None
+    feesEnabled: bool | None = None
 
     class Config:
         from_attributes = True
@@ -100,6 +118,40 @@ def parse_market_from_api(market_dict: dict) -> MarketSchema | None:
         endDate = market_dict.get("endDate", "")
         events = market_dict.get("events", [])
 
+        # Parse reward-related fields
+        uma_reward = None
+        if market_dict.get("umaReward") is not None:
+            uma_reward = Decimal(str(market_dict.get("umaReward", 0)))
+
+        clob_rewards = None
+        if market_dict.get("clobRewards"):
+            try:
+                clob_rewards = [
+                    ClobReward(
+                        id=str(r.get("id", "")),
+                        conditionId=str(r.get("conditionId", "")),
+                        assetAddress=str(r.get("assetAddress", "")),
+                        rewardsAmount=Decimal(str(r.get("rewardsAmount", 0))),
+                        rewardsDailyRate=Decimal(str(r.get("rewardsDailyRate", 0))),
+                        startDate=str(r.get("startDate", "")),
+                        endDate=str(r.get("endDate", "")),
+                    )
+                    for r in market_dict.get("clobRewards", [])
+                ]
+            except (ValueError, TypeError, KeyError):
+                clob_rewards = None
+
+        rewards_min_size = None
+        if market_dict.get("rewardsMinSize") is not None:
+            rewards_min_size = Decimal(str(market_dict.get("rewardsMinSize", 0)))
+
+        rewards_max_spread = None
+        if market_dict.get("rewardsMaxSpread") is not None:
+            rewards_max_spread = Decimal(str(market_dict.get("rewardsMaxSpread", 0)))
+
+        holding_rewards_enabled = market_dict.get("holdingRewardsEnabled")
+        fees_enabled = market_dict.get("feesEnabled")
+
         return MarketSchema(
             condition_id=condition_id,
             question=question,
@@ -121,6 +173,12 @@ def parse_market_from_api(market_dict: dict) -> MarketSchema | None:
             bestAsk=bestAsk,
             endDate=endDate,
             events=events,
+            umaReward=uma_reward,
+            clobRewards=clob_rewards,
+            rewardsMinSize=rewards_min_size,
+            rewardsMaxSpread=rewards_max_spread,
+            holdingRewardsEnabled=holding_rewards_enabled,
+            feesEnabled=fees_enabled,
         )
     except (ValueError, KeyError, TypeError):
         # Log error but don't crash - just skip this item
