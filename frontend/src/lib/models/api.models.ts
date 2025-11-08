@@ -4,17 +4,18 @@ export * from "./api.models.generated";
 // Re-export frontend-only models
 export * from "./frontend.models";
 
-// Convenience aliases for backward compatibility
-import type { TopHolderSchema as TopHolderGenerated } from "./api.models.generated";
+// Import types for re-export
+import type { TopHolder as TopHolderGenerated } from "./api.models.generated";
 
+// Convenience aliases for backward compatibility
 export type {
   Market,
   Event,
   Trade,
-  TopHolderSchema,
   MarketSearchResponse as MarketResponse,
 } from "./api.models.generated";
 
+// Re-export TopHolder
 export type TopHolder = TopHolderGenerated;
 
 // UserPosition is a frontend-specific Position model, different from backend Position (graph model)

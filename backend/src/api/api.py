@@ -3,7 +3,7 @@ from datetime import datetime
 from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
 
-from src.analytics.top_holders_analysis import TopHolderSchema, get_top_holders_with_wallet_info
+from src.analytics.top_holders_analysis import TopHolder, get_top_holders_with_wallet_info
 from src.analytics.trades_analytics import (
     UserTradesGroup,
     group_trades_by_user_detailed,
@@ -101,12 +101,12 @@ async def search_markets(q: str = Query(min_length=1)) -> SearchResponse:
     return await poly_client.search_markets(q)
 
 
-@app.get("/markets/top-holders", response_model=list[TopHolderSchema])
+@app.get("/markets/top-holders", response_model=list[TopHolder])
 async def get_top_holders_with_wallet_info_endpoint(
     condition_id: str = Query(min_length=1),
     token1: str = Query(min_length=1),
     token2: str = Query(min_length=1),
-) -> list[TopHolderSchema]:
+) -> list[TopHolder]:
     holders = await get_top_holders_with_wallet_info(condition_id, [token1, token2])
 
     if not holders:

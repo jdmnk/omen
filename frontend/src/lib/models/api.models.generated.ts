@@ -381,10 +381,10 @@ export interface components {
             } | null;
         };
         /**
-         * TopHolderSchema
-         * @description Polymarket holder schema enriched with wallet information and position data.
+         * TopHolder
+         * @description Polymarket holder enriched with wallet information and position data.
          */
-        "TopHolderSchema-Input": {
+        TopHolder: {
             /** Proxywallet */
             proxyWallet: string;
             /** Bio */
@@ -410,51 +410,13 @@ export interface components {
             /** Walletlasttransfer */
             walletLastTransfer?: string | null;
             /** Walletbalance */
-            walletBalance?: number | string | null;
+            walletBalance?: number | null;
             /** Avgprice */
-            avgPrice?: number | string | null;
+            avgPrice?: number | null;
             /** Realizedpnl */
-            realizedPnl?: number | string | null;
+            realizedPnl?: number | null;
             /** Totalbought */
-            totalBought?: number | string | null;
-        };
-        /**
-         * TopHolderSchema
-         * @description Polymarket holder schema enriched with wallet information and position data.
-         */
-        "TopHolderSchema-Output": {
-            /** Proxywallet */
-            proxyWallet: string;
-            /** Bio */
-            bio?: string | null;
-            /** Asset */
-            asset: string;
-            /** Pseudonym */
-            pseudonym?: string | null;
-            /** Amount */
-            amount: number;
-            /** Displayusernamepublic */
-            displayUsernamePublic: boolean;
-            /** Outcomeindex */
-            outcomeIndex: number;
-            /** Name */
-            name?: string | null;
-            /** Profileimage */
-            profileImage?: string | null;
-            /** Profileimageoptimized */
-            profileImageOptimized?: string | null;
-            /** Walletcreatedat */
-            walletCreatedAt?: string | null;
-            /** Walletlasttransfer */
-            walletLastTransfer?: string | null;
-            /** Walletbalance */
-            walletBalance?: string | null;
-            /** Avgprice */
-            avgPrice?: string | null;
-            /** Realizedpnl */
-            realizedPnl?: string | null;
-            /** Totalbought */
-            totalBought?: string | null;
+            totalBought?: number | null;
         };
         /** Trade */
         Trade: {
@@ -754,7 +716,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["TopHolderSchema-Output"][];
+                    "application/json": components["schemas"]["TopHolder"][];
                 };
             };
             /** @description Validation Error */
@@ -815,8 +777,7 @@ export type MessageResponse = components["schemas"]["MessageResponse"];
 export type SearchEventItem = components["schemas"]["SearchEventItem"];
 export type SearchMarketItem = components["schemas"]["SearchMarketItem"];
 export type SearchResponse = components["schemas"]["SearchResponse"];
-export type TopHolderSchemaInput = components["schemas"]["TopHolderSchema-Input"];
-export type TopHolderSchema = components["schemas"]["TopHolderSchema-Output"];
+export type TopHolder = components["schemas"]["TopHolder"];
 export type Trade = components["schemas"]["Trade"];
 export type UserTradesGroup = components["schemas"]["UserTradesGroup"];
 export type ValidationError = components["schemas"]["ValidationError"];
