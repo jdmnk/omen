@@ -3,7 +3,7 @@ from datetime import datetime
 from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
 
-from src.analytics.top_holders_analysis import TopHolderAnalysis, get_top_holders_with_wallet_info
+from src.analytics.top_holders_analysis import TopHolderAnalysis, get_top_holders_analysis
 from src.db.selects import SelectsClient
 from src.models.responses import (
     EventResponse,
@@ -45,7 +45,7 @@ def health() -> HealthResponse:
 
 
 @app.get("/markets/search-slug", response_model=MarketSearchResponse)
-async def search_markets_slug(slug: str = Query(min_length=1)) -> MarketSearchResponse:
+async def get_market_by_slug_endpoint(slug: str = Query(min_length=1)) -> MarketSearchResponse:
     """
     Get a market by its slug from Polymarket Gamma API.
 
@@ -59,7 +59,7 @@ async def search_markets_slug(slug: str = Query(min_length=1)) -> MarketSearchRe
 
 
 @app.get("/markets/trades", response_model=list[Trade])
-async def get_market_trades(condition_id: str = Query(min_length=1)) -> list[Trade]:
+async def get_market_trades_endpoint(condition_id: str = Query(min_length=1)) -> list[Trade]:
     trades = await poly_client.get_market_trades([condition_id])
 
     if trades is not None and len(trades) > 0:
@@ -69,7 +69,7 @@ async def get_market_trades(condition_id: str = Query(min_length=1)) -> list[Tra
 
 
 @app.get("/markets/search", response_model=SearchResponse)
-async def search_markets(q: str = Query(min_length=1)) -> SearchResponse:
+async def get_search_markets_endpoint(q: str = Query(min_length=1)) -> SearchResponse:
     """
     Search for markets using Polymarket Gamma API.
     Returns events with their markets, filtered to only active markets.
@@ -77,13 +77,13 @@ async def search_markets(q: str = Query(min_length=1)) -> SearchResponse:
     return await poly_client.search_markets(q)
 
 
-@app.get("/markets/top-holders", response_model=list[TopHolderAnalysis])
-async def get_top_holders_with_wallet_info_endpoint(
+@app.get("/markets/top-holders-analysis", response_model=list[TopHolderAnalysis])
+async def get_top_holders_analysis_endpoint(
     condition_id: str = Query(min_length=1),
     token1: str = Query(min_length=1),
     token2: str = Query(min_length=1),
 ) -> list[TopHolderAnalysis]:
-    holders = await get_top_holders_with_wallet_info(condition_id, [token1, token2])
+    holders = await get_top_holders_analysis(condition_id, [token1, token2])
 
     if not holders:
         raise HTTPException(status_code=404, detail="Top holders not found")
@@ -92,7 +92,7 @@ async def get_top_holders_with_wallet_info_endpoint(
 
 
 @app.get("/events/{event_id}", response_model=EventResponse)
-async def get_event_by_id(event_id: str) -> EventResponse:
+async def get_event_by_id_endpoint(event_id: str) -> EventResponse:
     """
     Get an event by its ID from Polymarket Gamma API.
 

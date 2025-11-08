@@ -18,7 +18,7 @@ def filter_blacklisted_wallets(holders: list[TopHolder]) -> list[TopHolder]:
     ]
 
 
-async def get_top_holders_with_wallet_info(
+async def get_top_holders_analysis(
     condition_id: str, token_ids: list[str]
 ) -> list[TopHolderAnalysis]:
     """
