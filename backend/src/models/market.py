@@ -8,6 +8,10 @@ from sqlalchemy.orm import Mapped, mapped_column
 
 from src.models.base import Base
 
+from src.utils.logging_config import get_logger
+
+logger = get_logger(__name__)
+
 
 class ClobReward(BaseModel):
     """Schema for a single CLOB reward configuration."""
@@ -52,9 +56,10 @@ class MarketDB(Base):
 
 # Pydantic model for API validation and serialization
 class Market(BaseModel):
-    condition_id: str
+    conditionId: str
     question: str
     icon: str
+    image: str
     outcomes: str
     outcomePrices: str
     slug: str
@@ -72,6 +77,10 @@ class Market(BaseModel):
     bestAsk: float = Field(ge=0, le=1)
     endDate: str
     events: list[dict] | None = None
+    active: bool
+    closed: bool
+    groupItemTitle: str
+
     # Reward-related fields
     umaReward: float | None = None
     clobRewards: list[ClobReward] | None = None
@@ -86,8 +95,8 @@ class Market(BaseModel):
 
 def parse_market_from_api(market_dict: dict) -> Market | None:
     try:
-        condition_id = market_dict.get("conditionId")
-        if not condition_id:
+        conditionId = market_dict.get("conditionId")
+        if not conditionId:
             return None
 
         slug = market_dict.get("slug", "")
@@ -102,6 +111,7 @@ def parse_market_from_api(market_dict: dict) -> Market | None:
         description = market_dict.get("description")
         question = market_dict.get("question", "")
         icon = market_dict.get("icon", "")
+        image = market_dict.get("image", "")
         outcomes = ",".join(json.loads(market_dict.get("outcomes", "[]")))
         outcomePrices = ",".join(json.loads(market_dict.get("outcomePrices", "[]")))
 
@@ -120,6 +130,9 @@ def parse_market_from_api(market_dict: dict) -> Market | None:
 
         endDate = market_dict.get("endDate", "")
         events = market_dict.get("events", [])
+        active = bool(market_dict.get("active"))
+        closed = bool(market_dict.get("closed"))
+        groupItemTitle = market_dict.get("groupItemTitle", "")
 
         # Parse reward-related fields
         uma_reward = None
@@ -156,9 +169,10 @@ def parse_market_from_api(market_dict: dict) -> Market | None:
         fees_enabled = market_dict.get("feesEnabled")
 
         return Market(
-            condition_id=condition_id,
+            conditionId=conditionId,
             question=question,
             icon=icon,
+            image=image,
             outcomes=outcomes,
             outcomePrices=outcomePrices,
             slug=slug,
@@ -182,7 +196,10 @@ def parse_market_from_api(market_dict: dict) -> Market | None:
             rewardsMaxSpread=rewards_max_spread,
             holdingRewardsEnabled=holding_rewards_enabled,
             feesEnabled=fees_enabled,
+            active=active,
+            closed=closed,
+            groupItemTitle=groupItemTitle,
         )
     except (ValueError, KeyError, TypeError):
-        # Log error but don't crash - just skip this item
+        logger.error(f"Error parsing market from API: {market_dict}")
         return None

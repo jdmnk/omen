@@ -42,23 +42,6 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/markets/autocomplete": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Autocomplete Markets */
-        get: operations["autocomplete_markets_markets_autocomplete_get"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
     "/markets/search-slug": {
         parameters: {
             query?: never;
@@ -90,23 +73,6 @@ export interface paths {
         };
         /** Get Market Trades */
         get: operations["get_market_trades_markets_trades_get"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/markets/trades/analytics": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Get Market Trades Analytics */
-        get: operations["get_market_trades_analytics_markets_trades_analytics_get"];
         put?: never;
         post?: never;
         delete?: never;
@@ -200,7 +166,7 @@ export interface components {
             endDate: string;
         };
         /** Event */
-        Event: {
+        "Event-Input": {
             /** Id */
             id: string;
             /** Slug */
@@ -209,17 +175,28 @@ export interface components {
             title: string;
             /** Closed */
             closed: boolean;
-            /** Raw */
-            raw: {
-                [key: string]: unknown;
-            };
+            /** Markets */
+            markets?: components["schemas"]["Market"][] | null;
+        };
+        /** Event */
+        "Event-Output": {
+            /** Id */
+            id: string;
+            /** Slug */
+            slug: string;
+            /** Title */
+            title: string;
+            /** Closed */
+            closed: boolean;
+            /** Markets */
+            markets?: components["schemas"]["Market"][] | null;
         };
         /**
          * EventResponse
          * @description Wrapper response for single event.
          */
         EventResponse: {
-            event: components["schemas"]["Event"];
+            event: components["schemas"]["Event-Output"];
         };
         /** HTTPValidationError */
         HTTPValidationError: {
@@ -236,12 +213,14 @@ export interface components {
         };
         /** Market */
         Market: {
-            /** Condition Id */
-            condition_id: string;
+            /** Conditionid */
+            conditionId: string;
             /** Question */
             question: string;
             /** Icon */
             icon: string;
+            /** Image */
+            image: string;
             /** Outcomes */
             outcomes: string;
             /** Outcomeprices */
@@ -278,6 +257,12 @@ export interface components {
             events?: {
                 [key: string]: unknown;
             }[] | null;
+            /** Active */
+            active: boolean;
+            /** Closed */
+            closed: boolean;
+            /** Groupitemtitle */
+            groupItemTitle: string;
             /** Umareward */
             umaReward?: number | null;
             /** Clobrewards */
@@ -290,16 +275,6 @@ export interface components {
             holdingRewardsEnabled?: boolean | null;
             /** Feesenabled */
             feesEnabled?: boolean | null;
-        };
-        /**
-         * MarketAutocompleteItem
-         * @description Market autocomplete item for typeahead.
-         */
-        MarketAutocompleteItem: {
-            /** Slug */
-            slug: string;
-            /** Question */
-            question: string;
         };
         /**
          * MarketSearchResponse
@@ -483,30 +458,6 @@ export interface components {
             /** Transactionhash */
             transactionHash: string;
         };
-        /**
-         * UserTradesGroup
-         * @description Trades-based group per user for a single condition (market).
-         */
-        UserTradesGroup: {
-            /** Proxywallet */
-            proxyWallet: string;
-            /** Name */
-            name?: string | null;
-            /** Pseudonym */
-            pseudonym?: string | null;
-            /** Profileimage */
-            profileImage?: string | null;
-            /** Totalvolume */
-            totalVolume: number;
-            /** Totalnotional */
-            totalNotional: number;
-            /** Totalusdvolume */
-            totalUsdVolume: number;
-            /** Totalholdings */
-            totalHoldings: number;
-            /** Trades */
-            trades: components["schemas"]["Trade"][];
-        };
         /** ValidationError */
         ValidationError: {
             /** Location */
@@ -565,38 +516,6 @@ export interface operations {
             };
         };
     };
-    autocomplete_markets_markets_autocomplete_get: {
-        parameters: {
-            query: {
-                q: string;
-                limit?: number;
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["MarketAutocompleteItem"][];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
     search_markets_slug_markets_search_slug_get: {
         parameters: {
             query: {
@@ -646,37 +565,6 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["Trade"][];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    get_market_trades_analytics_markets_trades_analytics_get: {
-        parameters: {
-            query: {
-                condition_id: string;
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["UserTradesGroup"][];
                 };
             };
             /** @description Validation Error */
@@ -790,12 +678,12 @@ export interface operations {
 
 // Clean type exports (no need to access via components["schemas"])
 export type ClobReward = components["schemas"]["ClobReward"];
-export type Event = components["schemas"]["Event"];
+export type EventInput = components["schemas"]["Event-Input"];
+export type Event = components["schemas"]["Event-Output"];
 export type EventResponse = components["schemas"]["EventResponse"];
 export type HTTPValidationError = components["schemas"]["HTTPValidationError"];
 export type HealthResponse = components["schemas"]["HealthResponse"];
 export type Market = components["schemas"]["Market"];
-export type MarketAutocompleteItem = components["schemas"]["MarketAutocompleteItem"];
 export type MarketSearchResponse = components["schemas"]["MarketSearchResponse"];
 export type MessageResponse = components["schemas"]["MessageResponse"];
 export type SearchEventItem = components["schemas"]["SearchEventItem"];
@@ -803,5 +691,4 @@ export type SearchMarketItem = components["schemas"]["SearchMarketItem"];
 export type SearchResponse = components["schemas"]["SearchResponse"];
 export type TopHolder = components["schemas"]["TopHolder"];
 export type Trade = components["schemas"]["Trade"];
-export type UserTradesGroup = components["schemas"]["UserTradesGroup"];
 export type ValidationError = components["schemas"]["ValidationError"];

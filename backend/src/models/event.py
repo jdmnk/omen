@@ -1,28 +1,7 @@
 from __future__ import annotations
 
-from datetime import datetime
-
 from pydantic import BaseModel
-from sqlalchemy import Boolean, DateTime, String, func
-from sqlalchemy.dialects.postgresql import JSONB
-from sqlalchemy.orm import Mapped, mapped_column
-
-from src.models.base import Base
-
-
-class EventDB(Base):
-    """SQLAlchemy ORM model for events table."""
-
-    __tablename__ = "events"
-
-    id: Mapped[str] = mapped_column(String, primary_key=True)
-    fetched_at: Mapped[datetime] = mapped_column(
-        DateTime, server_default=func.now(), onupdate=func.now()
-    )
-    slug: Mapped[str] = mapped_column(String, nullable=False, index=True)
-    title: Mapped[str] = mapped_column(String, nullable=False)
-    closed: Mapped[bool] = mapped_column(Boolean, nullable=False)
-    raw: Mapped[dict] = mapped_column(JSONB, nullable=False)
+from src.models.market import Market, parse_market_from_api
 
 
 class Event(BaseModel):
@@ -30,7 +9,7 @@ class Event(BaseModel):
     slug: str
     title: str
     closed: bool
-    raw: dict
+    markets: list[Market] | None = None
 
     class Config:
         from_attributes = True
@@ -54,12 +33,15 @@ def parse_event_from_api(event_dict: dict) -> Event | None:
         if isinstance(closed_raw, str):
             closed = closed_raw.lower() == "true"
 
+        markets_raw = event_dict.get("markets", [])
+        markets = [parse_market_from_api(m) for m in markets_raw]
+
         return Event(
             id=str(event_id),
             slug=slug,
             title=title,
             closed=closed,
-            raw=event_dict,
+            markets=markets,
         )
     except Exception:
         return None
