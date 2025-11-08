@@ -13,14 +13,7 @@ export function TerminalLayout() {
   const params = useParams();
   const marketSlug = params?.slug as string | undefined;
 
-  const {
-    data: marketData,
-    isLoading,
-    error,
-  } = useMarketBySlugQuery(marketSlug);
-
-  const market = marketData?.market;
-  console.log(market);
+  const { data: market, isLoading, error } = useMarketBySlugQuery(marketSlug);
 
   return (
     <div className="h-screen bg-background flex flex-col overflow-hidden">

@@ -2,10 +2,10 @@
 
 import { useQuery } from "@tanstack/react-query";
 import { getBaseUrl } from "../api";
-import { MarketResponse } from "@/lib/models/api.models";
+import { Market } from "@/lib/models/api.models";
 
 export function useMarketBySlugQuery(slug: string | undefined) {
-  return useQuery<MarketResponse>({
+  return useQuery<Market>({
     queryKey: ["market-by-slug", slug],
     queryFn: async () => {
       const response = await fetch(
@@ -17,7 +17,8 @@ export function useMarketBySlugQuery(slug: string | undefined) {
         throw new Error(`Failed to fetch market: ${response.statusText}`);
       }
 
-      const data = (await response.json()) as MarketResponse;
+      const data = (await response.json()) as Market;
+      console.log(data);
       return data;
     },
     enabled: !!slug && slug.length > 0,

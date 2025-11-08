@@ -24,7 +24,8 @@ export function useTopHoldersAnalysisQuery(
         throw new Error("Failed to fetch top holders with wallet info");
       }
 
-      return res.json();
+      const data = (await res.json()) as TopHolderAnalysis[];
+      return data ?? [];
     },
     enabled: !!conditionId && !!token1 && !!token2,
     staleTime: 120000, // 2 minutes
