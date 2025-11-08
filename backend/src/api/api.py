@@ -5,10 +5,10 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from src.analytics.top_holders_analysis import TopHolderAnalysis, get_top_holders_analysis
 from src.db.selects import SelectsClient
+from src.models.event import Event
+from src.models.market import Market
 from src.models.responses import (
-    EventResponse,
     HealthResponse,
-    MarketSearchResponse,
     MessageResponse,
 )
 from src.models.search import SearchResponse
@@ -44,8 +44,8 @@ def health() -> HealthResponse:
     return HealthResponse(status="ok")
 
 
-@app.get("/markets/search-slug", response_model=MarketSearchResponse)
-async def get_market_by_slug_endpoint(slug: str = Query(min_length=1)) -> MarketSearchResponse:
+@app.get("/markets/search-slug", response_model=Market)
+async def get_market_by_slug_endpoint(slug: str = Query(min_length=1)) -> Market:
     """
     Get a market by its slug from Polymarket Gamma API.
 
@@ -55,7 +55,7 @@ async def get_market_by_slug_endpoint(slug: str = Query(min_length=1)) -> Market
     if result is None:
         raise HTTPException(status_code=404, detail="Market not found")
 
-    return MarketSearchResponse(market=result)
+    return result
 
 
 @app.get("/markets/trades", response_model=list[Trade])
@@ -91,8 +91,8 @@ async def get_top_holders_analysis_endpoint(
     return holders
 
 
-@app.get("/events/{event_id}", response_model=EventResponse)
-async def get_event_by_id_endpoint(event_id: str) -> EventResponse:
+@app.get("/events/{event_id}", response_model=Event)
+async def get_event_by_id_endpoint(event_id: str) -> Event:
     """
     Get an event by its ID from Polymarket Gamma API.
 
@@ -102,4 +102,4 @@ async def get_event_by_id_endpoint(event_id: str) -> EventResponse:
     if result is None:
         raise HTTPException(status_code=404, detail="Event not found")
 
-    return EventResponse(event=result)
+    return result
