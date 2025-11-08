@@ -23,4 +23,3 @@ class PolymarketHoldersResponse(BaseModel):
 
     token: str
     holders: list[PolymarketHolder]
-

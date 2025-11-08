@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from pydantic import BaseModel
+
 from src.models.market import Market, parse_market_from_api
 
 

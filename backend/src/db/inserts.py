@@ -4,11 +4,11 @@ from sqlalchemy import text
 from sqlalchemy.dialects.postgresql import insert as pg_insert
 
 from src.db.db_core import DbCore
-from src.models.event import EventDB, Event
+from src.models.event import Event, EventDB
 from src.models.event_market import EventMarket
-from src.models.market import MarketDB, Market
-from src.models.trade import TradeDB, Trade
-from src.models.user_position import UserPositionDB, UserPosition
+from src.models.market import Market, MarketDB
+from src.models.trade import Trade, TradeDB
+from src.models.user_position import UserPosition, UserPositionDB
 from src.utils.logging_config import get_logger
 
 logger = get_logger(__name__)
@@ -128,7 +128,7 @@ class InsertsClient:
         return total
 
     async def insert_user_positions(
-        self, positions: list[UserPositionSchema], chunk_size: int = 1000
+        self, positions: list[UserPosition], chunk_size: int = 1000
     ) -> int:
         if not positions:
             return 0

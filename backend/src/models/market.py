@@ -7,7 +7,6 @@ from sqlalchemy import Boolean, DateTime, Numeric, String, func
 from sqlalchemy.orm import Mapped, mapped_column
 
 from src.models.base import Base
-
 from src.utils.logging_config import get_logger
 
 logger = get_logger(__name__)

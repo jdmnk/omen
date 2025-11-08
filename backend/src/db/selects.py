@@ -3,7 +3,7 @@ from __future__ import annotations
 from sqlalchemy import select, text
 
 from src.db.db_core import DbCore
-from src.models.market import MarketDB, Market
+from src.models.market import Market, MarketDB
 
 
 class SelectsClient:

@@ -11,6 +11,7 @@ from src.models.base import Base
 
 class TradeDB(Base):
     """SQLAlchemy ORM model for trades table."""
+
     __tablename__ = "trades"
 
     transactionHash: Mapped[str] = mapped_column(String, primary_key=True)
@@ -78,7 +79,9 @@ def parse_trade_from_api(trade_dict: dict) -> Trade | None:
             icon=str(trade_dict.get("icon", "")),
             eventSlug=str(trade_dict.get("eventSlug", "")),
             outcome=str(trade_dict.get("outcome", "")),
-            outcomeIndex=int(trade_dict.get("outcomeIndex")) if trade_dict.get("outcomeIndex") is not None else 0,
+            outcomeIndex=int(trade_dict.get("outcomeIndex"))
+            if trade_dict.get("outcomeIndex") is not None
+            else 0,
             name=str(trade_dict.get("name", "")),
             pseudonym=str(trade_dict.get("pseudonym", "")),
             bio=str(trade_dict.get("bio", "")),

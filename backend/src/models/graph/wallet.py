@@ -10,6 +10,7 @@ from src.utils.usdc import from_usdc_float
 
 class WalletDB(Base):
     """SQLAlchemy ORM model for wallets table."""
+
     __tablename__ = "wallets"
 
     id: Mapped[str] = mapped_column(String, primary_key=True)

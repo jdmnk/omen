@@ -8,6 +8,7 @@ from src.utils.usdc import from_usdc_float
 
 class PositionDB(Base):
     """SQLAlchemy ORM model for positions table."""
+
     __tablename__ = "positions"
 
     id: Mapped[str] = mapped_column(String, primary_key=True)
