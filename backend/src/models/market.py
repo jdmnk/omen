@@ -102,8 +102,8 @@ def parse_market_from_api(market_dict: dict) -> Market | None:
         description = market_dict.get("description")
         question = market_dict.get("question", "")
         icon = market_dict.get("icon", "")
-        outcomes = ", ".join(json.loads(market_dict.get("outcomes", "[]")))
-        outcomePrices = ", ".join(json.loads(market_dict.get("outcomePrices", "[]")))
+        outcomes = ",".join(json.loads(market_dict.get("outcomes", "[]")))
+        outcomePrices = ",".join(json.loads(market_dict.get("outcomePrices", "[]")))
 
         # Get numeric fields with defaults
         liquidity = Decimal(str(market_dict.get("liquidityNum") or 0))
