@@ -8,7 +8,7 @@
     "start": "next start",
     "type-check": "tsc --noEmit",
     "lint": "eslint",
-    "generate-types": "cd ../backend && poetry run python scripts/generate_types.py"
+    "type-gen": "cd ../backend && poetry run python scripts/generate_types.py"
   },
   "dependencies": {
     "@radix-ui/react-dialog": "^1.1.15",
