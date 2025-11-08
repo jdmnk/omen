@@ -414,10 +414,10 @@ class PolyClient:
                                 "category": market.get("category"),
                                 "liquidity": market.get("liquidity"),
                                 "volume": market.get("volume"),
-                                "outcomePrices": ", ".join(
+                                "outcomePrices": ",".join(
                                     json.loads(market.get("outcomePrices", "[]"))
                                 ),
-                                "outcomes": ", ".join(json.loads(market.get("outcomes", "[]"))),
+                                "outcomes": ",".join(json.loads(market.get("outcomes", "[]"))),
                                 "active": market.get("active", False),
                                 "closed": market.get("closed", False),
                                 "icon": market.get("icon"),
