@@ -4,10 +4,6 @@ from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
 
 from src.analytics.top_holders_analysis import TopHolder, get_top_holders_with_wallet_info
-from src.analytics.trades_analytics import (
-    UserTradesGroup,
-    group_trades_by_user_detailed,
-)
 from src.db.selects import SelectsClient
 from src.models.responses import (
     EventResponse,
@@ -80,16 +76,6 @@ async def get_market_trades(condition_id: str = Query(min_length=1)) -> list[Tra
         return trades
     else:
         raise HTTPException(status_code=404, detail="Trades not found")
-
-
-@app.get("/markets/trades/analytics", response_model=list[UserTradesGroup])
-async def get_market_trades_analytics(
-    condition_id: str = Query(min_length=1),
-) -> list[UserTradesGroup]:
-    trades = await poly_client.get_market_trades([condition_id])
-    if trades is None or len(trades) == 0:
-        raise HTTPException(status_code=404, detail="Trades not found")
-    return group_trades_by_user_detailed(trades)
 
 
 @app.get("/markets/search", response_model=SearchResponse)
