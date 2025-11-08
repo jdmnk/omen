@@ -5,6 +5,7 @@ import { formatNumber, formatCurrency } from "@/lib/ui/format.utils";
 import { ExternalLink } from "lucide-react";
 import Link from "next/link";
 import { useUserPositionsQuery } from "@/lib/queries/user-positions.query";
+import Image from "next/image";
 
 export function UserPositions({ userId }: { userId: string }) {
   const { data: positions, isLoading, error } = useUserPositionsQuery(userId);
@@ -86,7 +87,7 @@ export function UserPositions({ userId }: { userId: string }) {
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-1">
                     {position.icon && (
-                      <img
+                      <Image
                         src={position.icon}
                         alt=""
                         className="w-4 h-4 rounded"

@@ -35,7 +35,7 @@ const HOLDER_ROW_GRID_CLASSES =
 
 function HolderTagIcon({ icon }: { icon: HolderTagIcon }) {
   const iconPath = `/icons/${icon}.svg`;
-  return <img src={iconPath} alt="" className="w-4 h-4" />;
+  return <Image src={iconPath} alt="" className="w-4 h-4" />;
 }
 
 function TabItemContent({ label, number }: { label: string; number: number }) {
