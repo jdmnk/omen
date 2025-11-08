@@ -1,21 +1,21 @@
 import asyncio
 import signal
 
-from src.db.database_client import DatabaseClient
+from src.db.inserts import InsertsClient
 from src.polymarket.poly_client import PolyClient
 from src.utils.logging_config import get_logger
 
 logger = get_logger(__name__)
 
 
-async def update_markets(poly_client: PolyClient, db_client: DatabaseClient):
-    markets = await poly_client.get_active_markets()
-    await db_client.insert_markets(markets)
+async def update_markets(poly_client: PolyClient, inserts: InsertsClient):
+    markets = await poly_client.get_active_markets_by_events()
+    await inserts.insert_markets(markets)
 
 
 async def main():
     poly_client = PolyClient()
-    db_client = DatabaseClient()
+    inserts = InsertsClient()
 
     loop = asyncio.get_event_loop()
     stop_event = asyncio.Event()
@@ -31,7 +31,7 @@ async def main():
             logger.error("monitor_positions_task crashed", exc_info=exc)
             stop_event.set()
 
-    monitor_task = asyncio.create_task(update_markets(poly_client=poly_client, db_client=db_client))
+    monitor_task = asyncio.create_task(update_markets(poly_client=poly_client, inserts=inserts))
     monitor_task.add_done_callback(_report_task_error)
     # telegram_task = start_telegram_bot(client, stop_event)
     stop_task = asyncio.create_task(stop_event.wait())

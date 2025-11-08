@@ -1,33 +1,13 @@
+"""Search models from Polymarket Gamma API public-search endpoint."""
+
 from __future__ import annotations
 
 from pydantic import BaseModel
 
-from src.models.event import EventSchema
-from src.models.market import MarketSchema
-
-
-class MessageResponse(BaseModel):
-    message: str
-
-
-class HealthResponse(BaseModel):
-    status: str
-
-
-class MarketAutocompleteItem(BaseModel):
-    slug: str
-    question: str
-
-
-class MarketSearchResponse(BaseModel):
-    market: MarketSchema
-
-
-class EventResponse(BaseModel):
-    event: EventSchema
-
 
 class SearchMarketItem(BaseModel):
+    """Lightweight market data from search API."""
+
     id: str
     question: str
     conditionId: str
@@ -44,6 +24,8 @@ class SearchMarketItem(BaseModel):
 
 
 class SearchEventItem(BaseModel):
+    """Lightweight event data from search API."""
+
     id: str
     ticker: str
     slug: str
@@ -61,30 +43,10 @@ class SearchEventItem(BaseModel):
 
 
 class SearchResponse(BaseModel):
+    """Response from Polymarket search API."""
+
     events: list[SearchEventItem] | None = None
     markets: list[SearchMarketItem] | None = None
     tags: list[dict] | None = None
     profiles: list[dict] | None = None
     pagination: dict | None = None
-
-
-class PolymarketHolder(BaseModel):
-    """Schema for a single holder from Polymarket Data API."""
-
-    proxyWallet: str
-    bio: str | None = None
-    asset: str
-    pseudonym: str | None = None
-    amount: float
-    displayUsernamePublic: bool
-    outcomeIndex: int
-    name: str | None = None
-    profileImage: str | None = None
-    profileImageOptimized: str | None = None
-
-
-class PolymarketHoldersResponse(BaseModel):
-    """Schema for holders response from Polymarket Data API."""
-
-    token: str
-    holders: list[PolymarketHolder]

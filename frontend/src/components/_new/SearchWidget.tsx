@@ -177,13 +177,12 @@ export function SearchWidget({ currentMarket }: { currentMarket?: Market }) {
 
   // Parse event markets from the raw event data
   const { activeEventMarkets, closedEventMarkets } = useMemo(() => {
-    if (!eventData?.raw?.markets)
+    if (!eventData?.markets)
       return { activeEventMarkets: [], closedEventMarkets: [] };
 
-    const activeMarkets = eventData.raw.markets
-      .filter((m: any) => !m.closed && m.active)
-      .map((market: any) => ({
-        id: market.id,
+    const activeMarkets = eventData.markets
+      .filter((m) => !m.closed && m.active)
+      .map((market) => ({
         question: market.groupItemTitle,
         conditionId: market.conditionId,
         slug: market.slug,
@@ -196,10 +195,9 @@ export function SearchWidget({ currentMarket }: { currentMarket?: Market }) {
         closed: false,
       }));
 
-    const closedMarkets = eventData.raw.markets
-      .filter((m: any) => m.closed || !m.active)
-      .map((market: any) => ({
-        id: market.id,
+    const closedMarkets = eventData.markets
+      .filter((m) => m.closed || !m.active)
+      .map((market) => ({
         question: market.groupItemTitle,
         conditionId: market.conditionId,
         slug: market.slug,
@@ -287,7 +285,6 @@ export function SearchWidget({ currentMarket }: { currentMarket?: Market }) {
             emptyMessage="No markets in this event"
             renderItem={(market, index) => {
               const m = market as (typeof eventMarkets)[0];
-              const volume = parseVolume(m.volume);
               const odds = m.odds || 0;
 
               return (
@@ -306,11 +303,11 @@ export function SearchWidget({ currentMarket }: { currentMarket?: Market }) {
                     ) : undefined
                   }
                   rightValue={
-                    volume > 0 ? (
+                    m.volume > 0 ? (
                       <span>
                         vol{" "}
                         <span className="font-bold">
-                          {formatCompactCurrency(volume, 0)}
+                          {formatCompactCurrency(m.volume, 0)}
                         </span>
                       </span>
                     ) : undefined
@@ -330,21 +327,19 @@ export function SearchWidget({ currentMarket }: { currentMarket?: Market }) {
               emptyMessage="No closed markets"
               renderItem={(market, index) => {
                 const m = market as (typeof closedEventMarkets)[0];
-                const volume = parseVolume(m.volume);
 
                 return (
                   <SearchResultItem
-                    key={m.id || index}
                     title={m.question}
                     image={m.displayImage}
                     onClick={() => handleSelectMarket(m.slug)}
                     disabled={true}
                     leftValue={
-                      volume > 0 ? (
+                      m.volume > 0 ? (
                         <span>
                           vol{" "}
                           <span className="font-bold">
-                            {formatCompactCurrency(volume, 0)}
+                            {formatCompactCurrency(m.volume, 0)}
                           </span>
                         </span>
                       ) : undefined

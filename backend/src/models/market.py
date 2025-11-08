@@ -7,9 +7,26 @@ from sqlalchemy import Boolean, DateTime, Numeric, String, func
 from sqlalchemy.orm import Mapped, mapped_column
 
 from src.models.base import Base
+from src.utils.logging_config import get_logger
+
+logger = get_logger(__name__)
 
 
-class Market(Base):
+class ClobReward(BaseModel):
+    """Schema for a single CLOB reward configuration."""
+
+    id: str
+    conditionId: str
+    assetAddress: str
+    rewardsAmount: float
+    rewardsDailyRate: float
+    startDate: str
+    endDate: str
+
+
+class MarketDB(Base):
+    """SQLAlchemy ORM model for markets table."""
+
     __tablename__ = "markets"
 
     condition_id: Mapped[str] = mapped_column(String, primary_key=True)
@@ -36,37 +53,57 @@ class Market(Base):
     endDate: Mapped[str] = mapped_column(String, nullable=False)
 
 
-# Pydantic Model for validation and type safety
-class MarketSchema(BaseModel):
-    condition_id: str
+class MarketEvent(BaseModel):
+    id: str
+    slug: str
+    # Add more if needed
+
+
+# Pydantic model for API validation and serialization
+class Market(BaseModel):
+    conditionId: str
     question: str
     icon: str
+    image: str
     outcomes: str
     outcomePrices: str
     slug: str
     token1: str
     token2: str
     description: str
-    liquidity: Decimal = Field(ge=0)
-    volume: Decimal = Field(ge=0)
-    volume24hr: Decimal = Field(ge=0)
-    volume1wk: Decimal = Field(ge=0)
-    volume1mo: Decimal = Field(ge=0)
-    volume1yr: Decimal = Field(ge=0)
+    liquidity: float = Field(ge=0)
+    volume: float = Field(ge=0)
+    volume24hr: float = Field(ge=0)
+    volume1wk: float = Field(ge=0)
+    volume1mo: float = Field(ge=0)
+    volume1yr: float = Field(ge=0)
     negRisk: bool
-    bestBid: Decimal = Field(ge=0)
-    bestAsk: Decimal = Field(ge=0)
+    bestBid: float = Field(ge=0, le=1)
+    bestAsk: float = Field(ge=0, le=1)
     endDate: str
-    events: list[dict] | None = None
+    active: bool
+    closed: bool
+    groupItemTitle: str
+
+    # Event, but without all props
+    events: list[MarketEvent] | None = None
+
+    # Reward-related fields
+    umaReward: float | None = None
+    clobRewards: list[ClobReward] | None = None
+    rewardsMinSize: float | None = None
+    rewardsMaxSpread: float | None = None
+    holdingRewardsEnabled: bool | None = None
+    feesEnabled: bool | None = None
 
     class Config:
         from_attributes = True
 
 
-def parse_market_from_api(market_dict: dict) -> MarketSchema | None:
+def parse_market_from_api(market_dict: dict) -> Market | None:
     try:
-        condition_id = market_dict.get("conditionId")
-        if not condition_id:
+        conditionId = market_dict.get("conditionId")
+        if not conditionId:
             return None
 
         slug = market_dict.get("slug", "")
@@ -81,29 +118,71 @@ def parse_market_from_api(market_dict: dict) -> MarketSchema | None:
         description = market_dict.get("description")
         question = market_dict.get("question", "")
         icon = market_dict.get("icon", "")
-        outcomes = ", ".join(json.loads(market_dict.get("outcomes", "[]")))
-        outcomePrices = ", ".join(json.loads(market_dict.get("outcomePrices", "[]")))
+        image = market_dict.get("image", "")
+        outcomes = ",".join(json.loads(market_dict.get("outcomes", "[]")))
+        outcomePrices = ",".join(json.loads(market_dict.get("outcomePrices", "[]")))
 
         # Get numeric fields with defaults
-        liquidity = Decimal(str(market_dict.get("liquidityNum") or 0))
-        volume = Decimal(str(market_dict.get("volumeNum") or market_dict.get("volume") or 0))
-        volume24hr = Decimal(str(market_dict.get("volume24hr", 0)))
-        volume1wk = Decimal(str(market_dict.get("volume1wk", 0)))
-        volume1mo = Decimal(str(market_dict.get("volume1mo", 0)))
-        volume1yr = Decimal(str(market_dict.get("volume1yr", 0)))
+        liquidity = float(market_dict.get("liquidityNum") or 0)
+        volume = float(market_dict.get("volumeNum") or market_dict.get("volume") or 0)
+        volume24hr = float(market_dict.get("volume24hr", 0))
+        volume1wk = float(market_dict.get("volume1wk", 0))
+        volume1mo = float(market_dict.get("volume1mo", 0))
+        volume1yr = float(market_dict.get("volume1yr", 0))
 
         negRisk = market_dict.get("negRisk", False)
 
-        bestBid = Decimal(str(market_dict.get("bestBid", 0)))
-        bestAsk = Decimal(str(market_dict.get("bestAsk", 0)))
+        bestBid = float(market_dict.get("bestBid", 0))
+        bestAsk = float(market_dict.get("bestAsk", 0))
 
         endDate = market_dict.get("endDate", "")
-        events = market_dict.get("events", [])
+        events = [
+            MarketEvent(id=str(e.get("id", "")), slug=str(e.get("slug", "")))
+            for e in market_dict.get("events", [])
+        ]
+        active = bool(market_dict.get("active"))
+        closed = bool(market_dict.get("closed"))
+        groupItemTitle = market_dict.get("groupItemTitle", "")
 
-        return MarketSchema(
-            condition_id=condition_id,
+        # Parse reward-related fields
+        uma_reward = None
+        if market_dict.get("umaReward") is not None:
+            uma_reward = float(market_dict.get("umaReward", 0))
+
+        clob_rewards = None
+        if market_dict.get("clobRewards"):
+            try:
+                clob_rewards = [
+                    ClobReward(
+                        id=str(r.get("id", "")),
+                        conditionId=str(r.get("conditionId", "")),
+                        assetAddress=str(r.get("assetAddress", "")),
+                        rewardsAmount=float(r.get("rewardsAmount", 0)),
+                        rewardsDailyRate=float(r.get("rewardsDailyRate", 0)),
+                        startDate=str(r.get("startDate", "")),
+                        endDate=str(r.get("endDate", "")),
+                    )
+                    for r in market_dict.get("clobRewards", [])
+                ]
+            except (ValueError, TypeError, KeyError):
+                clob_rewards = None
+
+        rewards_min_size = None
+        if market_dict.get("rewardsMinSize") is not None:
+            rewards_min_size = float(market_dict.get("rewardsMinSize", 0))
+
+        rewards_max_spread = None
+        if market_dict.get("rewardsMaxSpread") is not None:
+            rewards_max_spread = float(market_dict.get("rewardsMaxSpread", 0))
+
+        holding_rewards_enabled = market_dict.get("holdingRewardsEnabled")
+        fees_enabled = market_dict.get("feesEnabled")
+
+        return Market(
+            conditionId=conditionId,
             question=question,
             icon=icon,
+            image=image,
             outcomes=outcomes,
             outcomePrices=outcomePrices,
             slug=slug,
@@ -121,7 +200,16 @@ def parse_market_from_api(market_dict: dict) -> MarketSchema | None:
             bestAsk=bestAsk,
             endDate=endDate,
             events=events,
+            umaReward=uma_reward,
+            clobRewards=clob_rewards,
+            rewardsMinSize=rewards_min_size,
+            rewardsMaxSpread=rewards_max_spread,
+            holdingRewardsEnabled=holding_rewards_enabled,
+            feesEnabled=fees_enabled,
+            active=active,
+            closed=closed,
+            groupItemTitle=groupItemTitle,
         )
     except (ValueError, KeyError, TypeError):
-        # Log error but don't crash - just skip this item
+        logger.error(f"Error parsing market from API: {market_dict}")
         return None

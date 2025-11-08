@@ -108,7 +108,7 @@ export function TopHoldersWidget({
     data: topHolders,
     isLoading,
     error,
-  } = useTopHoldersQuery(market.condition_id, market.token1, market.token2);
+  } = useTopHoldersQuery(market.conditionId, market.token1, market.token2);
 
   const { data: topHoldersPositions } = useTopHoldersPositionsQuery(
     topHolders?.map((h) => h.proxyWallet),

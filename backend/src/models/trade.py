@@ -7,10 +7,11 @@ from sqlalchemy import BigInteger, DateTime, Numeric, String, func
 from sqlalchemy.orm import Mapped, mapped_column
 
 from src.models.base import Base
-from src.utils.parse_utils import to_float, to_int
 
 
-class Trade(Base):
+class TradeDB(Base):
+    """SQLAlchemy ORM model for trades table."""
+
     __tablename__ = "trades"
 
     transactionHash: Mapped[str] = mapped_column(String, primary_key=True)
@@ -38,7 +39,7 @@ class Trade(Base):
     profileImageOptimized: Mapped[str] = mapped_column(String, nullable=True)
 
 
-class TradeSchema(BaseModel):
+class Trade(BaseModel):
     proxyWallet: str
     side: str
     asset: str
@@ -63,22 +64,24 @@ class TradeSchema(BaseModel):
         from_attributes = True
 
 
-def parse_trade_from_api(trade_dict: dict) -> TradeSchema | None:
+def parse_trade_from_api(trade_dict: dict) -> Trade | None:
     try:
-        return TradeSchema(
+        return Trade(
             proxyWallet=str(trade_dict.get("proxyWallet", "")),
             side=str(trade_dict.get("side", "")),
             asset=str(trade_dict.get("asset", "")),
             conditionId=str(trade_dict.get("conditionId", "")),
-            size=to_float(trade_dict.get("size")),
-            price=to_float(trade_dict.get("price")),
-            timestamp=to_int(trade_dict.get("timestamp")),
+            size=float(trade_dict.get("size") or 0),
+            price=float(trade_dict.get("price") or 0),
+            timestamp=int(trade_dict.get("timestamp") or 0),
             title=str(trade_dict.get("title", "")),
             slug=str(trade_dict.get("slug", "")),
             icon=str(trade_dict.get("icon", "")),
             eventSlug=str(trade_dict.get("eventSlug", "")),
             outcome=str(trade_dict.get("outcome", "")),
-            outcomeIndex=to_int(trade_dict.get("outcomeIndex")),
+            outcomeIndex=int(trade_dict.get("outcomeIndex"))
+            if trade_dict.get("outcomeIndex") is not None
+            else 0,
             name=str(trade_dict.get("name", "")),
             pseudonym=str(trade_dict.get("pseudonym", "")),
             bio=str(trade_dict.get("bio", "")),

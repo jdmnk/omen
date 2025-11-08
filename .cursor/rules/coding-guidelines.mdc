@@ -4,3 +4,4 @@ alwaysApply: true
 
 - ALWAYS keep code simple and consistent with the existing codebase
 - do not add excessive error and edge handling unless required
+- please do not create documentation markdown files unless prompted to do so!

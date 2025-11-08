@@ -7,14 +7,11 @@ from py_clob_client.client import ClobClient
 from py_clob_client.constants import POLYGON
 from py_clob_client.exceptions import PolyApiException
 
-from src.models.event import EventSchema, parse_event_from_api
-from src.models.market import MarketSchema, parse_market_from_api
-from src.models.public import SearchEventItem, SearchMarketItem, SearchResponse
-from src.models.trade import TradeSchema, parse_trade_from_api
-from src.models.user_position import (
-    UserPositionSchema,
-    parse_user_position_from_api,
-)
+from src.models.event import Event, parse_event_from_api
+from src.models.market import Market, parse_market_from_api
+from src.models.search import SearchEventItem, SearchMarketItem, SearchResponse
+from src.models.trade import Trade, parse_trade_from_api
+from src.models.user_position import UserPosition, parse_user_position_from_api
 from src.settings import settings
 from src.utils.logging_config import get_logger
 
@@ -198,7 +195,7 @@ class PolyClient:
 
     async def get_market_trades(
         self, condition_ids: list[str], min_amount: int = 100, count: int | None = None
-    ) -> list[TradeSchema]:
+    ) -> list[Trade]:
         """
         Data API /trades: 75 requests / 10s	(Throttle requests over the maximum configured rate)
 
@@ -282,9 +279,7 @@ class PolyClient:
             logger.error(traceback.format_exc())
             raise exc
 
-    async def get_user_positions_top(
-        self, user_id: str, count: int = 100
-    ) -> list[UserPositionSchema]:
+    async def get_user_positions_top(self, user_id: str, count: int = 100) -> list[UserPosition]:
         """
         Fetch top N user positions from Data API (already sorted), single page.
         """
@@ -303,14 +298,14 @@ class PolyClient:
                 return []
             data = response.json() or []
 
-        parsed: list[UserPositionSchema] = []
+        parsed: list[UserPosition] = []
         for p in data:
             schema = parse_user_position_from_api(p)
             if schema:
                 parsed.append(schema)
         return parsed
 
-    async def get_market_by_slug(self, slug: str) -> MarketSchema | None:
+    async def get_market_by_slug(self, slug: str) -> Market | None:
         """
         Fetch a market by its slug from Gamma API.
 
@@ -344,7 +339,7 @@ class PolyClient:
             logger.error(traceback.format_exc())
             raise exc from exc
 
-    async def get_event_by_id(self, event_id: str) -> EventSchema | None:
+    async def get_event_by_id(self, event_id: str) -> Event | None:
         """
         Fetch an event by its ID from Gamma API.
 
@@ -419,10 +414,10 @@ class PolyClient:
                                 "category": market.get("category"),
                                 "liquidity": market.get("liquidity"),
                                 "volume": market.get("volume"),
-                                "outcomePrices": ", ".join(
+                                "outcomePrices": ",".join(
                                     json.loads(market.get("outcomePrices", "[]"))
                                 ),
-                                "outcomes": ", ".join(json.loads(market.get("outcomes", "[]"))),
+                                "outcomes": ",".join(json.loads(market.get("outcomes", "[]"))),
                                 "active": market.get("active", False),
                                 "closed": market.get("closed", False),
                                 "icon": market.get("icon"),

@@ -3,21 +3,16 @@ from datetime import datetime
 from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
 
-from src.analytics.top_holders_analysis import TopHolderSchema, get_top_holders_with_wallet_info
-from src.analytics.trades_analytics import (
-    UserTradesGroup,
-    group_trades_by_user_detailed,
-)
+from src.analytics.top_holders_analysis import TopHolder, get_top_holders_with_wallet_info
 from src.db.selects import SelectsClient
-from src.models.public import (
+from src.models.responses import (
     EventResponse,
     HealthResponse,
-    MarketAutocompleteItem,
     MarketSearchResponse,
     MessageResponse,
-    SearchResponse,
 )
-from src.models.trade import TradeSchema
+from src.models.search import SearchResponse
+from src.models.trade import Trade
 from src.polymarket.poly_client import PolyClient
 from src.polymarket.poly_client_graphs import PolyClientGraphs
 from src.utils.logging_config import get_logger
@@ -49,15 +44,6 @@ def health() -> HealthResponse:
     return HealthResponse(status="ok")
 
 
-@app.get("/markets/autocomplete", response_model=list[MarketAutocompleteItem])
-async def autocomplete_markets(
-    q: str = Query(min_length=1), limit: int = 10
-) -> list[MarketAutocompleteItem]:
-    # hard cap to avoid excessive payloads
-    limit = max(1, min(limit, 25))
-    return await selects.autocomplete_markets(q, limit=limit)
-
-
 @app.get("/markets/search-slug", response_model=MarketSearchResponse)
 async def search_markets_slug(slug: str = Query(min_length=1)) -> MarketSearchResponse:
     """
@@ -72,24 +58,14 @@ async def search_markets_slug(slug: str = Query(min_length=1)) -> MarketSearchRe
     return MarketSearchResponse(market=result)
 
 
-@app.get("/markets/trades", response_model=list[TradeSchema])
-async def get_market_trades(condition_id: str = Query(min_length=1)) -> list[TradeSchema]:
+@app.get("/markets/trades", response_model=list[Trade])
+async def get_market_trades(condition_id: str = Query(min_length=1)) -> list[Trade]:
     trades = await poly_client.get_market_trades([condition_id])
 
     if trades is not None and len(trades) > 0:
         return trades
     else:
         raise HTTPException(status_code=404, detail="Trades not found")
-
-
-@app.get("/markets/trades/analytics", response_model=list[UserTradesGroup])
-async def get_market_trades_analytics(
-    condition_id: str = Query(min_length=1),
-) -> list[UserTradesGroup]:
-    trades = await poly_client.get_market_trades([condition_id])
-    if trades is None or len(trades) == 0:
-        raise HTTPException(status_code=404, detail="Trades not found")
-    return group_trades_by_user_detailed(trades)
 
 
 @app.get("/markets/search", response_model=SearchResponse)
@@ -101,12 +77,12 @@ async def search_markets(q: str = Query(min_length=1)) -> SearchResponse:
     return await poly_client.search_markets(q)
 
 
-@app.get("/markets/top-holders", response_model=list[TopHolderSchema])
+@app.get("/markets/top-holders", response_model=list[TopHolder])
 async def get_top_holders_with_wallet_info_endpoint(
     condition_id: str = Query(min_length=1),
     token1: str = Query(min_length=1),
     token2: str = Query(min_length=1),
-) -> list[TopHolderSchema]:
+) -> list[TopHolder]:
     holders = await get_top_holders_with_wallet_info(condition_id, [token1, token2])
 
     if not holders:

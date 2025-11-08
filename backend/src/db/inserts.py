@@ -4,11 +4,11 @@ from sqlalchemy import text
 from sqlalchemy.dialects.postgresql import insert as pg_insert
 
 from src.db.db_core import DbCore
-from src.models.event import Event as EventORM, EventSchema
+from src.models.event import Event, EventDB
 from src.models.event_market import EventMarket
-from src.models.market import Market as MarketORM, MarketSchema
-from src.models.trade import Trade as TradeORM, TradeSchema
-from src.models.user_position import UserPosition as UserPositionORM, UserPositionSchema
+from src.models.market import Market, MarketDB
+from src.models.trade import Trade, TradeDB
+from src.models.user_position import UserPosition, UserPositionDB
 from src.utils.logging_config import get_logger
 
 logger = get_logger(__name__)
@@ -18,7 +18,7 @@ class InsertsClient:
     def __init__(self, db_core: DbCore | None = None) -> None:
         self.core = db_core or DbCore()
 
-    async def insert_markets(self, markets: list[MarketSchema], chunk_size: int = 1000) -> int:
+    async def insert_markets(self, markets: list[Market], chunk_size: int = 1000) -> int:
         if not markets:
             return 0
         total = 0
@@ -27,10 +27,10 @@ class InsertsClient:
                 batch = markets[start : start + chunk_size]
                 values = [m.model_dump() for m in batch]
 
-                stmt = pg_insert(MarketORM).values(values)
+                stmt = pg_insert(MarketDB).values(values)
                 update_fields = {
                     col: stmt.excluded[col]
-                    for col in MarketORM.__table__.columns.keys()
+                    for col in MarketDB.__table__.columns.keys()
                     if col not in ["condition_id", "fetched_at"]
                 }
                 update_fields["fetched_at"] = text("now()")
@@ -43,7 +43,7 @@ class InsertsClient:
                 await session.commit()
         return total
 
-    async def insert_events(self, events: list[EventSchema], chunk_size: int = 500) -> int:
+    async def insert_events(self, events: list[Event], chunk_size: int = 500) -> int:
         if not events:
             return 0
         total = 0
@@ -52,10 +52,10 @@ class InsertsClient:
                 batch = events[start : start + chunk_size]
                 values = [e.model_dump() for e in batch]
 
-                stmt = pg_insert(EventORM).values(values)
+                stmt = pg_insert(EventDB).values(values)
                 update_fields = {
                     col: stmt.excluded[col]
-                    for col in EventORM.__table__.columns.keys()
+                    for col in EventDB.__table__.columns.keys()
                     if col not in ["id", "fetched_at"]
                 }
                 update_fields["fetched_at"] = text("now()")
@@ -67,7 +67,7 @@ class InsertsClient:
         return total
 
     async def insert_event_markets_from_events(
-        self, events: list[EventSchema], chunk_size: int = 2000
+        self, events: list[Event], chunk_size: int = 2000
     ) -> int:
         # Build mapping from schemas' raw payloads
         mappings: list[dict] = []
@@ -97,7 +97,7 @@ class InsertsClient:
                 await session.commit()
         return total
 
-    async def insert_trades(self, trades: list[TradeSchema], chunk_size: int = 1000) -> int:
+    async def insert_trades(self, trades: list[Trade], chunk_size: int = 1000) -> int:
         if not trades:
             return 0
         total = 0
@@ -107,10 +107,10 @@ class InsertsClient:
                     batch = trades[start : start + chunk_size]
                     values = [t.model_dump() for t in batch]
 
-                    stmt = pg_insert(TradeORM).values(values)
+                    stmt = pg_insert(TradeDB).values(values)
                     update_fields = {
                         col: stmt.excluded[col]
-                        for col in TradeORM.__table__.columns.keys()
+                        for col in TradeDB.__table__.columns.keys()
                         if col not in ["transactionHash", "fetched_at"]
                     }
                     update_fields["fetched_at"] = text("now()")
@@ -128,7 +128,7 @@ class InsertsClient:
         return total
 
     async def insert_user_positions(
-        self, positions: list[UserPositionSchema], chunk_size: int = 1000
+        self, positions: list[UserPosition], chunk_size: int = 1000
     ) -> int:
         if not positions:
             return 0
@@ -138,10 +138,10 @@ class InsertsClient:
                 batch = positions[start : start + chunk_size]
                 values = [p.model_dump() for p in batch]
 
-                stmt = pg_insert(UserPositionORM).values(values)
+                stmt = pg_insert(UserPositionDB).values(values)
                 update_fields = {
                     col: stmt.excluded[col]
-                    for col in UserPositionORM.__table__.columns.keys()
+                    for col in UserPositionDB.__table__.columns.keys()
                     if col not in ["proxyWallet", "asset", "fetched_at"]
                 }
                 update_fields["fetched_at"] = text("now()")

@@ -2,7 +2,7 @@ import asyncio
 
 from src.db.inserts import InsertsClient
 from src.db.selects import SelectsClient
-from src.models.market import MarketSchema
+from src.models.market import Market
 from src.polymarket.poly_client import PolyClient
 from src.utils.logging_config import get_logger
 
@@ -18,7 +18,7 @@ LIQ_PCT = 0.08  # 8 % of total liquidity
 VOL24_PCT = 0.03  # 3 % of 24 h volume
 
 
-def min_alert_size(market: MarketSchema) -> int:
+def min_alert_size(market: Market) -> int:
     """USD notional that a single trade must exceed
     before we run heavy insider checks."""
     liq_cut = LIQ_PCT * market.liquidity

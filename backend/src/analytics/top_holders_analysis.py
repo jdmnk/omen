@@ -1,9 +1,8 @@
 from datetime import datetime
-from decimal import Decimal
 
-from src.models.graph.position import PositionSchema
-from src.models.graph.wallet import WalletSchema
-from src.models.public import PolymarketHolder
+from src.models.graph.position import Position
+from src.models.graph.wallet import Wallet
+from src.models.polymarket import PolymarketHolder
 from src.polymarket.poly_client import PolyClient
 from src.polymarket.poly_client_graphs import PolyClientGraphs
 
@@ -13,18 +12,18 @@ BLACKLISTED_WALLETS: set[str] = {
 }
 
 
-class TopHolderSchema(PolymarketHolder):
-    """Polymarket holder schema enriched with wallet information and position data."""
+class TopHolder(PolymarketHolder):
+    """Polymarket holder enriched with wallet information and position data."""
 
     # Wallet fields (optional - may not exist for all wallets)
     walletCreatedAt: datetime | None = None
     walletLastTransfer: datetime | None = None
-    walletBalance: Decimal | None = None
+    walletBalance: float | None = None
 
     # Position fields (optional - may not exist if position not found)
-    avgPrice: Decimal | None = None
-    realizedPnl: Decimal | None = None
-    totalBought: Decimal | None = None
+    avgPrice: float | None = None
+    realizedPnl: float | None = None
+    totalBought: float | None = None
 
 
 def filter_blacklisted_wallets(holders: list[dict]) -> list[dict]:
@@ -39,7 +38,7 @@ def filter_blacklisted_wallets(holders: list[dict]) -> list[dict]:
 
 async def get_top_holders_with_wallet_info(
     condition_id: str, token_ids: list[str]
-) -> list[TopHolderSchema]:
+) -> list[TopHolder]:
     """
     Get top holders for a market and enrich them with wallet information and position data.
 
@@ -83,16 +82,16 @@ async def get_top_holders_with_wallet_info(
     positions = await poly_client_graphs.get_user_positions(unique_wallets, token_ids)
 
     # Create mappings for quick lookup
-    wallet_map: dict[str, WalletSchema] = {wallet.id: wallet for wallet in wallets}
+    wallet_map: dict[str, Wallet] = {wallet.id: wallet for wallet in wallets}
 
-    # Create position map: (user, tokenId) -> PositionSchema
-    position_map: dict[tuple[str, str], PositionSchema] = {}
+    # Create position map: (user, tokenId) -> Position
+    position_map: dict[tuple[str, str], Position] = {}
     for position in positions:
         key = (position.user, position.tokenId)
         position_map[key] = position
 
     # Enrich holders with wallet information and position/PnL data
-    enriched_holders: list[TopHolderSchema] = []
+    enriched_holders: list[TopHolder] = []
 
     for holder_dict in holders:
         proxy_wallet = holder_dict.get("proxyWallet")
@@ -106,7 +105,7 @@ async def get_top_holders_with_wallet_info(
         position = position_map.get((proxy_wallet, asset)) if asset else None
 
         enriched_holders.append(
-            TopHolderSchema(
+            TopHolder(
                 **holder_dict,
                 walletCreatedAt=wallet.createdAt if wallet else None,
                 walletLastTransfer=wallet.lastTransfer if wallet else None,

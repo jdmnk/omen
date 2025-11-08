@@ -7,10 +7,11 @@ from sqlalchemy import Boolean, DateTime, Integer, Numeric, String, func
 from sqlalchemy.orm import Mapped, mapped_column
 
 from src.models.base import Base
-from src.utils.parse_utils import to_float, to_int
 
 
-class UserPosition(Base):
+class UserPositionDB(Base):
+    """SQLAlchemy ORM model for user_positions table."""
+
     __tablename__ = "user_positions"
 
     # Composite primary key: one row per (wallet, asset)
@@ -45,7 +46,7 @@ class UserPosition(Base):
     negativeRisk: Mapped[bool] = mapped_column(Boolean, nullable=False)
 
 
-class UserPositionSchema(BaseModel):
+class UserPosition(BaseModel):
     proxyWallet: str
     asset: str
     conditionId: str
@@ -76,7 +77,7 @@ class UserPositionSchema(BaseModel):
         from_attributes = True
 
 
-def parse_user_position_from_api(pos: dict) -> UserPositionSchema | None:
+def parse_user_position_from_api(pos: dict) -> UserPosition | None:
     try:
         proxy_wallet = str(pos.get("user") or pos.get("proxyWallet") or "")
         if not proxy_wallet:
@@ -85,20 +86,20 @@ def parse_user_position_from_api(pos: dict) -> UserPositionSchema | None:
         if not asset:
             return None
 
-        return UserPositionSchema(
+        return UserPosition(
             proxyWallet=proxy_wallet,
             asset=asset,
             conditionId=str(pos.get("conditionId") or ""),
-            size=to_float(pos.get("size")),
-            avgPrice=to_float(pos.get("avgPrice")),
-            initialValue=to_float(pos.get("initialValue")),
-            currentValue=to_float(pos.get("currentValue")),
-            cashPnl=to_float(pos.get("cashPnl")),
-            percentPnl=to_float(pos.get("percentPnl")),
-            totalBought=to_float(pos.get("totalBought")),
-            realizedPnl=to_float(pos.get("realizedPnl")),
-            percentRealizedPnl=to_float(pos.get("percentRealizedPnl")),
-            curPrice=to_float(pos.get("curPrice")),
+            size=float(pos.get("size") or 0),
+            avgPrice=float(pos.get("avgPrice") or 0),
+            initialValue=float(pos.get("initialValue") or 0),
+            currentValue=float(pos.get("currentValue") or 0),
+            cashPnl=float(pos.get("cashPnl") or 0),
+            percentPnl=float(pos.get("percentPnl") or 0),
+            totalBought=float(pos.get("totalBought") or 0),
+            realizedPnl=float(pos.get("realizedPnl") or 0),
+            percentRealizedPnl=float(pos.get("percentRealizedPnl") or 0),
+            curPrice=float(pos.get("curPrice") or 0),
             redeemable=bool(pos.get("redeemable", False)),
             mergeable=bool(pos.get("mergeable", False)),
             title=str(pos.get("title") or ""),
@@ -106,7 +107,9 @@ def parse_user_position_from_api(pos: dict) -> UserPositionSchema | None:
             icon=str(pos.get("icon") or ""),
             eventSlug=str(pos.get("eventSlug") or ""),
             outcome=str(pos.get("outcome") or ""),
-            outcomeIndex=to_int(pos.get("outcomeIndex"), None),
+            outcomeIndex=int(pos.get("outcomeIndex"))
+            if pos.get("outcomeIndex") is not None
+            else None,
             oppositeOutcome=str(pos.get("oppositeOutcome") or ""),
             oppositeAsset=str(pos.get("oppositeAsset") or ""),
             endDate=str(pos.get("endDate") or ""),

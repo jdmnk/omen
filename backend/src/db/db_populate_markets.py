@@ -1,8 +1,8 @@
 import asyncio
 
 from src.db.inserts import InsertsClient
-from src.models.event import EventSchema, parse_event_from_api
-from src.models.market import MarketSchema, parse_market_from_api
+from src.models.event import Event, parse_event_from_api
+from src.models.market import Market, parse_market_from_api
 from src.polymarket.poly_client import PolyClient
 from src.utils.logging_config import get_logger
 
@@ -19,7 +19,7 @@ async def main() -> None:
 
     # Upsert markets present in those events (parse to schemas first)
     market_dicts = [m for ev in events for m in (ev.get("markets", []) or [])]
-    market_schemas: list[MarketSchema] = []
+    market_schemas: list[Market] = []
     for md in market_dicts:
         pm = parse_market_from_api(md)
         if pm:
@@ -28,7 +28,7 @@ async def main() -> None:
     logger.info("Inserted/updated %d markets from events", inserted_markets)
 
     # Upsert events with raw payload
-    event_schemas: list[EventSchema] = []
+    event_schemas: list[Event] = []
     for ev in events:
         pe = parse_event_from_api(ev)
         if pe:
