@@ -20,13 +20,6 @@ class HealthResponse(BaseModel):
     status: str
 
 
-class MarketAutocompleteItem(BaseModel):
-    """Market autocomplete item for typeahead."""
-
-    slug: str
-    question: str
-
-
 class MarketSearchResponse(BaseModel):
     """Wrapper response for single market."""
 
@@ -37,4 +30,3 @@ class EventResponse(BaseModel):
     """Wrapper response for single event."""
 
     event: Event
-

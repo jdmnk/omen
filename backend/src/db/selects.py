@@ -4,7 +4,6 @@ from sqlalchemy import select, text
 
 from src.db.db_core import DbCore
 from src.models.market import MarketDB, Market
-from src.models.responses import MarketAutocompleteItem
 
 
 class SelectsClient:
@@ -17,27 +16,6 @@ class SelectsClient:
             result = await session.execute(stmt)
             market_orm = result.scalar_one_or_none()
             return Market.model_validate(market_orm) if market_orm else None
-
-    async def autocomplete_markets(
-        self, query: str, limit: int = 10
-    ) -> list[MarketAutocompleteItem]:
-        q = (query or "").strip()
-        if not q:
-            return []
-
-        sql = text(
-            """
-            SELECT slug, question
-            FROM markets
-            WHERE :query <% question
-            ORDER BY :query <<-> question
-            LIMIT :limit
-            """
-        )
-        params = {"query": q, "limit": limit}
-        async with self.core.engine.connect() as conn:
-            rows = (await conn.execute(sql, params)).mappings().all()
-            return [MarketAutocompleteItem(slug=r["slug"], question=r["question"]) for r in rows]
 
     async def get_markets_by_volume_and_liquidity(
         self, *, min_volume: float, min_liquidity: float, limit: int | None = None

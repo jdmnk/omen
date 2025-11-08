@@ -8,7 +8,6 @@ from src.db.selects import SelectsClient
 from src.models.responses import (
     EventResponse,
     HealthResponse,
-    MarketAutocompleteItem,
     MarketSearchResponse,
     MessageResponse,
 )
@@ -43,15 +42,6 @@ def home() -> MessageResponse:
 @app.get("/health", response_model=HealthResponse)
 def health() -> HealthResponse:
     return HealthResponse(status="ok")
-
-
-@app.get("/markets/autocomplete", response_model=list[MarketAutocompleteItem])
-async def autocomplete_markets(
-    q: str = Query(min_length=1), limit: int = 10
-) -> list[MarketAutocompleteItem]:
-    # hard cap to avoid excessive payloads
-    limit = max(1, min(limit, 25))
-    return await selects.autocomplete_markets(q, limit=limit)
 
 
 @app.get("/markets/search-slug", response_model=MarketSearchResponse)
