@@ -11,6 +11,7 @@ from src.models.base import Base
 
 class ClobReward(BaseModel):
     """Schema for a single CLOB reward configuration."""
+
     id: str
     conditionId: str
     assetAddress: str
@@ -20,7 +21,9 @@ class ClobReward(BaseModel):
     endDate: str
 
 
-class Market(Base):
+class MarketDB(Base):
+    """SQLAlchemy ORM model for markets table."""
+
     __tablename__ = "markets"
 
     condition_id: Mapped[str] = mapped_column(String, primary_key=True)
@@ -47,8 +50,8 @@ class Market(Base):
     endDate: Mapped[str] = mapped_column(String, nullable=False)
 
 
-# Pydantic Model for validation and type safety
-class MarketSchema(BaseModel):
+# Pydantic model for API validation and serialization
+class Market(BaseModel):
     condition_id: str
     question: str
     icon: str
@@ -81,7 +84,7 @@ class MarketSchema(BaseModel):
         from_attributes = True
 
 
-def parse_market_from_api(market_dict: dict) -> MarketSchema | None:
+def parse_market_from_api(market_dict: dict) -> Market | None:
     try:
         condition_id = market_dict.get("conditionId")
         if not condition_id:
@@ -152,7 +155,7 @@ def parse_market_from_api(market_dict: dict) -> MarketSchema | None:
         holding_rewards_enabled = market_dict.get("holdingRewardsEnabled")
         fees_enabled = market_dict.get("feesEnabled")
 
-        return MarketSchema(
+        return Market(
             condition_id=condition_id,
             question=question,
             icon=icon,

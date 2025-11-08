@@ -1,8 +1,8 @@
 from datetime import datetime
 from decimal import Decimal
 
-from src.models.graph.position import PositionSchema
-from src.models.graph.wallet import WalletSchema
+from src.models.graph.position import Position
+from src.models.graph.wallet import Wallet
 from src.models.public import PolymarketHolder
 from src.polymarket.poly_client import PolyClient
 from src.polymarket.poly_client_graphs import PolyClientGraphs
@@ -83,10 +83,10 @@ async def get_top_holders_with_wallet_info(
     positions = await poly_client_graphs.get_user_positions(unique_wallets, token_ids)
 
     # Create mappings for quick lookup
-    wallet_map: dict[str, WalletSchema] = {wallet.id: wallet for wallet in wallets}
+    wallet_map: dict[str, Wallet] = {wallet.id: wallet for wallet in wallets}
 
-    # Create position map: (user, tokenId) -> PositionSchema
-    position_map: dict[tuple[str, str], PositionSchema] = {}
+    # Create position map: (user, tokenId) -> Position
+    position_map: dict[tuple[str, str], Position] = {}
     for position in positions:
         key = (position.user, position.tokenId)
         position_map[key] = position

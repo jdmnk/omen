@@ -10,7 +10,8 @@ from src.models.base import Base
 from src.utils.parse_utils import to_float, to_int
 
 
-class Trade(Base):
+class TradeDB(Base):
+    """SQLAlchemy ORM model for trades table."""
     __tablename__ = "trades"
 
     transactionHash: Mapped[str] = mapped_column(String, primary_key=True)
@@ -38,7 +39,7 @@ class Trade(Base):
     profileImageOptimized: Mapped[str] = mapped_column(String, nullable=True)
 
 
-class TradeSchema(BaseModel):
+class Trade(BaseModel):
     proxyWallet: str
     side: str
     asset: str
@@ -63,9 +64,9 @@ class TradeSchema(BaseModel):
         from_attributes = True
 
 
-def parse_trade_from_api(trade_dict: dict) -> TradeSchema | None:
+def parse_trade_from_api(trade_dict: dict) -> Trade | None:
     try:
-        return TradeSchema(
+        return Trade(
             proxyWallet=str(trade_dict.get("proxyWallet", "")),
             side=str(trade_dict.get("side", "")),
             asset=str(trade_dict.get("asset", "")),

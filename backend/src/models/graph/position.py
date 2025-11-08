@@ -34,7 +34,7 @@ class PositionSchema(BaseModel):
         from_attributes = True
 
 
-def parse_position_from_api(position_dict: dict) -> PositionSchema | None:
+def parse_position_from_api(position_dict: dict) -> Position | None:
     try:
         id = position_dict.get("id")
         if not id:
@@ -48,7 +48,7 @@ def parse_position_from_api(position_dict: dict) -> PositionSchema | None:
         avgPrice = from_usdc_decimal(position_dict.get("avgPrice"))
         totalBought = from_usdc_decimal(position_dict.get("totalBought"))
 
-        return PositionSchema(
+        return Position(
             id=id,
             realizedPnl=realizedPnl,
             user=user,

@@ -17,7 +17,7 @@ from src.models.public import (
     MessageResponse,
     SearchResponse,
 )
-from src.models.trade import TradeSchema
+from src.models.trade import Trade
 from src.polymarket.poly_client import PolyClient
 from src.polymarket.poly_client_graphs import PolyClientGraphs
 from src.utils.logging_config import get_logger
@@ -72,8 +72,8 @@ async def search_markets_slug(slug: str = Query(min_length=1)) -> MarketSearchRe
     return MarketSearchResponse(market=result)
 
 
-@app.get("/markets/trades", response_model=list[TradeSchema])
-async def get_market_trades(condition_id: str = Query(min_length=1)) -> list[TradeSchema]:
+@app.get("/markets/trades", response_model=list[Trade])
+async def get_market_trades(condition_id: str = Query(min_length=1)) -> list[Trade]:
     trades = await poly_client.get_market_trades([condition_id])
 
     if trades is not None and len(trades) > 0:

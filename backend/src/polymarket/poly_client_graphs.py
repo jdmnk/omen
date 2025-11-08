@@ -1,7 +1,7 @@
 import httpx
 
-from src.models.graph.position import PositionSchema, parse_position_from_api
-from src.models.graph.wallet import WalletSchema, parse_wallet_from_api
+from src.models.graph.position import Position, parse_position_from_api
+from src.models.graph.wallet import Wallet, parse_wallet_from_api
 from src.utils.logging_config import get_logger
 from src.utils.usdc import to_usdc
 
@@ -19,7 +19,7 @@ class PolyClientGraphs:
 
     async def get_market_positions(
         self, token_ids: list[str], min_amount: int = 0
-    ) -> list[PositionSchema]:
+    ) -> list[Position]:
         """
         Goldsky GraphQL api.
 
@@ -64,7 +64,7 @@ class PolyClientGraphs:
             response = await client.post(GOLDSKY_API_HOST + GOLDSKY_API_PNL_SUBGRAPH, json=payload)
             data = response.json()
             user_positions = data.get("data", {}).get("userPositions", [])
-            parsed_positions: list[PositionSchema] = [
+            parsed_positions: list[Position] = [
                 parse_position_from_api(position) for position in user_positions
             ]
 
@@ -75,7 +75,7 @@ class PolyClientGraphs:
 
     async def get_user_positions(
         self, wallet_ids: list[str], token_ids: list[str]
-    ) -> list[PositionSchema]:
+    ) -> list[Position]:
         """
         Goldsky GraphQL api to get positions for specific users and tokens.
 
@@ -126,13 +126,13 @@ class PolyClientGraphs:
             response = await client.post(GOLDSKY_API_HOST + GOLDSKY_API_PNL_SUBGRAPH, json=payload)
             data = response.json()
             user_positions = data.get("data", {}).get("userPositions", [])
-            parsed_positions: list[PositionSchema] = [
+            parsed_positions: list[Position] = [
                 parse_position_from_api(position) for position in user_positions
             ]
 
             return parsed_positions
 
-    async def get_wallets_info(self, wallet_ids: list[str]) -> list[WalletSchema]:
+    async def get_wallets_info(self, wallet_ids: list[str]) -> list[Wallet]:
         """
         Goldsky GraphQL api for wallet information.
 
@@ -167,7 +167,7 @@ class PolyClientGraphs:
             )
             data = response.json()
             wallets = data.get("data", {}).get("wallets", [])
-            parsed_wallets: list[WalletSchema] = [
+            parsed_wallets: list[Wallet] = [
                 w for w in [parse_wallet_from_api(wallet) for wallet in wallets] if w is not None
             ]
 
@@ -175,7 +175,7 @@ class PolyClientGraphs:
 
     async def get_user_positions_multiple_markets(
         self, wallet_ids: list[str], token_ids: list[str], min_amount: int = 0
-    ) -> list[PositionSchema]:
+    ) -> list[Position]:
         query = """
         query GetUserPositionsMultipleMarkets($first: Int!, $skip: Int!, $userIds: [String!]!, $tokenIds: [BigInt!]!, $minAmount: BigInt!) {
             userPositions(
@@ -218,7 +218,7 @@ class PolyClientGraphs:
             response = await client.post(GOLDSKY_API_HOST + GOLDSKY_API_PNL_SUBGRAPH, json=payload)
             data = response.json()
             user_positions = data.get("data", {}).get("userPositions", [])
-            parsed_positions: list[PositionSchema] = [
+            parsed_positions: list[Position] = [
                 parse_position_from_api(position) for position in user_positions
             ]
 

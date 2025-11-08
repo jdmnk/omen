@@ -219,12 +219,8 @@ export interface components {
             /** Enddate */
             endDate: string;
         };
-        /** EventResponse */
-        EventResponse: {
-            event: components["schemas"]["EventSchema"];
-        };
-        /** EventSchema */
-        EventSchema: {
+        /** Event */
+        Event: {
             /** Id */
             id: string;
             /** Slug */
@@ -238,6 +234,10 @@ export interface components {
                 [key: string]: unknown;
             };
         };
+        /** EventResponse */
+        EventResponse: {
+            event: components["schemas"]["Event"];
+        };
         /** HTTPValidationError */
         HTTPValidationError: {
             /** Detail */
@@ -248,15 +248,8 @@ export interface components {
             /** Status */
             status: string;
         };
-        /** MarketAutocompleteItem */
-        MarketAutocompleteItem: {
-            /** Slug */
-            slug: string;
-            /** Question */
-            question: string;
-        };
-        /** MarketSchema */
-        "MarketSchema-Input": {
+        /** Market */
+        "Market-Input": {
             /** Condition Id */
             condition_id: string;
             /** Question */
@@ -312,8 +305,8 @@ export interface components {
             /** Feesenabled */
             feesEnabled?: boolean | null;
         };
-        /** MarketSchema */
-        "MarketSchema-Output": {
+        /** Market */
+        "Market-Output": {
             /** Condition Id */
             condition_id: string;
             /** Question */
@@ -369,9 +362,16 @@ export interface components {
             /** Feesenabled */
             feesEnabled?: boolean | null;
         };
+        /** MarketAutocompleteItem */
+        MarketAutocompleteItem: {
+            /** Slug */
+            slug: string;
+            /** Question */
+            question: string;
+        };
         /** MarketSearchResponse */
         MarketSearchResponse: {
-            market: components["schemas"]["MarketSchema-Output"];
+            market: components["schemas"]["Market-Output"];
         };
         /** MessageResponse */
         MessageResponse: {
@@ -533,8 +533,8 @@ export interface components {
             /** Totalbought */
             totalBought?: string | null;
         };
-        /** TradeSchema */
-        TradeSchema: {
+        /** Trade */
+        Trade: {
             /** Proxywallet */
             proxyWallet: string;
             /** Side */
@@ -596,7 +596,7 @@ export interface components {
             /** Totalholdings */
             totalHoldings: number;
             /** Trades */
-            trades: components["schemas"]["TradeSchema"][];
+            trades: components["schemas"]["Trade"][];
         };
         /** ValidationError */
         ValidationError: {
@@ -736,7 +736,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["TradeSchema"][];
+                    "application/json": components["schemas"]["Trade"][];
                 };
             };
             /** @description Validation Error */
@@ -882,13 +882,13 @@ export interface operations {
 // Clean type exports (no need to access via components["schemas"])
 export type ClobRewardInput = components["schemas"]["ClobReward-Input"];
 export type ClobReward = components["schemas"]["ClobReward-Output"];
+export type Event = components["schemas"]["Event"];
 export type EventResponse = components["schemas"]["EventResponse"];
-export type EventSchema = components["schemas"]["EventSchema"];
 export type HTTPValidationError = components["schemas"]["HTTPValidationError"];
 export type HealthResponse = components["schemas"]["HealthResponse"];
+export type MarketInput = components["schemas"]["Market-Input"];
+export type Market = components["schemas"]["Market-Output"];
 export type MarketAutocompleteItem = components["schemas"]["MarketAutocompleteItem"];
-export type MarketSchemaInput = components["schemas"]["MarketSchema-Input"];
-export type MarketSchema = components["schemas"]["MarketSchema-Output"];
 export type MarketSearchResponse = components["schemas"]["MarketSearchResponse"];
 export type MessageResponse = components["schemas"]["MessageResponse"];
 export type SearchEventItem = components["schemas"]["SearchEventItem"];
@@ -896,6 +896,6 @@ export type SearchMarketItem = components["schemas"]["SearchMarketItem"];
 export type SearchResponse = components["schemas"]["SearchResponse"];
 export type TopHolderSchemaInput = components["schemas"]["TopHolderSchema-Input"];
 export type TopHolderSchema = components["schemas"]["TopHolderSchema-Output"];
-export type TradeSchema = components["schemas"]["TradeSchema"];
+export type Trade = components["schemas"]["Trade"];
 export type UserTradesGroup = components["schemas"]["UserTradesGroup"];
 export type ValidationError = components["schemas"]["ValidationError"];

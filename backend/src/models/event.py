@@ -10,7 +10,9 @@ from sqlalchemy.orm import Mapped, mapped_column
 from src.models.base import Base
 
 
-class Event(Base):
+class EventDB(Base):
+    """SQLAlchemy ORM model for events table."""
+
     __tablename__ = "events"
 
     id: Mapped[str] = mapped_column(String, primary_key=True)
@@ -23,7 +25,7 @@ class Event(Base):
     raw: Mapped[dict] = mapped_column(JSONB, nullable=False)
 
 
-class EventSchema(BaseModel):
+class Event(BaseModel):
     id: str
     slug: str
     title: str
@@ -34,7 +36,7 @@ class EventSchema(BaseModel):
         from_attributes = True
 
 
-def parse_event_from_api(event_dict: dict) -> EventSchema | None:
+def parse_event_from_api(event_dict: dict) -> Event | None:
     try:
         # id may be int; store as str for consistency with other ids
         event_id = event_dict.get("id")
@@ -52,7 +54,7 @@ def parse_event_from_api(event_dict: dict) -> EventSchema | None:
         if isinstance(closed_raw, str):
             closed = closed_raw.lower() == "true"
 
-        return EventSchema(
+        return Event(
             id=str(event_id),
             slug=slug,
             title=title,

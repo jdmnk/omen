@@ -4,7 +4,7 @@ from collections import defaultdict
 
 from pydantic import BaseModel, Field
 
-from src.models.trade import TradeSchema
+from src.models.trade import Trade
 
 
 class UserConditionStats(BaseModel):
@@ -48,7 +48,7 @@ def _outcome_key(trade: TradeSchema) -> str:
     return str(trade.asset)
 
 
-def aggregate_trades_by_user(trades: list[TradeSchema]) -> list[UserHoldingsSummary]:
+def aggregate_trades_by_user(trades: list[Trade]) -> list[UserHoldingsSummary]:
     """Group trades by user, aggregate volume and current holdings, order by holdings.
 
     - Volume per user: sum of absolute sizes across BUY and SELL for the same user and condition
@@ -172,10 +172,10 @@ class UserTradesGroup(BaseModel):
     totalHoldings: float
 
     # All trades (sorted by size desc)
-    trades: list[TradeSchema]
+    trades: list[Trade]
 
 
-def group_trades_by_user_detailed(trades: list[TradeSchema]) -> list[UserTradesGroup]:
+def group_trades_by_user_detailed(trades: list[Trade]) -> list[UserTradesGroup]:
     """Return groups of related trades by user with per-group stats.
 
     - Group by proxyWallet
@@ -185,7 +185,7 @@ def group_trades_by_user_detailed(trades: list[TradeSchema]) -> list[UserTradesG
     - Order groups by totalUsdVolume desc
     """
 
-    user_to_trades: dict[str, list[TradeSchema]] = {}
+    user_to_trades: dict[str, list[Trade]] = {}
     user_meta: dict[str, dict[str, str | None]] = {}
 
     # Partition trades by wallet and capture basic metadata

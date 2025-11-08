@@ -10,7 +10,8 @@ from src.models.base import Base
 from src.utils.parse_utils import to_float, to_int
 
 
-class UserPosition(Base):
+class UserPositionDB(Base):
+    """SQLAlchemy ORM model for user_positions table."""
     __tablename__ = "user_positions"
 
     # Composite primary key: one row per (wallet, asset)
@@ -45,7 +46,7 @@ class UserPosition(Base):
     negativeRisk: Mapped[bool] = mapped_column(Boolean, nullable=False)
 
 
-class UserPositionSchema(BaseModel):
+class UserPosition(BaseModel):
     proxyWallet: str
     asset: str
     conditionId: str
@@ -76,7 +77,7 @@ class UserPositionSchema(BaseModel):
         from_attributes = True
 
 
-def parse_user_position_from_api(pos: dict) -> UserPositionSchema | None:
+def parse_user_position_from_api(pos: dict) -> UserPosition | None:
     try:
         proxy_wallet = str(pos.get("user") or pos.get("proxyWallet") or "")
         if not proxy_wallet:
@@ -85,7 +86,7 @@ def parse_user_position_from_api(pos: dict) -> UserPositionSchema | None:
         if not asset:
             return None
 
-        return UserPositionSchema(
+        return UserPosition(
             proxyWallet=proxy_wallet,
             asset=asset,
             conditionId=str(pos.get("conditionId") or ""),

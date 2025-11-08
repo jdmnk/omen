@@ -7,15 +7,12 @@ from sqlalchemy.ext.asyncio import (
     create_async_engine,
 )
 
-from src.models.event import Event, EventSchema, parse_event_from_api
+from src.models.event import EventDB, Event, parse_event_from_api
 from src.models.event_market import EventMarket
-from src.models.graph.position import Position, PositionSchema, parse_position_from_api
-from src.models.market import Market, MarketSchema, parse_market_from_api
-from src.models.trade import Trade as TradeORM, TradeSchema
-from src.models.user_position import (
-    UserPosition as UserPositionORM,
-    UserPositionSchema,
-)
+from src.models.graph.position import PositionDB, Position, parse_position_from_api
+from src.models.market import MarketDB, Market, parse_market_from_api
+from src.models.trade import TradeDB, Trade
+from src.models.user_position import UserPositionDB, UserPosition
 from src.settings import settings
 from src.utils.logging_config import get_logger
 
@@ -42,7 +39,7 @@ class DatabaseClient:
             Number of markets successfully inserted/updated
         """
         # Parse and validate markets using Pydantic
-        parsed_markets: list[MarketSchema] = []
+        parsed_markets: list[Market] = []
         for market_dict in markets:
             parsed = parse_market_from_api(market_dict)
             if parsed:
@@ -61,12 +58,12 @@ class DatabaseClient:
                 values = [market.model_dump() for market in batch]
 
                 # Use PostgreSQL's INSERT ... ON CONFLICT for efficient upsert
-                stmt = pg_insert(Market).values(values)
+                stmt = pg_insert(MarketDB).values(values)
 
                 # On conflict, update all fields except primary key
                 update_fields = {
                     col: stmt.excluded[col]
-                    for col in Market.__table__.columns.keys()
+                    for col in MarketDB.__table__.columns.keys()
                     if col not in ["condition_id", "fetched_at"]
                 }
                 update_fields["fetched_at"] = text("now()")
@@ -89,7 +86,7 @@ class DatabaseClient:
 
         Returns number of events upserted.
         """
-        parsed_events: list[EventSchema] = []
+        parsed_events: list[Event] = []
         for ev_dict in events:
             parsed = parse_event_from_api(ev_dict)
             if parsed:
@@ -173,7 +170,7 @@ class DatabaseClient:
         logger.info("Inserted/updated %d event->market links", total_upserted)
         return total_upserted
 
-    async def insert_trades(self, trades: list[TradeSchema], chunk_size: int = 1000) -> int:
+    async def insert_trades(self, trades: list[Trade], chunk_size: int = 1000) -> int:
         """
         Upsert trades by transactionHash. Expects already parsed TradeSchema items.
         """
@@ -297,7 +294,7 @@ class DatabaseClient:
             print(deleted)
         return deleted
 
-    async def get_market_by_condition_id(self, condition_id: str) -> Market | None:
+    async def get_market_by_condition_id(self, condition_id: str) -> MarketDB | None:
         """
         Get a market by condition_id using the ORM.
         Returns the Market ORM model for full type safety.
@@ -308,11 +305,11 @@ class DatabaseClient:
                 print(f"{market.slug}: ${market.liquidity}")
         """
         async with self.async_session() as session:
-            stmt = select(Market).where(Market.condition_id == condition_id)
+            stmt = select(MarketDB).where(MarketDB.condition_id == condition_id)
             result = await session.execute(stmt)
             return result.scalar_one_or_none()
 
-    async def get_market_by_slug(self, slug: str) -> Market | None:
+    async def get_market_by_slug(self, slug: str) -> MarketDB | None:
         """
         Get a market by its slug using the ORM.
         Returns the Market ORM model for full type safety.
@@ -324,7 +321,7 @@ class DatabaseClient:
                 print(f"Bid/Ask: {market.bestBid}/{market.bestAsk}")
         """
         async with self.async_session() as session:
-            stmt = select(Market).where(Market.slug == slug)
+            stmt = select(MarketDB).where(MarketDB.slug == slug)
             result = await session.execute(stmt)
             market_orm = result.scalar_one_or_none()
 

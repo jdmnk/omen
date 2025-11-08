@@ -9,7 +9,8 @@ from src.models.base import Base
 from src.utils.usdc import from_usdc_decimal
 
 
-class Wallet(Base):
+class WalletDB(Base):
+    """SQLAlchemy ORM model for wallets table."""
     __tablename__ = "wallets"
 
     id: Mapped[str] = mapped_column(String, primary_key=True)
@@ -23,7 +24,7 @@ class Wallet(Base):
     )
 
 
-class WalletSchema(BaseModel):
+class Wallet(BaseModel):
     id: str
     signer: str | None = None
     type: str | None = None
@@ -35,7 +36,7 @@ class WalletSchema(BaseModel):
         from_attributes = True
 
 
-def parse_wallet_from_api(wallet_dict: dict) -> WalletSchema | None:
+def parse_wallet_from_api(wallet_dict: dict) -> Wallet | None:
     def parse_timestamp(value: object) -> datetime | None:
         try:
             if value is None:
@@ -61,7 +62,7 @@ def parse_wallet_from_api(wallet_dict: dict) -> WalletSchema | None:
         lastTransfer = parse_timestamp(wallet_dict.get("lastTransfer"))
         createdAt = parse_timestamp(wallet_dict.get("createdAt"))
 
-        return WalletSchema(
+        return Wallet(
             id=str(wallet_id),
             signer=str(signer) if signer else None,
             type=str(wallet_type) if wallet_type else None,
