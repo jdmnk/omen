@@ -73,7 +73,7 @@ function formatDuration(
   return nf.format(value);
 }
 
-export function autoFormatDuration(ms: number, locale = getUserLocale()) {
+export function autoFormatDuration(ms: number) {
   const seconds = ms / 1000;
   const minutes = seconds / 60;
   const hours = minutes / 60;
