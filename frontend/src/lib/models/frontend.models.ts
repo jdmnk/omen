@@ -3,16 +3,6 @@
 
 export type Interval = "1m" | "1w" | "1d" | "6h" | "1h" | "max";
 
-export type Position = {
-  id: string;
-  amount: number;
-  avgPrice: number;
-  tokenId: string;
-  totalBought: number;
-  realizedPnl: number;
-  user: string;
-};
-
 export type OrderBookLevel = {
   price: string;
   size: string;
@@ -40,25 +30,3 @@ export type OrderBookViewModel = {
 };
 
 export type OrderBookQueryResult = OrderBookResponse & OrderBookViewModel;
-
-export type UserConditionStats = {
-  conditionId: string;
-  slug?: string | null;
-  title?: string | null;
-  icon?: string | null;
-  volume: number;
-  notional: number;
-  netHoldingsByOutcome: Record<string, number>;
-  totalHoldings: number;
-};
-
-export type UserHoldingsSummary = {
-  proxyWallet: string;
-  name?: string | null;
-  pseudonym?: string | null;
-  profileImage?: string | null;
-  totalVolume: number;
-  totalNotional: number;
-  totalHoldings: number;
-  markets: UserConditionStats[];
-};
