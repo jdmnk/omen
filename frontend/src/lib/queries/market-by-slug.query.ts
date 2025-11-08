@@ -1,16 +1,27 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import { fetchMarketBySlug } from "./fetch/fetch-market-by-slug";
+import { getBaseUrl } from "../api";
 import { MarketResponse } from "@/lib/models/api.models";
 
 export function useMarketBySlugQuery(slug: string | undefined) {
   return useQuery<MarketResponse>({
     queryKey: ["market-by-slug", slug],
-    queryFn: () => fetchMarketBySlug(slug!),
+    queryFn: async () => {
+      const response = await fetch(
+        `${getBaseUrl()}/markets/search-slug?slug=${encodeURIComponent(slug!)}`,
+        { cache: "no-store" }
+      );
+
+      if (!response.ok) {
+        throw new Error(`Failed to fetch market: ${response.statusText}`);
+      }
+
+      const data = (await response.json()) as MarketResponse;
+      return data;
+    },
     enabled: !!slug && slug.length > 0,
     retry: 1,
     staleTime: 30000, // 30 seconds
   });
 }
-

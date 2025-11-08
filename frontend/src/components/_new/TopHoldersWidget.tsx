@@ -3,7 +3,7 @@
 import React, { useState, useMemo } from "react";
 import { Card } from "@/components/ui/card";
 import { LoadingSpinner } from "@/components/ui/spinner";
-import { useTopHoldersQuery } from "@/lib/queries/top-holders.query";
+import { useTopHoldersAnalysisQuery } from "@/lib/queries/top-holders-analysis.query";
 import { TopHolderAnalysis } from "@/lib/models/api.models";
 import {
   formatCompactCurrency,
@@ -108,7 +108,11 @@ export function TopHoldersWidget({
     data: topHolders,
     isLoading,
     error,
-  } = useTopHoldersQuery(market.conditionId, market.token1, market.token2);
+  } = useTopHoldersAnalysisQuery(
+    market.conditionId,
+    market.token1,
+    market.token2
+  );
 
   const { data: topHoldersPositions } = useTopHoldersPositionsQuery(
     topHolders?.map((h) => h.proxyWallet),
