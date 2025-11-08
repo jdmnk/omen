@@ -1,4 +1,5 @@
-#!/usr/bin/env node
+/* eslint-disable */
+// @ts-nocheck
 /**
  * Generate TypeScript types from FastAPI OpenAPI schema
  *
