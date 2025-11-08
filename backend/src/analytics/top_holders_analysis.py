@@ -1,8 +1,6 @@
-from datetime import datetime
-
 from src.models.graph.position import Position
 from src.models.graph.wallet import Wallet
-from src.models.polymarket import PolymarketHolder
+from src.models.top_holders import TopHolder, TopHolderAnalysis
 from src.polymarket.poly_client import PolyClient
 from src.polymarket.poly_client_graphs import PolyClientGraphs
 
@@ -12,33 +10,17 @@ BLACKLISTED_WALLETS: set[str] = {
 }
 
 
-class TopHolder(PolymarketHolder):
-    """Polymarket holder enriched with wallet information and position data."""
-
-    # Wallet fields (optional - may not exist for all wallets)
-    walletCreatedAt: datetime | None = None
-    walletLastTransfer: datetime | None = None
-    walletBalance: float | None = None
-
-    # Position fields (optional - may not exist if position not found)
-    avgPrice: float | None = None
-    realizedPnl: float | None = None
-    totalBought: float | None = None
-
-
-def filter_blacklisted_wallets(holders: list[dict]) -> list[dict]:
+def filter_blacklisted_wallets(holders: list[TopHolder]) -> list[TopHolder]:
     blacklist_normalized = {addr.lower() for addr in BLACKLISTED_WALLETS}
 
     return [
-        h
-        for h in holders
-        if h.get("proxyWallet") and h.get("proxyWallet", "").lower() not in blacklist_normalized
+        h for h in holders if h.proxyWallet and h.proxyWallet.lower() not in blacklist_normalized
     ]
 
 
 async def get_top_holders_with_wallet_info(
     condition_id: str, token_ids: list[str]
-) -> list[TopHolder]:
+) -> list[TopHolderAnalysis]:
     """
     Get top holders for a market and enrich them with wallet information and position data.
 
@@ -70,7 +52,7 @@ async def get_top_holders_with_wallet_info(
         return []
 
     # Extract unique proxy wallets (user addresses)
-    unique_wallets = list(set(h.get("proxyWallet") for h in holders if h.get("proxyWallet")))
+    unique_wallets = list(set(h.proxyWallet for h in holders if h.proxyWallet))
 
     if not unique_wallets:
         return []
@@ -91,22 +73,22 @@ async def get_top_holders_with_wallet_info(
         position_map[key] = position
 
     # Enrich holders with wallet information and position/PnL data
-    enriched_holders: list[TopHolder] = []
+    enriched_holders: list[TopHolderAnalysis] = []
 
-    for holder_dict in holders:
-        proxy_wallet = holder_dict.get("proxyWallet")
+    for holder in holders:
+        proxy_wallet = holder.proxyWallet
         if not proxy_wallet:
             continue
 
         wallet = wallet_map.get(proxy_wallet)
-        asset = holder_dict.get("asset", "")
+        asset = holder.asset
 
         # Find matching position by user and tokenId (asset)
         position = position_map.get((proxy_wallet, asset)) if asset else None
 
         enriched_holders.append(
-            TopHolder(
-                **holder_dict,
+            TopHolderAnalysis(
+                **holder.model_dump(),
                 walletCreatedAt=wallet.createdAt if wallet else None,
                 walletLastTransfer=wallet.lastTransfer if wallet else None,
                 walletBalance=wallet.balance if wallet else None,

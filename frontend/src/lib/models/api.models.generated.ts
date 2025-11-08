@@ -385,10 +385,10 @@ export interface components {
             } | null;
         };
         /**
-         * TopHolder
+         * TopHolderAnalysis
          * @description Polymarket holder enriched with wallet information and position data.
          */
-        TopHolder: {
+        TopHolderAnalysis: {
             /** Proxywallet */
             proxyWallet: string;
             /** Bio */
@@ -633,7 +633,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["TopHolder"][];
+                    "application/json": components["schemas"]["TopHolderAnalysis"][];
                 };
             };
             /** @description Validation Error */
@@ -695,6 +695,6 @@ export type MessageResponse = components["schemas"]["MessageResponse"];
 export type SearchEventItem = components["schemas"]["SearchEventItem"];
 export type SearchMarketItem = components["schemas"]["SearchMarketItem"];
 export type SearchResponse = components["schemas"]["SearchResponse"];
-export type TopHolder = components["schemas"]["TopHolder"];
+export type TopHolderAnalysis = components["schemas"]["TopHolderAnalysis"];
 export type Trade = components["schemas"]["Trade"];
 export type ValidationError = components["schemas"]["ValidationError"];

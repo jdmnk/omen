@@ -4,7 +4,7 @@ import React, { useState, useMemo } from "react";
 import { Card } from "@/components/ui/card";
 import { LoadingSpinner } from "@/components/ui/spinner";
 import { useTopHoldersQuery } from "@/lib/queries/top-holders.query";
-import { TopHolder } from "@/lib/models/api.models";
+import { TopHolderAnalysis } from "@/lib/models/api.models";
 import {
   formatCompactCurrency,
   formatCompactNumber,
@@ -59,9 +59,9 @@ function OutcomeColumn({
 }: {
   label: string;
   bgColor: string;
-  holders: TopHolder[];
+  holders: TopHolderAnalysis[];
   renderHolderRow: (
-    holder: TopHolder,
+    holder: TopHolderAnalysis,
     index: number,
     outcomeIndex: number
   ) => React.ReactElement;
@@ -136,7 +136,7 @@ export function TopHoldersWidget({
     }
     acc[outcomeIndex].push(holder);
     return acc;
-  }, {} as Record<number, TopHolder[]>);
+  }, {} as Record<number, TopHolderAnalysis[]>);
 
   // Sort by amount descending and take top N
   const outcome0Holders = (holdersByOutcome[0] || [])
@@ -166,7 +166,7 @@ export function TopHoldersWidget({
     : outcomePrices[1] || 0;
 
   const renderHolderRow = (
-    holder: TopHolder,
+    holder: TopHolderAnalysis,
     index: number,
     outcomeIndex: number
   ) => {

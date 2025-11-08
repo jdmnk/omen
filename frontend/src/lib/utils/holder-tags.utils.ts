@@ -1,4 +1,4 @@
-import { TopHolder, UserPosition } from "@/lib/models/api.models";
+import { TopHolderAnalysis, UserPosition } from "@/lib/models/api.models";
 
 export type HolderTagIcon =
   | "expert"
@@ -73,7 +73,7 @@ function getWalletAgeTags(walletCreatedAt: string | null): HolderTag[] {
  * Gets position-related tags based on holder's other positions
  */
 function getPositionTags(
-  holder: TopHolder,
+  holder: TopHolderAnalysis,
   allPositions: UserPosition[] | undefined,
   currentMarketTokenId: string
 ): HolderTag[] {
@@ -131,7 +131,7 @@ function getPositionTags(
  * Gets trader-type tags based on profitability, wallet size, and position characteristics
  */
 function getTraderTypeTags(
-  holder: TopHolder,
+  holder: TopHolderAnalysis,
   allPositions: UserPosition[] | undefined
 ): HolderTag[] {
   const tags: HolderTag[] = [];
@@ -230,7 +230,7 @@ function getTraderTypeTags(
  * Generates tags for a holder based on their wallet age and positions
  */
 export function generateHolderTags(
-  holder: TopHolder,
+  holder: TopHolderAnalysis,
   allPositions: UserPosition[] | undefined,
   currentMarketTokenId: string
 ): HolderTag[] {
@@ -252,7 +252,7 @@ export function generateHolderTags(
  * Generates tags for multiple holders
  */
 export function generateHolderTagsMap(
-  holders: TopHolder[],
+  holders: TopHolderAnalysis[],
   positionsMap: Record<string, UserPosition[]> | undefined,
   currentMarketTokenId: string
 ): Record<string, HolderTag[]> {

@@ -30,3 +30,32 @@ export type OrderBookViewModel = {
 };
 
 export type OrderBookQueryResult = OrderBookResponse & OrderBookViewModel;
+
+// UserPosition is a frontend-specific Position model, different from backend Position (graph model)
+export type UserPosition = {
+  proxyWallet: string;
+  asset: string;
+  conditionId: string;
+  size: number;
+  avgPrice: number;
+  initialValue: number;
+  currentValue: number;
+  cashPnl: number;
+  percentPnl: number;
+  totalBought: number;
+  realizedPnl: number;
+  percentRealizedPnl: number;
+  curPrice: number;
+  redeemable: boolean;
+  mergeable: boolean;
+  title: string | null;
+  slug: string | null;
+  icon: string | null;
+  eventSlug: string | null;
+  outcome: string | null;
+  outcomeIndex: number | null;
+  oppositeOutcome: string | null;
+  oppositeAsset: string | null;
+  endDate: string | null;
+  negativeRisk: boolean;
+};

@@ -10,6 +10,7 @@ from py_clob_client.exceptions import PolyApiException
 from src.models.event import Event, parse_event_from_api
 from src.models.market import Market, parse_market_from_api
 from src.models.search import SearchEventItem, SearchMarketItem, SearchResponse
+from src.models.top_holders import TopHolder
 from src.models.trade import Trade, parse_trade_from_api
 from src.models.user_position import UserPosition, parse_user_position_from_api
 from src.settings import settings
@@ -249,7 +250,9 @@ class PolyClient:
         parsed_trades = [t for t in (parse_trade_from_api(t) for t in all_trades) if t is not None]
         return parsed_trades
 
-    async def get_top_holders(self, condition_ids: list[str], min_balance: int = 1) -> list[dict]:
+    async def get_top_holders(
+        self, condition_ids: list[str], min_balance: int = 1
+    ) -> list[TopHolder]:
         """
         No pagination. Artificial limit of 20 per YES/NO per market (so total 40 per market).
 
@@ -270,7 +273,8 @@ class PolyClient:
                 if len(holders) > 0:
                     combined_holders: list[dict] = holders[0].get("holders", [])
                     combined_holders.extend(holders[1].get("holders", []))
-                    return combined_holders
+                    parsed_holders = [TopHolder(**h) for h in combined_holders]
+                    return parsed_holders
 
                 return []
 
