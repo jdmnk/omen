@@ -53,6 +53,12 @@ class MarketDB(Base):
     endDate: Mapped[str] = mapped_column(String, nullable=False)
 
 
+class MarketEvent(BaseModel):
+    id: str
+    slug: str
+    # Add more if needed
+
+
 # Pydantic model for API validation and serialization
 class Market(BaseModel):
     conditionId: str
@@ -75,10 +81,12 @@ class Market(BaseModel):
     bestBid: float = Field(ge=0, le=1)
     bestAsk: float = Field(ge=0, le=1)
     endDate: str
-    events: list[dict] | None = None
     active: bool
     closed: bool
     groupItemTitle: str
+
+    # Event, but without all props
+    events: list[MarketEvent] | None = None
 
     # Reward-related fields
     umaReward: float | None = None
@@ -128,7 +136,10 @@ def parse_market_from_api(market_dict: dict) -> Market | None:
         bestAsk = float(market_dict.get("bestAsk", 0))
 
         endDate = market_dict.get("endDate", "")
-        events = market_dict.get("events", [])
+        events = [
+            MarketEvent(id=str(e.get("id", "")), slug=str(e.get("slug", "")))
+            for e in market_dict.get("events", [])
+        ]
         active = bool(market_dict.get("active"))
         closed = bool(market_dict.get("closed"))
         groupItemTitle = market_dict.get("groupItemTitle", "")

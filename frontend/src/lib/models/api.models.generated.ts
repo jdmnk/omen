@@ -253,16 +253,14 @@ export interface components {
             bestAsk: number;
             /** Enddate */
             endDate: string;
-            /** Events */
-            events?: {
-                [key: string]: unknown;
-            }[] | null;
             /** Active */
             active: boolean;
             /** Closed */
             closed: boolean;
             /** Groupitemtitle */
             groupItemTitle: string;
+            /** Events */
+            events?: components["schemas"]["MarketEvent"][] | null;
             /** Umareward */
             umaReward?: number | null;
             /** Clobrewards */
@@ -275,6 +273,13 @@ export interface components {
             holdingRewardsEnabled?: boolean | null;
             /** Feesenabled */
             feesEnabled?: boolean | null;
+        };
+        /** MarketEvent */
+        MarketEvent: {
+            /** Id */
+            id: string;
+            /** Slug */
+            slug: string;
         };
         /**
          * MarketSearchResponse
@@ -684,6 +689,7 @@ export type EventResponse = components["schemas"]["EventResponse"];
 export type HTTPValidationError = components["schemas"]["HTTPValidationError"];
 export type HealthResponse = components["schemas"]["HealthResponse"];
 export type Market = components["schemas"]["Market"];
+export type MarketEvent = components["schemas"]["MarketEvent"];
 export type MarketSearchResponse = components["schemas"]["MarketSearchResponse"];
 export type MessageResponse = components["schemas"]["MessageResponse"];
 export type SearchEventItem = components["schemas"]["SearchEventItem"];
