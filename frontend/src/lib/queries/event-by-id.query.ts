@@ -1,6 +1,6 @@
 "use client";
 
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, keepPreviousData } from "@tanstack/react-query";
 import { Event } from "@/lib/models/api.models";
 import { getBaseUrl } from "../api";
 
@@ -27,5 +27,7 @@ export function useEventByIdQuery(eventId: string | undefined) {
     enabled: !!eventId && eventId.length > 0,
     retry: 1,
     staleTime: 30000, // 30 seconds
+    refetchInterval: 60000, // Refetch every minute
+    placeholderData: keepPreviousData, // Keep previous data on refetch errors
   });
 }
