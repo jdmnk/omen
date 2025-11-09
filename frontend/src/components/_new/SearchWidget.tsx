@@ -16,6 +16,34 @@ import { Market } from "@/lib/models/api.models";
 
 const INITIAL_LIMIT = 10;
 
+function renderVolumeValue(volume: number) {
+  if (volume <= 0) return undefined;
+  return (
+    <span>
+      vol <span className="font-bold">{formatCompactCurrency(volume, 0)}</span>
+    </span>
+  );
+}
+
+function renderOddsValue(odds: number | null) {
+  if (odds === null || odds <= 0) return undefined;
+  return (
+    <span className="text-outcome-neutral">
+      p <span className="font-bold">{formatNumber(odds * 100, 1)}%</span>
+    </span>
+  );
+}
+
+function renderMarketCountValue(count: number) {
+  if (count <= 0) return undefined;
+  return (
+    <span className="text-outcome-neutral">
+      {count === 1 ? "market" : "markets"}{" "}
+      <span className="font-bold">{count}</span>
+    </span>
+  );
+}
+
 function SearchResultItem({
   title,
   image,
@@ -89,6 +117,7 @@ function SearchSection({
   onToggle,
   renderItem,
   emptyMessage,
+  collapsedInitialCount = INITIAL_LIMIT,
 }: {
   title: string;
   items: unknown[];
@@ -96,13 +125,15 @@ function SearchSection({
   onToggle: () => void;
   renderItem: (item: unknown, index: number) => React.ReactNode;
   emptyMessage: string;
+  collapsedInitialCount?: number;
 }) {
   if (items.length === 0) return null;
 
-  const displayItems = isExpanded ? items : items.slice(0, INITIAL_LIMIT);
-  const hasMore = items.length > INITIAL_LIMIT;
-
-  const remainingCount = items.length - INITIAL_LIMIT;
+  const displayItems = isExpanded
+    ? items
+    : items.slice(0, collapsedInitialCount);
+  const hasMore = items.length > collapsedInitialCount;
+  const remainingCount = items.length - collapsedInitialCount;
 
   return (
     <div>
@@ -285,91 +316,41 @@ export function SearchWidget({ currentMarket }: { currentMarket?: Market }) {
             isExpanded={expandedEventMarkets}
             onToggle={() => setExpandedEventMarkets(!expandedEventMarkets)}
             emptyMessage="No markets in this event"
-            renderItem={(market, index) => {
+            renderItem={(market) => {
               const m = market as (typeof eventMarkets)[0];
-              const odds = m.odds || 0;
-
               return (
                 <SearchResultItem
                   title={m.question}
                   image={m.displayImage}
                   onClick={() => handleSelectMarket(m.slug)}
-                  leftValue={
-                    odds > 0 ? (
-                      <span className="text-outcome-neutral">
-                        p{" "}
-                        <span className="font-bold">
-                          {formatNumber(odds * 100, 1)}%
-                        </span>
-                      </span>
-                    ) : undefined
-                  }
-                  rightValue={
-                    m.volume > 0 ? (
-                      <span>
-                        vol{" "}
-                        <span className="font-bold">
-                          {formatCompactCurrency(m.volume, 0)}
-                        </span>
-                      </span>
-                    ) : undefined
-                  }
+                  leftValue={renderOddsValue(m.odds || 0)}
+                  rightValue={renderVolumeValue(m.volume)}
                 />
               );
             }}
           />
 
           {/* Closed Markets Section (independent collapsible) */}
-          {closedEventMarkets.length > 0 && (
-            <div>
-              <button
-                onClick={() => setExpandedClosedMarkets(!expandedClosedMarkets)}
-                className="w-full flex items-center justify-between px-3 py-1 text-xs text-brand-foreground hover:text-brand-foreground/80 transition-colors cursor-pointer"
-              >
-                <span>Closed Markets ({closedEventMarkets.length})</span>
-                <div className="flex items-center gap-1">
-                  {expandedClosedMarkets ? (
-                    <>
-                      <span className="text-xs">Show less</span>
-                      <ChevronUp className="h-4 w-4" />
-                    </>
-                  ) : (
-                    <>
-                      <span className="text-xs">
-                        Show {closedEventMarkets.length} more
-                      </span>
-                      <ChevronDown className="h-4 w-4" />
-                    </>
-                  )}
-                </div>
-              </button>
-
-              {expandedClosedMarkets && (
-                <div className="space-y-1">
-                  {closedEventMarkets.map((market, index) => (
-                    <div key={index}>
-                      <SearchResultItem
-                        title={market.question}
-                        image={market.displayImage}
-                        onClick={() => handleSelectMarket(market.slug)}
-                        disabled={true}
-                        leftValue={
-                          market.volume > 0 ? (
-                            <span>
-                              vol{" "}
-                              <span className="font-bold">
-                                {formatCompactCurrency(market.volume, 0)}
-                              </span>
-                            </span>
-                          ) : undefined
-                        }
-                      />
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-          )}
+          <SearchSection
+            title="Closed Markets"
+            items={closedEventMarkets}
+            isExpanded={expandedClosedMarkets}
+            onToggle={() => setExpandedClosedMarkets(!expandedClosedMarkets)}
+            emptyMessage="No closed markets"
+            collapsedInitialCount={0}
+            renderItem={(market) => {
+              const m = market as (typeof closedEventMarkets)[0];
+              return (
+                <SearchResultItem
+                  title={m.question}
+                  image={m.displayImage}
+                  onClick={() => handleSelectMarket(m.slug)}
+                  disabled={true}
+                  leftValue={renderVolumeValue(m.volume)}
+                />
+              );
+            }}
+          />
         </div>
       )}
 
@@ -397,7 +378,7 @@ export function SearchWidget({ currentMarket }: { currentMarket?: Market }) {
                 isExpanded={expandedMarkets}
                 onToggle={() => setExpandedMarkets(!expandedMarkets)}
                 emptyMessage="No markets found"
-                renderItem={(market, index) => {
+                renderItem={(market) => {
                   const m = market as (typeof markets)[0];
                   const odds = parseOutcomePrice(m.outcomePrices);
                   const volume = parseVolume(m.volume);
@@ -407,26 +388,8 @@ export function SearchWidget({ currentMarket }: { currentMarket?: Market }) {
                       title={m.question}
                       image={m.displayImage}
                       onClick={() => handleSelectMarket(m.slug)}
-                      leftValue={
-                        odds !== null ? (
-                          <span className="text-outcome-neutral">
-                            p{" "}
-                            <span className="font-bold">
-                              {formatNumber(odds * 100, 1)}%
-                            </span>
-                          </span>
-                        ) : undefined
-                      }
-                      rightValue={
-                        volume > 0 ? (
-                          <span>
-                            vol{" "}
-                            <span className="font-bold">
-                              {formatCompactCurrency(volume, 0)}
-                            </span>
-                          </span>
-                        ) : undefined
-                      }
+                      leftValue={renderOddsValue(odds)}
+                      rightValue={renderVolumeValue(volume)}
                     />
                   );
                 }}
@@ -439,35 +402,18 @@ export function SearchWidget({ currentMarket }: { currentMarket?: Market }) {
                 isExpanded={expandedEvents}
                 onToggle={() => setExpandedEvents(!expandedEvents)}
                 emptyMessage="No events found"
-                renderItem={(event, index) => {
+                renderItem={(event) => {
                   const e = event as (typeof events)[0];
                   const volume = e.volume24hr || e.volume || 0;
+                  const marketCount = e.markets?.length || 0;
 
                   return (
                     <SearchResultItem
                       title={e.title}
                       image={e.displayImage}
                       onClick={() => handleSelectEvent(e)}
-                      leftValue={
-                        e.markets && e.markets.length > 0 ? (
-                          <span className="text-outcome-neutral">
-                            {e.markets.length === 1 ? "market" : "markets"}{" "}
-                            <span className="font-bold">
-                              {e.markets.length}
-                            </span>
-                          </span>
-                        ) : undefined
-                      }
-                      rightValue={
-                        volume > 0 ? (
-                          <span>
-                            vol{" "}
-                            <span className="font-bold">
-                              {formatCompactCurrency(volume, 0)}
-                            </span>
-                          </span>
-                        ) : undefined
-                      }
+                      leftValue={renderMarketCountValue(marketCount)}
+                      rightValue={renderVolumeValue(volume)}
                     />
                   );
                 }}
