@@ -1,6 +1,6 @@
 "use client";
 
-import { useQuery } from "@tanstack/react-query";
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { POLYMARKET_CLOB_URL } from "../api";
 import { Interval } from "../models/api.models";
 
@@ -36,6 +36,7 @@ export function usePriceHistoryQuery(
     },
     retry: 1,
     staleTime: 60000, // 1 minute
+    placeholderData: keepPreviousData, // Keep previous data on refetch errors
   });
   return query;
 }

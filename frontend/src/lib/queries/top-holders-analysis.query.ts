@@ -1,6 +1,6 @@
 "use client";
 
-import { useQuery } from "@tanstack/react-query";
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { TopHolderAnalysis } from "@/lib/models/api.models";
 import { getBaseUrl } from "../api";
 
@@ -30,5 +30,6 @@ export function useTopHoldersAnalysisQuery(
     enabled: !!conditionId && !!token1 && !!token2,
     staleTime: 120000, // 2 minutes
     retry: 3,
+    placeholderData: keepPreviousData, // Keep previous data on refetch errors
   });
 }

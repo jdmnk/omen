@@ -1,6 +1,6 @@
 "use client";
 
-import { useQuery } from "@tanstack/react-query";
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { fetchTopHoldersPositions } from "./fetch/fetch-top-holders-positions";
 import { UserPosition } from "@/lib/models/api.models";
 
@@ -13,6 +13,7 @@ export function useTopHoldersPositionsQuery(
     queryFn: () => fetchTopHoldersPositions(wallets!, positionsPerHolder),
     enabled: !!wallets && wallets.length > 0,
     staleTime: 10 * 60 * 1000, // 10 minutes
-    retry: 0, // dont wanna retry not so spam the api
+    retry: 0, // dont wanna retry not to spam the api
+    placeholderData: keepPreviousData, // Keep previous data on refetch errors
   });
 }

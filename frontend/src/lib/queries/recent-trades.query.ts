@@ -1,6 +1,6 @@
 "use client";
 
-import { useQuery } from "@tanstack/react-query";
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { Trade } from "../models/api.models";
 import { DATA_API_HOST } from "../api";
 
@@ -25,5 +25,6 @@ export function useRecentTradesQuery(conditionId: string, minAmount?: number) {
     },
     staleTime: 30000, // 30 seconds
     // refetchInterval: 30000, // auto-refetch every 30 seconds
+    placeholderData: keepPreviousData, // Keep previous data on refetch errors
   });
 }
