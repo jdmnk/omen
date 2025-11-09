@@ -102,6 +102,8 @@ function SearchSection({
   const displayItems = isExpanded ? items : items.slice(0, INITIAL_LIMIT);
   const hasMore = items.length > INITIAL_LIMIT;
 
+  const remainingCount = items.length - INITIAL_LIMIT;
+
   return (
     <div>
       {/* Section Header */}
@@ -121,7 +123,7 @@ function SearchSection({
               </>
             ) : (
               <>
-                <span className="text-xs">Show all</span>
+                <span className="text-xs">Show {remainingCount} more</span>
                 <ChevronDown className="h-4 w-4" />
               </>
             )}
@@ -317,37 +319,56 @@ export function SearchWidget({ currentMarket }: { currentMarket?: Market }) {
             }}
           />
 
-          {/* Closed Markets Section (shown when expanded) */}
-          {expandedEventMarkets && closedEventMarkets.length > 0 && (
-            <SearchSection
-              title="Closed Markets"
-              items={closedEventMarkets}
-              isExpanded={expandedClosedMarkets}
-              onToggle={() => setExpandedClosedMarkets(!expandedClosedMarkets)}
-              emptyMessage="No closed markets"
-              renderItem={(market, index) => {
-                const m = market as (typeof closedEventMarkets)[0];
+          {/* Closed Markets Section (independent collapsible) */}
+          {closedEventMarkets.length > 0 && (
+            <div>
+              <button
+                onClick={() => setExpandedClosedMarkets(!expandedClosedMarkets)}
+                className="w-full flex items-center justify-between px-3 py-1 text-xs text-brand-foreground hover:text-brand-foreground/80 transition-colors cursor-pointer"
+              >
+                <span>Closed Markets ({closedEventMarkets.length})</span>
+                <div className="flex items-center gap-1">
+                  {expandedClosedMarkets ? (
+                    <>
+                      <span className="text-xs">Show less</span>
+                      <ChevronUp className="h-4 w-4" />
+                    </>
+                  ) : (
+                    <>
+                      <span className="text-xs">
+                        Show {closedEventMarkets.length} more
+                      </span>
+                      <ChevronDown className="h-4 w-4" />
+                    </>
+                  )}
+                </div>
+              </button>
 
-                return (
-                  <SearchResultItem
-                    title={m.question}
-                    image={m.displayImage}
-                    onClick={() => handleSelectMarket(m.slug)}
-                    disabled={true}
-                    leftValue={
-                      m.volume > 0 ? (
-                        <span>
-                          vol{" "}
-                          <span className="font-bold">
-                            {formatCompactCurrency(m.volume, 0)}
-                          </span>
-                        </span>
-                      ) : undefined
-                    }
-                  />
-                );
-              }}
-            />
+              {expandedClosedMarkets && (
+                <div className="space-y-1">
+                  {closedEventMarkets.map((market, index) => (
+                    <div key={index}>
+                      <SearchResultItem
+                        title={market.question}
+                        image={market.displayImage}
+                        onClick={() => handleSelectMarket(market.slug)}
+                        disabled={true}
+                        leftValue={
+                          market.volume > 0 ? (
+                            <span>
+                              vol{" "}
+                              <span className="font-bold">
+                                {formatCompactCurrency(market.volume, 0)}
+                              </span>
+                            </span>
+                          ) : undefined
+                        }
+                      />
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
           )}
         </div>
       )}
