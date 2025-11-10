@@ -27,9 +27,7 @@ export function useMarketsByConditionIdsQuery(
       );
 
       if (!response.ok) {
-        throw new Error(
-          `Failed to fetch markets: ${response.statusText}`
-        );
+        throw new Error(`Failed to fetch markets: ${response.statusText}`);
       }
 
       const data = (await response.json()) as Market[];
@@ -40,4 +38,3 @@ export function useMarketsByConditionIdsQuery(
     staleTime: 30000, // 30 seconds
   });
 }
-
