@@ -219,30 +219,20 @@ export function SearchWidget({ currentMarket }: { currentMarket?: Market }) {
       .filter((m) => !m.closed && m.active)
       .map((market) => ({
         question: market.groupItemTitle,
-        conditionId: market.conditionId,
         slug: market.slug,
-        icon: market.icon,
-        image: market.image,
-        displayImage: market.image || market.icon,
-        outcomePrices: market.outcomePrices,
+        displayImage: market.icon || market.image,
         volume: market.volume,
         odds: parseOutcomePrice(market.outcomePrices),
-        closed: false,
       }));
 
     const closedMarkets = eventData.markets
       .filter((m) => m.closed && m.active) // must be active or its a market thats not live
       .map((market) => ({
         question: market.groupItemTitle,
-        conditionId: market.conditionId,
         slug: market.slug,
-        icon: market.icon,
-        image: market.image,
-        displayImage: market.image || market.icon,
-        outcomePrices: market.outcomePrices,
+        displayImage: market.icon || market.image,
         volume: market.volume,
         odds: parseOutcomePrice(market.outcomePrices),
-        closed: true,
       }));
 
     return {
