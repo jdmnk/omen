@@ -115,13 +115,18 @@ export function TopHoldersWidget({
 
   // Step 2: Enrich holders with wallet info and position data
   const {
-    data: topHolders,
+    data: enrichedHolders,
     isLoading: isLoadingEnrichment,
     error: enrichmentError,
   } = useEnrichHoldersQuery(rawHolders, market.token1, market.token2);
 
-  const isLoading = isLoadingHolders || isLoadingEnrichment;
-  const error = holdersError || enrichmentError;
+  // Use enriched holders if available, otherwise fall back to raw holders
+  // TopHolderAnalysis extends TopHolder, so raw holders can be cast to TopHolderAnalysis
+  const topHolders =
+    enrichedHolders || (rawHolders as TopHolderAnalysis[] | undefined);
+
+  const isLoading = isLoadingHolders;
+  const error = holdersError;
 
   const { data: topHoldersPositions } = useTopHoldersPositionsQuery(
     topHolders?.map((h) => h.proxyWallet),
@@ -131,15 +136,15 @@ export function TopHoldersWidget({
   // Fetch orderbook to get live prices for PnL calculation
   const { data: orderbookData } = useOrderbookQuery(market.token1);
 
-  // Generate tags for all holders
+  // Generate tags for all holders (only works with enriched holders)
   const holderTagsMap = useMemo(() => {
-    if (!topHolders) return {};
+    if (!enrichedHolders) return {};
     return generateHolderTagsMap(
-      topHolders,
+      enrichedHolders,
       topHoldersPositions,
       market.token1
     );
-  }, [topHolders, topHoldersPositions, market.token1]);
+  }, [enrichedHolders, topHoldersPositions, market.token1]);
 
   // TopHolders already have outcomeIndex, no transformation needed
   const holdersByOutcome = (topHolders || []).reduce((acc, holder) => {
