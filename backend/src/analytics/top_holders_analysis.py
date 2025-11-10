@@ -18,38 +18,25 @@ def filter_blacklisted_wallets(holders: list[TopHolder]) -> list[TopHolder]:
     ]
 
 
-async def get_top_holders_analysis(
-    condition_id: str, token_ids: list[str]
-) -> list[TopHolderAnalysis]:
+async def enrich_holders(holders: list[TopHolder], token_ids: list[str]) -> list[TopHolderAnalysis]:
     """
-    Get top holders for a market and enrich them with wallet information and position data.
+    Enrich holders with wallet information and position data.
 
     Steps:
-    1. Get top holders from Polymarket Data API using get_top_holders
-    2. Get wallet info for all unique proxy wallets from Goldsky
-    3. Get position data for all holders from Goldsky
-    4. Enrich holders with wallet data and position/PnL data
+    1. Get wallet info for all unique proxy wallets from Goldsky
+    2. Get position data for all holders from Goldsky
+    3. Enrich holders with wallet data and position/PnL data
 
     Args:
-        condition_id: The market condition ID
+        holders: List of TopHolder objects to enrich
         token_ids: List of token IDs (token1, token2) for the market
 
-    Returns list of top holders enriched with wallet information and position data.
+    Returns list of holders enriched with wallet information and position data.
     """
-    poly_client = PolyClient()
+    if not holders:
+        return []
+
     poly_client_graphs = PolyClientGraphs()
-
-    # Get top holders from Polymarket API
-    holders = await poly_client.get_top_holders([condition_id])
-
-    if not holders:
-        return []
-
-    # Filter out blacklisted wallets
-    holders = filter_blacklisted_wallets(holders)
-
-    if not holders:
-        return []
 
     # Extract unique proxy wallets (user addresses)
     unique_wallets = list(set(h.proxyWallet for h in holders if h.proxyWallet))
@@ -99,3 +86,38 @@ async def get_top_holders_analysis(
         )
 
     return enriched_holders
+
+
+async def get_top_holders_analysis(
+    condition_id: str, token_ids: list[str]
+) -> list[TopHolderAnalysis]:
+    """
+    Get top holders for a market and enrich them with wallet information and position data.
+
+    Steps:
+    1. Get top holders from Polymarket Data API using get_top_holders
+    2. Filter out blacklisted wallets
+    3. Enrich holders with wallet data and position/PnL data
+
+    Args:
+        condition_id: The market condition ID
+        token_ids: List of token IDs (token1, token2) for the market
+
+    Returns list of top holders enriched with wallet information and position data.
+    """
+    poly_client = PolyClient()
+
+    # Get top holders from Polymarket API
+    holders = await poly_client.get_top_holders([condition_id])
+
+    if not holders:
+        return []
+
+    # Filter out blacklisted wallets
+    holders = filter_blacklisted_wallets(holders)
+
+    if not holders:
+        return []
+
+    # Enrich holders with wallet information and position data
+    return await enrich_holders(holders, token_ids)

@@ -2,8 +2,13 @@ from datetime import datetime
 
 from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel
 
-from src.analytics.top_holders_analysis import TopHolderAnalysis, get_top_holders_analysis
+from src.analytics.top_holders_analysis import (
+    TopHolderAnalysis,
+    enrich_holders,
+    get_top_holders_analysis,
+)
 from src.db.selects import SelectsClient
 from src.models.event import Event
 from src.models.market import Market
@@ -12,6 +17,7 @@ from src.models.responses import (
     MessageResponse,
 )
 from src.models.search import SearchResponse
+from src.models.top_holders import TopHolder
 from src.models.trade import Trade
 from src.polymarket.poly_client import PolyClient
 from src.polymarket.poly_client_graphs import PolyClientGraphs
@@ -79,7 +85,7 @@ async def get_search_markets_endpoint(q: str = Query(min_length=1)) -> SearchRes
 
 @app.get("/markets/by-condition-ids", response_model=list[Market])
 async def get_markets_by_condition_ids_endpoint(
-    condition_ids: list[str] = Query(min_length=1),
+    condition_ids: list[str],
 ) -> list[Market]:
     """
     Get multiple markets by their condition IDs from Polymarket Gamma API.
@@ -87,6 +93,33 @@ async def get_markets_by_condition_ids_endpoint(
     Official docs: https://docs.polymarket.com/api-reference/markets/list-markets
     """
     return await poly_client.get_markets_by_condition_ids(condition_ids)
+
+
+class EnrichHoldersRequest(BaseModel):
+    holders: list[TopHolder]
+    token1: str
+    token2: str
+
+
+@app.post("/markets/enrich-holders", response_model=list[TopHolderAnalysis])
+async def enrich_holders_endpoint(request: EnrichHoldersRequest) -> list[TopHolderAnalysis]:
+    """
+    Enrich holders with wallet information and position data.
+
+    Accepts a list of TopHolder objects and enriches them with wallet info and position data.
+    """
+    logger.info(
+        f"Enrich holders request: {len(request.holders)} holders, token1={request.token1}, token2={request.token2}"
+    )
+
+    try:
+        enriched = await enrich_holders(request.holders, [request.token1, request.token2])
+
+        logger.info(f"Returning {len(enriched)} enriched holders")
+        return enriched
+    except Exception as exc:
+        logger.error(f"Error in enrich holders endpoint: {exc!s}", exc_info=True)
+        raise HTTPException(status_code=500, detail=f"Internal server error: {exc!s}") from exc
 
 
 @app.get("/markets/top-holders-analysis", response_model=list[TopHolderAnalysis])
