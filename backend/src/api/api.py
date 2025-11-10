@@ -2,11 +2,8 @@ from datetime import datetime
 
 from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel
 
 from src.analytics.top_holders_analysis import (
-    TopHolderAnalysis,
-    get_top_holders_analysis,
     get_top_holders_pnl,
     get_top_holders_wallet_info,
 )
@@ -18,7 +15,12 @@ from src.models.responses import (
     MessageResponse,
 )
 from src.models.search import SearchResponse
-from src.models.top_holders import TopHolder, TopHolderPnl, TopHolderWalletInfo
+from src.models.top_holders import (
+    TopHolderPnl,
+    TopHoldersPnlRequest,
+    TopHoldersWalletInfoRequest,
+    TopHolderWalletInfo,
+)
 from src.models.trade import Trade
 from src.polymarket.poly_client import PolyClient
 from src.polymarket.poly_client_graphs import PolyClientGraphs
@@ -96,16 +98,6 @@ async def get_markets_by_condition_ids_endpoint(
     return await poly_client.get_markets_by_condition_ids(condition_ids)
 
 
-class TopHoldersPnlRequest(BaseModel):
-    holders: list[TopHolder]
-    token1: str
-    token2: str
-
-
-class TopHoldersWalletInfoRequest(BaseModel):
-    holders: list[TopHolder]
-
-
 @app.post("/markets/top-holders-pnl", response_model=list[TopHolderPnl])
 async def get_top_holders_pnl_endpoint(request: TopHoldersPnlRequest) -> list[TopHolderPnl]:
     """
@@ -145,34 +137,6 @@ async def get_top_holders_wallet_info_endpoint(
         return wallet_info
     except Exception as exc:
         logger.error(f"Error in top holders wallet info endpoint: {exc!s}", exc_info=True)
-        raise HTTPException(status_code=500, detail=f"Internal server error: {exc!s}") from exc
-
-
-@app.get("/markets/top-holders-analysis", response_model=list[TopHolderAnalysis])
-async def get_top_holders_analysis_endpoint(
-    condition_id: str = Query(min_length=1),
-    token1: str = Query(min_length=1),
-    token2: str = Query(min_length=1),
-) -> list[TopHolderAnalysis]:
-    logger.info(
-        f"Top holders analysis request: condition_id={condition_id}, token1={token1}, token2={token2}"
-    )
-
-    try:
-        holders = await get_top_holders_analysis(condition_id, [token1, token2])
-
-        if not holders:
-            logger.warning(
-                f"No holders found for condition_id={condition_id}, token1={token1}, token2={token2}"
-            )
-            raise HTTPException(status_code=404, detail="Top holders not found")
-
-        logger.info(f"Returning {len(holders)} holders")
-        return holders
-    except HTTPException:
-        raise
-    except Exception as exc:
-        logger.error(f"Error in top holders analysis endpoint: {exc!s}", exc_info=True)
         raise HTTPException(status_code=500, detail=f"Internal server error: {exc!s}") from exc
 
 

@@ -55,3 +55,13 @@ class TopHolderAnalysis(TopHolder):
     avgPrice: float | None = None
     realizedPnl: float | None = None
     totalBought: float | None = None
+
+
+class TopHoldersPnlRequest(BaseModel):
+    holders: list[TopHolder]
+    token1: str
+    token2: str
+
+
+class TopHoldersWalletInfoRequest(BaseModel):
+    holders: list[TopHolder]
