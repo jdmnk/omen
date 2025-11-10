@@ -7,7 +7,7 @@ export function EmptyState({
 }) {
   return (
     <div className="h-full flex items-center justify-center">
-      <span className="font-semibold text-muted-foreground">{message}</span>
+      <span className="text-brand-foreground italic text-sm">{message}</span>
     </div>
   );
 }
