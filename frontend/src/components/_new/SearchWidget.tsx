@@ -187,7 +187,7 @@ export function SearchWidget({ currentMarket }: { currentMarket?: Market }) {
 
   // Fetch event data
   const { data: eventData } = useEventByIdQuery(eventId);
-  console.log("eventData", eventData);
+  eventData && console.log("eventData", eventData);
 
   const { data: searchResults, isLoading } = useMarketSearchQuery(
     debouncedInput,
