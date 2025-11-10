@@ -226,7 +226,7 @@ export function SearchWidget({ currentMarket }: { currentMarket?: Market }) {
         displayImage: market.image || market.icon,
         outcomePrices: market.outcomePrices,
         volume: market.volume,
-        odds: market.bestAsk - market.bestBid,
+        odds: parseOutcomePrice(market.outcomePrices),
         closed: false,
       }));
 
@@ -241,7 +241,7 @@ export function SearchWidget({ currentMarket }: { currentMarket?: Market }) {
         displayImage: market.image || market.icon,
         outcomePrices: market.outcomePrices,
         volume: market.volume,
-        odds: market.bestAsk - market.bestBid,
+        odds: parseOutcomePrice(market.outcomePrices),
         closed: true,
       }));
 
