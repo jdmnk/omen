@@ -67,7 +67,7 @@ export function WatchlistWidget() {
   const remainingCount = watchlistedMarkets.length - INITIAL_LIMIT;
 
   return (
-    <div>
+    <div className="pt-2">
       {/* Section Header */}
       <button
         onClick={() => setIsExpanded(!isExpanded)}
