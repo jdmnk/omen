@@ -11,6 +11,7 @@ import { PriceChart } from "./PriceChart";
 import { formatCompactNumber, formatNumber } from "@/lib/ui/format.utils";
 import { cn } from "@/lib/utils";
 import { Card } from "../ui/card";
+import { WatchlistButton } from "./WatchlistButton";
 
 const INTERVALS: Interval[] = ["1h", "6h", "1d", "1w", "1m", "max"];
 
@@ -70,8 +71,13 @@ export function PriceChartWidget({ market }: { market: Market }) {
 
   return (
     <Card className="relative w-full h-full flex flex-col pb-2">
-      <div className="text-xs bg-brand-background px-3 py-2 rounded-t-brand border-b border-brand-stroke font-bold">
-        {market.question}
+      <div className="text-xs bg-brand-background px-3 py-2 rounded-t-brand border-b border-brand-stroke font-bold flex items-center justify-between gap-2">
+        <span className="flex-1 truncate">{market.question}</span>
+        <WatchlistButton
+          slug={market.slug}
+          conditionId={market.conditionId}
+          title={market.question}
+        />
       </div>
       <div className="flex items-center gap-12 mb-4 text-xs px-3 py-2 border-b border-brand-stroke bg-brand-background">
         <div className="text-outcome-yes">

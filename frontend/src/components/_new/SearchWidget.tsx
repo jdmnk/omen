@@ -6,6 +6,7 @@ import { Search, ChevronDown, ChevronUp } from "lucide-react";
 import Image from "next/image";
 import { useMarketSearchQuery } from "@/lib/queries/search.query";
 import { useEventByIdQuery } from "@/lib/queries/event-by-id.query";
+import { useMarketsByConditionIdsQuery } from "@/lib/queries/markets-by-condition-ids.query";
 import { Input } from "@/components/ui/input";
 import { Spinner } from "@/components/ui/spinner";
 import { formatNumber, formatCompactCurrency } from "@/lib/ui/format.utils";
@@ -13,6 +14,7 @@ import { cn } from "@/lib/utils";
 import { useRouter } from "next/navigation";
 import { parseOutcomePrice, parseVolume } from "@/lib/api-parse.utils";
 import { Market } from "@/lib/models/api.models";
+import { useWatchlist } from "@/lib/hooks/use-watchlist";
 
 const INITIAL_LIMIT = 10;
 
@@ -179,13 +181,71 @@ export function SearchWidget({ currentMarket }: { currentMarket?: Market }) {
   const [expandedEvents, setExpandedEvents] = useState(false);
   const [expandedEventMarkets, setExpandedEventMarkets] = useState(true);
   const [expandedClosedMarkets, setExpandedClosedMarkets] = useState(true);
+  const [expandedWatchlistedMarkets, setExpandedWatchlistedMarkets] =
+    useState(true);
   const router = useRouter();
+  const { watchlist, getConditionIds } = useWatchlist();
 
   // Get event ID from current market
   const eventId = currentMarket?.events?.[0]?.id;
 
   // Fetch event data
   const { data: eventData } = useEventByIdQuery(eventId);
+
+  // Get conditionIds from watchlist items (filter out empty ones from migrated data)
+  const conditionIds = useMemo(() => {
+    return getConditionIds().filter((id) => id && id.length > 0);
+  }, [getConditionIds]);
+
+  // Fetch watchlisted markets by conditionIds
+  const { data: fetchedMarkets, isLoading: isLoadingWatchlist } =
+    useMarketsByConditionIdsQuery(conditionIds, conditionIds.length > 0);
+
+  // Merge watchlist items with fetched market data
+  // Show watchlist items immediately (using stored title) even before API loads
+  const watchlistedMarkets = useMemo(() => {
+    // Create a map of fetched markets by conditionId for quick lookup
+    const fetchedMarketsMap = new Map<string, Market>();
+    if (fetchedMarkets) {
+      fetchedMarkets.forEach((market) => {
+        fetchedMarketsMap.set(market.conditionId, market);
+      });
+    }
+
+    return watchlist.map((item) => {
+      const fetchedMarket = fetchedMarketsMap.get(item.conditionId);
+
+      // Use fetched market data if available, otherwise use stored watchlist item data
+      if (fetchedMarket) {
+        return {
+          question: fetchedMarket.question || item.title,
+          conditionId: fetchedMarket.conditionId,
+          slug: fetchedMarket.slug || item.slug,
+          icon: fetchedMarket.icon,
+          image: fetchedMarket.image,
+          displayImage: fetchedMarket.image || fetchedMarket.icon,
+          outcomePrices: fetchedMarket.outcomePrices,
+          volume: fetchedMarket.volume,
+          odds: fetchedMarket.bestAsk - fetchedMarket.bestBid,
+          closed: fetchedMarket.closed,
+        };
+      } else {
+        // Use stored data for immediate display before API loads
+        return {
+          question: item.title,
+          conditionId: item.conditionId,
+          slug: item.slug,
+          icon: null,
+          image: null,
+          displayImage: null,
+          outcomePrices: null,
+          volume: 0,
+          odds: null,
+          closed: false,
+        };
+      }
+    });
+  }, [watchlist, fetchedMarkets]);
 
   const { data: searchResults, isLoading } = useMarketSearchQuery(
     debouncedInput,
@@ -292,6 +352,7 @@ export function SearchWidget({ currentMarket }: { currentMarket?: Market }) {
   const showResults = debouncedInput.trim().length > 0;
   const hasResults = (markets.length > 0 || events.length > 0) && !isLoading;
   const showEventMarkets = !showResults && eventMarkets.length > 0;
+  const showWatchlistedMarkets = !showResults && watchlistedMarkets.length > 0;
 
   return (
     <div className="flex flex-col h-full rounded-brand">
@@ -306,6 +367,33 @@ export function SearchWidget({ currentMarket }: { currentMarket?: Market }) {
           className="pl-9"
         />
       </div>
+
+      {/* Watchlisted Markets Section (shown when NOT searching) */}
+      {showWatchlistedMarkets && (
+        <div className="space-y-4">
+          <SearchSection
+            title="Watchlist"
+            items={watchlistedMarkets}
+            isExpanded={expandedWatchlistedMarkets}
+            onToggle={() =>
+              setExpandedWatchlistedMarkets(!expandedWatchlistedMarkets)
+            }
+            emptyMessage="No watchlisted markets"
+            renderItem={(market) => {
+              const m = market as (typeof watchlistedMarkets)[0];
+              return (
+                <SearchResultItem
+                  title={m.question}
+                  image={m.displayImage}
+                  onClick={() => handleSelectMarket(m.slug)}
+                  leftValue={renderOddsValue(m.odds || 0)}
+                  rightValue={renderVolumeValue(m.volume)}
+                />
+              );
+            }}
+          />
+        </div>
+      )}
 
       {/* Event Markets Section (shown when NOT searching) */}
       {showEventMarkets && (
