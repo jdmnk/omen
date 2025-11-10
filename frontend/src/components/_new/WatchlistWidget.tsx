@@ -1,18 +1,19 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { Star, ChevronDown, ChevronUp } from "lucide-react";
+import { ChevronDown, ChevronUp } from "lucide-react";
 import Link from "next/link";
 import { useWatchlist } from "@/lib/hooks/use-watchlist";
 import { useMarketsByConditionIdsQuery } from "@/lib/queries/markets-by-condition-ids.query";
 import { Market } from "@/lib/models/api.models";
 import { cn } from "@/lib/utils";
+import { WatchlistButton } from "./WatchlistButton";
 
 const INITIAL_LIMIT = 10;
 
 export function WatchlistWidget() {
   const [isExpanded, setIsExpanded] = useState(true);
-  const { watchlist, getConditionIds, toggleWatchlist } = useWatchlist();
+  const { watchlist, getConditionIds } = useWatchlist();
 
   // Get conditionIds from watchlist items (filter out empty ones from migrated data)
   const conditionIds = useMemo(() => {
@@ -54,15 +55,6 @@ export function WatchlistWidget() {
       }
     });
   }, [watchlist, fetchedMarkets]);
-
-  const handleUnwatchlist = (
-    e: React.MouseEvent | React.KeyboardEvent,
-    item: { slug: string; conditionId: string; title: string }
-  ) => {
-    e.preventDefault();
-    e.stopPropagation();
-    toggleWatchlist(item);
-  };
 
   if (watchlistedMarkets.length === 0) {
     return null;
@@ -107,6 +99,8 @@ export function WatchlistWidget() {
             (item) => item.slug === market.slug
           );
 
+          if (!watchlistItem) return null;
+
           return (
             <Link
               key={`${market.slug}-${index}`}
@@ -120,30 +114,12 @@ export function WatchlistWidget() {
             >
               <div className="flex gap-3 items-center">
                 {/* Star Icon - Clickable to unwatchlist */}
-                <div
-                  onClick={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    if (watchlistItem) handleUnwatchlist(e, watchlistItem);
-                  }}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter" || e.key === " ") {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      if (watchlistItem) handleUnwatchlist(e, watchlistItem);
-                    }
-                  }}
-                  role="button"
-                  tabIndex={0}
-                  aria-label="Remove from watchlist"
-                  className={cn(
-                    "shrink-0 transition-all duration-200 cursor-pointer",
-                    "hover:scale-110 active:scale-95",
-                    "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded"
-                  )}
-                >
-                  <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                </div>
+                <WatchlistButton
+                  slug={watchlistItem.slug}
+                  conditionId={watchlistItem.conditionId}
+                  title={watchlistItem.title}
+                  className="shrink-0"
+                />
 
                 {/* Title */}
                 <div className="flex-1 min-w-0">
