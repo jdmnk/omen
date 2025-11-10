@@ -8,11 +8,32 @@ import { cn } from "@/lib/utils";
 
 export default function Home() {
   const [email, setEmail] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // TODO: Add API call to submit email
-    console.log("Email submitted:", email);
+    setIsLoading(true);
+
+    try {
+      const response = await fetch("/api/signup", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email }),
+      });
+
+      if (response.ok) {
+        setIsSuccess(true);
+      } else {
+        console.error("Failed to sign up");
+      }
+    } catch (error) {
+      console.error("Error signing up:", error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -44,21 +65,30 @@ export default function Home() {
         </div>
 
         {/* Email Form */}
-        <form
-          onSubmit={handleSubmit}
-          className="flex w-full max-w-[280px] flex-col gap-2 mt-32"
-        >
-          <Input
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            placeholder="Enter your email"
-            required
-          />
-          <Button type="submit" variant="brand">
-            Join the waitlist
-          </Button>
-        </form>
+        {isSuccess ? (
+          <div className="flex w-full max-w-[280px] flex-col gap-2 mt-32">
+            <p className="text-[12px] font-normal italic text-[#BBA6F2]">
+              You're in!!
+            </p>
+          </div>
+        ) : (
+          <form
+            onSubmit={handleSubmit}
+            className="flex w-full max-w-[280px] flex-col gap-2 mt-32"
+          >
+            <Input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="Enter your email"
+              required
+              disabled={isLoading}
+            />
+            <Button type="submit" variant="brand" disabled={isLoading}>
+              {isLoading ? "Joining..." : "Join the waitlist"}
+            </Button>
+          </form>
+        )}
 
         {/* Logo */}
         <div className="absolute bottom-8 flex items-center gap-3">
