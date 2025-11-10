@@ -3,7 +3,8 @@
 import React, { useState, useMemo } from "react";
 import { Card } from "@/components/ui/card";
 import { LoadingSpinner } from "@/components/ui/spinner";
-import { useTopHoldersAnalysisQuery } from "@/lib/queries/top-holders-analysis.query";
+import { useTopHoldersQuery } from "@/lib/queries/top-holders.query";
+import { useEnrichHoldersQuery } from "@/lib/queries/enrich-holders.query";
 import { TopHolderAnalysis } from "@/lib/models/api.models";
 import {
   formatCompactCurrency,
@@ -104,15 +105,23 @@ export function TopHoldersWidget({
   limit?: number;
 }) {
   const [activeTab, setActiveTab] = useState("positions");
+
+  // Step 1: Fetch top holders directly from Polymarket API
+  const {
+    data: rawHolders,
+    isLoading: isLoadingHolders,
+    error: holdersError,
+  } = useTopHoldersQuery(market.conditionId);
+
+  // Step 2: Enrich holders with wallet info and position data
   const {
     data: topHolders,
-    isLoading,
-    error,
-  } = useTopHoldersAnalysisQuery(
-    market.conditionId,
-    market.token1,
-    market.token2
-  );
+    isLoading: isLoadingEnrichment,
+    error: enrichmentError,
+  } = useEnrichHoldersQuery(rawHolders, market.token1, market.token2);
+
+  const isLoading = isLoadingHolders || isLoadingEnrichment;
+  const error = holdersError || enrichmentError;
 
   const { data: topHoldersPositions } = useTopHoldersPositionsQuery(
     topHolders?.map((h) => h.proxyWallet),
