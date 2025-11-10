@@ -1,7 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
 import { google } from "googleapis";
-import { readFileSync } from "fs";
-import { resolve } from "path";
 
 // Email validation regex
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -9,17 +7,15 @@ const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 // Maximum email length (RFC 5321)
 const MAX_EMAIL_LENGTH = 320;
 
-const FORMULA_CHARS = ["=", "+", "-", "@", "\t", "\r", "\n"];
-
 /**
  * Sanitize email to prevent formula injection
  * Prefixes with single quote if starts with formula characters
  */
 function sanitizeEmail(email: string): string {
   // Remove leading/trailing whitespace
-  const trimmed = email.trim().toLowerCase();
+  return email.trim().toLowerCase();
 
-  return `'${trimmed}`; // Add single quote to force text mode in Google Sheets
+  // return `'${trimmed}`; // Add single quote to force text mode in Google Sheets
 }
 
 /**
@@ -53,9 +49,15 @@ export async function POST(request: NextRequest) {
     // Sanitize email to prevent formula injection
     const sanitizedEmail = sanitizeEmail(email);
 
-    // Load credentials from credentials.json
-    const credentialsPath = resolve(process.cwd(), "credentials.json");
-    const credentials = JSON.parse(readFileSync(credentialsPath, "utf-8"));
+    // Load credentials from environment variable (base64 encoded)
+    const credentialsBase64 = process.env.GOOGLE_CREDENTIALS;
+    if (!credentialsBase64) {
+      throw new Error("GOOGLE_CREDENTIALS environment variable is not set");
+    }
+    const credentialsJson = Buffer.from(credentialsBase64, "base64").toString(
+      "utf-8"
+    );
+    const credentials = JSON.parse(credentialsJson);
 
     // Authenticate with Google Sheets API
     const auth = new google.auth.GoogleAuth({
