@@ -102,17 +102,66 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/markets/top-holders-analysis": {
+    "/markets/by-condition-ids": {
         parameters: {
             query?: never;
             header?: never;
             path?: never;
             cookie?: never;
         };
-        /** Get Top Holders Analysis Endpoint */
-        get: operations["get_top_holders_analysis_endpoint_markets_top_holders_analysis_get"];
+        /**
+         * Get Markets By Condition Ids Endpoint
+         * @description Get multiple markets by their condition IDs from Polymarket Gamma API.
+         *
+         *     Official docs: https://docs.polymarket.com/api-reference/markets/list-markets
+         */
+        get: operations["get_markets_by_condition_ids_endpoint_markets_by_condition_ids_get"];
         put?: never;
         post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/markets/top-holders-pnl": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Get Top Holders Pnl Endpoint
+         * @description Get PnL data for holders.
+         *
+         *     Accepts a list of TopHolder objects and returns them with PnL data (avgPrice, realizedPnl, totalBought).
+         */
+        post: operations["get_top_holders_pnl_endpoint_markets_top_holders_pnl_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/markets/top-holders-wallet-info": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Get Top Holders Wallet Info Endpoint
+         * @description Get wallet information for holders.
+         *
+         *     Accepts a list of TopHolder objects and returns them with wallet info (walletCreatedAt, walletLastTransfer, walletBalance).
+         */
+        post: operations["get_top_holders_wallet_info_endpoint_markets_top_holders_wallet_info_post"];
         delete?: never;
         options?: never;
         head?: never;
@@ -358,10 +407,68 @@ export interface components {
             } | null;
         };
         /**
-         * TopHolderAnalysis
-         * @description Polymarket holder enriched with wallet information and position data.
+         * TopHolder
+         * @description Single holder from Polymarket Data API.
          */
-        TopHolderAnalysis: {
+        TopHolder: {
+            /** Proxywallet */
+            proxyWallet: string;
+            /** Bio */
+            bio?: string | null;
+            /** Asset */
+            asset: string;
+            /** Pseudonym */
+            pseudonym?: string | null;
+            /** Amount */
+            amount: number;
+            /** Displayusernamepublic */
+            displayUsernamePublic: boolean;
+            /** Outcomeindex */
+            outcomeIndex: number;
+            /** Name */
+            name?: string | null;
+            /** Profileimage */
+            profileImage?: string | null;
+            /** Profileimageoptimized */
+            profileImageOptimized?: string | null;
+        };
+        /**
+         * TopHolderPnl
+         * @description TopHolder with PnL data only.
+         */
+        TopHolderPnl: {
+            /** Proxywallet */
+            proxyWallet: string;
+            /** Bio */
+            bio?: string | null;
+            /** Asset */
+            asset: string;
+            /** Pseudonym */
+            pseudonym?: string | null;
+            /** Amount */
+            amount: number;
+            /** Displayusernamepublic */
+            displayUsernamePublic: boolean;
+            /** Outcomeindex */
+            outcomeIndex: number;
+            /** Name */
+            name?: string | null;
+            /** Profileimage */
+            profileImage?: string | null;
+            /** Profileimageoptimized */
+            profileImageOptimized?: string | null;
+            /** Avgprice */
+            avgPrice?: number | null;
+            /** Realizedpnl */
+            realizedPnl?: number | null;
+            /** Totalbought */
+            totalBought?: number | null;
+        };
+        /**
+         * TopHolderWalletInfo
+         * @description TopHolder with wallet info only.
+         */
+        TopHolderWalletInfo: {
             /** Proxywallet */
             proxyWallet: string;
             /** Bio */
@@ -388,12 +495,20 @@ export interface components {
             walletLastTransfer?: string | null;
             /** Walletbalance */
             walletBalance?: number | null;
-            /** Avgprice */
-            avgPrice?: number | null;
-            /** Realizedpnl */
-            realizedPnl?: number | null;
-            /** Totalbought */
-            totalBought?: number | null;
+        };
+        /** TopHoldersPnlRequest */
+        TopHoldersPnlRequest: {
+            /** Holders */
+            holders: components["schemas"]["TopHolder"][];
+            /** Token1 */
+            token1: string;
+            /** Token2 */
+            token2: string;
+        };
+        /** TopHoldersWalletInfoRequest */
+        TopHoldersWalletInfoRequest: {
+            /** Holders */
+            holders: components["schemas"]["TopHolder"][];
         };
         /** Trade */
         Trade: {
@@ -587,18 +702,18 @@ export interface operations {
             };
         };
     };
-    get_top_holders_analysis_endpoint_markets_top_holders_analysis_get: {
+    get_markets_by_condition_ids_endpoint_markets_by_condition_ids_get: {
         parameters: {
-            query: {
-                condition_id: string;
-                token1: string;
-                token2: string;
-            };
+            query?: never;
             header?: never;
             path?: never;
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody: {
+            content: {
+                "application/json": string[];
+            };
+        };
         responses: {
             /** @description Successful Response */
             200: {
@@ -606,7 +721,73 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["TopHolderAnalysis"][];
+                    "application/json": components["schemas"]["Market"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_top_holders_pnl_endpoint_markets_top_holders_pnl_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["TopHoldersPnlRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TopHolderPnl"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_top_holders_wallet_info_endpoint_markets_top_holders_wallet_info_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["TopHoldersWalletInfoRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TopHolderWalletInfo"][];
                 };
             };
             /** @description Validation Error */
@@ -665,6 +846,10 @@ export type MessageResponse = components["schemas"]["MessageResponse"];
 export type SearchEventItem = components["schemas"]["SearchEventItem"];
 export type SearchMarketItem = components["schemas"]["SearchMarketItem"];
 export type SearchResponse = components["schemas"]["SearchResponse"];
-export type TopHolderAnalysis = components["schemas"]["TopHolderAnalysis"];
+export type TopHolder = components["schemas"]["TopHolder"];
+export type TopHolderPnl = components["schemas"]["TopHolderPnl"];
+export type TopHolderWalletInfo = components["schemas"]["TopHolderWalletInfo"];
+export type TopHoldersPnlRequest = components["schemas"]["TopHoldersPnlRequest"];
+export type TopHoldersWalletInfoRequest = components["schemas"]["TopHoldersWalletInfoRequest"];
 export type Trade = components["schemas"]["Trade"];
 export type ValidationError = components["schemas"]["ValidationError"];
