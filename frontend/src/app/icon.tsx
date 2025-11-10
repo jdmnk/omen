@@ -81,7 +81,7 @@ export default async function Icon({ id }: { id: string }) {
           alignItems: "center",
           justifyContent: "center",
           color: "white",
-          fontFamily: "Geist",
+          fontFamily: "Roboto",
           borderRadius: id === "og" ? 0 : "20%", // Only round corners for app icons
         }}
       >
@@ -105,7 +105,7 @@ export default async function Icon({ id }: { id: string }) {
       ...size,
       fonts: [
         {
-          name: "Geist",
+          name: "Roboto",
           data: await loadGoogleFont(),
           style: "normal",
         },
@@ -115,7 +115,7 @@ export default async function Icon({ id }: { id: string }) {
 }
 
 async function loadGoogleFont() {
-  const url = `https://fonts.googleapis.com/css2?family=Geist:wght@700`;
+  const url = `https://fonts.googleapis.com/css2?family=Roboto:wght@700`;
   const css = await (await fetch(url)).text();
   const resource = css.match(
     /src: url\((.+)\) format\('(opentype|truetype)'\)/
