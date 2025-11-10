@@ -146,6 +146,7 @@
   }
   body {
     @apply bg-background text-foreground;
+    letter-spacing: 0.03em;
   }
 
   /* Custom scrollbar styles for WebKit browsers (Chrome, Safari, Edge) */
