@@ -187,6 +187,7 @@ export function SearchWidget({ currentMarket }: { currentMarket?: Market }) {
 
   // Fetch event data
   const { data: eventData } = useEventByIdQuery(eventId);
+  console.log("eventData", eventData);
 
   const { data: searchResults, isLoading } = useMarketSearchQuery(
     debouncedInput,
@@ -230,7 +231,7 @@ export function SearchWidget({ currentMarket }: { currentMarket?: Market }) {
       }));
 
     const closedMarkets = eventData.markets
-      .filter((m) => m.closed || !m.active)
+      .filter((m) => m.closed && m.active) // must be active or its a market thats not live
       .map((market) => ({
         question: market.groupItemTitle,
         conditionId: market.conditionId,
