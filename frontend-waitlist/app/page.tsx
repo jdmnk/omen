@@ -22,21 +22,21 @@ export default function Home() {
         <div className="flex flex-col items-center text-center">
           {/* Advanced Text */}
           <h1
-            className="font-serif text-5xl font-light italic text-[#BBA6F2]"
+            className="font-serif text-[32px] leading-none md:text-5xl font-light italic text-[#BBA6F2]"
             style={{
-              textShadow: "0px 0px 40px 0px #BBA6F2",
+              textShadow: "0px 0px 40px #BBA6F2",
             }}
           >
             Advanced
           </h1>
 
           {/* Polymarket Analytics */}
-          <h2 className="mt-3 text-5xl font-light text-white">
+          <h2 className="mt-2 text-[32px] leading-none md:text-5xl font-light text-white">
             Polymarket Analytics
           </h2>
 
           {/* Tagline */}
-          <p className="mt-10 text-2xl font-light text-white">
+          <p className="mt-10 text-base leading-tight md:text-2xl font-light text-white">
             Understand markets and holders in seconds.
             <br />
             Trade with confidence.
@@ -53,6 +53,9 @@ export default function Home() {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             placeholder="Enter your email"
+            autoComplete="off"
+            data-lpignore="true"
+            data-lpignoreall="true"
             required
           />
           <Button type="submit" variant="brand">
@@ -62,8 +65,18 @@ export default function Home() {
 
         {/* Logo */}
         <div className="absolute bottom-8 flex items-center gap-3">
-          <Image src="/logo.svg" alt="OMEN Logo" width={48} height={48} />
-          <span className="text-[28px] font-bold text-white">OMEN</span>
+          <div className="w-9 h-9 md:w-12 md:h-12">
+            <Image
+              src="/logo.svg"
+              alt="OMEN Logo"
+              width={48}
+              height={48}
+              className="w-full h-full"
+            />
+          </div>
+          <span className="text-[20px] md:text-[28px] font-bold text-white">
+            OMEN
+          </span>
         </div>
       </main>
     </div>
