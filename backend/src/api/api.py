@@ -6,8 +6,9 @@ from pydantic import BaseModel
 
 from src.analytics.top_holders_analysis import (
     TopHolderAnalysis,
-    enrich_holders,
     get_top_holders_analysis,
+    get_top_holders_pnl,
+    get_top_holders_wallet_info,
 )
 from src.db.selects import SelectsClient
 from src.models.event import Event
@@ -17,7 +18,7 @@ from src.models.responses import (
     MessageResponse,
 )
 from src.models.search import SearchResponse
-from src.models.top_holders import TopHolder
+from src.models.top_holders import TopHolder, TopHolderPnl, TopHolderWalletInfo
 from src.models.trade import Trade
 from src.polymarket.poly_client import PolyClient
 from src.polymarket.poly_client_graphs import PolyClientGraphs
@@ -95,30 +96,55 @@ async def get_markets_by_condition_ids_endpoint(
     return await poly_client.get_markets_by_condition_ids(condition_ids)
 
 
-class EnrichHoldersRequest(BaseModel):
+class TopHoldersPnlRequest(BaseModel):
     holders: list[TopHolder]
     token1: str
     token2: str
 
 
-@app.post("/markets/enrich-holders", response_model=list[TopHolderAnalysis])
-async def enrich_holders_endpoint(request: EnrichHoldersRequest) -> list[TopHolderAnalysis]:
-    """
-    Enrich holders with wallet information and position data.
+class TopHoldersWalletInfoRequest(BaseModel):
+    holders: list[TopHolder]
 
-    Accepts a list of TopHolder objects and enriches them with wallet info and position data.
+
+@app.post("/markets/top-holders-pnl", response_model=list[TopHolderPnl])
+async def get_top_holders_pnl_endpoint(request: TopHoldersPnlRequest) -> list[TopHolderPnl]:
+    """
+    Get PnL data for holders.
+
+    Accepts a list of TopHolder objects and returns them with PnL data (avgPrice, realizedPnl, totalBought).
     """
     logger.info(
-        f"Enrich holders request: {len(request.holders)} holders, token1={request.token1}, token2={request.token2}"
+        f"Top holders PnL request: {len(request.holders)} holders, token1={request.token1}, token2={request.token2}"
     )
 
     try:
-        enriched = await enrich_holders(request.holders, [request.token1, request.token2])
+        pnl_data = await get_top_holders_pnl(request.holders, [request.token1, request.token2])
 
-        logger.info(f"Returning {len(enriched)} enriched holders")
-        return enriched
+        logger.info(f"Returning {len(pnl_data)} holders with PnL data")
+        return pnl_data
     except Exception as exc:
-        logger.error(f"Error in enrich holders endpoint: {exc!s}", exc_info=True)
+        logger.error(f"Error in top holders PnL endpoint: {exc!s}", exc_info=True)
+        raise HTTPException(status_code=500, detail=f"Internal server error: {exc!s}") from exc
+
+
+@app.post("/markets/top-holders-wallet-info", response_model=list[TopHolderWalletInfo])
+async def get_top_holders_wallet_info_endpoint(
+    request: TopHoldersWalletInfoRequest,
+) -> list[TopHolderWalletInfo]:
+    """
+    Get wallet information for holders.
+
+    Accepts a list of TopHolder objects and returns them with wallet info (walletCreatedAt, walletLastTransfer, walletBalance).
+    """
+    logger.info(f"Top holders wallet info request: {len(request.holders)} holders")
+
+    try:
+        wallet_info = await get_top_holders_wallet_info(request.holders)
+
+        logger.info(f"Returning {len(wallet_info)} holders with wallet info")
+        return wallet_info
+    except Exception as exc:
+        logger.error(f"Error in top holders wallet info endpoint: {exc!s}", exc_info=True)
         raise HTTPException(status_code=500, detail=f"Internal server error: {exc!s}") from exc
 
 

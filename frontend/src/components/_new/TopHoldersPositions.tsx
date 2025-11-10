@@ -1,9 +1,16 @@
 "use client";
 
 import React, { useMemo } from "react";
-import { LoadingSpinner } from "@/components/ui/spinner";
+import { Spinner, LoadingSpinner } from "@/components/ui/spinner";
 import { useTopHoldersQuery } from "@/lib/queries/top-holders.query";
-import { useEnrichHoldersQuery } from "@/lib/queries/enrich-holders.query";
+import {
+  useTopHoldersPnlQuery,
+  type TopHolderPnl,
+} from "@/lib/queries/top-holders-pnl.query";
+import {
+  useTopHoldersWalletInfoQuery,
+  type TopHolderWalletInfo,
+} from "@/lib/queries/top-holders-wallet-info.query";
 import { TopHolderAnalysis } from "@/lib/models/api.models";
 import {
   formatCompactCurrency,
@@ -95,20 +102,66 @@ export function TopHoldersPositions({
     error: holdersError,
   } = useTopHoldersQuery(market.conditionId);
 
-  // Step 2: Enrich holders with wallet info and position data
+  // Step 2a: Get PnL data for holders
   const {
-    data: enrichedHolders,
-    isLoading: isLoadingEnrichment,
-    error: enrichmentError,
-  } = useEnrichHoldersQuery(rawHolders, market.token1, market.token2);
+    data: pnlHolders,
+    isLoading: isLoadingPnl,
+    error: pnlError,
+  } = useTopHoldersPnlQuery(rawHolders, market.token1, market.token2);
 
-  // Use enriched holders if available, otherwise fall back to raw holders
-  // TopHolderAnalysis extends TopHolder, so raw holders can be cast to TopHolderAnalysis
-  const topHolders =
-    enrichedHolders || (rawHolders as TopHolderAnalysis[] | undefined);
+  // Step 2b: Get wallet info for holders
+  const {
+    data: walletInfoHolders,
+    isLoading: isLoadingWalletInfo,
+    error: walletInfoError,
+  } = useTopHoldersWalletInfoQuery(rawHolders, true); // disable for now, unused
+
+  // Merge raw holders with PnL and wallet info data
+  const topHolders = useMemo(() => {
+    if (!rawHolders) return undefined;
+
+    // Create maps for quick lookup
+    const pnlMap = new Map<string, TopHolderPnl>();
+    if (pnlHolders) {
+      pnlHolders.forEach((holder) => {
+        const key = `${holder.proxyWallet}-${holder.outcomeIndex}`;
+        pnlMap.set(key, holder);
+      });
+    }
+
+    const walletMap = new Map<string, TopHolderWalletInfo>();
+    if (walletInfoHolders) {
+      walletInfoHolders.forEach((holder) => {
+        const key = `${holder.proxyWallet}-${holder.outcomeIndex}`;
+        walletMap.set(key, holder);
+      });
+    }
+
+    // Merge data
+    return rawHolders.map((rawHolder) => {
+      const key = `${rawHolder.proxyWallet}-${rawHolder.outcomeIndex}`;
+      const pnlData = pnlMap.get(key);
+      const walletData = walletMap.get(key);
+
+      return {
+        ...rawHolder,
+        ...(pnlData && {
+          avgPrice: pnlData.avgPrice,
+          realizedPnl: pnlData.realizedPnl,
+          totalBought: pnlData.totalBought,
+        }),
+        ...(walletData && {
+          walletCreatedAt: walletData.walletCreatedAt,
+          walletLastTransfer: walletData.walletLastTransfer,
+          walletBalance: walletData.walletBalance,
+        }),
+      } as TopHolderAnalysis;
+    });
+  }, [rawHolders, pnlHolders, walletInfoHolders]);
 
   const isLoading = isLoadingHolders;
-  const error = holdersError;
+  const isLoadingEnrichment = isLoadingPnl || isLoadingWalletInfo;
+  const error = holdersError || pnlError || walletInfoError;
 
   const { data: topHoldersPositions } = useTopHoldersPositionsQuery(
     topHolders?.map((h) => h.proxyWallet),
@@ -120,13 +173,43 @@ export function TopHoldersPositions({
 
   // Generate tags for all holders (only works with enriched holders)
   const holderTagsMap = useMemo(() => {
-    if (!enrichedHolders) return {};
+    if (!pnlHolders || !walletInfoHolders) return {};
+    // Create merged holders for tag generation
+    const mergedForTags =
+      rawHolders?.map((raw) => {
+        const key = `${raw.proxyWallet}-${raw.outcomeIndex}`;
+        const pnl = pnlHolders.find(
+          (h) => `${h.proxyWallet}-${h.outcomeIndex}` === key
+        );
+        const wallet = walletInfoHolders.find(
+          (h) => `${h.proxyWallet}-${h.outcomeIndex}` === key
+        );
+        return {
+          ...raw,
+          ...(pnl && {
+            avgPrice: pnl.avgPrice,
+            realizedPnl: pnl.realizedPnl,
+            totalBought: pnl.totalBought,
+          }),
+          ...(wallet && {
+            walletCreatedAt: wallet.walletCreatedAt,
+            walletLastTransfer: wallet.walletLastTransfer,
+            walletBalance: wallet.walletBalance,
+          }),
+        } as TopHolderAnalysis;
+      }) || [];
     return generateHolderTagsMap(
-      enrichedHolders,
+      mergedForTags,
       topHoldersPositions,
       market.token1
     );
-  }, [enrichedHolders, topHoldersPositions, market.token1]);
+  }, [
+    pnlHolders,
+    walletInfoHolders,
+    rawHolders,
+    topHoldersPositions,
+    market.token1,
+  ]);
 
   // TopHolders already have outcomeIndex, no transformation needed
   const holdersByOutcome = (topHolders || []).reduce((acc, holder) => {
@@ -204,6 +287,13 @@ export function TopHoldersPositions({
           : "text-muted-foreground"
         : "text-muted-foreground";
 
+    // Check if enrichment is still loading for this holder
+    const isEnrichmentLoading =
+      isLoadingEnrichment && (!pnlHolders || !walletInfoHolders);
+    const hasTags =
+      holderTagsMap[holder.proxyWallet] &&
+      holderTagsMap[holder.proxyWallet].length > 0;
+
     return (
       <div
         key={`${holder.proxyWallet}-${holder.outcomeIndex}-${index}`}
@@ -252,26 +342,34 @@ export function TopHoldersPositions({
                 </div>
               )}
             </div>
+          ) : isEnrichmentLoading ? (
+            <div className="flex items-center">
+              <Spinner size="sm" />
+            </div>
           ) : (
             <div className="text-muted-foreground">-</div>
           )}
         </div>
         <div>
           <div className="flex gap-1">
-            {holderTagsMap[holder.proxyWallet]?.map((tag, tagIndex) => {
-              return (
-                <TooltipPrimitive.Root key={tagIndex}>
-                  <TooltipTrigger asChild>
-                    <div className="cursor-help">
-                      <HolderTagIcon icon={tag.icon} />
-                    </div>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p>{tag.label}</p>
-                  </TooltipContent>
-                </TooltipPrimitive.Root>
-              );
-            })}
+            {isEnrichmentLoading && !hasTags ? (
+              <Spinner size="sm" />
+            ) : (
+              holderTagsMap[holder.proxyWallet]?.map((tag, tagIndex) => {
+                return (
+                  <TooltipPrimitive.Root key={tagIndex}>
+                    <TooltipTrigger asChild>
+                      <div className="cursor-help">
+                        <HolderTagIcon icon={tag.icon} />
+                      </div>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>{tag.label}</p>
+                    </TooltipContent>
+                  </TooltipPrimitive.Root>
+                );
+              })
+            )}
           </div>
         </div>
       </div>

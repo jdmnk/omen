@@ -1,24 +1,31 @@
 "use client";
 
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
-import { TopHolderAnalysis } from "@/lib/models/api.models";
 import { getBaseUrl } from "../api";
 import type { TopHolder } from "../queries/top-holders.query";
 
-export function useEnrichHoldersQuery(
+export interface TopHolderWalletInfo extends TopHolder {
+  walletCreatedAt: string | null;
+  walletLastTransfer: string | null;
+  walletBalance: number | null;
+}
+
+export function useTopHoldersWalletInfoQuery(
   holders: TopHolder[] | undefined,
-  token1: string,
-  token2: string
+  enabled: boolean = true
 ) {
-  return useQuery<TopHolderAnalysis[]>({
-    queryKey: ["enrich-holders", holders?.map((h) => h.proxyWallet).join(","), token1, token2],
+  return useQuery<TopHolderWalletInfo[]>({
+    queryKey: [
+      "top-holders-wallet-info",
+      holders?.map((h) => h.proxyWallet).join(","),
+    ],
     queryFn: async () => {
       if (!holders || holders.length === 0) {
         return [];
       }
 
       const base = getBaseUrl();
-      const url = `${base}/markets/enrich-holders`;
+      const url = `${base}/markets/top-holders-wallet-info`;
 
       const res = await fetch(url, {
         method: "POST",
@@ -27,23 +34,20 @@ export function useEnrichHoldersQuery(
         },
         body: JSON.stringify({
           holders,
-          token1,
-          token2,
         }),
         cache: "no-store",
       });
 
       if (!res.ok) {
-        throw new Error("Failed to enrich holders");
+        throw new Error("Failed to fetch top holders wallet info");
       }
 
-      const data = (await res.json()) as TopHolderAnalysis[];
+      const data = (await res.json()) as TopHolderWalletInfo[];
       return data ?? [];
     },
-    enabled: !!holders && holders.length > 0 && !!token1 && !!token2,
+    enabled: enabled && !!holders && holders.length > 0,
     staleTime: 120000, // 2 minutes
-    retry: 3,
+    retry: 2,
     placeholderData: keepPreviousData,
   });
 }
-

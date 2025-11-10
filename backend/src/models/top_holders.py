@@ -27,6 +27,22 @@ class TopHoldersResponse(BaseModel):
     holders: list[TopHolder]
 
 
+class TopHolderPnl(TopHolder):
+    """TopHolder with PnL data only."""
+
+    avgPrice: float | None = None
+    realizedPnl: float | None = None
+    totalBought: float | None = None
+
+
+class TopHolderWalletInfo(TopHolder):
+    """TopHolder with wallet info only."""
+
+    walletCreatedAt: datetime | None = None
+    walletLastTransfer: datetime | None = None
+    walletBalance: float | None = None
+
+
 class TopHolderAnalysis(TopHolder):
     """Polymarket holder enriched with wallet information and position data."""
 
