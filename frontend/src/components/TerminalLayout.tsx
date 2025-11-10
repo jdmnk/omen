@@ -51,9 +51,15 @@ export function TerminalLayout() {
               </ResizablePanel>
               <ResizableHandle />
               <ResizablePanel defaultSize={60} minSize={20}>
-                <div className="h-full pt-3 px-3 flex flex-col min-h-0">
-                  <TopHoldersWidget market={market} isLoading={isLoading} />
-                </div>
+                {!marketSlug && !isLoading ? (
+                  <EmptyState />
+                ) : error ? (
+                  <ErrorState />
+                ) : (
+                  <div className="h-full pt-3 px-3 flex flex-col min-h-0">
+                    <TopHoldersWidget market={market} isLoading={isLoading} />
+                  </div>
+                )}
               </ResizablePanel>
             </ResizablePanelGroup>
           </ResizablePanel>
