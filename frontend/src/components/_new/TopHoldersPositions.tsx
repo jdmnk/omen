@@ -11,7 +11,6 @@ import {
   useTopHoldersWalletInfoQuery,
   type TopHolderWalletInfo,
 } from "@/lib/queries/top-holders-wallet-info.query";
-import { TopHolder } from "@/lib/models/api.models";
 import {
   formatCompactCurrency,
   formatCompactNumber,
@@ -304,16 +303,21 @@ export function TopHoldersPositions({
       >
         <div className="flex items-center justify-center">
           {holder.profileImageOptimized || holder.profileImage ? (
-            <Image
-              src={holder.profileImageOptimized || holder.profileImage || ""}
-              alt=""
-              width={24}
-              height={24}
-              className="w-6 h-6 rounded-full shrink-0 object-cover"
-            />
+            <div className="relative w-6 h-6 shrink-0">
+              <Image
+                src={holder.profileImageOptimized || holder.profileImage || ""}
+                alt=""
+                width={24}
+                height={24}
+                className="w-6 h-6 rounded-full object-cover opacity-80"
+              />
+              <div className="absolute inset-0 flex items-center justify-center rounded-full bg-muted/40 text-xs font-medium">
+                {index + 1}
+              </div>
+            </div>
           ) : (
             <div className="w-6 h-6 rounded-full bg-muted flex items-center justify-center text-xs font-medium shrink-0">
-              {displayName.charAt(0).toUpperCase()}
+              {index + 1}
             </div>
           )}
         </div>
