@@ -14,29 +14,26 @@ export default function Home() {
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-black px-4 py-32">
-      <main className="flex w-full max-w-2xl flex-col items-center justify-center gap-16 text-center">
+      <main className="flex w-full max-w-2xl flex-col items-center justify-center text-center">
         {/* Main Content */}
-        <div className="flex flex-col items-center gap-8">
+        <div className="flex flex-col items-center text-center">
           {/* Advanced Text */}
-          <h1 className="text-6xl font-normal italic leading-none tracking-tight text-[#9966FF] sm:text-7xl md:text-8xl">
-            <span
-              className="drop-shadow-[0_0_30px_rgba(153,102,255,0.6)]"
-              style={{
-                textShadow:
-                  "0 0 30px rgba(153, 102, 255, 0.6), 0 0 60px rgba(153, 102, 255, 0.3)",
-              }}
-            >
-              Advanced
-            </span>
+          <h1
+            className="font-serif text-5xl font-light italic text-[#BBA6F2]"
+            style={{
+              textShadow: "0px 0px 40px 0px #BBA6F2",
+            }}
+          >
+            Advanced
           </h1>
 
           {/* Polymarket Analytics */}
-          <h2 className="text-6xl font-bold leading-none tracking-tight text-white sm:text-7xl md:text-8xl">
+          <h2 className="mt-3 text-5xl font-light text-white">
             Polymarket Analytics
           </h2>
 
           {/* Tagline */}
-          <p className="max-w-md text-xl leading-relaxed text-white sm:text-2xl">
+          <p className="mt-10 text-2xl font-light text-white">
             Understand markets and holders in seconds.
             <br />
             Trade with confidence.
@@ -46,7 +43,7 @@ export default function Home() {
         {/* Email Form */}
         <form
           onSubmit={handleSubmit}
-          className="flex w-full max-w-md flex-col gap-4"
+          className="flex w-full max-w-[280px] flex-col gap-3 mt-32"
         >
           <input
             type="email"
