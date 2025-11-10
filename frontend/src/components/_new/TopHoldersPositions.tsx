@@ -18,7 +18,7 @@ import {
   formatNumber,
 } from "@/lib/ui/format.utils";
 import Link from "next/link";
-import { Market } from "@/lib/models/api.models";
+import { Market, TopHolderAnalysis } from "@/lib/models/api.models";
 import { useOrderbookQuery } from "@/lib/queries/orderbook.query";
 import { POLYMARKET_URL } from "@/lib/api";
 import { useTopHoldersPositionsQuery } from "@/lib/queries/top-holders-positions.query";
@@ -33,8 +33,6 @@ import {
 } from "@/components/ui/tooltip";
 import * as TooltipPrimitive from "@radix-ui/react-tooltip";
 import Image from "next/image";
-
-export type TopHolderAnalysis = TopHolder & TopHolderPnl & TopHolderWalletInfo;
 
 const HOLDER_ROW_GRID_CLASSES =
   "grid grid-cols-[24px_auto_2.5rem_6rem_4.5rem] items-center gap-3";

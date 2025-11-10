@@ -1,4 +1,4 @@
-import { TopHolderAnalysis, UserPosition } from "@/lib/models/api.models";
+import { UserPosition, TopHolderAnalysis } from "@/lib/models/api.models";
 
 export type HolderTagIcon =
   | "expert"
