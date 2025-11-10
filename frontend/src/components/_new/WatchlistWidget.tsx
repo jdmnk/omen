@@ -23,7 +23,7 @@ export function WatchlistWidget() {
   // Fetch watchlisted markets by conditionIds
   const { data: fetchedMarkets } = useMarketsByConditionIdsQuery(
     conditionIds,
-    conditionIds.length > 0
+    false // disable for now (dont need extra data) conditionIds.length > 0
   );
 
   // Merge watchlist items with fetched market data
