@@ -2,6 +2,9 @@
 
 import Image from "next/image";
 import { useState } from "react";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 
 export default function Home() {
   const [email, setEmail] = useState("");
@@ -13,7 +16,7 @@ export default function Home() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-black px-4 py-32">
+    <div className="flex min-h-screen items-center justify-center bg-black px-4">
       <main className="flex w-full max-w-2xl flex-col items-center justify-center text-center">
         {/* Main Content */}
         <div className="flex flex-col items-center text-center">
@@ -43,28 +46,24 @@ export default function Home() {
         {/* Email Form */}
         <form
           onSubmit={handleSubmit}
-          className="flex w-full max-w-[280px] flex-col gap-3 mt-32"
+          className="flex w-full max-w-[280px] flex-col gap-2 mt-32"
         >
-          <input
+          <Input
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            placeholder="shayne@coplan.com"
-            className="h-14 w-full rounded-lg border border-white/10 bg-white/5 px-5 text-lg text-white placeholder:text-white/50 focus:border-white/20 focus:outline-none focus:ring-1 focus:ring-white/20"
+            placeholder="Enter your email"
             required
           />
-          <button
-            type="submit"
-            className="h-14 w-full rounded-lg bg-[#4B0082] text-lg font-medium text-white transition-colors hover:bg-[#5a0099] focus:outline-none focus:ring-2 focus:ring-[#9966FF] focus:ring-offset-2 focus:ring-offset-black"
-          >
+          <Button type="submit" variant="brand">
             Join the waitlist
-          </button>
+          </Button>
         </form>
 
         {/* Logo */}
-        <div className="mt-16 flex items-center gap-3">
-          <Image src="/logo.svg" alt="OMEN Logo" width={37} height={37} />
-          <span className="text-xl font-bold text-white">OMEN</span>
+        <div className="absolute bottom-8 flex items-center gap-3">
+          <Image src="/logo.svg" alt="OMEN Logo" width={48} height={48} />
+          <span className="text-[28px] font-bold text-white">OMEN</span>
         </div>
       </main>
     </div>

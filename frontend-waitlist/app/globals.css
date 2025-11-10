@@ -41,6 +41,16 @@
   --sidebar-accent-foreground: oklch(0.205 0 0);
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
+
+  /* custom colors */
+  --brand-background: #110928;
+  --brand-foreground: #bba6f2;
+  --brand-stroke: #382e52;
+  --brand-highlight: #651fff;
+  --brand-background-2: #240f5a;
+
+  /* custom other variables */
+  --brand-radius: var(--radius);
 }
 
 @theme inline {
@@ -81,6 +91,14 @@
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
+
+  /* custom colors */
+  --color-brand-background: var(--brand-background);
+  --color-brand-foreground: var(--brand-foreground);
+  --color-brand-highlight: var(--brand-highlight);
+  --color-brand-stroke: var(--brand-stroke);
+  --color-brand-background-2: var(--brand-background-2);
+  --radius-brand: var(--brand-radius);
 }
 
 body {
