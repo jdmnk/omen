@@ -1,7 +1,6 @@
 from src.models.graph.position import Position
 from src.models.graph.wallet import Wallet
-from src.models.top_holders import TopHolder, TopHolderAnalysis, TopHolderPnl, TopHolderWalletInfo
-from src.polymarket.poly_client import PolyClient
+from src.models.top_holders import TopHolder, TopHolderPnl, TopHolderWalletInfo
 from src.polymarket.poly_client_graphs import PolyClientGraphs
 
 # Blacklist of wallet addresses to exclude from top holders analysis
