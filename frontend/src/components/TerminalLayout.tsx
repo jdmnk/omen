@@ -2,7 +2,11 @@
 
 import { useParams } from "next/navigation";
 import { Header } from "./_new/Header";
-import { ResizablePanel, ResizablePanelGroup } from "@/components/ui/resizable";
+import {
+  ResizablePanel,
+  ResizablePanelGroup,
+  ResizableHandle,
+} from "@/components/ui/resizable";
 import { SearchWidget } from "./_new/SearchWidget";
 import { useMarketBySlugQuery } from "@/lib/queries/market-by-slug.query";
 import { PriceChartWidget } from "./_new/PriceChartWidget";
@@ -23,17 +27,17 @@ export function TerminalLayout() {
         <ResizablePanelGroup direction="horizontal" className="h-full w-full">
           {/* Left sidebar */}
           <ResizablePanel defaultSize={25} minSize={10}>
-            <div className="h-full overflow-auto border-t border-b border-r border-brand-stroke rounded-r-brand">
+            <div className="h-full overflow-auto border-t border-b border-r border-brand-stroke rounded-r-brand mr-3">
               <SearchWidget currentMarket={market} />
             </div>
           </ResizablePanel>
 
           {/* Main content */}
-          {/* <ResizableHandle withHandle /> */}
+          <ResizableHandle />
           <ResizablePanel defaultSize={50} minSize={20}>
             <ResizablePanelGroup direction="vertical" className="h-full">
               <ResizablePanel defaultSize={40} minSize={20}>
-                <div className="h-full px-6 pb-3">
+                <div className="h-full px-3 pb-3">
                   {!marketSlug ? (
                     <EmptyState />
                   ) : isLoading ? (
@@ -45,9 +49,9 @@ export function TerminalLayout() {
                   )}
                 </div>
               </ResizablePanel>
-              {/* <ResizableHandle withHandle /> */}
+              <ResizableHandle />
               <ResizablePanel defaultSize={60} minSize={20}>
-                <div className="h-full pt-3 px-6 flex flex-col min-h-0">
+                <div className="h-full pt-3 px-3 flex flex-col min-h-0">
                   <TopHoldersWidget market={market} isLoading={isLoading} />
                 </div>
               </ResizablePanel>
@@ -55,9 +59,9 @@ export function TerminalLayout() {
           </ResizablePanel>
 
           {/* Right sidebar */}
-          {/* <ResizableHandle withHandle /> */}
+          <ResizableHandle />
           <ResizablePanel defaultSize={25} minSize={10}>
-            <div className="h-full overflow-auto border-t border-b border-l border-brand-stroke rounded-l-brand">
+            <div className="h-full overflow-auto border-t border-b border-l border-brand-stroke rounded-l-brand ml-3">
               <div className="flex flex-col h-full rounded-brand">
                 <div className="flex-1 flex items-center justify-center">
                   <p className="text-brand-foreground italic text-sm">
