@@ -4,7 +4,6 @@ import Image from "next/image";
 import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
 
 export default function Home() {
   const [email, setEmail] = useState("");
@@ -68,7 +67,7 @@ export default function Home() {
         {isSuccess ? (
           <div className="flex w-full max-w-[280px] flex-col gap-2 mt-32">
             <p className="text-[12px] font-normal italic text-[#BBA6F2]">
-              You're in!!
+              {"You're in!"}
             </p>
           </div>
         ) : (
