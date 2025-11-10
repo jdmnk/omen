@@ -2,8 +2,7 @@
 
 import { useQuery } from "@tanstack/react-query";
 import { Market } from "@/lib/models/api.models";
-
-const GAMMA_API_HOST = "https://gamma-api.polymarket.com";
+import { getBaseUrl } from "../api";
 
 export function useMarketsByConditionIdsQuery(
   conditionIds: string[],
@@ -16,15 +15,14 @@ export function useMarketsByConditionIdsQuery(
         return [];
       }
 
-      // Build query parameters - condition_ids accepts an array
+      // Build query parameters - FastAPI accepts multiple query params with same name
       const params = new URLSearchParams();
       conditionIds.forEach((id) => {
         params.append("condition_ids", id);
       });
-      params.append("limit", "100"); // Set a reasonable limit
 
       const response = await fetch(
-        `${GAMMA_API_HOST}/markets?${params.toString()}`,
+        `${getBaseUrl()}/markets/by-condition-ids?${params.toString()}`,
         { cache: "no-store" }
       );
 

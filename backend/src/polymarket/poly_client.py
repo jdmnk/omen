@@ -377,6 +377,49 @@ class PolyClient:
             logger.error(traceback.format_exc())
             raise exc from exc
 
+    async def get_markets_by_condition_ids(self, condition_ids: list[str]) -> list[Market]:
+        """
+        Fetch multiple markets by their condition IDs from Gamma API.
+
+        Official docs: https://docs.polymarket.com/api-reference/markets/list-markets
+
+        Args:
+            condition_ids: List of condition IDs to fetch
+
+        Returns:
+            List of MarketSchema objects
+
+        Raises:
+            PolyApiException: If API request fails
+        """
+        if not condition_ids or len(condition_ids) == 0:
+            return []
+
+        try:
+            async with httpx.AsyncClient() as client:
+                params: dict[str, list[str] | int] = {
+                    "limit": 100,  # Reasonable limit for watchlist use case
+                    "condition_ids": condition_ids,  # httpx will handle multiple query params
+                }
+
+                response = await client.get(f"{GAMMA_API_HOST}/markets", params=params)
+                response.raise_for_status()
+                markets_data = response.json()
+
+                # Parse raw API markets into typed MarketSchema objects
+                parsed_markets = [
+                    m for m in (parse_market_from_api(m) for m in markets_data) if m is not None
+                ]
+                return parsed_markets
+        except httpx.HTTPStatusError as exc:
+            logger.error(f"get_markets_by_condition_ids: error fetching markets: {exc}")
+            logger.error(traceback.format_exc())
+            raise PolyApiException(f"Failed to fetch markets by condition IDs: {exc}") from exc
+        except Exception as exc:
+            logger.error(f"get_markets_by_condition_ids: unexpected error: {exc}")
+            logger.error(traceback.format_exc())
+            raise exc from exc
+
     async def search_markets(self, query: str) -> SearchResponse:
         """
         Search for markets, events, and profiles using Gamma API public-search endpoint.

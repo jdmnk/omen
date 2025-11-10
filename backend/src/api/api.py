@@ -77,6 +77,18 @@ async def get_search_markets_endpoint(q: str = Query(min_length=1)) -> SearchRes
     return await poly_client.search_markets(q)
 
 
+@app.get("/markets/by-condition-ids", response_model=list[Market])
+async def get_markets_by_condition_ids_endpoint(
+    condition_ids: list[str] = Query(min_length=1),
+) -> list[Market]:
+    """
+    Get multiple markets by their condition IDs from Polymarket Gamma API.
+
+    Official docs: https://docs.polymarket.com/api-reference/markets/list-markets
+    """
+    return await poly_client.get_markets_by_condition_ids(condition_ids)
+
+
 @app.get("/markets/top-holders-analysis", response_model=list[TopHolderAnalysis])
 async def get_top_holders_analysis_endpoint(
     condition_id: str = Query(min_length=1),
