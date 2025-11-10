@@ -11,7 +11,7 @@ import {
   useTopHoldersWalletInfoQuery,
   type TopHolderWalletInfo,
 } from "@/lib/queries/top-holders-wallet-info.query";
-import { TopHolderAnalysis } from "@/lib/models/api.models";
+import { TopHolder } from "@/lib/models/api.models";
 import {
   formatCompactCurrency,
   formatCompactNumber,
@@ -33,6 +33,8 @@ import {
 } from "@/components/ui/tooltip";
 import * as TooltipPrimitive from "@radix-ui/react-tooltip";
 import Image from "next/image";
+
+export type TopHolderAnalysis = TopHolder & TopHolderPnl & TopHolderWalletInfo;
 
 const HOLDER_ROW_GRID_CLASSES =
   "grid grid-cols-[24px_auto_2.5rem_6rem_4.5rem] items-center gap-3";
