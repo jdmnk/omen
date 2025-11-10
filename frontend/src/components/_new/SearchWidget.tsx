@@ -308,9 +308,6 @@ export function SearchWidget({ currentMarket }: { currentMarket?: Market }) {
         />
       </div>
 
-      {/* Watchlisted Markets Section (shown when NOT searching) */}
-      {!showResults && <WatchlistWidget />}
-
       {/* Event Markets Section (shown when NOT searching) */}
       {showEventMarkets && (
         <div className="space-y-4">
@@ -357,6 +354,9 @@ export function SearchWidget({ currentMarket }: { currentMarket?: Market }) {
           />
         </div>
       )}
+
+      {/* Watchlisted Markets Section (shown when NOT searching) */}
+      {!showResults && <WatchlistWidget />}
 
       {/* Results below (shown when searching) */}
       {showResults && (

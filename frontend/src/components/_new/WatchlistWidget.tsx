@@ -118,7 +118,7 @@ export function WatchlistWidget() {
                 "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
               )}
             >
-              <div className="flex items-start gap-3">
+              <div className="flex gap-3 items-center">
                 {/* Star Icon - Clickable to unwatchlist */}
                 <div
                   onClick={(e) => {
@@ -137,7 +137,7 @@ export function WatchlistWidget() {
                   tabIndex={0}
                   aria-label="Remove from watchlist"
                   className={cn(
-                    "shrink-0 mt-0.5 transition-all duration-200 cursor-pointer",
+                    "shrink-0 transition-all duration-200 cursor-pointer",
                     "hover:scale-110 active:scale-95",
                     "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded"
                   )}
