@@ -110,7 +110,7 @@ class PolyClientGraphs:
         """
 
         variables = {
-            "first": 1000,
+            "first": 500,
             "skip": 0,
             "userIds": wallet_ids,
             "tokenIds": token_ids,
