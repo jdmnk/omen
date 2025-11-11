@@ -4,6 +4,7 @@ import Image from "next/image";
 import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { TEXTS } from "./texts.const";
 
 export default function Home() {
   const [email, setEmail] = useState("");
@@ -27,7 +28,7 @@ export default function Home() {
 
   const handleEmailBlur = () => {
     if (email && !validateEmail(email)) {
-      setError("Please enter a valid email address");
+      setError(TEXTS.form.emailError);
     } else {
       setError("");
     }
@@ -48,12 +49,12 @@ export default function Home() {
     e.preventDefault();
 
     if (!email) {
-      setError("Please enter a valid email address");
+      setError(TEXTS.form.emailError);
       return;
     }
 
     if (!validateEmail(email)) {
-      setError("Please enter a valid email address");
+      setError(TEXTS.form.emailError);
       return;
     }
 
@@ -93,19 +94,19 @@ export default function Home() {
               textShadow: "0px 0px 40px #BBA6F2",
             }}
           >
-            Advanced
+            {TEXTS.hero.advanced}
           </h1>
 
           {/* Polymarket Analytics */}
           <h2 className="mt-2 text-[32px] leading-none md:text-5xl font-light text-white">
-            Polymarket Analytics
+            {TEXTS.hero.title}
           </h2>
 
           {/* Tagline */}
           <p className="mt-10 text-base leading-tight md:text-2xl font-light text-white">
-            Understand markets and holders in seconds.
+            {TEXTS.hero.tagline.line1}
             <br />
-            Trade with confidence.
+            {TEXTS.hero.tagline.line2}
           </p>
         </div>
 
@@ -113,10 +114,10 @@ export default function Home() {
         {isSuccess ? (
           <div className="flex w-full max-w-[280px] flex-col gap-2 mt-32">
             <p className="text-sm md:text-base font-normal italic text-[#BBA6F2] h-10 flex items-center justify-center">
-              {"You're in!"}
+              {TEXTS.form.successMessage}
             </p>
             <Button onClick={handleShare} variant="brand" size="xl">
-              {copied ? "Copied!" : "Share"}
+              {copied ? TEXTS.form.copiedButton : TEXTS.form.shareButton}
             </Button>
           </div>
         ) : (
@@ -134,7 +135,7 @@ export default function Home() {
                 value={email}
                 onChange={handleEmailChange}
                 onBlur={handleEmailBlur}
-                placeholder="Enter your email"
+                placeholder={TEXTS.form.emailPlaceholder}
                 aria-invalid={error ? "true" : "false"}
                 disabled={isLoading}
               />
@@ -145,7 +146,7 @@ export default function Home() {
               disabled={isLoading}
               size="xl"
             >
-              {isLoading ? "Joining..." : "Join the waitlist"}
+              {isLoading ? TEXTS.form.joiningButton : TEXTS.form.joinButton}
             </Button>
           </form>
         )}
@@ -155,14 +156,14 @@ export default function Home() {
           <div className="w-9 h-9 md:w-12 md:h-12">
             <Image
               src="/logo.svg"
-              alt="OMEN Logo"
+              alt={TEXTS.branding.logoAlt}
               width={48}
               height={48}
               className="w-full h-full"
             />
           </div>
           <span className="text-[20px] md:text-[28px] font-bold text-white">
-            OMEN
+            {TEXTS.branding.name}
           </span>
         </div>
       </main>

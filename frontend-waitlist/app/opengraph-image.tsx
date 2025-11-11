@@ -1,9 +1,10 @@
 import { ImageResponse } from "next/og";
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";
+import { TEXTS } from "./texts.const";
 
 // Image metadata
-export const alt = "Omen | Advanced Polymarket Analytics";
+export const alt = TEXTS.og.alt;
 export const size = {
   width: 1200,
   height: 630,
@@ -61,7 +62,7 @@ export default async function Image() {
             // marginBottom: 12,
           }}
         >
-          Advanced
+          {TEXTS.hero.advanced}
         </div>
 
         {/* Polymarket Analytics */}
@@ -75,7 +76,7 @@ export default async function Image() {
             marginBottom: 20,
           }}
         >
-          Polymarket Analytics
+          {TEXTS.hero.title}
         </div>
 
         {/* Tagline */}
@@ -101,8 +102,8 @@ export default async function Image() {
               alignItems: "center",
             }}
           >
-            <div>Understand markets and holders in seconds.</div>
-            <div>Trade with confidence.</div>
+            <div>{TEXTS.hero.tagline.line1}</div>
+            <div>{TEXTS.hero.tagline.line2}</div>
           </div>
         </div>
 
@@ -119,7 +120,7 @@ export default async function Image() {
         >
           <img
             src={logoDataUrl}
-            alt="OMEN Logo"
+            alt={TEXTS.branding.logoAlt}
             width={48}
             height={48}
             style={{
