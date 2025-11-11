@@ -9,10 +9,44 @@ export default function Home() {
   const [email, setEmail] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
+  const [error, setError] = useState("");
+
+  const validateEmail = (emailValue: string): boolean => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(emailValue);
+  };
+
+  const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setEmail(value);
+    if (error && value) {
+      setError("");
+    }
+  };
+
+  const handleEmailBlur = () => {
+    if (email && !validateEmail(email)) {
+      setError("Please enter a valid email address");
+    } else {
+      setError("");
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (!email) {
+      setError("Please enter a valid email address");
+      return;
+    }
+
+    if (!validateEmail(email)) {
+      setError("Please enter a valid email address");
+      return;
+    }
+
     setIsLoading(true);
+    setError("");
 
     try {
       const response = await fetch("/api/signup", {
@@ -73,16 +107,23 @@ export default function Home() {
         ) : (
           <form
             onSubmit={handleSubmit}
+            noValidate
             className="flex w-full max-w-[280px] flex-col gap-2 mt-32"
           >
-            <Input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="Enter your email"
-              required
-              disabled={isLoading}
-            />
+            <div className="flex flex-col">
+              {error && (
+                <p className="text-xs text-destructive text-left">{error}</p>
+              )}
+              <Input
+                type="email"
+                value={email}
+                onChange={handleEmailChange}
+                onBlur={handleEmailBlur}
+                placeholder="Enter your email"
+                aria-invalid={error ? "true" : "false"}
+                disabled={isLoading}
+              />
+            </div>
             <Button
               type="submit"
               variant="brand"
