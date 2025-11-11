@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Roboto } from "next/font/google";
 import "./globals.css";
 import { ProvidersClient } from "./providers-client";
+import { METADATA } from "@/lib/metadata.const";
 
 const roboto = Roboto({
   weight: ["300", "400", "500", "700"],
@@ -10,9 +11,8 @@ const roboto = Roboto({
 });
 
 export const metadata: Metadata = {
-  title: "Omen Insight",
-  description:
-    "Omen Insight is a platform for Polymarket analysis and insights",
+  title: METADATA.title,
+  description: METADATA.description,
 };
 
 export default function RootLayout({
