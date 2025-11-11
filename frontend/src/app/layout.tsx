@@ -23,7 +23,7 @@ export default function RootLayout({
   return (
     <html lang="en" className="dark h-screen">
       <body
-        className={`${roboto.variable} antialiased flex flex-col h-screen overflow-hidden`}
+        className={`${roboto.variable} antialiased flex flex-col h-screen overflow-hidden bg-background`}
       >
         <ProvidersClient>{children}</ProvidersClient>
       </body>
