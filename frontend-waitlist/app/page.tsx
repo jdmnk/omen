@@ -10,6 +10,7 @@ export default function Home() {
   const [isLoading, setIsLoading] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [error, setError] = useState("");
+  const [copied, setCopied] = useState(false);
 
   const validateEmail = (emailValue: string): boolean => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -29,6 +30,17 @@ export default function Home() {
       setError("Please enter a valid email address");
     } else {
       setError("");
+    }
+  };
+
+  const handleShare = async () => {
+    try {
+      const url = window.location.href;
+      await navigator.clipboard.writeText(url);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch (error) {
+      console.error("Failed to copy link:", error);
     }
   };
 
@@ -100,9 +112,12 @@ export default function Home() {
         {/* Email Form */}
         {isSuccess ? (
           <div className="flex w-full max-w-[280px] flex-col gap-2 mt-32">
-            <p className="text-[12px] font-normal italic text-[#BBA6F2]">
+            <p className="text-base font-normal italic text-[#BBA6F2] h-10">
               {"You're in!"}
             </p>
+            <Button onClick={handleShare} variant="brand" size="xl">
+              {copied ? "Copied!" : "Share"}
+            </Button>
           </div>
         ) : (
           <form
