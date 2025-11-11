@@ -1,7 +1,7 @@
 export const TEXTS = {
   hero: {
-    advanced: "Smart Money",
-    title: "Become Prediction Market",
+    heroLine1: "Smart Money",
+    heroLine2: "Become Prediction Market",
     tagline: {
       line1: "Win more trades. Spend less time analyzing.",
       line2: "Act faster on institutional-grade market insights.",

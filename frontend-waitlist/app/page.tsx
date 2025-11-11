@@ -87,20 +87,20 @@ export default function Home() {
       <main className="flex w-full max-w-2xl flex-col items-center justify-center text-center">
         {/* Main Content */}
         <div className="flex flex-col items-center text-center">
-          {/* Advanced Text */}
+          {/* Hero Line 2 */}
+          <h1 className="mt-2 text-[32px] leading-none md:text-5xl font-light text-white">
+            {TEXTS.hero.heroLine2}
+          </h1>
+
+          {/* Hero Line 1 */}
           <h1
             className="font-serif text-[32px] leading-none md:text-5xl font-light italic text-[#BBA6F2]"
             style={{
               textShadow: "0px 0px 40px #BBA6F2",
             }}
           >
-            {TEXTS.hero.advanced}
+            {TEXTS.hero.heroLine1}
           </h1>
-
-          {/* Polymarket Analytics */}
-          <h2 className="mt-2 text-[32px] leading-none md:text-5xl font-light text-white">
-            {TEXTS.hero.title}
-          </h2>
 
           {/* Tagline */}
           <p className="mt-10 text-base leading-tight md:text-2xl font-light text-white">

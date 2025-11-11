@@ -49,7 +49,20 @@ export default async function Image() {
           justifyContent: "center",
         }}
       >
-        {/* Advanced Text */}
+        {/* Hero Line 1 */}
+        <div
+          style={{
+            fontSize: 52,
+            fontFamily: "Roboto",
+            fontWeight: 300,
+            color: "white",
+            lineHeight: 1,
+          }}
+        >
+          {TEXTS.hero.heroLine2}
+        </div>
+
+        {/* Hero Line 2 */}
         <div
           style={{
             fontSize: 52,
@@ -59,24 +72,9 @@ export default async function Image() {
             color: "#BBA6F2",
             textShadow: "0px 0px 40px #BBA6F2",
             lineHeight: 1,
-            // marginBottom: 12,
           }}
         >
-          {TEXTS.hero.advanced}
-        </div>
-
-        {/* Polymarket Analytics */}
-        <div
-          style={{
-            fontSize: 52,
-            fontFamily: "Roboto",
-            fontWeight: 300,
-            color: "white",
-            lineHeight: 1,
-            marginBottom: 20,
-          }}
-        >
-          {TEXTS.hero.title}
+          {TEXTS.hero.heroLine1}
         </div>
 
         {/* Tagline */}
@@ -85,7 +83,7 @@ export default async function Image() {
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
-            marginTop: 20,
+            marginTop: 40,
           }}
         >
           <div
