@@ -39,7 +39,6 @@ export default async function Image() {
     (
       <div
         style={{
-          fontSize: 128,
           background: "#020402",
           width: "100%",
           height: "100%",
@@ -47,20 +46,19 @@ export default async function Image() {
           flexDirection: "column",
           alignItems: "center",
           justifyContent: "center",
-          padding: "80px",
         }}
       >
         {/* Advanced Text */}
         <div
           style={{
-            fontSize: 80,
+            fontSize: 52,
             fontFamily: "Roboto Serif",
             fontStyle: "italic",
             fontWeight: 300,
             color: "#BBA6F2",
             textShadow: "0px 0px 40px #BBA6F2",
             lineHeight: 1,
-            marginBottom: 20,
+            // marginBottom: 12,
           }}
         >
           Advanced
@@ -69,12 +67,12 @@ export default async function Image() {
         {/* Polymarket Analytics */}
         <div
           style={{
-            fontSize: 80,
+            fontSize: 52,
             fontFamily: "Roboto",
             fontWeight: 300,
             color: "white",
             lineHeight: 1,
-            marginBottom: 40,
+            marginBottom: 20,
           }}
         >
           Polymarket Analytics
@@ -91,38 +89,32 @@ export default async function Image() {
         >
           <div
             style={{
-              fontSize: 32,
+              fontSize: 34,
               fontFamily: "Roboto",
               fontWeight: 300,
               color: "white",
-              lineHeight: 1.4,
+              lineHeight: 1.1,
               textAlign: "center",
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "center",
+              alignItems: "center",
             }}
           >
-            Understand markets and holders in seconds.
-          </div>
-          <div
-            style={{
-              fontSize: 32,
-              fontFamily: "Roboto",
-              fontWeight: 300,
-              color: "white",
-              lineHeight: 1.4,
-              textAlign: "center",
-            }}
-          >
-            Trade with confidence.
+            <div>Understand markets and holders in seconds.</div>
+            <div>Trade with confidence.</div>
           </div>
         </div>
 
         {/* OMEN Branding */}
         <div
           style={{
-            position: "absolute",
-            bottom: 40,
+            // position: "absolute",
+            // bottom: 40,
             display: "flex",
             alignItems: "center",
             gap: 12,
+            marginTop: 100,
           }}
         >
           <img
@@ -134,7 +126,7 @@ export default async function Image() {
               display: "flex",
             }}
           />
-          <div
+          {/* <div
             style={{
               fontSize: 40,
               fontFamily: "Roboto",
@@ -143,7 +135,7 @@ export default async function Image() {
             }}
           >
             OMEN
-          </div>
+          </div> */}
         </div>
       </div>
     ),
