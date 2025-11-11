@@ -124,7 +124,7 @@ export default function Home() {
           <form
             onSubmit={handleSubmit}
             noValidate
-            className="flex w-full max-w-[280px] flex-col gap-2 mt-32"
+            className="flex w-full max-w-[280px] flex-col gap-3 mt-32"
           >
             <div className="flex flex-col">
               {error && (

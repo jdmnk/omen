@@ -18,7 +18,7 @@ export const TEXTS = {
     joiningButton: "Joining...",
     successMessage: "You're in!",
     shareButton: "Share",
-    copiedButton: "Copied!",
+    copiedButton: "URL Copied!",
   },
   og: {
     alt: "Omen | Advanced Polymarket Analytics",
