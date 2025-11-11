@@ -83,7 +83,12 @@ export default function Home() {
               required
               disabled={isLoading}
             />
-            <Button type="submit" variant="brand" disabled={isLoading}>
+            <Button
+              type="submit"
+              variant="brand"
+              disabled={isLoading}
+              size="xl"
+            >
               {isLoading ? "Joining..." : "Join the waitlist"}
             </Button>
           </form>
