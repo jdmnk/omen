@@ -112,7 +112,7 @@ export default function Home() {
         {/* Email Form */}
         {isSuccess ? (
           <div className="flex w-full max-w-[280px] flex-col gap-2 mt-32">
-            <p className="text-base font-normal italic text-[#BBA6F2] h-10">
+            <p className="text-sm md:text-base font-normal italic text-[#BBA6F2] h-10 flex items-center justify-center">
               {"You're in!"}
             </p>
             <Button onClick={handleShare} variant="brand" size="xl">
