@@ -127,9 +127,13 @@ export default function Home() {
             className="flex w-full max-w-[280px] flex-col gap-3 mt-32"
           >
             <div className="flex flex-col">
-              {error && (
-                <p className="text-xs text-destructive text-left">{error}</p>
-              )}
+              <p
+                className={`text-xs text-destructive text-left min-h-[16px] ${
+                  error ? "opacity-100" : "opacity-0"
+                }`}
+              >
+                {error || "\u00A0"}
+              </p>
               <Input
                 type="email"
                 value={email}
