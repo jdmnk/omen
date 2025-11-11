@@ -1,10 +1,10 @@
 export const TEXTS = {
   hero: {
-    advanced: "Advanced",
-    title: "Polymarket Analytics",
+    advanced: "Smart Money",
+    title: "Become Prediction Market",
     tagline: {
-      line1: "Understand markets and holders in seconds.",
-      line2: "Trade with confidence.",
+      line1: "Win more trades. Spend less time analyzing.",
+      line2: "Act faster on institutional-grade market insights.",
     },
   },
   branding: {
