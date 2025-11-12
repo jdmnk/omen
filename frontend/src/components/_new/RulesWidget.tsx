@@ -1,9 +1,9 @@
 "use client";
 
-import React from "react";
+import React, { useMemo } from "react";
 import { LoadingSpinner } from "@/components/ui/spinner";
 import { useOnchainUpdatesQuery } from "@/lib/queries/onchain-updates.query";
-import { formatAddress } from "@/lib/ui/format.utils";
+import { decodeHexToText } from "@/lib/ui/format.utils";
 
 interface RulesWidgetProps {
   questionId?: string;
@@ -24,6 +24,16 @@ export function RulesWidget({
     error,
   } = useOnchainUpdatesQuery(questionId, owner);
 
+  // Decode hex strings to text
+  const decodedUpdates = useMemo(() => {
+    if (!updates) return [];
+    return updates.map((update) => ({
+      ...update,
+      decodedText: decodeHexToText(update.update),
+      isHex: update.update.startsWith("0x") && update.update.length > 2,
+    }));
+  }, [updates]);
+
   return (
     <div className="space-y-4 p-4">
       {/* Market Description Section */}
@@ -37,11 +47,11 @@ export function RulesWidget({
       )}
 
       <div>
-        {updates && updates.length > 0 && (
+        {decodedUpdates && decodedUpdates.length > 0 && (
           <div>
             <h3 className="text-sm font-semibold mb-3">Additional Context</h3>
             <div className="space-y-3">
-              {updates.map((update, index) => (
+              {decodedUpdates.map((update, index) => (
                 <div
                   key={index}
                   className="border rounded-md p-3 space-y-2 bg-muted/50"
@@ -52,9 +62,15 @@ export function RulesWidget({
                       {new Date(update.timestamp * 1000).toLocaleString()}
                     </span>
                   </div>
-                  <div className="text-sm break-all font-mono">
-                    {update.update}
-                  </div>
+                  {update.decodedText && update.decodedText.length > 0 ? (
+                    <div className="text-sm whitespace-pre-wrap">
+                      {update.decodedText}
+                    </div>
+                  ) : (
+                    <div className="text-sm break-all font-mono text-muted-foreground">
+                      {update.update}
+                    </div>
+                  )}
                 </div>
               ))}
             </div>
