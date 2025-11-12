@@ -1,0 +1,1638 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "FastAPI",
+    "version": "0.1.0"
+  },
+  "paths": {
+    "/": {
+      "get": {
+        "summary": "Home",
+        "operationId": "home__get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessageResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/health": {
+      "get": {
+        "summary": "Health",
+        "operationId": "health_health_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HealthResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/markets/search-slug": {
+      "get": {
+        "summary": "Get Market By Slug Endpoint",
+        "description": "Get a market by its slug from Polymarket Gamma API.\n\nOfficial docs: https://docs.polymarket.com/api-reference/markets/get-market-by-slug",
+        "operationId": "get_market_by_slug_endpoint_markets_search_slug_get",
+        "parameters": [
+          {
+            "name": "slug",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "title": "Slug"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Market"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/markets/trades": {
+      "get": {
+        "summary": "Get Market Trades Endpoint",
+        "operationId": "get_market_trades_endpoint_markets_trades_get",
+        "parameters": [
+          {
+            "name": "condition_id",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "title": "Condition Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Trade"
+                  },
+                  "title": "Response Get Market Trades Endpoint Markets Trades Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/markets/search": {
+      "get": {
+        "summary": "Get Search Markets Endpoint",
+        "description": "Search for markets using Polymarket Gamma API.\nReturns events with their markets, filtered to only active markets.",
+        "operationId": "get_search_markets_endpoint_markets_search_get",
+        "parameters": [
+          {
+            "name": "q",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "title": "Q"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SearchResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/markets/by-condition-ids": {
+      "get": {
+        "summary": "Get Markets By Condition Ids Endpoint",
+        "description": "Get multiple markets by their condition IDs from Polymarket Gamma API.\n\nOfficial docs: https://docs.polymarket.com/api-reference/markets/list-markets",
+        "operationId": "get_markets_by_condition_ids_endpoint_markets_by_condition_ids_get",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array",
+                "title": "Condition Ids"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/Market"
+                  },
+                  "type": "array",
+                  "title": "Response Get Markets By Condition Ids Endpoint Markets By Condition Ids Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/markets/top-holders-pnl": {
+      "post": {
+        "summary": "Get Top Holders Pnl Endpoint",
+        "description": "Get PnL data for holders.\n\nAccepts a list of TopHolder objects and returns them with PnL data (avgPrice, realizedPnl, totalBought).",
+        "operationId": "get_top_holders_pnl_endpoint_markets_top_holders_pnl_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TopHoldersPnlRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/TopHolderPnl"
+                  },
+                  "type": "array",
+                  "title": "Response Get Top Holders Pnl Endpoint Markets Top Holders Pnl Post"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/markets/top-holders-wallet-info": {
+      "post": {
+        "summary": "Get Top Holders Wallet Info Endpoint",
+        "description": "Get wallet information for holders.\n\nAccepts a list of TopHolder objects and returns them with wallet info (walletCreatedAt, walletLastTransfer, walletBalance).",
+        "operationId": "get_top_holders_wallet_info_endpoint_markets_top_holders_wallet_info_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TopHoldersWalletInfoRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/TopHolderWalletInfo"
+                  },
+                  "type": "array",
+                  "title": "Response Get Top Holders Wallet Info Endpoint Markets Top Holders Wallet Info Post"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/events/{event_id}": {
+      "get": {
+        "summary": "Get Event By Id Endpoint",
+        "description": "Get an event by its ID from Polymarket Gamma API.\n\nOfficial docs: https://docs.polymarket.com/api-reference/events/get-event-by-id",
+        "operationId": "get_event_by_id_endpoint_events__event_id__get",
+        "parameters": [
+          {
+            "name": "event_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Event Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Event"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/onchain/updates": {
+      "get": {
+        "summary": "Get Updates Endpoint",
+        "description": "Get all updates for a questionID and owner from the UMA CTF Adapter contract on-chain.\n\nCalls getUpdates(bytes32 questionID, address owner) on contract 0x6A9D222616C90FcA5754cd1333cFD9b7fb6a4F74.",
+        "operationId": "get_updates_endpoint_onchain_updates_get",
+        "parameters": [
+          {
+            "name": "question_id",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "description": "Question ID as hex string (bytes32)",
+              "title": "Question Id"
+            },
+            "description": "Question ID as hex string (bytes32)"
+          },
+          {
+            "name": "owner",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "description": "Owner address",
+              "title": "Owner"
+            },
+            "description": "Owner address"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/AncillaryDataUpdate"
+                  },
+                  "title": "Response Get Updates Endpoint Onchain Updates Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "AncillaryDataUpdate": {
+        "properties": {
+          "timestamp": {
+            "type": "integer",
+            "title": "Timestamp"
+          },
+          "update": {
+            "type": "string",
+            "title": "Update"
+          }
+        },
+        "type": "object",
+        "required": [
+          "timestamp",
+          "update"
+        ],
+        "title": "AncillaryDataUpdate",
+        "description": "Ancillary data update from UMA CTF Adapter."
+      },
+      "ClobReward": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "conditionId": {
+            "type": "string",
+            "title": "Conditionid"
+          },
+          "assetAddress": {
+            "type": "string",
+            "title": "Assetaddress"
+          },
+          "rewardsAmount": {
+            "type": "number",
+            "title": "Rewardsamount"
+          },
+          "rewardsDailyRate": {
+            "type": "number",
+            "title": "Rewardsdailyrate"
+          },
+          "startDate": {
+            "type": "string",
+            "title": "Startdate"
+          },
+          "endDate": {
+            "type": "string",
+            "title": "Enddate"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "conditionId",
+          "assetAddress",
+          "rewardsAmount",
+          "rewardsDailyRate",
+          "startDate",
+          "endDate"
+        ],
+        "title": "ClobReward",
+        "description": "Schema for a single CLOB reward configuration."
+      },
+      "Event": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "slug": {
+            "type": "string",
+            "title": "Slug"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "closed": {
+            "type": "boolean",
+            "title": "Closed"
+          },
+          "markets": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/Market"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Markets"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "slug",
+          "title",
+          "closed"
+        ],
+        "title": "Event"
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "type": "array",
+            "title": "Detail"
+          }
+        },
+        "type": "object",
+        "title": "HTTPValidationError"
+      },
+      "HealthResponse": {
+        "properties": {
+          "status": {
+            "type": "string",
+            "title": "Status"
+          }
+        },
+        "type": "object",
+        "required": [
+          "status"
+        ],
+        "title": "HealthResponse",
+        "description": "Health check response."
+      },
+      "Market": {
+        "properties": {
+          "conditionId": {
+            "type": "string",
+            "title": "Conditionid"
+          },
+          "question": {
+            "type": "string",
+            "title": "Question"
+          },
+          "questionId": {
+            "type": "string",
+            "title": "Questionid"
+          },
+          "marketMakerAddress": {
+            "type": "string",
+            "title": "Marketmakeraddress"
+          },
+          "submitted_by": {
+            "type": "string",
+            "title": "Submitted By"
+          },
+          "icon": {
+            "type": "string",
+            "title": "Icon"
+          },
+          "image": {
+            "type": "string",
+            "title": "Image"
+          },
+          "outcomes": {
+            "type": "string",
+            "title": "Outcomes"
+          },
+          "outcomePrices": {
+            "type": "string",
+            "title": "Outcomeprices"
+          },
+          "slug": {
+            "type": "string",
+            "title": "Slug"
+          },
+          "token1": {
+            "type": "string",
+            "title": "Token1"
+          },
+          "token2": {
+            "type": "string",
+            "title": "Token2"
+          },
+          "description": {
+            "type": "string",
+            "title": "Description"
+          },
+          "liquidity": {
+            "type": "number",
+            "minimum": 0.0,
+            "title": "Liquidity"
+          },
+          "volume": {
+            "type": "number",
+            "minimum": 0.0,
+            "title": "Volume"
+          },
+          "volume24hr": {
+            "type": "number",
+            "minimum": 0.0,
+            "title": "Volume24Hr"
+          },
+          "volume1wk": {
+            "type": "number",
+            "minimum": 0.0,
+            "title": "Volume1Wk"
+          },
+          "volume1mo": {
+            "type": "number",
+            "minimum": 0.0,
+            "title": "Volume1Mo"
+          },
+          "volume1yr": {
+            "type": "number",
+            "minimum": 0.0,
+            "title": "Volume1Yr"
+          },
+          "negRisk": {
+            "type": "boolean",
+            "title": "Negrisk"
+          },
+          "bestBid": {
+            "type": "number",
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "Bestbid"
+          },
+          "bestAsk": {
+            "type": "number",
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "Bestask"
+          },
+          "endDate": {
+            "type": "string",
+            "title": "Enddate"
+          },
+          "active": {
+            "type": "boolean",
+            "title": "Active"
+          },
+          "closed": {
+            "type": "boolean",
+            "title": "Closed"
+          },
+          "groupItemTitle": {
+            "type": "string",
+            "title": "Groupitemtitle"
+          },
+          "events": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/MarketEvent"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Events"
+          },
+          "umaReward": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Umareward"
+          },
+          "clobRewards": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/ClobReward"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Clobrewards"
+          },
+          "rewardsMinSize": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rewardsminsize"
+          },
+          "rewardsMaxSpread": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rewardsmaxspread"
+          },
+          "holdingRewardsEnabled": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Holdingrewardsenabled"
+          },
+          "feesEnabled": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Feesenabled"
+          }
+        },
+        "type": "object",
+        "required": [
+          "conditionId",
+          "question",
+          "questionId",
+          "marketMakerAddress",
+          "submitted_by",
+          "icon",
+          "image",
+          "outcomes",
+          "outcomePrices",
+          "slug",
+          "token1",
+          "token2",
+          "description",
+          "liquidity",
+          "volume",
+          "volume24hr",
+          "volume1wk",
+          "volume1mo",
+          "volume1yr",
+          "negRisk",
+          "bestBid",
+          "bestAsk",
+          "endDate",
+          "active",
+          "closed",
+          "groupItemTitle"
+        ],
+        "title": "Market"
+      },
+      "MarketEvent": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "slug": {
+            "type": "string",
+            "title": "Slug"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "slug"
+        ],
+        "title": "MarketEvent"
+      },
+      "MessageResponse": {
+        "properties": {
+          "message": {
+            "type": "string",
+            "title": "Message"
+          }
+        },
+        "type": "object",
+        "required": [
+          "message"
+        ],
+        "title": "MessageResponse",
+        "description": "Generic message response."
+      },
+      "SearchEventItem": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "ticker": {
+            "type": "string",
+            "title": "Ticker"
+          },
+          "slug": {
+            "type": "string",
+            "title": "Slug"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "subtitle": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Subtitle"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description"
+          },
+          "image": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Image"
+          },
+          "icon": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Icon"
+          },
+          "active": {
+            "type": "boolean",
+            "title": "Active"
+          },
+          "closed": {
+            "type": "boolean",
+            "title": "Closed"
+          },
+          "liquidity": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Liquidity"
+          },
+          "volume": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Volume"
+          },
+          "volume24hr": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Volume24Hr"
+          },
+          "markets": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/SearchMarketItem"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Markets"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "ticker",
+          "slug",
+          "title",
+          "active",
+          "closed"
+        ],
+        "title": "SearchEventItem",
+        "description": "Lightweight event data from search API."
+      },
+      "SearchMarketItem": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "question": {
+            "type": "string",
+            "title": "Question"
+          },
+          "conditionId": {
+            "type": "string",
+            "title": "Conditionid"
+          },
+          "slug": {
+            "type": "string",
+            "title": "Slug"
+          },
+          "category": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Category"
+          },
+          "liquidity": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Liquidity"
+          },
+          "volume": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Volume"
+          },
+          "outcomePrices": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Outcomeprices"
+          },
+          "outcomes": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Outcomes"
+          },
+          "active": {
+            "type": "boolean",
+            "title": "Active"
+          },
+          "closed": {
+            "type": "boolean",
+            "title": "Closed"
+          },
+          "icon": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Icon"
+          },
+          "image": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Image"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "question",
+          "conditionId",
+          "slug",
+          "active",
+          "closed"
+        ],
+        "title": "SearchMarketItem",
+        "description": "Lightweight market data from search API."
+      },
+      "SearchResponse": {
+        "properties": {
+          "events": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/SearchEventItem"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Events"
+          },
+          "markets": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/SearchMarketItem"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Markets"
+          },
+          "tags": {
+            "anyOf": [
+              {
+                "items": {
+                  "additionalProperties": true,
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Tags"
+          },
+          "profiles": {
+            "anyOf": [
+              {
+                "items": {
+                  "additionalProperties": true,
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Profiles"
+          },
+          "pagination": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Pagination"
+          }
+        },
+        "type": "object",
+        "title": "SearchResponse",
+        "description": "Response from Polymarket search API."
+      },
+      "TopHolder": {
+        "properties": {
+          "proxyWallet": {
+            "type": "string",
+            "title": "Proxywallet"
+          },
+          "bio": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Bio"
+          },
+          "asset": {
+            "type": "string",
+            "title": "Asset"
+          },
+          "pseudonym": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Pseudonym"
+          },
+          "amount": {
+            "type": "number",
+            "title": "Amount"
+          },
+          "displayUsernamePublic": {
+            "type": "boolean",
+            "title": "Displayusernamepublic"
+          },
+          "outcomeIndex": {
+            "type": "integer",
+            "title": "Outcomeindex"
+          },
+          "name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          },
+          "profileImage": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Profileimage"
+          },
+          "profileImageOptimized": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Profileimageoptimized"
+          }
+        },
+        "type": "object",
+        "required": [
+          "proxyWallet",
+          "asset",
+          "amount",
+          "displayUsernamePublic",
+          "outcomeIndex"
+        ],
+        "title": "TopHolder",
+        "description": "Single holder from Polymarket Data API."
+      },
+      "TopHolderPnl": {
+        "properties": {
+          "proxyWallet": {
+            "type": "string",
+            "title": "Proxywallet"
+          },
+          "bio": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Bio"
+          },
+          "asset": {
+            "type": "string",
+            "title": "Asset"
+          },
+          "pseudonym": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Pseudonym"
+          },
+          "amount": {
+            "type": "number",
+            "title": "Amount"
+          },
+          "displayUsernamePublic": {
+            "type": "boolean",
+            "title": "Displayusernamepublic"
+          },
+          "outcomeIndex": {
+            "type": "integer",
+            "title": "Outcomeindex"
+          },
+          "name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          },
+          "profileImage": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Profileimage"
+          },
+          "profileImageOptimized": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Profileimageoptimized"
+          },
+          "avgPrice": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Avgprice"
+          },
+          "realizedPnl": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Realizedpnl"
+          },
+          "totalBought": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Totalbought"
+          }
+        },
+        "type": "object",
+        "required": [
+          "proxyWallet",
+          "asset",
+          "amount",
+          "displayUsernamePublic",
+          "outcomeIndex"
+        ],
+        "title": "TopHolderPnl",
+        "description": "TopHolder with PnL data only."
+      },
+      "TopHolderWalletInfo": {
+        "properties": {
+          "proxyWallet": {
+            "type": "string",
+            "title": "Proxywallet"
+          },
+          "bio": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Bio"
+          },
+          "asset": {
+            "type": "string",
+            "title": "Asset"
+          },
+          "pseudonym": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Pseudonym"
+          },
+          "amount": {
+            "type": "number",
+            "title": "Amount"
+          },
+          "displayUsernamePublic": {
+            "type": "boolean",
+            "title": "Displayusernamepublic"
+          },
+          "outcomeIndex": {
+            "type": "integer",
+            "title": "Outcomeindex"
+          },
+          "name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          },
+          "profileImage": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Profileimage"
+          },
+          "profileImageOptimized": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Profileimageoptimized"
+          },
+          "walletCreatedAt": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Walletcreatedat"
+          },
+          "walletLastTransfer": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Walletlasttransfer"
+          },
+          "walletBalance": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Walletbalance"
+          }
+        },
+        "type": "object",
+        "required": [
+          "proxyWallet",
+          "asset",
+          "amount",
+          "displayUsernamePublic",
+          "outcomeIndex"
+        ],
+        "title": "TopHolderWalletInfo",
+        "description": "TopHolder with wallet info only."
+      },
+      "TopHoldersPnlRequest": {
+        "properties": {
+          "holders": {
+            "items": {
+              "$ref": "#/components/schemas/TopHolder"
+            },
+            "type": "array",
+            "title": "Holders"
+          },
+          "token1": {
+            "type": "string",
+            "title": "Token1"
+          },
+          "token2": {
+            "type": "string",
+            "title": "Token2"
+          }
+        },
+        "type": "object",
+        "required": [
+          "holders",
+          "token1",
+          "token2"
+        ],
+        "title": "TopHoldersPnlRequest"
+      },
+      "TopHoldersWalletInfoRequest": {
+        "properties": {
+          "holders": {
+            "items": {
+              "$ref": "#/components/schemas/TopHolder"
+            },
+            "type": "array",
+            "title": "Holders"
+          }
+        },
+        "type": "object",
+        "required": [
+          "holders"
+        ],
+        "title": "TopHoldersWalletInfoRequest"
+      },
+      "Trade": {
+        "properties": {
+          "proxyWallet": {
+            "type": "string",
+            "title": "Proxywallet"
+          },
+          "side": {
+            "type": "string",
+            "title": "Side"
+          },
+          "asset": {
+            "type": "string",
+            "title": "Asset"
+          },
+          "conditionId": {
+            "type": "string",
+            "title": "Conditionid"
+          },
+          "size": {
+            "type": "number",
+            "title": "Size"
+          },
+          "price": {
+            "type": "number",
+            "title": "Price"
+          },
+          "timestamp": {
+            "type": "integer",
+            "title": "Timestamp"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "slug": {
+            "type": "string",
+            "title": "Slug"
+          },
+          "icon": {
+            "type": "string",
+            "title": "Icon"
+          },
+          "eventSlug": {
+            "type": "string",
+            "title": "Eventslug"
+          },
+          "outcome": {
+            "type": "string",
+            "title": "Outcome"
+          },
+          "outcomeIndex": {
+            "type": "integer",
+            "title": "Outcomeindex"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "pseudonym": {
+            "type": "string",
+            "title": "Pseudonym"
+          },
+          "bio": {
+            "type": "string",
+            "title": "Bio"
+          },
+          "profileImage": {
+            "type": "string",
+            "title": "Profileimage"
+          },
+          "profileImageOptimized": {
+            "type": "string",
+            "title": "Profileimageoptimized"
+          },
+          "transactionHash": {
+            "type": "string",
+            "title": "Transactionhash"
+          }
+        },
+        "type": "object",
+        "required": [
+          "proxyWallet",
+          "side",
+          "asset",
+          "conditionId",
+          "size",
+          "price",
+          "timestamp",
+          "title",
+          "slug",
+          "icon",
+          "eventSlug",
+          "outcome",
+          "outcomeIndex",
+          "name",
+          "pseudonym",
+          "bio",
+          "profileImage",
+          "profileImageOptimized",
+          "transactionHash"
+        ],
+        "title": "Trade"
+      },
+      "ValidationError": {
+        "properties": {
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "type": "array",
+            "title": "Location"
+          },
+          "msg": {
+            "type": "string",
+            "title": "Message"
+          },
+          "type": {
+            "type": "string",
+            "title": "Error Type"
+          }
+        },
+        "type": "object",
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError"
+      }
+    }
+  }
+}
