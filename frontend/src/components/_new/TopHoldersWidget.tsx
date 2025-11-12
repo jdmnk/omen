@@ -6,6 +6,7 @@ import { Market } from "@/lib/models/api.models";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { OrderBook } from "./OrderBook";
 import { TopHoldersPositions } from "./TopHoldersPositions";
+import { RulesWidget } from "./RulesWidget";
 import { LoadingSpinner } from "@/components/ui/spinner";
 import { Command } from "lucide-react";
 
@@ -31,6 +32,7 @@ export function TopHoldersWidget({
   limit?: number;
 }) {
   const [activeTab, setActiveTab] = useState("positions");
+  console.log("market", market);
 
   return (
     <Card className="h-full flex flex-col">
@@ -74,14 +76,17 @@ export function TopHoldersWidget({
           value="rules"
           className="flex-1 overflow-auto min-h-0 mt-0"
         >
-          <div className="space-y-4 p-4">
-            <div>
-              <h3 className="text-sm font-semibold mb-3">Market Description</h3>
-              <div className="text-sm text-muted-foreground whitespace-pre-wrap">
-                {market?.description || "No description available."}
-              </div>
+          {isLoading ? (
+            <div className="flex items-center justify-center py-8">
+              <LoadingSpinner message="Loading market..." size="sm" />
             </div>
-          </div>
+          ) : market ? (
+            <RulesWidget
+              questionId={market.questionId}
+              owner={market.submitted_by}
+              marketDescription={market.description}
+            />
+          ) : null}
         </TabsContent>
 
         <TabsContent value="book" className="flex-1 overflow-auto min-h-0 mt-0">
