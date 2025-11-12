@@ -9,6 +9,30 @@ from src.models.responses import AncillaryDataUpdate
 from src.settings import settings
 from src.utils.logging_config import get_logger
 
+
+def decode_hex_to_text(hex_str: str) -> str:
+    """
+    Decode a hex string to UTF-8 text.
+    Handles hex strings with or without 0x prefix.
+    Removes null bytes and trims whitespace.
+    """
+    try:
+        # Remove 0x prefix if present
+        clean_hex = hex_str[2:] if hex_str.startswith("0x") else hex_str
+
+        # Convert hex pairs to bytes
+        bytes_data = bytes.fromhex(clean_hex)
+
+        # Decode as UTF-8
+        text = bytes_data.decode("utf-8", errors="ignore")
+
+        # Remove null bytes and trim
+        return text.replace("\x00", "").strip()
+    except Exception:
+        # If decoding fails, return empty string
+        return ""
+
+
 logger = get_logger(__name__)
 
 # UMA CTF Adapter contract address
@@ -52,7 +76,7 @@ class PolyClientOnchain:
             current_dir = os.path.dirname(os.path.abspath(__file__))
             abi_file_path = os.path.join(current_dir, "abi", "UmaCtfAdapter.abi.json")
 
-            with open(abi_file_path, "r") as f:
+            with open(abi_file_path) as f:
                 content = f.read()
                 # The file is a TypeScript file but contains a JSON array
                 # Parse it directly as JSON
@@ -101,7 +125,7 @@ class PolyClientOnchain:
                 timestamp = update[0]
                 update_bytes = update[1]
 
-                # Convert bytes to hex string (with 0x prefix)
+                # Convert bytes to hex string (with 0x prefix) for decoding
                 if isinstance(update_bytes, bytes):
                     update_hex = "0x" + update_bytes.hex()
                 elif isinstance(update_bytes, str):
@@ -113,10 +137,13 @@ class PolyClientOnchain:
                     # Fallback: convert to hex
                     update_hex = "0x" + bytes(update_bytes).hex()
 
+                # Decode hex to text
+                decoded_text = decode_hex_to_text(update_hex)
+
                 result.append(
                     AncillaryDataUpdate(
                         timestamp=timestamp,
-                        update=update_hex,
+                        text=decoded_text,
                     )
                 )
 

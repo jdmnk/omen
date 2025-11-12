@@ -91,29 +91,3 @@ export function formatAddress(addr: string) {
   if (!addr) return "";
   return `${addr.slice(0, 6)}…${addr.slice(-4)}`;
 }
-
-/**
- * Decode a hex string to UTF-8 text.
- * Handles hex strings with or without 0x prefix.
- * Removes null bytes and trims whitespace.
- */
-export function decodeHexToText(hex: string): string {
-  try {
-    // Remove 0x prefix if present
-    const cleanHex = hex.startsWith("0x") ? hex.slice(2) : hex;
-
-    // Convert hex pairs to bytes
-    const bytes = new Uint8Array(
-      cleanHex.match(/.{1,2}/g)?.map((byte) => parseInt(byte, 16)) || []
-    );
-
-    // Decode as UTF-8
-    const text = new TextDecoder("utf-8", { fatal: false }).decode(bytes);
-
-    // Remove null bytes and trim
-    return text.replace(/\0/g, "").trim();
-  } catch (error) {
-    // If decoding fails, return the original hex string
-    return hex;
-  }
-}

@@ -5,7 +5,7 @@ import { getBaseUrl } from "../api";
 
 export interface AncillaryDataUpdate {
   timestamp: number;
-  update: string; // hex string with 0x prefix
+  text: string; // decoded UTF-8 text from backend
 }
 
 export function useClarificationsQuery(

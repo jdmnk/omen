@@ -1,8 +1,7 @@
 "use client";
 
-import React, { useMemo } from "react";
+import React from "react";
 import { useClarificationsQuery } from "@/lib/queries/clarifications.query";
-import { decodeHexToText } from "@/lib/ui/format.utils";
 
 interface RulesWidgetProps {
   questionId?: string;
@@ -21,16 +20,6 @@ export function RulesWidget({
     error,
   } = useClarificationsQuery(questionId, owner);
 
-  // Decode hex strings to text
-  const decodedUpdates = useMemo(() => {
-    if (!updates) return [];
-    return updates.map((update) => ({
-      ...update,
-      decodedText: decodeHexToText(update.update),
-      isHex: update.update.startsWith("0x") && update.update.length > 2,
-    }));
-  }, [updates]);
-
   return (
     <div className="space-y-4 p-4">
       {/* Market Description Section */}
@@ -44,11 +33,11 @@ export function RulesWidget({
       )}
 
       <div>
-        {decodedUpdates && decodedUpdates.length > 0 && (
+        {updates && updates.length > 0 && (
           <div>
             <h3 className="text-sm font-semibold mb-3">Additional Context</h3>
             <div className="space-y-3">
-              {decodedUpdates.map((update, index) => (
+              {updates.map((update, index) => (
                 <div
                   key={index}
                   className="border rounded-md p-3 space-y-2 bg-muted/50"
@@ -59,13 +48,13 @@ export function RulesWidget({
                       {new Date(update.timestamp * 1000).toLocaleString()}
                     </span>
                   </div>
-                  {update.decodedText && update.decodedText.length > 0 ? (
+                  {update.text && update.text.length > 0 ? (
                     <div className="text-sm whitespace-pre-wrap">
-                      {update.decodedText}
+                      {update.text}
                     </div>
                   ) : (
-                    <div className="text-sm break-all font-mono text-muted-foreground">
-                      {update.update}
+                    <div className="text-sm text-muted-foreground">
+                      No content available.
                     </div>
                   )}
                 </div>

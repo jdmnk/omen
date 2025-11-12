@@ -19,4 +19,4 @@ class AncillaryDataUpdate(BaseModel):
     """Ancillary data update from UMA CTF Adapter."""
 
     timestamp: int
-    update: str  # bytes encoded as hex string
+    text: str  # decoded UTF-8 text from hex string
