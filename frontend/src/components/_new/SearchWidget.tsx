@@ -218,7 +218,7 @@ export function SearchWidget({ currentMarket }: { currentMarket?: Market }) {
     const activeMarkets = eventData.markets
       .filter((m) => !m.closed && m.active)
       .map((market) => ({
-        question: market.groupItemTitle,
+        question: market.groupItemTitle || market.question,
         slug: market.slug,
         displayImage: market.icon || market.image,
         volume: market.volume,
