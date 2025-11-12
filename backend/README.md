@@ -3,6 +3,8 @@
 ```bash
 # spin up services
 docker compose up --build
+# spinds up services in dev mode
+docker compose -f docker-compose.dev.yml up --build
 
 # fresh start
 docker compose exec app python -m src.db.db_init --reset
