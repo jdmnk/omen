@@ -14,8 +14,8 @@ services:
     depends_on:
       db:
         condition: service_healthy
-      db-init:
-        condition: service_completed_successfully
+      # db-init:
+      #   condition: service_completed_successfully
       redis:
         condition: service_started
     volumes:
@@ -40,15 +40,15 @@ services:
       retries: 10
       start_period: 5s
 
-  db-init:
-    build: .
-    command: ["python", "-m", "src.db.db_init"]
-    environment:
-      DATABASE_URL: "${DATABASE_URL}"
-    depends_on:
-      db:
-        condition: service_healthy
-    restart: "no"
+  # db-init:
+  #   build: .
+  #   command: ["python", "-m", "src.db.db_init"]
+  #   environment:
+  #     DATABASE_URL: "${DATABASE_URL}"
+  #   depends_on:
+  #     db:
+  #       condition: service_healthy
+  #   restart: "no"
 
   redis:
     image: redis:7
