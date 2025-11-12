@@ -72,7 +72,7 @@ export function PriceChartWidget({ market }: { market: Market }) {
     : Math.abs(market.bestAsk - market.bestBid) * 100;
 
   // prevent SSR iossues with locales below
-  if (isMounted()) {
+  if (!isMounted) {
     return null;
   }
 
