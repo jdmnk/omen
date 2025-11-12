@@ -8,14 +8,14 @@ export interface AncillaryDataUpdate {
   update: string; // hex string with 0x prefix
 }
 
-export function useOnchainUpdatesQuery(
+export function useClarificationsQuery(
   questionId: string | undefined,
   owner: string | undefined
 ) {
   return useQuery<AncillaryDataUpdate[]>({
-    queryKey: ["onchain-updates", questionId, owner],
+    queryKey: ["clarifications", questionId, owner],
     queryFn: async () => {
-      const url = new URL(`${getBaseUrl()}/onchain/updates`);
+      const url = new URL(`${getBaseUrl()}/markets/clarifications`);
       url.searchParams.set("question_id", questionId!);
       url.searchParams.set("owner", owner!);
 
@@ -23,7 +23,7 @@ export function useOnchainUpdatesQuery(
 
       if (!response.ok) {
         throw new Error(
-          `Failed to fetch onchain updates: ${response.statusText}`
+          `Failed to fetch clarifications: ${response.statusText}`
         );
       }
 

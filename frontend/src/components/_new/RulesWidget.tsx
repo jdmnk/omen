@@ -1,8 +1,7 @@
 "use client";
 
 import React, { useMemo } from "react";
-import { LoadingSpinner } from "@/components/ui/spinner";
-import { useOnchainUpdatesQuery } from "@/lib/queries/onchain-updates.query";
+import { useClarificationsQuery } from "@/lib/queries/clarifications.query";
 import { decodeHexToText } from "@/lib/ui/format.utils";
 
 interface RulesWidgetProps {
@@ -16,13 +15,11 @@ export function RulesWidget({
   owner,
   marketDescription,
 }: RulesWidgetProps) {
-  console.log("questionId", questionId);
-  console.log("owner", owner);
   const {
     data: updates,
     isLoading,
     error,
-  } = useOnchainUpdatesQuery(questionId, owner);
+  } = useClarificationsQuery(questionId, owner);
 
   // Decode hex strings to text
   const decodedUpdates = useMemo(() => {

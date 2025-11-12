@@ -14,7 +14,7 @@ logger = get_logger(__name__)
 # UMA CTF Adapter contract address
 UMA_CTF_ADAPTER_ADDRESS = "0x6A9D222616C90FcA5754cd1333cFD9b7fb6a4F74"
 
-# Polygon RPC endpoint (public endpoint, can be overridden via env)
+# Good free Polygon RPC endpoint
 POLYGON_RPC_URL = "https://polygon-rpc.com"
 
 
@@ -63,7 +63,7 @@ class PolyClientOnchain:
             logger.error(traceback.format_exc())
             raise
 
-    def get_updates(self, question_id: str, owner: str) -> list[AncillaryDataUpdate]:
+    def get_rules_updates(self, question_id: str, owner: str) -> list[AncillaryDataUpdate]:
         """
         Get all updates for a questionID and owner from the UMA CTF Adapter contract.
 

@@ -157,8 +157,8 @@ async def get_event_by_id_endpoint(event_id: str) -> Event:
     return result
 
 
-@app.get("/onchain/updates", response_model=list[AncillaryDataUpdate])
-async def get_updates_endpoint(
+@app.get("/markets/clarifications", response_model=list[AncillaryDataUpdate])
+async def get_clarifications_endpoint(
     question_id: str = Query(min_length=1, description="Question ID as hex string (bytes32)"),
     owner: str = Query(min_length=1, description="Owner address"),
 ) -> list[AncillaryDataUpdate]:
@@ -168,8 +168,8 @@ async def get_updates_endpoint(
     Calls getUpdates(bytes32 questionID, address owner) on contract 0x6A9D222616C90FcA5754cd1333cFD9b7fb6a4F74.
     """
     try:
-        updates = poly_client_onchain.get_updates(question_id, owner)
+        updates = poly_client_onchain.get_rules_updates(question_id, owner)
         return updates
     except Exception as exc:
-        logger.error(f"Error in get_updates endpoint: {exc!s}", exc_info=True)
+        logger.error(f"Error in get_clarifications endpoint: {exc!s}", exc_info=True)
         raise HTTPException(status_code=500, detail=f"Internal server error: {exc!s}") from exc
