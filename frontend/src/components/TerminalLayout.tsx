@@ -12,12 +12,21 @@ import { useMarketBySlugQuery } from "@/lib/queries/market-by-slug.query";
 import { PriceChartWidget } from "./_new/PriceChartWidget";
 import { EmptyState, LoadingState, ErrorState } from "./_new/WidgetHelpers";
 import { TopHoldersWidget } from "./_new/TopHoldersWidget";
+import { Market } from "@/lib/models/api.models";
 
-export function TerminalLayout() {
+export function TerminalLayout({
+  initialMarket,
+}: {
+  initialMarket?: Market | null;
+}) {
   const params = useParams();
   const marketSlug = params?.slug as string | undefined;
 
-  const { data: market, isLoading, error } = useMarketBySlugQuery(marketSlug);
+  const {
+    data: market,
+    isLoading,
+    error,
+  } = useMarketBySlugQuery(marketSlug, initialMarket);
 
   return (
     <div className="h-screen bg-background flex flex-col overflow-hidden">

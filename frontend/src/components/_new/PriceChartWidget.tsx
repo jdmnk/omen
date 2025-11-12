@@ -12,6 +12,7 @@ import { formatCompactNumber, formatNumber } from "@/lib/ui/format.utils";
 import { cn } from "@/lib/utils";
 import { Card } from "../ui/card";
 import { WatchlistButton } from "./WatchlistButton";
+import { useIsMounted } from "@/lib/hooks/use-is-mounted";
 
 const INTERVALS: Interval[] = ["1h", "6h", "1d", "1w", "1m", "max"];
 
@@ -42,6 +43,7 @@ const deduplicateTimeStamps = (data: PriceHistoryPoint[]) => {
 
 export function PriceChartWidget({ market }: { market: Market }) {
   const [interval, setInterval] = useState<Interval>("max");
+  const isMounted = useIsMounted();
   const { data, isLoading, error } = usePriceHistoryQuery(
     market.token1,
     interval,
@@ -68,6 +70,11 @@ export function PriceChartWidget({ market }: { market: Market }) {
   const spread = orderbookData?.spread
     ? orderbookData.spread * 100
     : Math.abs(market.bestAsk - market.bestBid) * 100;
+
+  // prevent SSR iossues with locales below
+  if (isMounted()) {
+    return null;
+  }
 
   return (
     <Card className="relative w-full h-full flex flex-col pb-2">

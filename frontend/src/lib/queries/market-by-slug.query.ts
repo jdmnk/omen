@@ -4,7 +4,10 @@ import { useQuery } from "@tanstack/react-query";
 import { getBaseUrl } from "../api";
 import { Market } from "@/lib/models/api.models";
 
-export function useMarketBySlugQuery(slug: string | undefined) {
+export function useMarketBySlugQuery(
+  slug: string | undefined,
+  initialData?: Market | null
+) {
   return useQuery<Market>({
     queryKey: ["market-by-slug", slug],
     queryFn: async () => {
@@ -22,6 +25,7 @@ export function useMarketBySlugQuery(slug: string | undefined) {
       return data;
     },
     enabled: !!slug && slug.length > 0,
+    initialData: initialData || undefined,
     retry: 1,
     staleTime: 30000, // 30 seconds
   });
