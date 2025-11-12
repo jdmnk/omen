@@ -27,6 +27,7 @@ from src.polymarket.poly_client import PolyClient
 from src.polymarket.poly_client_graphs import PolyClientGraphs
 from src.polymarket.poly_client_onchain import PolyClientOnchain
 from src.utils.logging_config import get_logger
+from src.utils.redis_client import redis_client
 
 logger = get_logger(__name__)
 app = FastAPI()
@@ -166,9 +167,28 @@ async def get_clarifications_endpoint(
     Get all updates for a questionID and owner from the UMA CTF Adapter contract on-chain.
 
     Calls getUpdates(bytes32 questionID, address owner) on contract 0x6A9D222616C90FcA5754cd1333cFD9b7fb6a4F74.
+    Results are cached in Redis for 24 hours.
     """
+    # Create cache key from question_id and owner
+    cache_key = f"clarifications:{question_id}"
+
     try:
+        # Try to get from cache first
+        cached_result = redis_client.get(cache_key)
+        if cached_result is not None:
+            logger.info(f"Cache hit for clarifications: {cache_key}")
+            # Convert dict list back to Pydantic models
+            return [AncillaryDataUpdate(**item) for item in cached_result]
+
+        # Cache miss - fetch from on-chain
+        logger.info(f"Cache miss for {cache_key}, fetching from chain")
         updates = poly_client_onchain.get_rules_updates(question_id, owner)
+
+        # Cache the result for 24 hours (86400 seconds)
+        updates_dict = [update.model_dump() for update in updates]
+        redis_client.set(cache_key, updates_dict, expiry_seconds=86400)
+        logger.info(f"Cached clarifications for {cache_key}")
+
         return updates
     except Exception as exc:
         logger.error(f"Error in get_clarifications endpoint: {exc!s}", exc_info=True)
