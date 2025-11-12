@@ -6,6 +6,9 @@ docker compose up --build
 # spinds up services in dev mode
 docker compose -f docker-compose.dev.yml up --build
 
+# rebuild just app + reinstall in dev
+docker compose -f docker-compose.dev.yml up -d --build --no-deps app
+
 # fresh start
 docker compose exec app python -m src.db.db_init --reset
 docker compose exec app python -m src.db.db_populate_markets
