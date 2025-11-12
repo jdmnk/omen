@@ -11,6 +11,7 @@ from src.db.selects import SelectsClient
 from src.models.event import Event
 from src.models.market import Market
 from src.models.responses import (
+    AncillaryDataUpdate,
     HealthResponse,
     MessageResponse,
 )
@@ -24,6 +25,7 @@ from src.models.top_holders import (
 from src.models.trade import Trade
 from src.polymarket.poly_client import PolyClient
 from src.polymarket.poly_client_graphs import PolyClientGraphs
+from src.polymarket.poly_client_onchain import PolyClientOnchain
 from src.utils.logging_config import get_logger
 
 logger = get_logger(__name__)
@@ -41,6 +43,7 @@ app.add_middleware(
 selects = SelectsClient()
 poly_client = PolyClient()
 poly_client_graphs = PolyClientGraphs()
+poly_client_onchain = PolyClientOnchain()
 
 
 @app.get("/", response_model=MessageResponse)
@@ -152,3 +155,21 @@ async def get_event_by_id_endpoint(event_id: str) -> Event:
         raise HTTPException(status_code=404, detail="Event not found")
 
     return result
+
+
+@app.get("/onchain/updates", response_model=list[AncillaryDataUpdate])
+async def get_updates_endpoint(
+    question_id: str = Query(min_length=1, description="Question ID as hex string (bytes32)"),
+    owner: str = Query(min_length=1, description="Owner address"),
+) -> list[AncillaryDataUpdate]:
+    """
+    Get all updates for a questionID and owner from the UMA CTF Adapter contract on-chain.
+
+    Calls getUpdates(bytes32 questionID, address owner) on contract 0x6A9D222616C90FcA5754cd1333cFD9b7fb6a4F74.
+    """
+    try:
+        updates = poly_client_onchain.get_updates(question_id, owner)
+        return updates
+    except Exception as exc:
+        logger.error(f"Error in get_updates endpoint: {exc!s}", exc_info=True)
+        raise HTTPException(status_code=500, detail=f"Internal server error: {exc!s}") from exc

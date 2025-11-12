@@ -13,3 +13,10 @@ class HealthResponse(BaseModel):
     """Health check response."""
 
     status: str
+
+
+class AncillaryDataUpdate(BaseModel):
+    """Ancillary data update from UMA CTF Adapter."""
+
+    timestamp: int
+    update: str  # bytes encoded as hex string
