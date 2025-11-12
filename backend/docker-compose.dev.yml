@@ -52,8 +52,17 @@ services:
 
   redis:
     image: redis:7
+    command: >
+      redis-server
+      --save 900 1
+      --save 300 10
+      --save 60 10000
+      --appendonly yes
+      --appendfsync no
     volumes:
       - redisdata:/data
+    ports:
+      - "6379:6379"
 
 volumes:
   pgdata:
