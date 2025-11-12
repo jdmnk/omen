@@ -5,7 +5,7 @@ from typing import Any
 from web3 import Web3
 from web3.middleware import ExtraDataToPOAMiddleware
 
-from src.models.responses import AncillaryDataUpdate
+from src.models.onchain.ancillary_data import AncillaryDataUpdate
 from src.settings import settings
 from src.utils.logging_config import get_logger
 

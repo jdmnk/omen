@@ -10,8 +10,8 @@ from src.analytics.top_holders_analysis import (
 from src.db.selects import SelectsClient
 from src.models.event import Event
 from src.models.market import Market
+from src.models.onchain.ancillary_data import AncillaryDataUpdate
 from src.models.responses import (
-    AncillaryDataUpdate,
     HealthResponse,
     MessageResponse,
 )
