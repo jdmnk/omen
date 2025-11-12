@@ -57,8 +57,6 @@ services:
       --save 900 1
       --save 300 10
       --save 60 10000
-      --appendonly yes
-      --appendfsync no
     volumes:
       - redisdata:/data
     ports:
