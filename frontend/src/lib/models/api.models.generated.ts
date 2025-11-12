@@ -190,10 +190,42 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/onchain/updates": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Updates Endpoint
+         * @description Get all updates for a questionID and owner from the UMA CTF Adapter contract on-chain.
+         *
+         *     Calls getUpdates(bytes32 questionID, address owner) on contract 0x6A9D222616C90FcA5754cd1333cFD9b7fb6a4F74.
+         */
+        get: operations["get_updates_endpoint_onchain_updates_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        /**
+         * AncillaryDataUpdate
+         * @description Ancillary data update from UMA CTF Adapter.
+         */
+        AncillaryDataUpdate: {
+            /** Timestamp */
+            timestamp: number;
+            /** Update */
+            update: string;
+        };
         /**
          * ClobReward
          * @description Schema for a single CLOB reward configuration.
@@ -246,6 +278,12 @@ export interface components {
             conditionId: string;
             /** Question */
             question: string;
+            /** Questionid */
+            questionId: string;
+            /** Marketmakeraddress */
+            marketMakerAddress: string;
+            /** Submitted By */
+            submitted_by: string;
             /** Icon */
             icon: string;
             /** Image */
@@ -832,10 +870,45 @@ export interface operations {
             };
         };
     };
+    get_updates_endpoint_onchain_updates_get: {
+        parameters: {
+            query: {
+                /** @description Question ID as hex string (bytes32) */
+                question_id: string;
+                /** @description Owner address */
+                owner: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AncillaryDataUpdate"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
 }
 
 
 // Clean type exports (no need to access via components["schemas"])
+export type AncillaryDataUpdate = components["schemas"]["AncillaryDataUpdate"];
 export type ClobReward = components["schemas"]["ClobReward"];
 export type Event = components["schemas"]["Event"];
 export type HTTPValidationError = components["schemas"]["HTTPValidationError"];

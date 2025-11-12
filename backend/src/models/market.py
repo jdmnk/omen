@@ -34,6 +34,9 @@ class MarketDB(Base):
         DateTime, server_default=func.now(), onupdate=func.now()
     )
     question: Mapped[str] = mapped_column(String, nullable=False)
+    questionId: Mapped[str] = mapped_column(String, nullable=False)
+    marketMakerAddress: Mapped[str] = mapped_column(String, nullable=False)
+    submitted_by: Mapped[str] = mapped_column(String, nullable=False)
     icon: Mapped[str] = mapped_column(String, nullable=False)
     outcomes: Mapped[str] = mapped_column(String, nullable=False)
     outcomePrices: Mapped[str] = mapped_column(String, nullable=False)
@@ -63,6 +66,9 @@ class MarketEvent(BaseModel):
 class Market(BaseModel):
     conditionId: str
     question: str
+    questionId: str
+    marketMakerAddress: str
+    submitted_by: str
     icon: str
     image: str
     outcomes: str
@@ -117,6 +123,9 @@ def parse_market_from_api(market_dict: dict) -> Market | None:
         token2 = tokens[1]
         description = market_dict.get("description")
         question = market_dict.get("question", "")
+        questionId = market_dict.get("questionID", "")  # WARNING - UPPERCASE "ID" from api!!!
+        marketMakerAddress = market_dict.get("marketMakerAddress", "")
+        submitted_by = market_dict.get("submitted_by", "")
         icon = market_dict.get("icon", "")
         image = market_dict.get("image", "")
         outcomes = ",".join(json.loads(market_dict.get("outcomes", "[]")))
@@ -181,6 +190,9 @@ def parse_market_from_api(market_dict: dict) -> Market | None:
         return Market(
             conditionId=conditionId,
             question=question,
+            questionId=questionId,
+            marketMakerAddress=marketMakerAddress,
+            submitted_by=submitted_by,
             icon=icon,
             image=image,
             outcomes=outcomes,
