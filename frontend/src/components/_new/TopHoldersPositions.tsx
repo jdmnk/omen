@@ -34,7 +34,8 @@ import * as TooltipPrimitive from "@radix-ui/react-tooltip";
 import Image from "next/image";
 
 const HOLDER_ROW_GRID_CLASSES =
-  "grid grid-cols-[24px_auto_2.5rem_6rem_4.5rem] items-center gap-3";
+  // "grid grid-cols-[24px_auto_3rem_6.5rem_4.5rem] items-center gap-3";
+  "grid grid-cols-[24px_2.5fr_minmax(3rem,1fr)_minmax(6.5rem,2fr)_minmax(4.5rem,1.5fr)] items-center gap-3";
 
 function HolderTagIcon({ icon }: { icon: HolderTagIcon }) {
   const iconPath = `/icons/${icon}.svg`;
