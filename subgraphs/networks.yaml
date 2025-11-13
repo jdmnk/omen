@@ -1,0 +1,97 @@
+mainnet:
+  contracts:
+    ConditionalTokens:
+      address: '0xC59b0e4De5F1248C1140964E0fF287B192407E0C'
+      transactionHash: '0x7e10ef2a2116a46153d52ad50d6428fa9f4b19c36c803ba2f707cd70b7434348'
+      startBlock: 8623608
+    FixedProductMarketMakerFactory:
+      address: '0x4b4fb012298aceA6D5149be3f02cc252A88b755b'
+      transactionHash: '0xc21edc19c4f4249f047cec4cb13052e4ce39446766f723b9a94b3748a433e9b6'
+      startBlock: 9969340
+    Exchange:
+      address: ''
+      transactionHash: ''
+      startBlock: 0
+    NegRiskExchange:
+      address: ''
+      transactionHash: ''
+      startBlock: 0
+    UmaSportsOracle:
+      address: ''
+      transactionHash: ''
+      startBlock: 0
+    networkName: mainnet
+matic:
+  contracts:
+    ConditionalTokens:
+      address: '0x4D97DCd97eC945f40cF65F87097ACe5EA0476045'
+      transactionHash: '0xf822536aff16fdb8df59bc9c0b5854c5bec4b9a76484ea9d6944908ced563389'
+      startBlock: 4023686
+    FixedProductMarketMakerFactory:
+      address: '0x8B9805A2f595B6705e74F7310829f2d299D21522'
+      transactionHash: '0x1af1b88e36bb0289f6e037e00d01b26bed997ce7a0406ebafce07dcf766ce7c6'
+      startBlock: 4023693
+    Exchange:
+      address: '0x4bFb41d5B3570DeFd03C39a9A4D8dE6Bd8B8982E'
+      transactionHash: '0x35423c49cb07c9ccecad9af20df52cccdeff0d46f833d438de8b02f2504aed22'
+      startBlock: 33605403
+    NegRiskExchange:
+      address: '0xC5d563A36AE78145C45a50134d48A1215220f80a'
+      transactionHash: '0x5935e680b186f72b6db932ce351dd6f0288b1e056ab8d0d307c5146606879369'
+      startBlock: 50505492
+    NegRiskAdapter:
+      address: '0xd91E80cF2E7be2e162c6513ceD06f1dD0dA35296'
+      transactionHash: '0x192214f14b05d4404271a8d54d633d840277ba7b96df853417eb3fce274af2b9'
+      startBlock: 50505403
+    NegRiskOperator:
+      address: '0x71523d0f655B41E805Cec45b17163f528B59B820'
+    NegRiskWrappedCollateral:
+      address: '0x3A3BD7bb9528E159577F7C2e685CC81A765002E2'
+    UmaSportsOracle:
+      address: '0xb21182d0494521Cf45DbbeEbb5A3ACAAb6d22093'
+      transactionHash: '0xb0cc39f6c2a66a9545a1918724f3e38b8e61b0f7e5282ab1154351a18dc4e0a4'
+      startBlock: 68931384
+    USDC:
+      address: '0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174'
+      transactionHash: '0x51103659d8827d6d24732d1168de73390f4f387d58a8281944241657f1bc61d7'
+      startBlock: 5013591
+    ProxyWalletFactory:
+      address: '0xaB45c5A4B0c941a2F231C04C3f49182e1A254052'
+      transactionHash: '0xda92d52957b2f8eb6f3f66e20a24a21f99e544e1cb2bc15b643beb3344eb4d99'
+      startBlock: 4022827
+    ProxyWalletImplementation:
+      address: '0x44e999d5c2F66Ef0861317f9A4805AC2e90aEB4f'
+      transactionHash: '0xda92d52957b2f8eb6f3f66e20a24a21f99e544e1cb2bc15b643beb3344eb4d99'
+      startBlock: 4022827
+    RelayHub:
+      address: '0xD216153c06E857cD7f72665E0aF1d7D82172F494'
+      transactionHash: '0x34159122fb20e9ee0c2e1b1b6ad59018a47403e473ffffcd5a401ec6428dfb79'
+      startBlock: 3764531
+    SafeProxyFactory:
+      address: '0xaacFeEa03eb1561C4e67d661e40682Bd20E3541b'
+      transactionHash: '0xddcfc612da555656acb1ac68d50a64cd07a8f9a84af534410567d781c49dfe5f'
+      startBlock: 19426226
+  networkName: matic
+mumbai:
+  contracts:
+    ConditionalTokens:
+      address: '0x7D8610E9567d2a6C9FBf66a5A13E9Ba8bb120d43'
+      transactionHash: '0xb3ce795972a85754f8803d6b43408fc71f472733766236072a270b04ffbb937b'
+      startBlock: 3456411
+    FixedProductMarketMakerFactory:
+      address: '0x5a80a64c8ae0551b09c3df377b60953872c5aa7f'
+      transactionHash: '0x994ccfecb4d13de47ff3775c9b63752e4c78ad8f66ea9cc272a3f623b9f10ec1'
+      startBlock: 3456423
+    Exchange:
+      address: '0x4bFb41d5B3570DeFd03C39a9A4D8dE6Bd8B8982E'
+      transactionHash: '0x4cf5ff4362abb630398f45b0ed26787e7b2524c53c4cc006641764f5f8267609'
+      startBlock: 28311804
+    NegRiskExchange:
+      address: '0x87d1A0DdB4C63a6301916F02090A51a7241571e4'
+      transactionHash: '0xbbf404aab8cb23f696aa50550fe3d80e52775bdabe3948b98f2c1b90e9b41172'
+      startBlock: 43225359
+    UmaSportsOracle:
+      address: ''
+      transactionHash: ''
+      startBlock: 0
+  networkName: mumbai
