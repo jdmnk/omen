@@ -51,12 +51,15 @@ export function TopHoldersWidget({
           <TabsTrigger value="book">
             <TabItemContent number={3} label="BOOK" />
           </TabsTrigger>
-          <TabsTrigger value="news" disabled>
+          <TabsTrigger value="coming-soon" disabled>
+            <TabItemContent number={4} label="COMING SOON" />
+          </TabsTrigger>
+          {/* <TabsTrigger value="news" disabled>
             <TabItemContent number={4} label="NEWS" />
           </TabsTrigger>
           <TabsTrigger value="trades" disabled>
             <TabItemContent number={5} label="LIVE TRADES" />
-          </TabsTrigger>
+          </TabsTrigger> */}
         </TabsList>
 
         <TabsContent
