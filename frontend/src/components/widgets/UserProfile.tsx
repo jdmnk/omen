@@ -9,9 +9,11 @@ import { UserClosedPositions } from "./UserClosedPositions";
 import { formatAddress, formatCompactCurrency } from "@/lib/ui/format.utils";
 import { useUserTradedQuery } from "@/lib/queries/user-traded.query";
 import { useUserValueQuery } from "@/lib/queries/user-value.query";
+import { useIsMounted } from "@/lib/hooks/use-is-mounted";
 
 export function UserProfile({ userId }: { userId: string }) {
   const [activeTab, setActiveTab] = useState("positions");
+  const isMounted = useIsMounted();
 
   const { data: tradedData } = useUserTradedQuery(userId);
   const { data: valueData } = useUserValueQuery(userId);
@@ -36,7 +38,9 @@ export function UserProfile({ userId }: { userId: string }) {
             Markets Traded
           </div>
           <div className="text-xl font-bold">
-            {tradedData?.traded?.toLocaleString() || "-"}
+            {isMounted && tradedData?.traded
+              ? tradedData.traded.toLocaleString()
+              : "-"}
           </div>
         </Card>
         <Card className="p-4">
@@ -44,7 +48,9 @@ export function UserProfile({ userId }: { userId: string }) {
             Portfolio Value
           </div>
           <div className="text-xl font-bold">
-            {formatCompactCurrency(totalValue)}
+            {isMounted && totalValue !== 0
+              ? formatCompactCurrency(totalValue)
+              : "-"}
           </div>
         </Card>
         <Card className="p-4">
