@@ -9,7 +9,7 @@ dataSources:
     name: ConditionalTokens
     network: { { networkName } }
     source:
-      address: "0x4D97DCd97eC945f40cF65F87097ACe5EA0476045"
+      address: "{{ contracts.ConditionalTokens.address }}"
       abi: ConditionalTokens
       startBlock: { { contracts.ConditionalTokens.startBlock } }
     mapping:
@@ -38,7 +38,7 @@ dataSources:
     name: Exchange
     network: { { networkName } }
     source:
-      address: "0x4bFb41d5B3570DeFd03C39a9A4D8dE6Bd8B8982E"
+      address: "{{ contracts.Exchange.address }}"
       abi: Exchange
       startBlock: { { contracts.Exchange.startBlock } }
     mapping:
@@ -59,7 +59,7 @@ dataSources:
     name: NegRiskExchange
     network: { { networkName } }
     source:
-      address: "0xC5d563A36AE78145C45a50134d48A1215220f80a"
+      address: "{{ contracts.NegRiskExchange.address }}"
       abi: Exchange
       startBlock: { { contracts.NegRiskExchange.startBlock } }
     mapping:
@@ -80,7 +80,7 @@ dataSources:
     name: NegRiskAdapter
     network: { { networkName } }
     source:
-      address: "0xd91E80cF2E7be2e162c6513ceD06f1dD0dA35296"
+      address: "{{ contracts.NegRiskAdapter.address }}"
       abi: NegRiskAdapter
       startBlock: { { contracts.NegRiskAdapter.startBlock } }
     mapping:
@@ -112,7 +112,7 @@ dataSources:
     name: FixedProductMarketMakerFactory
     network: { { networkName } }
     source:
-      address: "0x8B9805A2f595B6705e74F7310829f2d299D21522"
+      address: "{{ contracts.FixedProductMarketMakerFactory.address }}"
       abi: FixedProductMarketMakerFactory
       startBlock: { { contracts.FixedProductMarketMakerFactory.startBlock } }
     mapping:

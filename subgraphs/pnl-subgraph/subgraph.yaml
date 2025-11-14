@@ -1,17 +1,18 @@
-specVersion: 1.3.0
-description: Users+PnL Subgraph
-indexerHints:
-  prune: auto
+specVersion: 0.0.4
+description: PnL Subgraph
+repository: https://github.com/polymarket/polymarket-subgraph
 schema:
   file: ./schema.graphql
+features:
+  - grafting
 dataSources:
   - kind: ethereum/contract
     name: ConditionalTokens
-    network: { { networkName } }
+    network: matic
     source:
-      address: "0x4D97DCd97eC945f40cF65F87097ACe5EA0476045"
+      address: '0x4D97DCd97eC945f40cF65F87097ACe5EA0476045'
       abi: ConditionalTokens
-      startBlock: { { contracts.ConditionalTokens.startBlock } }
+      startBlock: 4023686
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -36,11 +37,11 @@ dataSources:
       file: ./src/ConditionalTokensMapping.ts
   - kind: ethereum/contract
     name: Exchange
-    network: { { networkName } }
+    network: matic
     source:
-      address: "0x4bFb41d5B3570DeFd03C39a9A4D8dE6Bd8B8982E"
+      address: '0x4bFb41d5B3570DeFd03C39a9A4D8dE6Bd8B8982E'
       abi: Exchange
-      startBlock: { { contracts.Exchange.startBlock } }
+      startBlock: 33605403
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -57,11 +58,11 @@ dataSources:
       file: ./src/ExchangeMapping.ts
   - kind: ethereum/contract
     name: NegRiskExchange
-    network: { { networkName } }
+    network: matic
     source:
-      address: "0xC5d563A36AE78145C45a50134d48A1215220f80a"
+      address: '0xC5d563A36AE78145C45a50134d48A1215220f80a'
       abi: Exchange
-      startBlock: { { contracts.NegRiskExchange.startBlock } }
+      startBlock: 50505492
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -78,11 +79,11 @@ dataSources:
       file: ./src/ExchangeMapping.ts
   - kind: ethereum/contract
     name: NegRiskAdapter
-    network: { { networkName } }
+    network: matic
     source:
-      address: "0xd91E80cF2E7be2e162c6513ceD06f1dD0dA35296"
+      address: '0xd91E80cF2E7be2e162c6513ceD06f1dD0dA35296'
       abi: NegRiskAdapter
-      startBlock: { { contracts.NegRiskAdapter.startBlock } }
+      startBlock: 50505403
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -110,14 +111,14 @@ dataSources:
       file: ./src/NegRiskAdapterMapping.ts
   - kind: ethereum/contract
     name: FixedProductMarketMakerFactory
-    network: { { networkName } }
+    network: matic
     source:
-      address: "0x8B9805A2f595B6705e74F7310829f2d299D21522"
+      address: '0x8B9805A2f595B6705e74F7310829f2d299D21522'
       abi: FixedProductMarketMakerFactory
-      startBlock: { { contracts.FixedProductMarketMakerFactory.startBlock } }
+      startBlock: 4023693
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.6
+      apiVersion: 0.0.5
       language: wasm/assemblyscript
       entities:
         - FixedProductMarketMaker
@@ -131,12 +132,12 @@ dataSources:
 templates:
   - name: FixedProductMarketMaker
     kind: ethereum/contract
-    network: { { networkName } }
+    network: matic
     source:
       abi: FixedProductMarketMaker
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.6
+      apiVersion: 0.0.5
       language: wasm/assemblyscript
       entities:
         - UserPosition
