@@ -38,8 +38,26 @@ export function useUserPnlQuery(
         throw new Error(`Failed to fetch user PnL: ${response.statusText}`);
       }
 
-      const data = await response.json();
-      return data;
+      const rawData: UserPnlPoint[] = await response.json();
+
+      // Sort by timestamp ascending and remove duplicates
+      const sortedData = rawData.sort((a, b) => a.t - b.t);
+
+      // Remove duplicate timestamps (keep the last value for each timestamp)
+      const uniqueData: UserPnlPoint[] = [];
+      let lastTime: number | null = null;
+
+      for (const point of sortedData) {
+        if (point.t !== lastTime) {
+          uniqueData.push(point);
+          lastTime = point.t;
+        } else {
+          // Update the last point if we have a duplicate timestamp
+          uniqueData[uniqueData.length - 1] = point;
+        }
+      }
+
+      return uniqueData;
     },
     staleTime: 60000, // 1 minute
   });
