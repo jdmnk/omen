@@ -59,3 +59,33 @@ export type UserPosition = {
   endDate: string | null;
   negativeRisk: boolean;
 };
+
+export type ClosedPosition = {
+  proxyWallet: string;
+  asset: string;
+  conditionId: string;
+  avgPrice: number;
+  totalBought: number;
+  realizedPnl: number;
+  curPrice: number;
+  timestamp: number;
+  title: string;
+  slug: string;
+  icon: string;
+  eventSlug: string;
+  outcome: string;
+  outcomeIndex: number;
+  oppositeOutcome: string;
+  oppositeAsset: string;
+  endDate: string;
+};
+
+export type UserTraded = {
+  user: string;
+  traded: number;
+};
+
+export type UserValue = {
+  user: string;
+  value: number;
+};
