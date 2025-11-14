@@ -2,7 +2,7 @@
 
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { Trade } from "../models/api.models";
-import { DATA_API_HOST } from "../api";
+import { DATA_API_HOST } from "../api.const";
 
 export function useRecentTradesQuery(conditionId: string, minAmount?: number) {
   return useQuery<Trade[]>({

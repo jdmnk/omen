@@ -1,4 +1,4 @@
-import { DATA_API_HOST } from "@/lib/api";
+import { DATA_API_HOST } from "@/lib/api.const";
 import { UserPosition } from "@/lib/models/api.models";
 
 export async function fetchUserPositions(

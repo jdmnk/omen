@@ -2,8 +2,8 @@ import { TerminalLayout } from "@/components/widgets/TerminalLayout";
 import type { Metadata } from "next";
 import { Market } from "@/lib/models/api.models";
 import { METADATA } from "@/lib/metadata.const";
-import { getBaseUrl } from "@/lib/api";
-import { getSiteUrl } from "@/lib/app";
+import { getBaseUrl } from "@/lib/api.const";
+import { getSiteUrl } from "@/lib/app.const";
 
 async function fetchMarket(slug: string): Promise<Market | null> {
   const baseUrl = getBaseUrl();

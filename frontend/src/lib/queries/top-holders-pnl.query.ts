@@ -1,7 +1,7 @@
 "use client";
 
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
-import { getBaseUrl } from "../api";
+import { getBaseUrl } from "../api.const";
 import type { TopHolder } from "../queries/top-holders.query";
 
 export interface TopHolderPnl extends TopHolder {

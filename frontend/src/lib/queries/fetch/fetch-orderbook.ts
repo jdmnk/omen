@@ -1,4 +1,4 @@
-import { POLYMARKET_CLOB_URL } from "@/lib/api";
+import { POLYMARKET_CLOB_URL } from "@/lib/api.const";
 
 export type OrderBookLevel = {
   price: string;

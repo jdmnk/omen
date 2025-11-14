@@ -3,7 +3,7 @@ import { Roboto } from "next/font/google";
 import "./globals.css";
 import { ProvidersClient } from "./providers-client";
 import { METADATA } from "@/lib/metadata.const";
-import { getSiteUrl } from "@/lib/app";
+import { getSiteUrl } from "@/lib/app.const";
 
 const roboto = Roboto({
   weight: ["300", "400", "500", "700"],

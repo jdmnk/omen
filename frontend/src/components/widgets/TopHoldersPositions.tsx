@@ -19,7 +19,7 @@ import {
 import Link from "next/link";
 import { Market, TopHolderAnalysis } from "@/lib/models/api.models";
 import { useOrderbookQuery } from "@/lib/queries/orderbook.query";
-import { POLYMARKET_URL } from "@/lib/api";
+import { POLYMARKET_URL } from "@/lib/api.const";
 import { useTopHoldersPositionsQuery } from "@/lib/queries/top-holders-positions.query";
 import { generateHolderTagsMap } from "@/lib/utils/holder-tags.utils";
 import type { HolderTagIcon } from "@/lib/utils/holder-tags.utils";

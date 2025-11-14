@@ -1,7 +1,7 @@
 "use client";
 
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
-import { DATA_API_HOST } from "../api";
+import { DATA_API_HOST } from "../api.const";
 
 // Blacklist of wallet addresses to exclude from top holders (same as backend)
 const BLACKLISTED_WALLETS: Set<string> = new Set([
@@ -28,8 +28,7 @@ function filterBlacklistedWallets(holders: TopHolder[]): TopHolder[] {
 
   return holders.filter(
     (h) =>
-      h.proxyWallet &&
-      !blacklistNormalized.has(h.proxyWallet.toLowerCase())
+      h.proxyWallet && !blacklistNormalized.has(h.proxyWallet.toLowerCase())
   );
 }
 
@@ -74,4 +73,3 @@ export function useTopHoldersQuery(
     placeholderData: keepPreviousData,
   });
 }
-

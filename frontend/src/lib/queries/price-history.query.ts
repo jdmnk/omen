@@ -1,7 +1,7 @@
 "use client";
 
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
-import { POLYMARKET_CLOB_URL } from "../api";
+import { POLYMARKET_CLOB_URL } from "../api.const";
 import { Interval } from "../models/api.models";
 
 type PriceHistoryResponse = {

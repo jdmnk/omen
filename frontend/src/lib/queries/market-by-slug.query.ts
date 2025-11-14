@@ -1,7 +1,7 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import { getBaseUrl } from "../api";
+import { getBaseUrl } from "../api.const";
 import { Market } from "@/lib/models/api.models";
 
 export function useMarketBySlugQuery(

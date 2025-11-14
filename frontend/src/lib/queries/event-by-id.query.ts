@@ -2,7 +2,7 @@
 
 import { useQuery, keepPreviousData } from "@tanstack/react-query";
 import { Event } from "@/lib/models/api.models";
-import { getBaseUrl } from "../api";
+import { getBaseUrl } from "../api.const";
 
 export function useEventByIdQuery(eventId: string | undefined) {
   return useQuery<Event | null>({
