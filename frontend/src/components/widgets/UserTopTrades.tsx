@@ -1,13 +1,13 @@
 "use client";
 
-import React, { useState } from "react";
-import { useRecentTradesQuery } from "@/lib/queries/recent-trades.query";
-import { LoadingSpinner } from "@/components/ui/spinner";
+import React from "react";
+import { useRecentTradesInfiniteQuery } from "@/lib/queries/recent-trades.query";
+import { LoadingSpinner, Spinner } from "@/components/ui/spinner";
 import { formatCompactCurrency, formatNumber } from "@/lib/ui/format.utils";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 import { Trade } from "@/lib/models/api.models";
-import { Button } from "@/components/ui/button";
+import InfiniteScroll from "@/components/ui/infinite-scroll";
 
 const TRADE_ROW_GRID_CLASSES =
   "grid grid-cols-[minmax(300px,2fr)_minmax(80px,1fr)_minmax(100px,1fr)_minmax(100px,1fr)_minmax(100px,1fr)] items-center gap-4";
@@ -54,12 +54,14 @@ function TradeRow({ trade }: { trade: Trade }) {
 }
 
 export function UserTopTrades({ userId }: { userId: string }) {
-  const [limit, setLimit] = useState(50);
   const {
-    data: trades,
+    data,
     isLoading,
     error,
-  } = useRecentTradesQuery(undefined, undefined, userId, limit);
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  } = useRecentTradesInfiniteQuery(undefined, undefined, userId);
 
   if (isLoading) {
     return (
@@ -77,7 +79,9 @@ export function UserTopTrades({ userId }: { userId: string }) {
     );
   }
 
-  if (!trades || trades.length === 0) {
+  const allTrades = data?.pages.flatMap((page) => page) || [];
+
+  if (allTrades.length === 0) {
     return (
       <div className="text-center py-8 text-sm text-muted-foreground">
         No trades found
@@ -97,24 +101,25 @@ export function UserTopTrades({ userId }: { userId: string }) {
         </div>
       </div>
       <div className="px-4">
-        {trades.map((trade, index) => (
-          <TradeRow key={`${trade.transactionHash}-${index}`} trade={trade} />
-        ))}
+        <InfiniteScroll
+          isLoading={isFetchingNextPage}
+          hasMore={!!hasNextPage}
+          next={fetchNextPage}
+          threshold={0.8}
+        >
+          {allTrades.map((trade, index) => (
+            <TradeRow key={`${trade.transactionHash}-${index}`} trade={trade} />
+          ))}
+        </InfiniteScroll>
       </div>
-      {trades.length === limit && (
+      {isFetchingNextPage && (
         <div className="flex items-center justify-center py-4">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => setLimit((prev) => prev + 50)}
-          >
-            Load More
-          </Button>
+          <Spinner size="sm" />
         </div>
       )}
-      {trades.length < limit && trades.length > 0 && (
+      {!hasNextPage && allTrades.length > 0 && (
         <div className="text-center py-4 text-xs text-muted-foreground">
-          All {trades.length} trades loaded
+          All {allTrades.length} trades loaded
         </div>
       )}
     </div>

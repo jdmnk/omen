@@ -1,13 +1,13 @@
 "use client";
 
-import React, { useState } from "react";
-import { useClosedPositionsQuery } from "@/lib/queries/closed-positions.query";
-import { LoadingSpinner } from "@/components/ui/spinner";
+import React from "react";
+import { useClosedPositionsInfiniteQuery } from "@/lib/queries/closed-positions.query";
+import { LoadingSpinner, Spinner } from "@/components/ui/spinner";
 import { formatCompactCurrency, formatNumber } from "@/lib/ui/format.utils";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 import { ClosedPosition } from "@/lib/models/frontend.models";
-import { Button } from "@/components/ui/button";
+import InfiniteScroll from "@/components/ui/infinite-scroll";
 
 const POSITION_ROW_GRID_CLASSES =
   "grid grid-cols-[minmax(300px,2fr)_minmax(100px,1fr)_minmax(100px,1fr)_minmax(100px,1fr)_minmax(100px,1fr)] items-center gap-4";
@@ -74,12 +74,14 @@ function ClosedPositionRow({ position }: { position: ClosedPosition }) {
 }
 
 export function UserClosedPositions({ userId }: { userId: string }) {
-  const [limit, setLimit] = useState(50);
   const {
-    data: positions,
+    data,
     isLoading,
     error,
-  } = useClosedPositionsQuery(userId, limit);
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  } = useClosedPositionsInfiniteQuery(userId);
 
   if (isLoading) {
     return (
@@ -97,7 +99,9 @@ export function UserClosedPositions({ userId }: { userId: string }) {
     );
   }
 
-  if (!positions || positions.length === 0) {
+  const allPositions = data?.pages.flatMap((page) => page) || [];
+
+  if (allPositions.length === 0) {
     return (
       <div className="text-center py-8 text-sm text-muted-foreground">
         No closed positions found
@@ -117,27 +121,28 @@ export function UserClosedPositions({ userId }: { userId: string }) {
         </div>
       </div>
       <div className="px-4">
-        {positions.map((position, index) => (
-          <ClosedPositionRow
-            key={`${position.conditionId}-${position.outcomeIndex}-${index}`}
-            position={position}
-          />
-        ))}
+        <InfiniteScroll
+          isLoading={isFetchingNextPage}
+          hasMore={!!hasNextPage}
+          next={fetchNextPage}
+          threshold={0.8}
+        >
+          {allPositions.map((position, index) => (
+            <ClosedPositionRow
+              key={`${position.conditionId}-${position.outcomeIndex}-${index}`}
+              position={position}
+            />
+          ))}
+        </InfiniteScroll>
       </div>
-      {positions.length === limit && (
+      {isFetchingNextPage && (
         <div className="flex items-center justify-center py-4">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => setLimit((prev) => prev + 50)}
-          >
-            Load More
-          </Button>
+          <Spinner size="sm" />
         </div>
       )}
-      {positions.length < limit && positions.length > 0 && (
+      {!hasNextPage && allPositions.length > 0 && (
         <div className="text-center py-4 text-xs text-muted-foreground">
-          All {positions.length} closed positions loaded
+          All {allPositions.length} closed positions loaded
         </div>
       )}
     </div>

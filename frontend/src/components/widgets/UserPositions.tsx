@@ -1,12 +1,13 @@
 "use client";
 
-import React, { useState, useEffect, useRef, useCallback } from "react";
-import { useUserPositionsQuery } from "@/lib/queries/user-positions.query";
+import React from "react";
+import { useUserPositionsInfiniteQuery } from "@/lib/queries/user-positions.query";
 import { LoadingSpinner, Spinner } from "@/components/ui/spinner";
 import { formatCompactCurrency, formatNumber } from "@/lib/ui/format.utils";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 import { UserPosition } from "@/lib/models/api.models";
+import InfiniteScroll from "@/components/ui/infinite-scroll";
 
 const POSITION_ROW_GRID_CLASSES =
   "grid grid-cols-[minmax(300px,2fr)_minmax(100px,1fr)_minmax(100px,1fr)_minmax(100px,1fr)_minmax(100px,1fr)] items-center gap-4";
@@ -76,33 +77,14 @@ function PositionRow({ position }: { position: UserPosition }) {
 }
 
 export function UserPositions({ userId }: { userId: string }) {
-  const { data: positions, isLoading, error } = useUserPositionsQuery(userId);
-  const [displayCount, setDisplayCount] = useState(20);
-  const [isLoadingMore, setIsLoadingMore] = useState(false);
-  const scrollRef = useRef<HTMLDivElement>(null);
-
-  const handleScroll = useCallback(() => {
-    if (!scrollRef.current || !positions) return;
-
-    const { scrollTop, scrollHeight, clientHeight } = scrollRef.current;
-    const scrolledToBottom = scrollHeight - scrollTop - clientHeight < 100;
-
-    if (scrolledToBottom && displayCount < positions.length && !isLoadingMore) {
-      setIsLoadingMore(true);
-      setTimeout(() => {
-        setDisplayCount((prev) => Math.min(prev + 20, positions.length));
-        setIsLoadingMore(false);
-      }, 300);
-    }
-  }, [positions, displayCount, isLoadingMore]);
-
-  useEffect(() => {
-    const scrollElement = scrollRef.current;
-    if (scrollElement) {
-      scrollElement.addEventListener("scroll", handleScroll);
-      return () => scrollElement.removeEventListener("scroll", handleScroll);
-    }
-  }, [handleScroll]);
+  const {
+    data,
+    isLoading,
+    error,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  } = useUserPositionsInfiniteQuery(userId);
 
   if (isLoading) {
     return (
@@ -120,7 +102,9 @@ export function UserPositions({ userId }: { userId: string }) {
     );
   }
 
-  if (!positions || positions.length === 0) {
+  const allPositions = data?.pages.flatMap((page) => page) || [];
+
+  if (allPositions.length === 0) {
     return (
       <div className="text-center py-8 text-sm text-muted-foreground">
         No positions found
@@ -128,10 +112,8 @@ export function UserPositions({ userId }: { userId: string }) {
     );
   }
 
-  const displayedPositions = positions.slice(0, displayCount);
-
   return (
-    <div ref={scrollRef} className="flex flex-col h-full overflow-auto">
+    <div className="flex flex-col h-full overflow-auto">
       <div className="px-4 py-3 bg-muted/20 sticky top-0 z-10">
         <div className={cn(POSITION_ROW_GRID_CLASSES, "text-xs font-bold")}>
           <div>Market</div>
@@ -142,18 +124,28 @@ export function UserPositions({ userId }: { userId: string }) {
         </div>
       </div>
       <div className="px-4">
-        {displayedPositions.map((position, index) => (
-          <PositionRow key={`${position.slug}-${index}`} position={position} />
-        ))}
+        <InfiniteScroll
+          isLoading={isFetchingNextPage}
+          hasMore={!!hasNextPage}
+          next={fetchNextPage}
+          threshold={0.8}
+        >
+          {allPositions.map((position, index) => (
+            <PositionRow
+              key={`${position.slug}-${index}`}
+              position={position}
+            />
+          ))}
+        </InfiniteScroll>
       </div>
-      {isLoadingMore && (
+      {isFetchingNextPage && (
         <div className="flex items-center justify-center py-4">
           <Spinner size="sm" />
         </div>
       )}
-      {displayCount >= positions.length && positions.length > 20 && (
+      {!hasNextPage && allPositions.length > 0 && (
         <div className="text-center py-4 text-xs text-muted-foreground">
-          All {positions.length} positions loaded
+          All {allPositions.length} positions loaded
         </div>
       )}
     </div>
