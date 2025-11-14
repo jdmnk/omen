@@ -141,13 +141,13 @@ function SearchSection({
       {/* Section Header */}
       <button
         onClick={onToggle}
-        className="w-full flex items-center justify-between px-3 py-1 text-xs text-brand-foreground hover:text-brand-foreground/80 transition-colors cursor-pointer"
+        className="w-full flex items-center justify-between px-3 py-1 text-xs text-brand-foreground hover:text-brand-foreground/80 transition-colors cursor-pointer gap-1"
       >
-        <span>
+        <span className="truncate">
           {title} ({items.length})
         </span>
         {hasMore && (
-          <div className="flex items-center gap-1">
+          <div className="flex items-center gap-1 truncate">
             {isExpanded ? (
               <>
                 <span className="text-xs">Show less</span>
