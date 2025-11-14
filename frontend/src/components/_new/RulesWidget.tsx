@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import Linkify from "linkify-react";
 import { useClarificationsQuery } from "@/lib/queries/clarifications.query";
 import { Market } from "@/lib/models/api.models";
 
@@ -32,7 +33,19 @@ export function RulesWidget({ market }: RulesWidgetProps) {
         <div>
           <h3 className="text-sm font-semibold mb-3">Market Description</h3>
           <div className="text-sm text-muted-foreground whitespace-pre-wrap">
-            {description || "No description available."}
+            {description ? (
+              <Linkify
+                options={{
+                  target: "_blank",
+                  rel: "noopener noreferrer",
+                  className: "text-primary hover:underline",
+                }}
+              >
+                {description}
+              </Linkify>
+            ) : (
+              "No description available."
+            )}
           </div>
           {market.resolutionSource && (
             <div className="text-sm text-muted-foreground whitespace-pre-wrap">
