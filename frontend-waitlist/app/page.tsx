@@ -83,7 +83,7 @@ export default function Home() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center px-4">
+    <div className="flex min-h-svh items-center justify-center px-4">
       <main className="flex w-full max-w-2xl flex-col items-center justify-center text-center">
         {/* Main Content */}
         <div className="flex flex-col items-center text-center">
@@ -124,7 +124,7 @@ export default function Home() {
           <form
             onSubmit={handleSubmit}
             noValidate
-            className="flex w-full max-w-[280px] flex-col gap-3 mt-32"
+            className="flex w-full max-w-[280px] flex-col gap-3 mt-16 md:mt-32"
           >
             <div className="flex flex-col">
               <p
