@@ -1,17 +1,17 @@
 "use client";
 
 import { useParams } from "next/navigation";
-import { Header } from "./_new/Header";
+import { Header } from "./Header";
 import {
   ResizablePanel,
   ResizablePanelGroup,
   ResizableHandle,
 } from "@/components/ui/resizable";
-import { SearchWidget } from "./_new/SearchWidget";
+import { SearchWidget } from "./SearchWidget";
 import { useMarketBySlugQuery } from "@/lib/queries/market-by-slug.query";
-import { PriceChartWidget } from "./_new/PriceChartWidget";
-import { EmptyState, LoadingState, ErrorState } from "./_new/WidgetHelpers";
-import { TopHoldersWidget } from "./_new/TopHoldersWidget";
+import { PriceChartWidget } from "./PriceChartWidget";
+import { EmptyState, LoadingState, ErrorState } from "./WidgetHelpers";
+import { TopHoldersWidget } from "./TopHoldersWidget";
 import { Market } from "@/lib/models/api.models";
 
 export function TerminalLayout({
