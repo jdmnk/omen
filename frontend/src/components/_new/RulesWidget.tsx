@@ -19,12 +19,12 @@ function isUrl(str: string): boolean {
 }
 
 export function RulesWidget({ market }: RulesWidgetProps) {
-  const { questionId, marketMakerAddress, description } = market;
+  const { questionId, submitted_by, description } = market;
   const {
     data: updates,
     isLoading,
     error,
-  } = useClarificationsQuery(questionId, marketMakerAddress);
+  } = useClarificationsQuery(questionId, submitted_by);
 
   return (
     <div className="space-y-4 p-4">
@@ -47,23 +47,27 @@ export function RulesWidget({ market }: RulesWidgetProps) {
               "No description available."
             )}
           </div>
-          {market.resolutionSource && (
-            <div className="text-sm text-muted-foreground whitespace-pre-wrap">
-              Resolution source:{" "}
-              {isUrl(market.resolutionSource) ? (
-                <a
-                  href={market.resolutionSource}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-primary hover:underline"
-                >
-                  {market.resolutionSource}
-                </a>
-              ) : (
-                market.resolutionSource
-              )}
-            </div>
-          )}
+        </div>
+      )}
+
+      {market.resolutionSource && (
+        <div>
+          <h3 className="text-sm font-semibold mb-3">Resolution Source</h3>
+
+          <div className="text-sm text-muted-foreground whitespace-pre-wrap">
+            {isUrl(market.resolutionSource) ? (
+              <a
+                href={market.resolutionSource}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-primary hover:underline"
+              >
+                {market.resolutionSource}
+              </a>
+            ) : (
+              market.resolutionSource
+            )}
+          </div>
         </div>
       )}
 
