@@ -340,11 +340,11 @@
         }
       }
     },
-    "/onchain/updates": {
+    "/markets/clarifications": {
       "get": {
-        "summary": "Get Updates Endpoint",
-        "description": "Get all updates for a questionID and owner from the UMA CTF Adapter contract on-chain.\n\nCalls getUpdates(bytes32 questionID, address owner) on contract 0x6A9D222616C90FcA5754cd1333cFD9b7fb6a4F74.",
-        "operationId": "get_updates_endpoint_onchain_updates_get",
+        "summary": "Get Clarifications Endpoint",
+        "description": "Get all updates for a questionID and owner from the UMA CTF Adapter contract on-chain.\n\nCalls getUpdates(bytes32 questionID, address owner) on contract 0x6A9D222616C90FcA5754cd1333cFD9b7fb6a4F74.\nResults are cached in Redis for 24 hours.",
+        "operationId": "get_clarifications_endpoint_markets_clarifications_get",
         "parameters": [
           {
             "name": "question_id",
@@ -381,7 +381,7 @@
                   "items": {
                     "$ref": "#/components/schemas/AncillaryDataUpdate"
                   },
-                  "title": "Response Get Updates Endpoint Onchain Updates Get"
+                  "title": "Response Get Clarifications Endpoint Markets Clarifications Get"
                 }
               }
             }
@@ -408,15 +408,15 @@
             "type": "integer",
             "title": "Timestamp"
           },
-          "update": {
+          "text": {
             "type": "string",
-            "title": "Update"
+            "title": "Text"
           }
         },
         "type": "object",
         "required": [
           "timestamp",
-          "update"
+          "text"
         ],
         "title": "AncillaryDataUpdate",
         "description": "Ancillary data update from UMA CTF Adapter."
@@ -650,6 +650,10 @@
             "type": "string",
             "title": "Groupitemtitle"
           },
+          "resolutionSource": {
+            "type": "string",
+            "title": "Resolutionsource"
+          },
           "events": {
             "anyOf": [
               {
@@ -761,7 +765,8 @@
           "endDate",
           "active",
           "closed",
-          "groupItemTitle"
+          "groupItemTitle",
+          "resolutionSource"
         ],
         "title": "Market"
       },
