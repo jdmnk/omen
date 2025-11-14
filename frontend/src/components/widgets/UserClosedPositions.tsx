@@ -7,7 +7,7 @@ import { formatCompactCurrency, formatNumber } from "@/lib/ui/format.utils";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 import { ClosedPosition } from "@/lib/models/frontend.models";
-import InfiniteScroll from "@/components/ui/infinite-scroll";
+import { useInfiniteScroll } from "@/lib/hooks/use-infinite-scroll";
 
 const POSITION_ROW_GRID_CLASSES =
   "grid grid-cols-[minmax(300px,2fr)_minmax(100px,1fr)_minmax(100px,1fr)_minmax(100px,1fr)_minmax(100px,1fr)] items-center gap-4";
@@ -45,9 +45,7 @@ function ClosedPositionRow({ position }: { position: ClosedPosition }) {
         </div>
       </div>
       <div>
-        <div className="font-semibold">
-          {formatNumber(avgPrice * 100, 1)}%
-        </div>
+        <div className="font-semibold">{formatNumber(avgPrice * 100, 1)}%</div>
         <div className="text-xs text-muted-foreground">avg price</div>
       </div>
       <div>
@@ -63,7 +61,9 @@ function ClosedPositionRow({ position }: { position: ClosedPosition }) {
         <div className="text-xs text-muted-foreground">total bought</div>
       </div>
       <div className={cn("flex flex-col", pnlColor)}>
-        <div className="font-semibold">{formatCompactCurrency(realizedPnl)}</div>
+        <div className="font-semibold">
+          {formatCompactCurrency(realizedPnl)}
+        </div>
         <div className="text-xs">
           {pnlPercent > 0 ? "+" : ""}
           {formatNumber(pnlPercent, 1)}%
@@ -82,6 +82,12 @@ export function UserClosedPositions({ userId }: { userId: string }) {
     hasNextPage,
     isFetchingNextPage,
   } = useClosedPositionsInfiniteQuery(userId);
+
+  const { scrollRef, sentinelRef } = useInfiniteScroll({
+    hasNextPage: !!hasNextPage,
+    isFetchingNextPage,
+    fetchNextPage,
+  });
 
   if (isLoading) {
     return (
@@ -110,7 +116,7 @@ export function UserClosedPositions({ userId }: { userId: string }) {
   }
 
   return (
-    <div className="flex flex-col h-full overflow-auto">
+    <div ref={scrollRef} className="flex flex-col h-full overflow-auto">
       <div className="px-4 py-3 bg-muted/20 sticky top-0 z-10">
         <div className={cn(POSITION_ROW_GRID_CLASSES, "text-xs font-bold")}>
           <div>Market</div>
@@ -121,19 +127,13 @@ export function UserClosedPositions({ userId }: { userId: string }) {
         </div>
       </div>
       <div className="px-4">
-        <InfiniteScroll
-          isLoading={isFetchingNextPage}
-          hasMore={!!hasNextPage}
-          next={fetchNextPage}
-          threshold={0.8}
-        >
-          {allPositions.map((position, index) => (
-            <ClosedPositionRow
-              key={`${position.conditionId}-${position.outcomeIndex}-${index}`}
-              position={position}
-            />
-          ))}
-        </InfiniteScroll>
+        {allPositions.map((position, index) => (
+          <ClosedPositionRow
+            key={`${position.conditionId}-${position.outcomeIndex}-${index}`}
+            position={position}
+          />
+        ))}
+        {hasNextPage && <div ref={sentinelRef} className="h-4" />}
       </div>
       {isFetchingNextPage && (
         <div className="flex items-center justify-center py-4">
@@ -148,4 +148,3 @@ export function UserClosedPositions({ userId }: { userId: string }) {
     </div>
   );
 }
-
