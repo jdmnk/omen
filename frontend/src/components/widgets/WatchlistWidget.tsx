@@ -8,6 +8,7 @@ import { useMarketsByConditionIdsQuery } from "@/lib/queries/markets-by-conditio
 import { Market } from "@/lib/models/api.models";
 import { cn } from "@/lib/utils";
 import { WatchlistButton } from "./WatchlistButton";
+import { WatchlistShareButton } from "./WatchlistShareButton";
 
 const INITIAL_LIMIT = 10;
 
@@ -69,27 +70,32 @@ export function WatchlistWidget() {
   return (
     <div className="pt-2">
       {/* Section Header */}
-      <button
-        onClick={() => setIsExpanded(!isExpanded)}
-        className="w-full flex items-center justify-between px-3 py-1 text-xs text-brand-foreground hover:text-brand-foreground/80 transition-colors cursor-pointer"
-      >
-        <span>Watchlist ({watchlistedMarkets.length})</span>
-        {hasMore && (
-          <div className="flex items-center gap-1">
-            {isExpanded ? (
-              <>
-                <span className="text-xs">Show less</span>
-                <ChevronUp className="h-4 w-4" />
-              </>
-            ) : (
-              <>
-                <span className="text-xs">Show {remainingCount} more</span>
-                <ChevronDown className="h-4 w-4" />
-              </>
-            )}
-          </div>
-        )}
-      </button>
+      <div className="w-full flex items-center justify-between px-3 py-1">
+        <button
+          onClick={() => setIsExpanded(!isExpanded)}
+          className="flex-1 flex items-center justify-between text-xs text-brand-foreground hover:text-brand-foreground/80 transition-colors cursor-pointer"
+        >
+          <span>Watchlist ({watchlistedMarkets.length})</span>
+          {hasMore && (
+            <div className="flex items-center gap-1">
+              {isExpanded ? (
+                <>
+                  <span className="text-xs">Show less</span>
+                  <ChevronUp className="h-4 w-4" />
+                </>
+              ) : (
+                <>
+                  <span className="text-xs">Show {remainingCount} more</span>
+                  <ChevronDown className="h-4 w-4" />
+                </>
+              )}
+            </div>
+          )}
+        </button>
+
+        {/* Share Button */}
+        <WatchlistShareButton markets={watchlistedMarkets} className="ml-2" />
+      </div>
 
       {/* Watchlist Items */}
       <div className="space-y-1">
