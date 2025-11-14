@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useUserPnlQuery, UserPnlInterval } from "@/lib/queries/user-pnl.query";
+import { useRecentTradesQuery } from "@/lib/queries/recent-trades.query";
 import { UserPnlChart } from "./UserPnlChart";
 import { formatCompactCurrency, formatAddress } from "@/lib/ui/format.utils";
 import { cn } from "@/lib/utils";
@@ -18,16 +19,46 @@ const INTERVAL_LABELS: Record<UserPnlInterval, string> = {
   max: "MAX",
 };
 
+// Map interval to trade limit (fetch enough trades to cover the time period)
+const INTERVAL_TRADE_LIMITS: Record<UserPnlInterval, number> = {
+  "12h": 200,
+  "1d": 300,
+  "1w": 500,
+  "1m": 1000,
+  max: 2000,
+};
+
 export function UserPnlChartWidget({ userId }: { userId: string }) {
   const [interval, setInterval] = useState<UserPnlInterval>("1m");
   const isMounted = useIsMounted();
   const { data, isLoading, error } = useUserPnlQuery(userId, interval);
+
+  // Fetch trades for the selected interval
+  const tradeLimit = INTERVAL_TRADE_LIMITS[interval];
+  const { data: tradesData } = useRecentTradesQuery(
+    undefined,
+    undefined,
+    userId,
+    tradeLimit
+  );
 
   const chartData =
     data?.map((item) => ({
       time: item.t,
       value: item.p,
     })) || [];
+
+  // Filter trades to only those within the chart time range
+  const filteredTrades = useMemo(() => {
+    if (!tradesData || !data || data.length === 0) return [];
+
+    const minTime = data[0].t;
+    const maxTime = data[data.length - 1].t;
+
+    return tradesData.filter((trade) => {
+      return trade.timestamp >= minTime && trade.timestamp <= maxTime;
+    });
+  }, [tradesData, data]);
 
   const currentPnl = data && data.length > 0 ? data[data.length - 1].p : 0;
   const isPositive = currentPnl >= 0;
@@ -77,7 +108,12 @@ export function UserPnlChartWidget({ userId }: { userId: string }) {
 
       {/* Chart */}
       <div className="flex-1 w-full min-h-0">
-        <UserPnlChart data={chartData} isLoading={isLoading} error={error} />
+        <UserPnlChart
+          data={chartData}
+          trades={filteredTrades}
+          isLoading={isLoading}
+          error={error}
+        />
       </div>
     </Card>
   );

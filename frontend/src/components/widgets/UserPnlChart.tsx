@@ -1,20 +1,27 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   createChart,
+  createSeriesMarkers,
   ColorType,
   IChartApi,
+  ISeriesApi,
   DeepPartial,
   ChartOptions,
   AreaSeries,
   LineData,
   Time,
+  SeriesMarker,
 } from "lightweight-charts";
 import { Spinner } from "@/components/ui/spinner";
+import { Trade } from "@/lib/models/api.models";
+import { formatCompactCurrency, formatNumber } from "@/lib/ui/format.utils";
+import { cn } from "@/lib/utils";
 
 type UserPnlChartProps = {
   data: ChartPoint[];
+  trades?: Trade[];
   error?: Error | null;
   isLoading?: boolean;
 };
@@ -67,10 +74,20 @@ type ChartPoint = {
   value: number;
 };
 
-export function UserPnlChart({ data, error, isLoading }: UserPnlChartProps) {
+export function UserPnlChart({
+  data,
+  trades = [],
+  error,
+  isLoading,
+}: UserPnlChartProps) {
   const chartContainerRef = useRef<HTMLDivElement>(null);
   const chartRef = useRef<IChartApi | null>(null);
-  const seriesRef = useRef<ReturnType<IChartApi["addSeries"]> | null>(null);
+  const seriesRef = useRef<ISeriesApi<"Area"> | null>(null);
+  const [hoveredTrade, setHoveredTrade] = useState<Trade | null>(null);
+  const [hoveredMarkerPosition, setHoveredMarkerPosition] = useState<{
+    x: number;
+    y: number;
+  } | null>(null);
 
   useEffect(() => {
     if (!chartContainerRef.current) return;
@@ -136,11 +153,11 @@ export function UserPnlChart({ data, error, isLoading }: UserPnlChartProps) {
   useEffect(() => {
     if (data && data.length > 0 && seriesRef.current && chartRef.current) {
       seriesRef.current.setData(data as LineData<Time>[]);
-      
+
       // Determine if overall PnL is positive or negative and update colors
       const lastValue = data[data.length - 1]?.value || 0;
       const isPositive = lastValue >= 0;
-      
+
       seriesRef.current.applyOptions({
         lineColor: isPositive ? "#22c55e" : "#ef4444",
         topColor: isPositive ? "#166534" : "#7f1d1d",
@@ -150,9 +167,60 @@ export function UserPnlChart({ data, error, isLoading }: UserPnlChartProps) {
         priceLineColor: isPositive ? "#22c55e" : "#ef4444",
       });
 
+      // Add trade markers using createSeriesMarkers
+      if (trades && trades.length > 0) {
+        const markers: SeriesMarker<Time>[] = trades.map((trade) => ({
+          time: trade.timestamp as Time,
+          position: trade.side === "BUY" ? "belowBar" : "aboveBar",
+          color: trade.side === "BUY" ? "#22c55e" : "#ef4444",
+          shape: trade.side === "BUY" ? "arrowUp" : "arrowDown",
+          text: "",
+        }));
+
+        createSeriesMarkers(seriesRef.current, markers);
+      } else {
+        createSeriesMarkers(seriesRef.current, []);
+      }
+
       chartRef.current.timeScale().fitContent();
     }
-  }, [data]);
+  }, [data, trades]);
+
+  // Handle crosshair move to show trade tooltips
+  useEffect(() => {
+    if (!chartRef.current || !chartContainerRef.current) return;
+
+    const handleCrosshairMove = (param: any) => {
+      if (!param.point || !param.time || !trades || trades.length === 0) {
+        setHoveredTrade(null);
+        setHoveredMarkerPosition(null);
+        return;
+      }
+
+      // Find if there's a trade at the current time (within 5 minutes tolerance)
+      const time = param.time as number;
+      const trade = trades.find((t) => Math.abs(t.timestamp - time) < 300);
+
+      if (trade && chartContainerRef.current) {
+        setHoveredTrade(trade);
+        setHoveredMarkerPosition({
+          x: param.point.x,
+          y: param.point.y,
+        });
+      } else {
+        setHoveredTrade(null);
+        setHoveredMarkerPosition(null);
+      }
+    };
+
+    chartRef.current.subscribeCrosshairMove(handleCrosshairMove);
+
+    return () => {
+      if (chartRef.current) {
+        chartRef.current.unsubscribeCrosshairMove(handleCrosshairMove);
+      }
+    };
+  }, [trades]);
 
   if (error) {
     return (
@@ -180,7 +248,60 @@ export function UserPnlChart({ data, error, isLoading }: UserPnlChartProps) {
         </div>
       )}
       <div ref={chartContainerRef} className="w-full h-full" />
+
+      {/* Trade Tooltip */}
+      {hoveredTrade && hoveredMarkerPosition && (
+        <div
+          className="absolute z-20 pointer-events-none"
+          style={{
+            left: hoveredMarkerPosition.x + 15,
+            top: hoveredMarkerPosition.y - 10,
+          }}
+        >
+          <div className="bg-background border border-brand-stroke rounded-md shadow-lg p-3 text-xs max-w-xs">
+            <div className="flex items-center gap-2 mb-2">
+              <span
+                className={cn(
+                  "font-bold px-1.5 py-0.5 rounded text-xs",
+                  hoveredTrade.side === "BUY"
+                    ? "bg-outcome-yes/20 text-outcome-yes"
+                    : "bg-outcome-no/20 text-outcome-no"
+                )}
+              >
+                {hoveredTrade.side}
+              </span>
+              <span className="font-semibold truncate max-w-[200px]">
+                {hoveredTrade.outcome}
+              </span>
+            </div>
+            <div className="space-y-1 text-muted-foreground">
+              <div className="truncate max-w-[250px]">
+                <span className="font-medium">{hoveredTrade.title}</span>
+              </div>
+              <div>
+                <span>Size: </span>
+                <span className="text-foreground font-medium">
+                  {formatNumber(hoveredTrade.size, 0)} shares
+                </span>
+              </div>
+              <div>
+                <span>Price: </span>
+                <span className="text-foreground font-medium">
+                  {formatNumber(hoveredTrade.price * 100, 1)}%
+                </span>
+              </div>
+              <div>
+                <span>Value: </span>
+                <span className="text-foreground font-medium">
+                  {formatCompactCurrency(
+                    hoveredTrade.size * hoveredTrade.price
+                  )}
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
-
