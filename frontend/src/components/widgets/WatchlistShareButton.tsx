@@ -1,15 +1,15 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Share2, Copy, Download, Check } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
-  generateWatchlistShareImageCanvas,
+  generateWatchlistShareImage,
   shareWatchlistImage,
   copyImageToClipboard,
   downloadWatchlistImage,
   type WatchlistMarket,
-} from "@/lib/utils/share-watchlist-canvas.utils";
+} from "@/lib/utils/share-watchlist.utils";
 import {
   Dialog,
   DialogContent,
@@ -19,6 +19,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
+import { WatchlistShareImage } from "./WatchlistShareImage";
 
 interface WatchlistShareButtonProps {
   markets: WatchlistMarket[];
@@ -33,17 +34,18 @@ export function WatchlistShareButton({
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [shareImageUrl, setShareImageUrl] = useState<string | null>(null);
   const [isCopied, setIsCopied] = useState(false);
+  const imageRef = useRef<HTMLDivElement>(null);
 
   const handleShareClick = async (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
 
-    if (isGenerating || markets.length === 0) return;
+    if (isGenerating || markets.length === 0 || !imageRef.current) return;
 
     setIsGenerating(true);
     setIsCopied(false);
     try {
-      const dataUrl = await generateWatchlistShareImageCanvas(markets);
+      const dataUrl = await generateWatchlistShareImage(imageRef.current);
       setShareImageUrl(dataUrl);
       setIsDialogOpen(true);
     } catch (error) {
@@ -78,6 +80,13 @@ export function WatchlistShareButton({
 
   return (
     <>
+      {/* Hidden render target for image generation */}
+      <div className="fixed -left-[9999px] -top-[9999px] pointer-events-none">
+        <div ref={imageRef}>
+          <WatchlistShareImage markets={markets} />
+        </div>
+      </div>
+
       {/* Share Button */}
       <button
         onClick={handleShareClick}
