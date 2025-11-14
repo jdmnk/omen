@@ -190,7 +190,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/onchain/updates": {
+    "/markets/clarifications": {
         parameters: {
             query?: never;
             header?: never;
@@ -198,12 +198,13 @@ export interface paths {
             cookie?: never;
         };
         /**
-         * Get Updates Endpoint
+         * Get Clarifications Endpoint
          * @description Get all updates for a questionID and owner from the UMA CTF Adapter contract on-chain.
          *
          *     Calls getUpdates(bytes32 questionID, address owner) on contract 0x6A9D222616C90FcA5754cd1333cFD9b7fb6a4F74.
+         *     Results are cached in Redis for 24 hours.
          */
-        get: operations["get_updates_endpoint_onchain_updates_get"];
+        get: operations["get_clarifications_endpoint_markets_clarifications_get"];
         put?: never;
         post?: never;
         delete?: never;
@@ -223,8 +224,8 @@ export interface components {
         AncillaryDataUpdate: {
             /** Timestamp */
             timestamp: number;
-            /** Update */
-            update: string;
+            /** Text */
+            text: string;
         };
         /**
          * ClobReward
@@ -326,6 +327,8 @@ export interface components {
             closed: boolean;
             /** Groupitemtitle */
             groupItemTitle: string;
+            /** Resolutionsource */
+            resolutionSource: string;
             /** Events */
             events?: components["schemas"]["MarketEvent"][] | null;
             /** Umareward */
@@ -870,7 +873,7 @@ export interface operations {
             };
         };
     };
-    get_updates_endpoint_onchain_updates_get: {
+    get_clarifications_endpoint_markets_clarifications_get: {
         parameters: {
             query: {
                 /** @description Question ID as hex string (bytes32) */

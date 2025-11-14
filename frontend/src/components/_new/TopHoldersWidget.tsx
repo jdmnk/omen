@@ -81,11 +81,7 @@ export function TopHoldersWidget({
               <LoadingSpinner message="Loading market..." size="sm" />
             </div>
           ) : market ? (
-            <RulesWidget
-              questionId={market.questionId}
-              owner={market.submitted_by}
-              marketDescription={market.description}
-            />
+            <RulesWidget market={market} />
           ) : null}
         </TabsContent>
 

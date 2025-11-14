@@ -2,33 +2,55 @@
 
 import React from "react";
 import { useClarificationsQuery } from "@/lib/queries/clarifications.query";
+import { Market } from "@/lib/models/api.models";
 
 interface RulesWidgetProps {
-  questionId?: string;
-  owner?: string;
-  marketDescription?: string;
+  market: Market;
 }
 
-export function RulesWidget({
-  questionId,
-  owner,
-  marketDescription,
-}: RulesWidgetProps) {
+function isUrl(str: string): boolean {
+  try {
+    new URL(str);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+export function RulesWidget({ market }: RulesWidgetProps) {
+  const { questionId, marketMakerAddress, description } = market;
   const {
     data: updates,
     isLoading,
     error,
-  } = useClarificationsQuery(questionId, owner);
+  } = useClarificationsQuery(questionId, marketMakerAddress);
 
   return (
     <div className="space-y-4 p-4">
       {/* Market Description Section */}
-      {marketDescription && (
+      {description && (
         <div>
           <h3 className="text-sm font-semibold mb-3">Market Description</h3>
           <div className="text-sm text-muted-foreground whitespace-pre-wrap">
-            {marketDescription || "No description available."}
+            {description || "No description available."}
           </div>
+          {market.resolutionSource && (
+            <div className="text-sm text-muted-foreground whitespace-pre-wrap">
+              Resolution source:{" "}
+              {isUrl(market.resolutionSource) ? (
+                <a
+                  href={market.resolutionSource}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-primary hover:underline"
+                >
+                  {market.resolutionSource}
+                </a>
+              ) : (
+                market.resolutionSource
+              )}
+            </div>
+          )}
         </div>
       )}
 

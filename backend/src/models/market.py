@@ -54,6 +54,7 @@ class MarketDB(Base):
     bestBid: Mapped[Decimal] = mapped_column(Numeric, nullable=False)
     bestAsk: Mapped[Decimal] = mapped_column(Numeric, nullable=False)
     endDate: Mapped[str] = mapped_column(String, nullable=False)
+    resolutionSource: Mapped[str] = mapped_column(String, nullable=False)
 
 
 class MarketEvent(BaseModel):
@@ -90,6 +91,7 @@ class Market(BaseModel):
     active: bool
     closed: bool
     groupItemTitle: str
+    resolutionSource: str
 
     # Event, but without all props
     events: list[MarketEvent] | None = None
@@ -152,6 +154,7 @@ def parse_market_from_api(market_dict: dict) -> Market | None:
         active = bool(market_dict.get("active"))
         closed = bool(market_dict.get("closed"))
         groupItemTitle = market_dict.get("groupItemTitle", "")
+        resolutionSource = market_dict.get("resolutionSource", "")
 
         # Parse reward-related fields
         uma_reward = None
@@ -221,6 +224,7 @@ def parse_market_from_api(market_dict: dict) -> Market | None:
             active=active,
             closed=closed,
             groupItemTitle=groupItemTitle,
+            resolutionSource=resolutionSource,
         )
     except (ValueError, KeyError, TypeError):
         logger.error(f"Error parsing market from API: {market_dict}")
