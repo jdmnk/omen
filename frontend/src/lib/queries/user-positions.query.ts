@@ -16,8 +16,11 @@ export function useUserPositionsInfiniteQuery(userId: string) {
       url.searchParams.set("sortBy", "CURRENT");
       url.searchParams.set("sortDirection", "DESC");
       url.searchParams.set("limit", PAGE_SIZE.toString());
-      url.searchParams.set("offset", ((pageParam as number) * PAGE_SIZE).toString());
-      
+      url.searchParams.set(
+        "offset",
+        ((pageParam as number) * PAGE_SIZE).toString()
+      );
+
       const response = await fetch(url.toString());
       if (!response.ok) {
         throw new Error(`Failed to fetch positions: ${response.statusText}`);
