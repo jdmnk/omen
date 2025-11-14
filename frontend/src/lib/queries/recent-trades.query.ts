@@ -4,13 +4,23 @@ import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { Trade } from "../models/api.models";
 import { DATA_API_HOST } from "../api.const";
 
-export function useRecentTradesQuery(conditionId: string, minAmount?: number) {
+export function useRecentTradesQuery(
+  conditionId?: string,
+  minAmount?: number,
+  user?: string,
+  limit: number = 50
+) {
   return useQuery<Trade[]>({
-    queryKey: ["recent-trades", conditionId, minAmount],
+    queryKey: ["recent-trades", conditionId, minAmount, user, limit],
     queryFn: async () => {
       const url = new URL(`${DATA_API_HOST}/trades`);
-      url.searchParams.set("market", conditionId);
-      url.searchParams.set("limit", "50"); // max 10000!
+      if (conditionId) {
+        url.searchParams.set("market", conditionId);
+      }
+      if (user) {
+        url.searchParams.set("user", user);
+      }
+      url.searchParams.set("limit", limit.toString()); // max 10000!
       url.searchParams.set("offset", "0");
       url.searchParams.set("filterType", "CASH");
       url.searchParams.set("filterAmount", (minAmount || 10).toString());

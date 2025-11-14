@@ -324,7 +324,8 @@ export function TopHoldersPositions({
         </div>
         <div className="min-w-0 overflow-hidden">
           <Link
-            href={`${POLYMARKET_URL}/profile/${holder.proxyWallet}`}
+            // href={`${POLYMARKET_URL}/profile/${holder.proxyWallet}`}
+            href={`/user/${holder.proxyWallet}`}
             target="_blank"
             className="block truncate hover:underline"
           >
