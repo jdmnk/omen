@@ -6,6 +6,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { UserPositions } from "./UserPositions";
 import { UserTopTrades } from "./UserTopTrades";
 import { UserClosedPositions } from "./UserClosedPositions";
+import { UserPnlChartWidget } from "./UserPnlChartWidget";
 import { formatAddress, formatCompactCurrency } from "@/lib/ui/format.utils";
 import { useUserTradedQuery } from "@/lib/queries/user-traded.query";
 import { useUserValueQuery } from "@/lib/queries/user-value.query";
@@ -67,8 +68,13 @@ export function UserProfile({ userId }: { userId: string }) {
         </Card>
       </div>
 
+      {/* PnL Chart */}
+      <div className="h-80">
+        <UserPnlChartWidget userId={userId} />
+      </div>
+
       {/* Main Content */}
-      <Card className="flex flex-col" style={{ height: "calc(100vh - 24rem)" }}>
+      <Card className="flex flex-col" style={{ height: "calc(100vh - 44rem)" }}>
         <Tabs
           value={activeTab}
           onValueChange={setActiveTab}
