@@ -231,12 +231,16 @@ export function UserPnlChart({
             const isProfit = position.realizedPnl >= 0;
             const id = `cp-${position.timestamp}-${idx}`;
             idToPosition[id] = position;
+            const pnlText = `${isProfit ? "+" : ""}${formatCompactCurrency(
+              position.realizedPnl
+            )}`;
             return {
               id,
               time: position.timestamp as Time,
               position: isProfit ? "belowBar" : "aboveBar",
               color: isProfit ? "#22c55e" : "#ef4444",
-              shape: "circle",
+              shape: isProfit ? "arrowUp" : "arrowDown",
+              text: pnlText,
             };
           }
         );
