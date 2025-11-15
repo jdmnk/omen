@@ -28,7 +28,7 @@ const MIN_SIZE_OPTIONS = [
 ];
 
 export function UserPnlChartWidget({ userId }: { userId: string }) {
-  const [interval, setInterval] = useState<UserPnlInterval>("1m");
+  const [interval, setInterval] = useState<UserPnlInterval>("1w");
   const [minSize, setMinSize] = useState<number>(500);
   const isMounted = useIsMounted();
   const { data, isLoading, error } = useUserPnlQuery(userId, interval);
@@ -68,18 +68,20 @@ export function UserPnlChartWidget({ userId }: { userId: string }) {
   return (
     <Card className="relative w-full h-full flex flex-col pb-2">
       <div className="text-xs bg-brand-background px-3 py-2 rounded-t-brand border-b border-brand-stroke font-bold flex items-center justify-between gap-2">
-        <span className="flex-1">
-          PnL History
-          <span className="ml-3 text-muted-foreground font-normal">
-            Current:{" "}
-          </span>
-          <span
-            className={cn(
-              "font-bold",
-              isPositive ? "text-outcome-yes" : "text-outcome-no"
-            )}
-          >
-            {formatCompactCurrency(currentPnl)}
+        <span className="flex-1 flex">
+          <span>PnL History</span>
+          <span>
+            <span className="ml-3 text-muted-foreground font-normal">
+              Current:{" "}
+            </span>
+            <span
+              className={cn(
+                "font-bold",
+                isPositive ? "text-outcome-yes" : "text-outcome-no"
+              )}
+            >
+              {formatCompactCurrency(currentPnl)}
+            </span>
           </span>
         </span>
       </div>
