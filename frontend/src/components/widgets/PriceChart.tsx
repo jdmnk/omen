@@ -12,6 +12,7 @@ import {
   Time,
 } from "lightweight-charts";
 import { Spinner } from "@/components/ui/spinner";
+import { areaSeriesBaseOptions } from "@/lib/ui/chart.config";
 
 type PriceChartProps = {
   data: ChartPoint[];
@@ -90,22 +91,12 @@ export function PriceChart({ data, error, isLoading }: PriceChartProps) {
 
     // Create area series with gradient fill
     const lineSeries = chart.addSeries(AreaSeries, {
+      ...areaSeriesBaseOptions,
       priceFormat: {
         type: "price",
         precision: 2,
         minMove: 0.01,
       },
-      lineColor: "#651fff",
-      topColor: "#341084", // Start color at the line
-      bottomColor: "rgba(101, 15, 255, 0)", // Fade to transparent at bottom
-      lineWidth: 2,
-      crosshairMarkerVisible: true,
-      crosshairMarkerRadius: 4,
-      lastValueVisible: true,
-      priceLineVisible: true,
-      priceLineColor: "#651fff",
-      priceLineWidth: 1,
-      priceLineStyle: 2, // dashed
     });
     seriesRef.current = lineSeries;
 

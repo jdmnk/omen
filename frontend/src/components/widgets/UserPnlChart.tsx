@@ -19,6 +19,7 @@ import { Spinner } from "@/components/ui/spinner";
 import { ClosedPosition } from "@/lib/models/frontend.models";
 import { formatCompactCurrency, formatCurrency } from "@/lib/ui/format.utils";
 import { cn } from "@/lib/utils";
+import { areaSeriesBaseOptions } from "@/lib/ui/chart.config";
 
 type UserPnlChartProps = {
   data: ChartPoint[];
@@ -108,22 +109,12 @@ export function UserPnlChart({
 
     // Create area series - color will be green for positive PnL, red for negative
     const lineSeries = chart.addSeries(AreaSeries, {
+      ...areaSeriesBaseOptions,
       priceFormat: {
         type: "price",
         precision: 2,
         minMove: 0.01,
       },
-      lineColor: "#22c55e", // green by default
-      topColor: "#166534",
-      bottomColor: "rgba(34, 197, 94, 0)",
-      lineWidth: 2,
-      crosshairMarkerVisible: true,
-      crosshairMarkerRadius: 4,
-      lastValueVisible: true,
-      priceLineVisible: true,
-      priceLineColor: "#22c55e",
-      priceLineWidth: 1,
-      priceLineStyle: 2,
     });
     seriesRef.current = lineSeries;
 
@@ -192,30 +183,14 @@ export function UserPnlChart({
         chartRef.current.removeSeries(seriesRef.current);
       }
 
-      // Determine if overall PnL is positive or negative
-      const lastValue = data[data.length - 1]?.value || 0;
-      const isPositive = lastValue >= 0;
-
-      // Create new series with colors based on PnL
+      // Create new series with shared colors (match PriceChart)
       const lineSeries = chartRef.current.addSeries(AreaSeries, {
+        ...areaSeriesBaseOptions,
         priceFormat: {
           type: "price",
           precision: 2,
           minMove: 0.01,
         },
-        lineColor: isPositive ? "#22c55e" : "#ef4444",
-        topColor: isPositive ? "#166534" : "#7f1d1d",
-        bottomColor: isPositive
-          ? "rgba(34, 197, 94, 0)"
-          : "rgba(239, 68, 68, 0)",
-        lineWidth: 2,
-        crosshairMarkerVisible: true,
-        crosshairMarkerRadius: 4,
-        lastValueVisible: true,
-        priceLineVisible: true,
-        priceLineColor: isPositive ? "#22c55e" : "#ef4444",
-        priceLineWidth: 1,
-        priceLineStyle: 2,
       });
 
       seriesRef.current = lineSeries;
