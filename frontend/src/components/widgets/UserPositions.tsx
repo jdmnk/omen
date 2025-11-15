@@ -8,6 +8,12 @@ import { cn } from "@/lib/utils";
 import Link from "next/link";
 import { UserPosition } from "@/lib/models/api.models";
 import { useInfiniteScroll } from "@/lib/hooks/use-infinite-scroll";
+import {
+  TABLE_HEADER_CLASSES,
+  TABLE_ROW_CLASSES,
+  TABLE_HEADER_CONTAINER_CLASSES,
+  TABLE_CONTENT_CONTAINER_CLASSES,
+} from "./shared-table-styles";
 
 const POSITION_ROW_GRID_CLASSES =
   "grid grid-cols-[minmax(250px,2fr)_minmax(80px,0.8fr)_minmax(80px,0.8fr)_minmax(80px,0.8fr)_minmax(80px,0.8fr)_minmax(100px,1fr)] items-center gap-4";
@@ -30,12 +36,7 @@ function PositionRow({ position }: { position: UserPosition }) {
       : "text-muted-foreground";
 
   return (
-    <div
-      className={cn(
-        POSITION_ROW_GRID_CLASSES,
-        "py-2 border-b border-border/50 last:border-0 text-xs"
-      )}
-    >
+    <div className={cn(POSITION_ROW_GRID_CLASSES, TABLE_ROW_CLASSES)}>
       <div className="min-w-0 overflow-hidden">
         <Link
           href={`/market/${position.slug}`}
@@ -113,13 +114,8 @@ export function UserPositions({ userId }: { userId: string }) {
 
   return (
     <div ref={scrollRef} className="flex flex-col h-full overflow-auto">
-      <div className="px-4 py-2 sticky top-0 z-10 bg-background">
-        <div
-          className={cn(
-            POSITION_ROW_GRID_CLASSES,
-            "text-xs text-brand-foreground font-bold"
-          )}
-        >
+      <div className={TABLE_HEADER_CONTAINER_CLASSES}>
+        <div className={cn(POSITION_ROW_GRID_CLASSES, TABLE_HEADER_CLASSES)}>
           <div>Market</div>
           <div>Outcome</div>
           <div>Size</div>
@@ -128,7 +124,7 @@ export function UserPositions({ userId }: { userId: string }) {
           <div>PnL</div>
         </div>
       </div>
-      <div className="px-4">
+      <div className={TABLE_CONTENT_CONTAINER_CLASSES}>
         {allPositions.map((position, index) => (
           <PositionRow key={`${position.slug}-${index}`} position={position} />
         ))}

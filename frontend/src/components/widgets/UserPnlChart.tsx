@@ -49,6 +49,9 @@ const chartOptions: DeepPartial<ChartOptions> = {
       bottom: 0.1,
     },
   },
+  localization: {
+    priceFormatter: formatCompactCurrency,
+  },
   handleScale: false,
   handleScroll: false,
   crosshair: {

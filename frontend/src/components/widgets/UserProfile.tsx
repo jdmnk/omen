@@ -81,9 +81,15 @@ export function UserProfile({ userId }: { userId: string }) {
           className="w-full flex flex-col h-full min-h-0"
         >
           <TabsList className="px-3 pt-2 shrink-0">
-            <TabsTrigger value="positions">Current Positions</TabsTrigger>
-            <TabsTrigger value="closed">Closed Positions</TabsTrigger>
-            <TabsTrigger value="trades">Top Trades</TabsTrigger>
+            <TabsTrigger value="positions" className="uppercase">
+              Open Positions
+            </TabsTrigger>
+            <TabsTrigger value="closed" className="uppercase">
+              Closed Positions
+            </TabsTrigger>
+            <TabsTrigger value="trades" className="uppercase">
+              Top Trades
+            </TabsTrigger>
           </TabsList>
 
           <TabsContent

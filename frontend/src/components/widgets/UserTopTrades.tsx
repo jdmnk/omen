@@ -8,9 +8,15 @@ import { cn } from "@/lib/utils";
 import Link from "next/link";
 import { Trade } from "@/lib/models/api.models";
 import { useInfiniteScroll } from "@/lib/hooks/use-infinite-scroll";
+import {
+  TABLE_HEADER_CLASSES,
+  TABLE_ROW_CLASSES,
+  TABLE_HEADER_CONTAINER_CLASSES,
+  TABLE_CONTENT_CONTAINER_CLASSES,
+} from "./shared-table-styles";
 
 const TRADE_ROW_GRID_CLASSES =
-  "grid grid-cols-[minmax(300px,2fr)_minmax(80px,1fr)_minmax(100px,1fr)_minmax(100px,1fr)_minmax(100px,1fr)] items-center gap-4";
+  "grid grid-cols-[minmax(250px,2fr)_minmax(80px,0.8fr)_minmax(80px,0.8fr)_minmax(80px,0.8fr)_minmax(80px,0.8fr)_minmax(80px,0.8fr)] items-center gap-4";
 
 function TradeRow({ trade }: { trade: Trade }) {
   const size = trade.size || 0;
@@ -21,12 +27,7 @@ function TradeRow({ trade }: { trade: Trade }) {
     trade.side === "BUY" ? "text-outcome-yes" : "text-outcome-no";
 
   return (
-    <div
-      className={cn(
-        TRADE_ROW_GRID_CLASSES,
-        "py-3 border-b border-border/50 last:border-0 text-sm hover:bg-muted/20"
-      )}
-    >
+    <div className={cn(TRADE_ROW_GRID_CLASSES, TABLE_ROW_CLASSES)}>
       <div className="min-w-0 overflow-hidden">
         <Link
           href={`/market/${trade.slug}`}
@@ -34,14 +35,13 @@ function TradeRow({ trade }: { trade: Trade }) {
         >
           {trade.title}
         </Link>
-        <div className="text-xs text-muted-foreground mt-0.5">
-          {trade.outcome}
-        </div>
+      </div>
+      <div>
+        <div className="font-semibold">{trade.outcome}</div>
       </div>
       <div className={cn("font-semibold", sideColor)}>{trade.side}</div>
       <div>
         <div className="font-semibold">{formatNumber(size, 0)}</div>
-        <div className="text-xs text-muted-foreground">shares</div>
       </div>
       <div>
         <div className="font-semibold">{formatNumber(price * 100, 1)}%</div>
@@ -97,16 +97,17 @@ export function UserTopTrades({ userId }: { userId: string }) {
 
   return (
     <div ref={scrollRef} className="flex flex-col h-full overflow-auto">
-      <div className="px-4 py-3 bg-muted/20 sticky top-0 z-10">
-        <div className={cn(TRADE_ROW_GRID_CLASSES, "text-xs font-bold")}>
+      <div className={TABLE_HEADER_CONTAINER_CLASSES}>
+        <div className={cn(TRADE_ROW_GRID_CLASSES, TABLE_HEADER_CLASSES)}>
           <div>Market</div>
+          <div>Outcome</div>
           <div>Side</div>
           <div>Size</div>
           <div>Price</div>
           <div>Amount</div>
         </div>
       </div>
-      <div className="px-4">
+      <div className={TABLE_CONTENT_CONTAINER_CLASSES}>
         {allTrades.map((trade, index) => (
           <TradeRow key={`${trade.transactionHash}-${index}`} trade={trade} />
         ))}
