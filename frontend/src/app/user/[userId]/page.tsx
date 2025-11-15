@@ -2,6 +2,7 @@ import { UserProfile } from "@/components/widgets/UserProfile";
 import type { Metadata } from "next";
 import { METADATA } from "@/lib/metadata.const";
 import { getSiteUrl } from "@/lib/app.const";
+import { Header } from "@/components/Header";
 
 export async function generateMetadata({
   params,
@@ -37,5 +38,12 @@ export default async function UserPage({
 }) {
   const { userId } = await params;
 
-  return <UserProfile userId={userId} />;
+  return (
+    <div className="h-full bg-background flex flex-col overflow-hidden">
+      {/* <Header /> */}
+      <main className="flex-1 w-full flex flex-col overflow-hidden min-h-0">
+        <UserProfile userId={userId} />
+      </main>
+    </div>
+  );
 }
