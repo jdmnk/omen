@@ -9,22 +9,19 @@ export function useMarketsByConditionIdsQuery(
   enabled: boolean = true
 ) {
   return useQuery<Market[]>({
-    queryKey: ["markets-by-condition-ids", conditionIds.sort().join(",")],
+    queryKey: ["markets-by-condition-ids", [...conditionIds].sort().join(",")],
     queryFn: async () => {
       if (!conditionIds || conditionIds.length === 0) {
         return [];
       }
 
-      // Build query parameters - FastAPI accepts multiple query params with same name
-      const params = new URLSearchParams();
-      conditionIds.forEach((id) => {
-        params.append("condition_ids", id);
+      // POST to backend with JSON body to avoid query parsing issues / long URLs
+      const response = await fetch(`${getBaseUrl()}/markets/by-condition-ids`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ condition_ids: conditionIds }),
+        cache: "no-store",
       });
-
-      const response = await fetch(
-        `${getBaseUrl()}/markets/by-condition-ids?${params.toString()}`,
-        { cache: "no-store" }
-      );
 
       if (!response.ok) {
         throw new Error(`Failed to fetch markets: ${response.statusText}`);
