@@ -57,7 +57,7 @@ export function UserPnlChartWidget({ userId }: { userId: string }) {
     <Card className="relative w-full h-full flex flex-col pb-2">
       <div className="text-xs bg-brand-background px-3 py-2 rounded-t-brand border-b border-brand-stroke font-bold flex items-center justify-between gap-2">
         <span className="flex-1">
-          PnL History - {formatAddress(userId)}
+          PnL History
           <span className="ml-3 text-muted-foreground font-normal">
             Current:{" "}
           </span>
