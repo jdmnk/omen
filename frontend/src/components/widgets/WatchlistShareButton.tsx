@@ -109,10 +109,12 @@ export function WatchlistShareButton({
 
       {/* Share Image Dialog */}
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent>
+        <DialogContent className="sm:max-w-3xl md:max-w-4xl lg:max-w-5xl xl:max-w-6xl">
           <DialogHeader>
-            <DialogTitle className="text-2xl">Share Your Watchlist</DialogTitle>
-            <DialogDescription className="text-base">
+            <DialogTitle className="text-2xl sm:text-3xl">
+              Share Your Watchlist
+            </DialogTitle>
+            <DialogDescription className="text-muted-foreground text-base sm:text-lg">
               Your personalized watchlist is ready to share on social media
             </DialogDescription>
           </DialogHeader>

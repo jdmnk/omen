@@ -1,6 +1,5 @@
 "use client";
 
-import { getSiteUrl } from "@/lib/app.const";
 import type { WatchlistMarket } from "@/lib/utils/share-watchlist.utils";
 
 interface WatchlistShareImageProps {
@@ -11,7 +10,7 @@ export function WatchlistShareImage({ markets }: WatchlistShareImageProps) {
   const maxDisplayMarkets = 5;
   const displayMarkets = markets.slice(0, maxDisplayMarkets);
   const remainingMarkets = markets.length - displayMarkets.length;
-  const websiteUrl = getSiteUrl().replace("https://", "");
+  const websiteUrl = "omeninsight.com";
 
   return (
     <div
@@ -32,7 +31,8 @@ export function WatchlistShareImage({ markets }: WatchlistShareImageProps) {
             top: "30%",
             width: "40%",
             paddingBottom: "40%",
-            background: "radial-gradient(circle, rgba(99, 34, 254, 0.08) 0%, transparent 70%)",
+            background:
+              "radial-gradient(circle, rgba(99, 34, 254, 0.08) 0%, transparent 70%)",
           }}
         />
         <div
@@ -42,7 +42,8 @@ export function WatchlistShareImage({ markets }: WatchlistShareImageProps) {
             top: "50%",
             width: "35%",
             paddingBottom: "35%",
-            background: "radial-gradient(circle, rgba(101, 31, 255, 0.06) 0%, transparent 70%)",
+            background:
+              "radial-gradient(circle, rgba(101, 31, 255, 0.06) 0%, transparent 70%)",
           }}
         />
         <div
@@ -52,10 +53,11 @@ export function WatchlistShareImage({ markets }: WatchlistShareImageProps) {
             top: "25%",
             width: "50%",
             paddingBottom: "50%",
-            background: "radial-gradient(circle, rgba(135, 120, 174, 0.04) 0%, transparent 70%)",
+            background:
+              "radial-gradient(circle, rgba(135, 120, 174, 0.04) 0%, transparent 70%)",
           }}
         />
-        
+
         {/* Grid pattern */}
         <div
           className="absolute inset-0"
@@ -81,7 +83,7 @@ export function WatchlistShareImage({ markets }: WatchlistShareImageProps) {
               className="w-20 h-20"
               style={{ flexShrink: 0 }}
             />
-            
+
             {/* Title and subtitle */}
             <div className="flex flex-col">
               <h1
@@ -111,7 +113,8 @@ export function WatchlistShareImage({ markets }: WatchlistShareImageProps) {
               style={{
                 height: "40px",
                 marginLeft: "50px",
-                background: "linear-gradient(135deg, rgba(99, 34, 254, 0.2) 0%, rgba(101, 31, 255, 0.2) 100%)",
+                background:
+                  "linear-gradient(135deg, rgba(99, 34, 254, 0.2) 0%, rgba(101, 31, 255, 0.2) 100%)",
                 borderColor: "rgba(99, 34, 254, 0.4)",
               }}
             >
@@ -148,18 +151,20 @@ export function WatchlistShareImage({ markets }: WatchlistShareImageProps) {
               className="flex items-center rounded-xl border-[1.5px] px-7 py-0"
               style={{
                 minHeight: "100px",
-                background: "linear-gradient(135deg, rgba(99, 34, 254, 0.15) 0%, rgba(101, 31, 255, 0.1) 100%)",
+                background:
+                  "linear-gradient(135deg, rgba(99, 34, 254, 0.15) 0%, rgba(101, 31, 255, 0.1) 100%)",
                 borderColor: "rgba(99, 34, 254, 0.3)",
                 boxShadow: "0 0 8px rgba(99, 34, 254, 0.3)",
               }}
             >
               {/* Number badge */}
               <div
-                className="flex items-center justify-center rounded-full flex-shrink-0"
+                className="flex items-center justify-center rounded-full shrink-0"
                 style={{
                   width: "44px",
                   height: "44px",
-                  background: "linear-gradient(135deg, #6322FE 0%, #651fff 100%)",
+                  background:
+                    "linear-gradient(135deg, #6322FE 0%, #651fff 100%)",
                 }}
               >
                 <span
@@ -199,10 +204,11 @@ export function WatchlistShareImage({ markets }: WatchlistShareImageProps) {
             <div
               className="w-full h-[1.5px] mb-8"
               style={{
-                background: "linear-gradient(90deg, transparent 0%, rgba(99, 34, 254, 0.4) 50%, transparent 100%)",
+                background:
+                  "linear-gradient(90deg, transparent 0%, rgba(99, 34, 254, 0.4) 50%, transparent 100%)",
               }}
             />
-            
+
             {/* Remaining markets text */}
             <p
               className="font-light"
@@ -219,4 +225,3 @@ export function WatchlistShareImage({ markets }: WatchlistShareImageProps) {
     </div>
   );
 }
-
