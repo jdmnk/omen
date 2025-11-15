@@ -11,6 +11,7 @@ import { formatAddress, formatCompactCurrency } from "@/lib/ui/format.utils";
 import { useUserTradedQuery } from "@/lib/queries/user-traded.query";
 import { useUserValueQuery } from "@/lib/queries/user-value.query";
 import { useIsMounted } from "@/lib/hooks/use-is-mounted";
+import { useUserDataQuery } from "@/lib/queries/user-data.query";
 
 export function UserProfile({ userId }: { userId: string }) {
   const [activeTab, setActiveTab] = useState("positions");
@@ -18,6 +19,7 @@ export function UserProfile({ userId }: { userId: string }) {
 
   const { data: tradedData } = useUserTradedQuery(userId);
   const { data: valueData } = useUserValueQuery(userId);
+  const { data: userData } = useUserDataQuery(userId);
 
   const totalValue = useMemo(() => {
     if (!valueData || valueData.length === 0) return 0;
@@ -26,46 +28,51 @@ export function UserProfile({ userId }: { userId: string }) {
 
   return (
     <div className="container mx-auto max-w-7xl p-6 space-y-6">
-      {/* Header */}
-      <div>
-        <h1 className="text-2xl font-bold">{formatAddress(userId)}</h1>
-        <p className="text-sm text-muted-foreground mt-1">Trading Profile</p>
-      </div>
-
-      {/* User Summary Section */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
-        <Card className="p-3">
-          <div className="text-xs text-muted-foreground mb-0.5">
-            Markets Traded
+      {/* Compact Header + Inline Stats */}
+      <div className="flex items-start justify-between gap-3 flex-wrap">
+        <img
+          src={userData?.profileImage || "/logo.svg"}
+          alt=""
+          className="h-8 w-8 rounded-full border border-brand-stroke object-cover"
+        />
+        <div className="min-w-0 flex-1">
+          <div className="flex items-center gap-2">
+            <h1 className="text-sm font-bold truncate max-w-[60vw]">
+              {userData?.name || userData?.pseudonym || formatAddress(userId)}
+            </h1>
           </div>
-          <div className="text-lg font-bold">
-            {isMounted && tradedData?.traded
-              ? tradedData.traded.toLocaleString()
+          <div className="text-[11px] text-muted-foreground">
+            Joined{" "}
+            {userData?.createdAt
+              ? new Date(userData.createdAt).toLocaleDateString()
               : "-"}
           </div>
-        </Card>
-        <Card className="p-3">
-          <div className="text-xs text-muted-foreground mb-0.5">
-            Portfolio Value
+          {userData?.bio ? (
+            <p className="text-xs text-muted-foreground truncate">
+              {userData.bio}
+            </p>
+          ) : null}
+        </div>
+        {/* Inline Stats */}
+        <div className="flex items-center gap-3 text-xs shrink-0">
+          <div className="flex items-center gap-1">
+            <span className="text-muted-foreground">Markets</span>
+            <span className="font-bold">
+              {isMounted && tradedData?.traded
+                ? tradedData.traded.toLocaleString()
+                : "-"}
+            </span>
           </div>
-          <div className="text-lg font-bold">
-            {isMounted && totalValue !== 0
-              ? formatCompactCurrency(totalValue)
-              : "-"}
+          <div className="h-3 w-px bg-brand-stroke" />
+          <div className="flex items-center gap-1">
+            <span className="text-muted-foreground">Portfolio</span>
+            <span className="font-bold">
+              {isMounted && totalValue !== 0
+                ? formatCompactCurrency(totalValue)
+                : "-"}
+            </span>
           </div>
-        </Card>
-        <Card className="p-3">
-          <div className="text-xs text-muted-foreground mb-0.5">Total PnL</div>
-          <div className="text-lg font-bold text-muted-foreground">
-            Coming soon
-          </div>
-        </Card>
-        <Card className="p-3">
-          <div className="text-xs text-muted-foreground mb-0.5">Win Rate</div>
-          <div className="text-lg font-bold text-muted-foreground">
-            Coming soon
-          </div>
-        </Card>
+        </div>
       </div>
 
       {/* PnL Chart */}
