@@ -13,10 +13,12 @@ import {
   LineData,
   Time,
   SeriesMarker,
+  ISeriesMarkersPluginApi,
 } from "lightweight-charts";
 import { Spinner } from "@/components/ui/spinner";
 import { ClosedPosition } from "@/lib/models/frontend.models";
-import { formatCompactCurrency } from "@/lib/ui/format.utils";
+import { formatCompactCurrency, formatCurrency } from "@/lib/ui/format.utils";
+import { cn } from "@/lib/utils";
 
 type UserPnlChartProps = {
   data: ChartPoint[];
@@ -85,6 +87,10 @@ export function UserPnlChart({
   const chartContainerRef = useRef<HTMLDivElement>(null);
   const chartRef = useRef<IChartApi | null>(null);
   const seriesRef = useRef<ISeriesApi<"Area"> | null>(null);
+  const markersPluginRef = useRef<ISeriesMarkersPluginApi<Time> | null>(null);
+  const markerIdToPositionRef = useRef<Record<string, ClosedPosition>>({});
+  const crosshairHandlerRef = useRef<((param: any) => void) | null>(null);
+  const tooltipRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     if (!chartContainerRef.current) return;
@@ -121,6 +127,17 @@ export function UserPnlChart({
     });
     seriesRef.current = lineSeries;
 
+    // Create tooltip container
+    const tooltip = document.createElement("div");
+    tooltip.className = cn(
+      "absolute z-20 pointer-events-none hidden rounded-md border px-3 py-2 text-xs shadow-md",
+      "border-zinc-700 bg-zinc-900/90 text-zinc-100 backdrop-blur"
+    );
+    tooltip.style.left = "0px";
+    tooltip.style.top = "0px";
+    tooltipRef.current = tooltip;
+    chartContainerRef.current.appendChild(tooltip);
+
     const handleResize = () => {
       if (chartContainerRef.current && chartRef.current) {
         const width = chartContainerRef.current.clientWidth;
@@ -142,6 +159,11 @@ export function UserPnlChart({
     return () => {
       resizeObserver.disconnect();
       window.removeEventListener("resize", handleResize);
+      // cleanup tooltip
+      if (tooltipRef.current && tooltipRef.current.parentElement) {
+        tooltipRef.current.parentElement.removeChild(tooltipRef.current);
+      }
+      tooltipRef.current = null;
       chart.remove();
       seriesRef.current = null;
     };
@@ -151,6 +173,22 @@ export function UserPnlChart({
     if (data && data.length > 0 && chartRef.current) {
       // Remove existing series if it exists to clear old markers
       if (seriesRef.current) {
+        // detach markers plugin if any
+        if (markersPluginRef.current) {
+          try {
+            markersPluginRef.current.detach();
+          } catch {
+            // ignore
+          }
+          markersPluginRef.current = null;
+        }
+        // unsubscribe old crosshair handler if any
+        if (crosshairHandlerRef.current) {
+          chartRef.current?.unsubscribeCrosshairMove(
+            crosshairHandlerRef.current
+          );
+          crosshairHandlerRef.current = null;
+        }
         chartRef.current.removeSeries(seriesRef.current);
       }
 
@@ -185,34 +223,106 @@ export function UserPnlChart({
       // Set the data
       lineSeries.setData(data as LineData<Time>[]);
 
-      // Create markers for closed positions
+      // Create markers for closed positions (no in-chart text; tooltip on hover)
       if (closedPositions && closedPositions.length > 0) {
+        const idToPosition: Record<string, ClosedPosition> = {};
         const markers: SeriesMarker<Time>[] = closedPositions.map(
-          (position) => {
+          (position, idx) => {
             const isProfit = position.realizedPnl >= 0;
-            const pnlText = formatCompactCurrency(position.realizedPnl);
-
-            // Truncate market title for display (max 20 chars)
-            const truncatedTitle =
-              position.title.length > 20
-                ? position.title.substring(0, 20) + "..."
-                : position.title;
-
-            // Combine market name and PnL
-            const markerText = `${truncatedTitle}\n${pnlText}`;
-
+            const id = `cp-${position.timestamp}-${idx}`;
+            idToPosition[id] = position;
             return {
+              id,
               time: position.timestamp as Time,
               position: isProfit ? "belowBar" : "aboveBar",
               color: isProfit ? "#22c55e" : "#ef4444",
               shape: "circle",
-              text: markerText,
             };
           }
         );
+        markerIdToPositionRef.current = idToPosition;
+        markersPluginRef.current = createSeriesMarkers(lineSeries, markers, {
+          zOrder: "top",
+        });
 
-        // Use createSeriesMarkers to add markers to the series
-        createSeriesMarkers(lineSeries, markers);
+        // Tooltip handling on marker hover
+        const handler = (param: any) => {
+          const tooltipEl = tooltipRef.current;
+          if (!tooltipEl) return;
+
+          // Hide if not on chart
+          if (!param?.point) {
+            tooltipEl.classList.add("hidden");
+            return;
+          }
+
+          const hoveredId = param.hoveredObjectId as string | undefined;
+          if (!hoveredId) {
+            tooltipEl.classList.add("hidden");
+            return;
+          }
+
+          const pos = markerIdToPositionRef.current[hoveredId];
+          if (!pos) {
+            tooltipEl.classList.add("hidden");
+            return;
+          }
+
+          // Build tooltip content
+          const isProfit = pos.realizedPnl >= 0;
+          const dateStr = new Date(pos.timestamp * 1000).toLocaleString();
+          const pnlStr = formatCurrency(pos.realizedPnl, 2);
+          const avgStr = formatCurrency(pos.avgPrice, 2);
+          const curStr = formatCurrency(pos.curPrice, 2);
+          const title = pos.title;
+          const outcome = pos.outcome;
+
+          tooltipEl.innerHTML = `
+            <div class="flex flex-col gap-1">
+              <div class="font-medium">${title}</div>
+              <div class="text-[11px] text-zinc-300">${dateStr}</div>
+              <div class="mt-1 grid grid-cols-2 gap-x-3 gap-y-1">
+                <div class="text-zinc-400">Outcome</div>
+                <div class="text-zinc-100 text-right">${outcome}</div>
+                <div class="text-zinc-400">Avg Price</div>
+                <div class="text-zinc-100 text-right">${avgStr}</div>
+                <div class="text-zinc-400">Close Price</div>
+                <div class="text-zinc-100 text-right">${curStr}</div>
+                <div class="text-zinc-400">Realized PnL</div>
+                <div class="${
+                  isProfit ? "text-emerald-400" : "text-red-400"
+                } text-right font-medium">${pnlStr}</div>
+              </div>
+            </div>
+          `;
+
+          // Position tooltip relative to container
+          const container = chartContainerRef.current!;
+          const containerRect = container.getBoundingClientRect();
+          // param.point is relative to the chart pane
+          const margin = 12;
+          let left = param.point.x + margin;
+          let top = param.point.y + margin;
+
+          // Pre-display to measure
+          tooltipEl.style.left = "0px";
+          tooltipEl.style.top = "0px";
+          tooltipEl.classList.remove("hidden");
+          const tooltipRect = tooltipEl.getBoundingClientRect();
+
+          if (left + tooltipRect.width > containerRect.width) {
+            left = Math.max(0, param.point.x - tooltipRect.width - margin);
+          }
+          if (top + tooltipRect.height > containerRect.height) {
+            top = Math.max(0, param.point.y - tooltipRect.height - margin);
+          }
+
+          tooltipEl.style.left = `${left}px`;
+          tooltipEl.style.top = `${top}px`;
+        };
+
+        crosshairHandlerRef.current = handler;
+        chartRef.current.subscribeCrosshairMove(handler);
       }
 
       chartRef.current.timeScale().fitContent();
@@ -244,7 +354,7 @@ export function UserPnlChart({
           </p>
         </div>
       )}
-      <div ref={chartContainerRef} className="w-full h-full" />
+      <div ref={chartContainerRef} className="relative w-full h-full" />
     </div>
   );
 }
