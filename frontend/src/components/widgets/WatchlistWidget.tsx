@@ -7,6 +7,7 @@ import { useWatchlist } from "@/lib/hooks/use-watchlist";
 import { useMarketsByConditionIdsQuery } from "@/lib/queries/markets-by-condition-ids.query";
 import { Market } from "@/lib/models/api.models";
 import { cn } from "@/lib/utils";
+import { parseOutcomePrice } from "@/lib/api-parse.utils";
 import { WatchlistButton } from "./WatchlistButton";
 import { WatchlistShareButton } from "./WatchlistShareButton";
 
@@ -24,7 +25,7 @@ export function WatchlistWidget() {
   // Fetch watchlisted markets by conditionIds
   const { data: fetchedMarkets } = useMarketsByConditionIdsQuery(
     conditionIds,
-    false // disable for now (dont need extra data) conditionIds.length > 0
+    conditionIds.length > 0 // disable for now (dont need extra data)
   );
 
   // Merge watchlist items with fetched market data
@@ -43,9 +44,11 @@ export function WatchlistWidget() {
 
       // Use fetched market data if available, otherwise use stored watchlist item data
       if (fetchedMarket) {
+        const yesPrice = parseOutcomePrice(fetchedMarket.outcomePrices);
         return {
           question: fetchedMarket.question || item.title,
           slug: fetchedMarket.slug || item.slug,
+          probYes: yesPrice,
         };
       } else {
         // Use stored data for immediate display before API loads

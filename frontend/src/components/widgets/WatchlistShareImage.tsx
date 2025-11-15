@@ -192,6 +192,23 @@ export function WatchlistShareImage({ markets }: WatchlistShareImageProps) {
               >
                 {market.question}
               </div>
+
+              {/* Yes odds */}
+              {typeof market.probYes === "number" &&
+                !Number.isNaN(market.probYes) && (
+                  <div className="ml-auto text-right">
+                    <div
+                      style={{
+                        fontSize: "24px",
+                        lineHeight: "1",
+                        fontWeight: 700,
+                        color: "var(--brand-primary)",
+                      }}
+                    >
+                      {Math.round(market.probYes * 100)}%
+                    </div>
+                  </div>
+                )}
             </div>
           ))}
         </div>
