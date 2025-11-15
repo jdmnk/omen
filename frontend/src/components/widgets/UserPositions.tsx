@@ -10,7 +10,7 @@ import { UserPosition } from "@/lib/models/api.models";
 import { useInfiniteScroll } from "@/lib/hooks/use-infinite-scroll";
 
 const POSITION_ROW_GRID_CLASSES =
-  "grid grid-cols-[minmax(300px,2fr)_minmax(100px,1fr)_minmax(100px,1fr)_minmax(100px,1fr)_minmax(100px,1fr)] items-center gap-4";
+  "grid grid-cols-[minmax(250px,2fr)_minmax(80px,0.8fr)_minmax(80px,0.8fr)_minmax(80px,0.8fr)_minmax(80px,0.8fr)_minmax(100px,1fr)] items-center gap-4";
 
 function PositionRow({ position }: { position: UserPosition }) {
   const size = position.size || 0;
@@ -33,7 +33,7 @@ function PositionRow({ position }: { position: UserPosition }) {
     <div
       className={cn(
         POSITION_ROW_GRID_CLASSES,
-        "py-3 border-b border-border/50 last:border-0 text-sm hover:bg-muted/20"
+        "py-2 border-b border-border/50 last:border-0 text-xs"
       )}
     >
       <div className="min-w-0 overflow-hidden">
@@ -43,31 +43,24 @@ function PositionRow({ position }: { position: UserPosition }) {
         >
           {position.title}
         </Link>
-        <div className="text-xs text-muted-foreground mt-0.5">
-          {position.outcome}
-        </div>
+      </div>
+      <div>
+        <div className="font-semibold">{position.outcome}</div>
       </div>
       <div>
         <div className="font-semibold">{formatNumber(size, 0)}</div>
-        <div className="text-xs text-muted-foreground">shares</div>
       </div>
       <div>
         <div className="font-semibold">
           {formatNumber(currentPrice * 100, 1)}%
         </div>
-        <div className="text-xs text-muted-foreground">
-          avg: {formatNumber(avgPrice * 100, 1)}%
-        </div>
       </div>
       <div>
         <div className="font-semibold">{formatCompactCurrency(totalValue)}</div>
-        <div className="text-xs text-muted-foreground">
-          cost: {formatCompactCurrency(totalCost)}
-        </div>
       </div>
-      <div className={cn("flex flex-col", pnlColor)}>
+      <div className={cn("flex items-center gap-1", pnlColor)}>
         <div className="font-semibold">{formatCompactCurrency(pnl)}</div>
-        <div className="text-xs">
+        <div className="opacity-75">
           {pnlPercent > 0 ? "+" : ""}
           {formatNumber(pnlPercent, 1)}%
         </div>
@@ -120,9 +113,15 @@ export function UserPositions({ userId }: { userId: string }) {
 
   return (
     <div ref={scrollRef} className="flex flex-col h-full overflow-auto">
-      <div className="px-4 py-3 bg-muted/20 sticky top-0 z-10">
-        <div className={cn(POSITION_ROW_GRID_CLASSES, "text-xs font-bold")}>
+      <div className="px-4 py-2 sticky top-0 z-10 bg-background">
+        <div
+          className={cn(
+            POSITION_ROW_GRID_CLASSES,
+            "text-xs text-brand-foreground font-bold"
+          )}
+        >
           <div>Market</div>
+          <div>Outcome</div>
           <div>Size</div>
           <div>Price</div>
           <div>Value</div>
