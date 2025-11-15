@@ -50,7 +50,7 @@ const chartOptions: DeepPartial<ChartOptions> = {
     },
   },
   localization: {
-    priceFormatter: formatCompactCurrency,
+    priceFormatter: (price: number) => formatCompactCurrency(price),
   },
   handleScale: false,
   handleScroll: false,
@@ -164,19 +164,28 @@ export function UserPnlChart({
         priceLineColor: isPositive ? "#22c55e" : "#ef4444",
       });
 
-      // Add closed position markers showing PnL values
+      // Add closed position markers showing PnL values and market names
       if (closedPositions && closedPositions.length > 0) {
         const markers: SeriesMarker<Time>[] = closedPositions.map(
           (position) => {
             const isProfit = position.realizedPnl >= 0;
             const pnlText = formatCompactCurrency(position.realizedPnl);
 
+            // Truncate market title for display (max 20 chars)
+            const truncatedTitle =
+              position.title.length > 20
+                ? position.title.substring(0, 20) + "..."
+                : position.title;
+
+            // Combine market name and PnL
+            const markerText = `${truncatedTitle}\n${pnlText}`;
+
             return {
               time: position.timestamp as Time,
               position: isProfit ? "belowBar" : "aboveBar",
               color: isProfit ? "#22c55e" : "#ef4444",
               shape: "circle",
-              text: pnlText,
+              text: markerText,
             };
           }
         );
