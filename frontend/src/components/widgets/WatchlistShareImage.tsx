@@ -18,7 +18,7 @@ export function WatchlistShareImage({ markets }: WatchlistShareImageProps) {
       style={{
         width: "1200px",
         background:
-          "linear-gradient(135deg, #020402 0%, #110928 50%, #0a0514 100%)",
+          "linear-gradient(135deg, var(--background) 0%, var(--brand-background) 50%, var(--brand-background-deeper) 100%)",
       }}
     >
       {/* Background gradients and grid */}
@@ -74,7 +74,7 @@ export function WatchlistShareImage({ markets }: WatchlistShareImageProps) {
       {/* Content */}
       <div className="relative flex flex-col px-[70px] py-[70px]">
         {/* Header */}
-        <div className="flex items-start justify-between mb-[50px]">
+        <div className="flex items-center justify-between mb-[50px]">
           <div className="flex items-center gap-6">
             {/* Logo */}
             <img
@@ -90,7 +90,7 @@ export function WatchlistShareImage({ markets }: WatchlistShareImageProps) {
                 className="font-bold leading-none"
                 style={{
                   fontSize: "56px",
-                  color: "#6322FE",
+                  color: "var(--brand-primary)",
                   marginBottom: "8px",
                 }}
               >
@@ -100,15 +100,15 @@ export function WatchlistShareImage({ markets }: WatchlistShareImageProps) {
                 className="font-light leading-none"
                 style={{
                   fontSize: "28px",
-                  color: "#8778ae",
+                  color: "var(--brand-foreground)",
                 }}
               >
-                My Watchlist
+                Watchlist
               </p>
             </div>
 
             {/* Market count badge */}
-            <div
+            {/* <div
               className="flex items-center justify-center px-4 rounded-[20px] border-[1.5px]"
               style={{
                 height: "40px",
@@ -127,16 +127,15 @@ export function WatchlistShareImage({ markets }: WatchlistShareImageProps) {
               >
                 {markets.length} market{markets.length !== 1 ? "s" : ""}
               </span>
-            </div>
+            </div> */}
           </div>
 
           {/* Website URL */}
           <div
-            className="font-normal"
+            className="flex items-center"
             style={{
-              fontSize: "20px",
-              color: "#8778ae",
-              marginTop: "12px",
+              fontSize: "32px",
+              color: "var(--brand-foreground)",
             }}
           >
             {websiteUrl}
@@ -164,7 +163,7 @@ export function WatchlistShareImage({ markets }: WatchlistShareImageProps) {
                   width: "44px",
                   height: "44px",
                   background:
-                    "linear-gradient(135deg, #6322FE 0%, #651fff 100%)",
+                    "linear-gradient(135deg, var(--brand-primary) 0%, var(--brand-highlight) 100%)",
                 }}
               >
                 <span
@@ -183,7 +182,7 @@ export function WatchlistShareImage({ markets }: WatchlistShareImageProps) {
                 className="ml-5 font-normal"
                 style={{
                   fontSize: "22px",
-                  color: "#ffffff",
+                  color: "var(--foreground)",
                   lineHeight: "1.3",
                   overflow: "hidden",
                   display: "-webkit-box",
@@ -214,7 +213,7 @@ export function WatchlistShareImage({ markets }: WatchlistShareImageProps) {
               className="font-light"
               style={{
                 fontSize: "22px",
-                color: "#8778ae",
+                color: "var(--brand-foreground)",
               }}
             >
               +{remainingMarkets} more market{remainingMarkets !== 1 ? "s" : ""}

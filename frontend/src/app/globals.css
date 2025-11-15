@@ -51,6 +51,8 @@
   --color-brand-foreground: var(--brand-foreground);
   --color-brand-highlight: var(--brand-highlight);
   --color-brand-stroke: var(--brand-stroke);
+  --color-brand-primary: var(--brand-primary);
+  --color-brand-background-deeper: var(--brand-background-deeper);
   --radius-brand: var(--brand-radius);
 }
 
@@ -98,6 +100,8 @@
   --brand-foreground: #8778ae;
   --brand-stroke: #382e52;
   --brand-highlight: #651fff;
+  --brand-primary: #6322fe;
+  --brand-background-deeper: #0a0514;
 
   /* custom other variables */
   --brand-radius: var(--radius);
@@ -135,6 +139,8 @@
   --sidebar-accent-foreground: oklch(0.985 0 0);
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: oklch(0.556 0 0);
+  --brand-primary: #6322fe;
+  --brand-background-deeper: #0a0514;
 }
 
 @layer base {

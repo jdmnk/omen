@@ -88,13 +88,15 @@ export function WatchlistShareButton({
       </div>
 
       {/* Share Button */}
-      <button
+      <Button
         onClick={handleShareClick}
         disabled={isGenerating}
+        variant="ghost"
+        size="icon"
         className={cn(
-          "p-2 rounded-md transition-all duration-200 cursor-pointer",
-          "bg-brand-highlight/10 hover:bg-brand-highlight/20",
-          "text-brand-highlight hover:text-brand-primary",
+          "cursor-pointer",
+          "text-brand-foreground hover:text-brand-highlight",
+          "hover:bg-transparent",
           className
         )}
         aria-label="Share watchlist"
@@ -105,7 +107,7 @@ export function WatchlistShareButton({
         ) : (
           <Share2 className="h-4 w-4" />
         )}
-      </button>
+      </Button>
 
       {/* Share Image Dialog */}
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
