@@ -131,7 +131,7 @@ export function WatchlistShareImage({ markets }: WatchlistShareImageProps) {
           </div>
 
           {/* Website URL */}
-          <div
+          {/* <div
             className="flex items-center"
             style={{
               fontSize: "32px",
@@ -139,7 +139,7 @@ export function WatchlistShareImage({ markets }: WatchlistShareImageProps) {
             }}
           >
             {websiteUrl}
-          </div>
+          </div> */}
         </div>
 
         {/* Market cards */}
