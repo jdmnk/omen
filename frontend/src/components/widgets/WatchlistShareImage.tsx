@@ -10,7 +10,6 @@ export function WatchlistShareImage({ markets }: WatchlistShareImageProps) {
   const maxDisplayMarkets = 5;
   const displayMarkets = markets.slice(0, maxDisplayMarkets);
   const remainingMarkets = markets.length - displayMarkets.length;
-  const websiteUrl = "omeninsight.com";
 
   return (
     <div

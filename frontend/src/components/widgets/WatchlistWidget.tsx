@@ -48,7 +48,7 @@ export function WatchlistWidget() {
         return {
           question: fetchedMarket.question || item.title,
           slug: fetchedMarket.slug || item.slug,
-          probYes: yesPrice,
+          probYes: yesPrice ?? undefined,
         };
       } else {
         // Use stored data for immediate display before API loads

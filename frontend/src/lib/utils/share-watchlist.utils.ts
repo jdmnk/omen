@@ -3,6 +3,7 @@ import { toPng } from "html-to-image";
 export interface WatchlistMarket {
   question: string;
   slug: string;
+  probYes?: number;
 }
 
 export async function generateWatchlistShareImage(
@@ -49,7 +50,8 @@ export async function shareWatchlistImage(dataUrl: string) {
   const isShareCanceled = (error: unknown) => {
     const anyErr = error as any;
     const name = anyErr?.name as string | undefined;
-    const message = (anyErr?.message as string | undefined)?.toLowerCase?.() ?? "";
+    const message =
+      (anyErr?.message as string | undefined)?.toLowerCase?.() ?? "";
     return (
       name === "AbortError" ||
       message.includes("abort") ||
@@ -86,4 +88,3 @@ export async function shareWatchlistImage(dataUrl: string) {
   await downloadWatchlistImage(dataUrl);
   return false;
 }
-
