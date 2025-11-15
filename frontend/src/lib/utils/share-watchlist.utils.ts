@@ -46,6 +46,17 @@ export async function downloadWatchlistImage(
 }
 
 export async function shareWatchlistImage(dataUrl: string) {
+  const isShareCanceled = (error: unknown) => {
+    const anyErr = error as any;
+    const name = anyErr?.name as string | undefined;
+    const message = (anyErr?.message as string | undefined)?.toLowerCase?.() ?? "";
+    return (
+      name === "AbortError" ||
+      message.includes("abort") ||
+      message.includes("cancel")
+    );
+  };
+
   try {
     // Try native share API first
     if (navigator.share && navigator.canShare) {
@@ -64,6 +75,10 @@ export async function shareWatchlistImage(dataUrl: string) {
       }
     }
   } catch (error) {
+    if (isShareCanceled(error)) {
+      // User canceled share — do not fallback to download
+      return false;
+    }
     console.error("Share failed, falling back to download:", error);
   }
 
