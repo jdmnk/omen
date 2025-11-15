@@ -4,7 +4,7 @@ import { useState, useMemo } from "react";
 import { useUserPnlQuery, UserPnlInterval } from "@/lib/queries/user-pnl.query";
 import { useClosedPositionsInfiniteQuery } from "@/lib/queries/closed-positions.query";
 import { UserPnlChart } from "./UserPnlChart";
-import { formatCompactCurrency, formatAddress } from "@/lib/ui/format.utils";
+import { formatCompactCurrency } from "@/lib/ui/format.utils";
 import { cn } from "@/lib/utils";
 import { Card } from "../ui/card";
 import { useIsMounted } from "@/lib/hooks/use-is-mounted";
@@ -19,8 +19,17 @@ const INTERVAL_LABELS: Record<UserPnlInterval, string> = {
   max: "MAX",
 };
 
+const MIN_SIZE_OPTIONS = [
+  { value: 0, label: "All" },
+  { value: 100, label: "$100+" },
+  { value: 500, label: "$500+" },
+  { value: 1000, label: "$1K+" },
+  { value: 5000, label: "$5K+" },
+];
+
 export function UserPnlChartWidget({ userId }: { userId: string }) {
   const [interval, setInterval] = useState<UserPnlInterval>("1m");
+  const [minSize, setMinSize] = useState<number>(5000);
   const isMounted = useIsMounted();
   const { data, isLoading, error } = useUserPnlQuery(userId, interval);
 
@@ -33,7 +42,7 @@ export function UserPnlChartWidget({ userId }: { userId: string }) {
       value: item.p,
     })) || [];
 
-  // Filter closed positions to only those within the chart time range
+  // Filter closed positions to only those within the chart time range and above minimum size
   const filteredClosedPositions = useMemo(() => {
     if (!closedPositionsData || !data || data.length === 0) return [];
 
@@ -42,9 +51,12 @@ export function UserPnlChartWidget({ userId }: { userId: string }) {
     const maxTime = data[data.length - 1].t;
 
     return allClosedPositions.filter((position) => {
-      return position.timestamp >= minTime && position.timestamp <= maxTime;
+      const inTimeRange =
+        position.timestamp >= minTime && position.timestamp <= maxTime;
+      const meetsMinSize = Math.abs(position.realizedPnl) >= minSize;
+      return inTimeRange && meetsMinSize;
     });
-  }, [closedPositionsData, data]);
+  }, [closedPositionsData, data, minSize]);
 
   const currentPnl = data && data.length > 0 ? data[data.length - 1].p : 0;
   const isPositive = currentPnl >= 0;
@@ -72,24 +84,51 @@ export function UserPnlChartWidget({ userId }: { userId: string }) {
         </span>
       </div>
 
-      {/* Interval Selector */}
-      <div className="flex items-center gap-1 mb-2 px-2 justify-end mt-2">
-        {INTERVALS.map((int) => (
-          <button
-            key={int}
-            onClick={() => setInterval(int)}
-            disabled={isLoading}
-            className={cn(
-              "px-2.5 py-0.5 text-xs rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer",
-              "border border-brand-stroke",
-              interval === int
-                ? "bg-brand-highlight text-secondary-foreground"
-                : "bg-brand-background text-brand-foreground hover:bg-brand-highlight/50"
-            )}
-          >
-            {INTERVAL_LABELS[int]}
-          </button>
-        ))}
+      {/* Controls Row */}
+      <div className="flex items-center justify-between gap-2 mb-2 px-2 mt-2">
+        {/* Min Size Filter */}
+        <div className="flex items-center gap-1">
+          <span className="text-xs text-muted-foreground">Min Size:</span>
+          {MIN_SIZE_OPTIONS.map((option) => (
+            <button
+              key={option.value}
+              onClick={() => setMinSize(option.value)}
+              disabled={isLoading}
+              className={cn(
+                "px-2 py-0.5 text-xs rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer",
+                "border border-brand-stroke",
+                minSize === option.value
+                  ? "bg-brand-highlight text-secondary-foreground"
+                  : "bg-brand-background text-brand-foreground hover:bg-brand-highlight/50"
+              )}
+            >
+              {option.label}
+            </button>
+          ))}
+          <span className="text-xs text-muted-foreground ml-1">
+            ({filteredClosedPositions.length} positions)
+          </span>
+        </div>
+
+        {/* Interval Selector */}
+        <div className="flex items-center gap-1">
+          {INTERVALS.map((int) => (
+            <button
+              key={int}
+              onClick={() => setInterval(int)}
+              disabled={isLoading}
+              className={cn(
+                "px-2.5 py-0.5 text-xs rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer",
+                "border border-brand-stroke",
+                interval === int
+                  ? "bg-brand-highlight text-secondary-foreground"
+                  : "bg-brand-background text-brand-foreground hover:bg-brand-highlight/50"
+              )}
+            >
+              {INTERVAL_LABELS[int]}
+            </button>
+          ))}
+        </div>
       </div>
 
       {/* Chart */}

@@ -148,23 +148,44 @@ export function UserPnlChart({
   }, []);
 
   useEffect(() => {
-    if (data && data.length > 0 && seriesRef.current && chartRef.current) {
-      seriesRef.current.setData(data as LineData<Time>[]);
+    if (data && data.length > 0 && chartRef.current) {
+      // Remove existing series if it exists to clear old markers
+      if (seriesRef.current) {
+        chartRef.current.removeSeries(seriesRef.current);
+      }
 
-      // Determine if overall PnL is positive or negative and update colors
+      // Determine if overall PnL is positive or negative
       const lastValue = data[data.length - 1]?.value || 0;
       const isPositive = lastValue >= 0;
 
-      seriesRef.current.applyOptions({
+      // Create new series with colors based on PnL
+      const lineSeries = chartRef.current.addSeries(AreaSeries, {
+        priceFormat: {
+          type: "price",
+          precision: 2,
+          minMove: 0.01,
+        },
         lineColor: isPositive ? "#22c55e" : "#ef4444",
         topColor: isPositive ? "#166534" : "#7f1d1d",
         bottomColor: isPositive
           ? "rgba(34, 197, 94, 0)"
           : "rgba(239, 68, 68, 0)",
+        lineWidth: 2,
+        crosshairMarkerVisible: true,
+        crosshairMarkerRadius: 4,
+        lastValueVisible: true,
+        priceLineVisible: true,
         priceLineColor: isPositive ? "#22c55e" : "#ef4444",
+        priceLineWidth: 1,
+        priceLineStyle: 2,
       });
 
-      // Add closed position markers showing PnL values and market names
+      seriesRef.current = lineSeries;
+
+      // Set the data
+      lineSeries.setData(data as LineData<Time>[]);
+
+      // Create markers for closed positions
       if (closedPositions && closedPositions.length > 0) {
         const markers: SeriesMarker<Time>[] = closedPositions.map(
           (position) => {
@@ -190,9 +211,8 @@ export function UserPnlChart({
           }
         );
 
-        createSeriesMarkers(seriesRef.current, markers);
-      } else {
-        createSeriesMarkers(seriesRef.current, []);
+        // Use createSeriesMarkers to add markers to the series
+        createSeriesMarkers(lineSeries, markers);
       }
 
       chartRef.current.timeScale().fitContent();
