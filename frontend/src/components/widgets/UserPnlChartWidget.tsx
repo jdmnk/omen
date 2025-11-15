@@ -29,7 +29,7 @@ const MIN_SIZE_OPTIONS = [
 
 export function UserPnlChartWidget({ userId }: { userId: string }) {
   const [interval, setInterval] = useState<UserPnlInterval>("1m");
-  const [minSize, setMinSize] = useState<number>(5000);
+  const [minSize, setMinSize] = useState<number>(500);
   const isMounted = useIsMounted();
   const { data, isLoading, error } = useUserPnlQuery(userId, interval);
 
