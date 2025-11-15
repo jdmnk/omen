@@ -69,7 +69,7 @@ export function UserProfile({ userId }: { userId: string }) {
       </div>
 
       {/* PnL Chart */}
-      <div className="h-80">
+      <div className="h-96">
         <UserPnlChartWidget userId={userId} />
       </div>
 
