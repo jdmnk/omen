@@ -7,7 +7,9 @@ import { useWatchlist } from "@/lib/hooks/use-watchlist";
 import { useMarketsByConditionIdsQuery } from "@/lib/queries/markets-by-condition-ids.query";
 import { Market } from "@/lib/models/api.models";
 import { cn } from "@/lib/utils";
+import { parseOutcomePrice } from "@/lib/api-parse.utils";
 import { WatchlistButton } from "./WatchlistButton";
+import { WatchlistShareButton } from "./WatchlistShareButton";
 
 const INITIAL_LIMIT = 10;
 
@@ -23,7 +25,7 @@ export function WatchlistWidget() {
   // Fetch watchlisted markets by conditionIds
   const { data: fetchedMarkets } = useMarketsByConditionIdsQuery(
     conditionIds,
-    false // disable for now (dont need extra data) conditionIds.length > 0
+    conditionIds.length > 0 // disable for now (dont need extra data)
   );
 
   // Merge watchlist items with fetched market data
@@ -42,9 +44,11 @@ export function WatchlistWidget() {
 
       // Use fetched market data if available, otherwise use stored watchlist item data
       if (fetchedMarket) {
+        const yesPrice = parseOutcomePrice(fetchedMarket.outcomePrices);
         return {
           question: fetchedMarket.question || item.title,
           slug: fetchedMarket.slug || item.slug,
+          probYes: yesPrice ?? undefined,
         };
       } else {
         // Use stored data for immediate display before API loads
@@ -69,27 +73,32 @@ export function WatchlistWidget() {
   return (
     <div className="pt-2">
       {/* Section Header */}
-      <button
-        onClick={() => setIsExpanded(!isExpanded)}
-        className="w-full flex items-center justify-between px-3 py-1 text-xs text-brand-foreground hover:text-brand-foreground/80 transition-colors cursor-pointer"
-      >
-        <span>Watchlist ({watchlistedMarkets.length})</span>
-        {hasMore && (
-          <div className="flex items-center gap-1">
-            {isExpanded ? (
-              <>
-                <span className="text-xs">Show less</span>
-                <ChevronUp className="h-4 w-4" />
-              </>
-            ) : (
-              <>
-                <span className="text-xs">Show {remainingCount} more</span>
-                <ChevronDown className="h-4 w-4" />
-              </>
-            )}
-          </div>
-        )}
-      </button>
+      <div className="w-full flex items-center justify-between px-3 py-1">
+        <button
+          onClick={() => setIsExpanded(!isExpanded)}
+          className="flex-1 flex items-center justify-between text-xs text-brand-foreground hover:text-brand-foreground/80 transition-colors cursor-pointer"
+        >
+          <span>Watchlist ({watchlistedMarkets.length})</span>
+          {hasMore && (
+            <div className="flex items-center gap-1">
+              {isExpanded ? (
+                <>
+                  <span className="text-xs">Show less</span>
+                  <ChevronUp className="h-4 w-4" />
+                </>
+              ) : (
+                <>
+                  <span className="text-xs">Show {remainingCount} more</span>
+                  <ChevronDown className="h-4 w-4" />
+                </>
+              )}
+            </div>
+          )}
+        </button>
+
+        {/* Share Button */}
+        <WatchlistShareButton markets={watchlistedMarkets} className="ml-2" />
+      </div>
 
       {/* Watchlist Items */}
       <div className="space-y-1">

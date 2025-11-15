@@ -1,6 +1,7 @@
 from datetime import datetime
+from typing import Annotated
 
-from fastapi import FastAPI, HTTPException, Query
+from fastapi import Body, FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
 
 from src.analytics.top_holders_analysis import (
@@ -92,12 +93,25 @@ async def get_search_markets_endpoint(q: str = Query(min_length=1)) -> SearchRes
 
 @app.get("/markets/by-condition-ids", response_model=list[Market])
 async def get_markets_by_condition_ids_endpoint(
-    condition_ids: list[str],
+    condition_ids: Annotated[list[str], Query(description="Repeat the query param per ID")],
 ) -> list[Market]:
     """
     Get multiple markets by their condition IDs from Polymarket Gamma API.
 
     Official docs: https://docs.polymarket.com/api-reference/markets/list-markets
+    """
+    return await poly_client.get_markets_by_condition_ids(condition_ids)
+
+
+@app.post("/markets/by-condition-ids", response_model=list[Market])
+async def post_markets_by_condition_ids_endpoint(
+    condition_ids: Annotated[
+        list[str],
+        Body(embed=True, description='JSON body: { "condition_ids": ["id1", ...] }'),
+    ],
+) -> list[Market]:
+    """
+    POST variant that accepts condition IDs in the JSON body.
     """
     return await poly_client.get_markets_by_condition_ids(condition_ids)
 
