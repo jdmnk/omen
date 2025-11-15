@@ -33,36 +33,36 @@ export function UserProfile({ userId }: { userId: string }) {
       </div>
 
       {/* User Summary Section */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <Card className="p-4">
-          <div className="text-xs text-muted-foreground mb-1">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
+        <Card className="p-3">
+          <div className="text-xs text-muted-foreground mb-0.5">
             Markets Traded
           </div>
-          <div className="text-xl font-bold">
+          <div className="text-lg font-bold">
             {isMounted && tradedData?.traded
               ? tradedData.traded.toLocaleString()
               : "-"}
           </div>
         </Card>
-        <Card className="p-4">
-          <div className="text-xs text-muted-foreground mb-1">
+        <Card className="p-3">
+          <div className="text-xs text-muted-foreground mb-0.5">
             Portfolio Value
           </div>
-          <div className="text-xl font-bold">
+          <div className="text-lg font-bold">
             {isMounted && totalValue !== 0
               ? formatCompactCurrency(totalValue)
               : "-"}
           </div>
         </Card>
-        <Card className="p-4">
-          <div className="text-xs text-muted-foreground mb-1">Total PnL</div>
-          <div className="text-xl font-bold text-muted-foreground">
+        <Card className="p-3">
+          <div className="text-xs text-muted-foreground mb-0.5">Total PnL</div>
+          <div className="text-lg font-bold text-muted-foreground">
             Coming soon
           </div>
         </Card>
-        <Card className="p-4">
-          <div className="text-xs text-muted-foreground mb-1">Win Rate</div>
-          <div className="text-xl font-bold text-muted-foreground">
+        <Card className="p-3">
+          <div className="text-xs text-muted-foreground mb-0.5">Win Rate</div>
+          <div className="text-lg font-bold text-muted-foreground">
             Coming soon
           </div>
         </Card>

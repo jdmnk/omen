@@ -81,7 +81,7 @@ export function UserClosedPositions({ userId }: { userId: string }) {
     fetchNextPage,
     hasNextPage,
     isFetchingNextPage,
-  } = useClosedPositionsInfiniteQuery(userId);
+  } = useClosedPositionsInfiniteQuery(userId, "TIMESTAMP");
 
   const { scrollRef, sentinelRef } = useInfiniteScroll({
     hasNextPage: !!hasNextPage,

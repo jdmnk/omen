@@ -6,14 +6,32 @@ import { DATA_API_HOST } from "../api.const";
 
 const PAGE_SIZE = 50;
 
-export function useClosedPositionsInfiniteQuery(userId: string) {
+/**
+ * Available sorting options for closed positions:
+ * - REALIZEDPNL: Sort by realized profit/loss
+ * - TITLE: Sort by market title
+ * - PRICE: Sort by current price
+ * - AVGPRICE: Sort by average price
+ * - TIMESTAMP: Sort by closing timestamp (latest first when DESC)
+ */
+export type ClosedPositionSortBy =
+  | "REALIZEDPNL"
+  | "TITLE"
+  | "PRICE"
+  | "AVGPRICE"
+  | "TIMESTAMP";
+
+export function useClosedPositionsInfiniteQuery(
+  userId: string,
+  sortBy: ClosedPositionSortBy = "TIMESTAMP"
+) {
   return useInfiniteQuery<ClosedPosition[], Error>({
-    queryKey: ["closed-positions-infinite", userId],
+    queryKey: ["closed-positions-infinite", userId, sortBy],
     queryFn: async ({ pageParam = 0 }) => {
       const url = new URL(`${DATA_API_HOST}/closed-positions`);
       url.searchParams.set("user", userId);
       url.searchParams.set("limit", PAGE_SIZE.toString());
-      url.searchParams.set("sortBy", "REALIZEDPNL");
+      url.searchParams.set("sortBy", sortBy);
       url.searchParams.set("sortDirection", "DESC");
       url.searchParams.set(
         "offset",
