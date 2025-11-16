@@ -19,6 +19,7 @@ import { Spinner } from "@/components/ui/spinner";
 import { formatCompactCurrency, formatCurrency } from "@/lib/ui/format.utils";
 import { cn } from "@/lib/utils";
 import { areaSeriesBaseOptions } from "@/lib/ui/chart.config";
+import type { MarkerMarketInfo } from "@/lib/queries/user-pnl-markers.query";
 
 type UserPnlChartProps = {
   data: ChartPoint[];
@@ -86,7 +87,62 @@ type AnalyticsMarker = {
   severity?: "large" | "extreme";
   tradesCount?: number;
   notional?: number;
+  markets?: MarkerMarketInfo[];
 };
+
+const sizeFormatter = new Intl.NumberFormat("en-US", {
+  maximumFractionDigits: 2,
+});
+
+function buildMarketDetailsHtml(markets?: MarkerMarketInfo[]): string {
+  if (!markets || markets.length === 0) {
+    return "";
+  }
+
+  const sections = markets
+    .map((market) => {
+      const title = market.title ?? "Market";
+      const outcomeLine = market.outcome
+        ? `<div class="text-[11px] text-zinc-400">Outcome: ${market.outcome}</div>`
+        : "";
+      const tradesCount = market.tradesCount ?? 0;
+      const sizeStr =
+        market.totalSize !== undefined && market.totalSize !== null
+          ? sizeFormatter.format(market.totalSize)
+          : "-";
+      const avgPriceStr =
+        market.avgPrice !== undefined && market.avgPrice !== null
+          ? formatCurrency(market.avgPrice, 2)
+          : "-";
+      const notionalStr =
+        market.notional !== undefined && market.notional !== null
+          ? formatCurrency(market.notional, 2)
+          : "-";
+      const side = market.side ?? "-";
+
+      return `
+        <div class="border-t border-zinc-800 pt-2">
+          <div class="text-[12px] font-medium text-zinc-100">${title}</div>
+          ${outcomeLine}
+          <div class="mt-1 grid grid-cols-2 gap-x-3 gap-y-1 text-[11px]">
+            <div class="text-zinc-400">Trades</div>
+            <div class="text-right text-zinc-100">${tradesCount}</div>
+            <div class="text-zinc-400">Size</div>
+            <div class="text-right text-zinc-100">${sizeStr}</div>
+            <div class="text-zinc-400">Avg Price</div>
+            <div class="text-right text-zinc-100">${avgPriceStr}</div>
+            <div class="text-zinc-400">Notional</div>
+            <div class="text-right text-zinc-100">${notionalStr}</div>
+            <div class="text-zinc-400">Last Side</div>
+            <div class="text-right text-zinc-100">${side}</div>
+          </div>
+        </div>
+      `;
+    })
+    .join("");
+
+  return `<div class="mt-2 flex flex-col gap-2">${sections}</div>`;
+}
 
 export function UserPnlChart({
   data,
@@ -280,6 +336,7 @@ export function UserPnlChart({
           return;
         }
         const dateStr = new Date(am.t * 1000).toLocaleString();
+        const marketsHtml = buildMarketDetailsHtml(am.markets);
         if (am.kind === "swing") {
           const isUp = am.direction === "up";
           const deltaStr =
@@ -300,6 +357,7 @@ export function UserPnlChart({
                 <div class="text-zinc-400">Change</div>
                 <div class="text-zinc-100 text-right">${deltaStr}</div>
               </div>
+              ${marketsHtml}
             </div>
           `;
         } else {
@@ -316,6 +374,7 @@ export function UserPnlChart({
                 <div class="text-zinc-400">Notional</div>
                 <div class="text-zinc-100 text-right">${ntoStr}</div>
               </div>
+              ${marketsHtml}
             </div>
           `;
         }

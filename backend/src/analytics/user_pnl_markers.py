@@ -20,6 +20,24 @@ class PnlMarker(TypedDict, total=False):
     # trade cluster fields
     tradesCount: int
     notional: float
+    # shared optional market details
+    markets: list["MarkerMarketInfo"]
+
+
+class MarkerMarketInfo(TypedDict, total=False):
+    title: str
+    outcome: str | None
+    tradesCount: int
+    totalSize: float
+    avgPrice: float | None
+    notional: float
+    side: str | None
+
+
+class TradeBucketStats(TypedDict, total=False):
+    count: int
+    notional: float
+    markets: list[MarkerMarketInfo]
 
 
 def _quantile(values: list[float], q: float) -> float:
@@ -37,6 +55,93 @@ def _quantile(values: list[float], q: float) -> float:
 
 def _median(values: list[int]) -> float:
     return _quantile([float(x) for x in values], 0.5)
+
+
+def _build_trade_bucket_stats(
+    trades: list[Trade],
+    grid_times: list[int],
+) -> dict[int, TradeBucketStats]:
+    if not trades or len(grid_times) < 2:
+        return {}
+
+    dts = [grid_times[i] - grid_times[i - 1] for i in range(1, len(grid_times))]
+    step = max(1, int(_median(dts)))
+    half = max(1, step // 2)
+
+    bucket_stats: dict[int, dict[str, Any]] = {}
+    for tr in trades:
+        tt = int(tr.timestamp)
+        nearest_t = None
+        min_diff = 1_000_000_000
+        for gt in grid_times:
+            diff = abs(gt - tt)
+            if diff < min_diff:
+                min_diff = diff
+                nearest_t = gt
+            elif gt > tt and diff > min_diff:
+                break
+        if nearest_t is None or min_diff > half:
+            continue
+
+        entry = bucket_stats.setdefault(
+            nearest_t,
+            {"count": 0, "notional": 0.0, "markets": {}},
+        )
+        entry["count"] += 1
+        notional = float(tr.size) * float(tr.price)
+        entry["notional"] += notional
+
+        market_key = f"{tr.title}|{tr.outcome}"
+        markets_dict: dict[str, dict[str, Any]] = entry["markets"]
+        market_entry = markets_dict.setdefault(
+            market_key,
+            {
+                "title": tr.title,
+                "outcome": tr.outcome,
+                "tradesCount": 0,
+                "totalSize": 0.0,
+                "weightedPrice": 0.0,
+                "notional": 0.0,
+                "side": tr.side,
+            },
+        )
+        market_entry["tradesCount"] += 1
+        size_float = float(tr.size)
+        market_entry["totalSize"] += size_float
+        market_entry["weightedPrice"] += float(tr.price) * size_float
+        market_entry["notional"] += notional
+        if tr.side:
+            market_entry["side"] = tr.side
+
+    stats: dict[int, TradeBucketStats] = {}
+    for t, entry in bucket_stats.items():
+        markets_info: list[MarkerMarketInfo] = []
+        for market in entry["markets"].values():
+            total_size = float(market["totalSize"])
+            avg_price = (
+                float(market["weightedPrice"]) / total_size if total_size > 0 else None
+            )
+            markets_info.append(
+                {
+                    "title": market.get("title", ""),
+                    "outcome": market.get("outcome"),
+                    "tradesCount": int(market.get("tradesCount", 0)),
+                    "totalSize": total_size,
+                    "avgPrice": avg_price,
+                    "notional": float(market.get("notional", 0.0)),
+                    "side": market.get("side"),
+                }
+            )
+        markets_info.sort(
+            key=lambda m: float(m.get("notional") or 0.0),
+            reverse=True,
+        )
+        stats[t] = {
+            "count": int(entry.get("count", 0)),
+            "notional": float(entry.get("notional", 0.0)),
+            "markets": markets_info[:3],
+        }
+    return stats
 
 
 def _compute_swing_markers(points: list[PriceHistoryPoint]) -> list[PnlMarker]:
@@ -76,61 +181,64 @@ def _compute_swing_markers(points: list[PriceHistoryPoint]) -> list[PnlMarker]:
 
 
 def _aggregate_trade_clusters(
-    trades: list[Trade],
     grid_times: list[int],
+    bucket_stats: dict[int, TradeBucketStats],
 ) -> list[PnlMarker]:
-    if not trades or len(grid_times) < 2:
+    if len(grid_times) < 2 or not bucket_stats:
         return []
 
-    # Determine grid step (seconds)
-    dts = [grid_times[i] - grid_times[i - 1] for i in range(1, len(grid_times))]
-    step = max(1, int(_median(dts)))
-    half = step // 2
-
-    # Aggregate trades into nearest grid time (within half step)
-    agg: dict[int, dict[str, float | int]] = {t: {"count": 0, "notional": 0.0} for t in grid_times}
-    for tr in trades:
-        tt = int(tr.timestamp)
-        # Binary search could be used; linear is fine given bounded trades
-        # Snap to closest grid time within half step
-        # Find insertion index
-        # Simple two-pointer walk is not necessary; use manual nearest check
-        # Since we don't expect huge arrays here, linear scan is acceptable
-        nearest_t = None
-        min_diff = 1_000_000_000
-        for gt in grid_times:
-            diff = abs(gt - tt)
-            if diff < min_diff:
-                min_diff = diff
-                nearest_t = gt
-            elif gt > tt and diff > min_diff:
-                # Early break after passing the closest point
-                break
-        if nearest_t is None or min_diff > half:
-            continue
-        # Approximate notional
-        notional = float(tr.size) * float(tr.price)
-        agg[nearest_t]["count"] = int(agg[nearest_t]["count"]) + 1
-        agg[nearest_t]["notional"] = float(agg[nearest_t]["notional"]) + notional
-
-    counts = [int(v["count"]) for v in agg.values()]
-    notionals = [float(v["notional"]) for v in agg.values()]
-    count_q90 = _quantile([float(c) for c in counts if c > 0], 0.90) if any(counts) else 0.0
-    notional_q90 = _quantile([n for n in notionals if n > 0], 0.90) if any(notionals) else 0.0
+    counts = [int(bucket_stats.get(t, {}).get("count", 0)) for t in grid_times]
+    notionals = [float(bucket_stats.get(t, {}).get("notional", 0.0)) for t in grid_times]
+    count_q90 = (
+        _quantile([float(c) for c in counts if c > 0], 0.90) if any(counts) else 0.0
+    )
+    notional_q90 = (
+        _quantile([n for n in notionals if n > 0], 0.90) if any(notionals) else 0.0
+    )
 
     markers: list[PnlMarker] = []
     for t in grid_times:
-        cnt = int(agg[t]["count"])
-        nto = float(agg[t]["notional"])
+        stats = bucket_stats.get(t)
+        if not stats:
+            continue
+        cnt = int(stats.get("count", 0))
+        nto = float(stats.get("notional", 0.0))
         if cnt == 0:
             continue
         # Consider a cluster if either dimension exceeds its 90th percentile
         if (count_q90 and cnt >= count_q90) or (notional_q90 and nto >= notional_q90):
-            markers.append({"t": t, "kind": "trade_cluster", "tradesCount": cnt, "notional": nto})
+            marker: PnlMarker = {
+                "t": t,
+                "kind": "trade_cluster",
+                "tradesCount": cnt,
+                "notional": nto,
+            }
+            markets_info = stats.get("markets")
+            if markets_info:
+                marker["markets"] = markets_info
+            markers.append(marker)
 
     # Limit to avoid clutter: top by notional then by count
-    markers.sort(key=lambda m: (float(m.get("notional", 0.0)), int(m.get("tradesCount", 0))), reverse=True)
+    markers.sort(
+        key=lambda m: (float(m.get("notional", 0.0)), int(m.get("tradesCount", 0))),
+        reverse=True,
+    )
     return markers[:20]
+
+
+def _attach_market_info(
+    markers: list[PnlMarker],
+    bucket_stats: dict[int, TradeBucketStats],
+) -> None:
+    if not markers or not bucket_stats:
+        return
+    for marker in markers:
+        stats = bucket_stats.get(int(marker["t"]))
+        if not stats:
+            continue
+        markets_info = stats.get("markets")
+        if markets_info:
+            marker["markets"] = markets_info
 
 
 class UserPnlWithMarkers(TypedDict):
@@ -170,10 +278,10 @@ async def build_user_pnl_and_markers(
             continue
 
     grid_times = [int(p["t"]) for p in points]
-    trade_markers = _aggregate_trade_clusters(trades, grid_times)
+    bucket_stats = _build_trade_bucket_stats(trades, grid_times)
+    trade_markers = _aggregate_trade_clusters(grid_times, bucket_stats)
+    _attach_market_info(swing_markers, bucket_stats)
 
     # Merge and sort markers by time; keep both kinds
     markers = sorted([*swing_markers, *trade_markers], key=lambda m: int(m["t"]))
     return {"points": points, "markers": markers}
-
-

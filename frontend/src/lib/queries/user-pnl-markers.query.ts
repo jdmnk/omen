@@ -2,20 +2,33 @@ import { useQuery } from "@tanstack/react-query";
 import { getBaseUrl } from "@/lib/api.const";
 
 export type PnlPoint = { t: number; p: number };
+export type MarkerMarketInfo = {
+  title?: string | null;
+  outcome?: string | null;
+  tradesCount?: number | null;
+  totalSize?: number | null;
+  avgPrice?: number | null;
+  notional?: number | null;
+  side?: string | null;
+};
+
+type BasePnlMarker = {
+  t: number;
+  markets?: MarkerMarketInfo[];
+};
+
 export type PnlMarker =
-  | {
-      t: number;
+  | (BasePnlMarker & {
       kind: "swing";
       delta?: number;
       direction?: "up" | "down";
       severity?: "large" | "extreme";
-    }
-  | {
-      t: number;
+    })
+  | (BasePnlMarker & {
       kind: "trade_cluster";
       tradesCount?: number;
       notional?: number;
-    };
+    });
 
 export type PnlWithMarkersResponse = {
   points: PnlPoint[];
@@ -49,5 +62,4 @@ export function useUserPnlWithMarkersQuery(
     staleTime: 60_000,
   });
 }
-
 

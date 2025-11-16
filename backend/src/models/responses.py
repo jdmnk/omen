@@ -35,6 +35,17 @@ class PnlMarker(BaseModel):
     # optional trade cluster fields
     tradesCount: int | None = None
     notional: float | None = None
+    markets: list["MarkerMarketInfo"] | None = None
+
+
+class MarkerMarketInfo(BaseModel):
+    title: str | None = None
+    outcome: str | None = None
+    tradesCount: int | None = None
+    totalSize: float | None = None
+    avgPrice: float | None = None
+    notional: float | None = None
+    side: str | None = None
 
 
 class PnlWithMarkersResponse(BaseModel):

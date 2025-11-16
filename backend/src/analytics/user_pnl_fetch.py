@@ -43,7 +43,7 @@ async def fetch_user_pnl_and_trades_basic(
     poly_client = PolyClient()
     raw_trades = await poly_client.get_market_trades(
         None,  # all markets
-        min_amount=1,
+        min_amount=10,
         count=max_trades,
         user=user_address,
     )
@@ -60,5 +60,3 @@ async def fetch_user_pnl_and_trades_basic(
         "pnl_points": pnl_points,
         "trades": trades_payload,
     }
-
-
