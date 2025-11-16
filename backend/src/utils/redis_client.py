@@ -120,4 +120,3 @@ class RedisClient:
 
 # Global Redis client instance
 redis_client = RedisClient()
-

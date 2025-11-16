@@ -1,7 +1,8 @@
 """API response wrapper models."""
 
-from pydantic import BaseModel
 from typing import Literal
+
+from pydantic import BaseModel
 
 
 class MessageResponse(BaseModel):

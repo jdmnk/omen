@@ -21,7 +21,7 @@ class PnlMarker(TypedDict, total=False):
     tradesCount: int
     notional: float
     # shared optional market details
-    markets: list["MarkerMarketInfo"]
+    markets: list[MarkerMarketInfo]
 
 
 class MarkerMarketInfo(TypedDict, total=False):
@@ -118,9 +118,7 @@ def _build_trade_bucket_stats(
         markets_info: list[MarkerMarketInfo] = []
         for market in entry["markets"].values():
             total_size = float(market["totalSize"])
-            avg_price = (
-                float(market["weightedPrice"]) / total_size if total_size > 0 else None
-            )
+            avg_price = float(market["weightedPrice"]) / total_size if total_size > 0 else None
             markets_info.append(
                 {
                     "title": market.get("title", ""),
@@ -189,12 +187,8 @@ def _aggregate_trade_clusters(
 
     counts = [int(bucket_stats.get(t, {}).get("count", 0)) for t in grid_times]
     notionals = [float(bucket_stats.get(t, {}).get("notional", 0.0)) for t in grid_times]
-    count_q90 = (
-        _quantile([float(c) for c in counts if c > 0], 0.90) if any(counts) else 0.0
-    )
-    notional_q90 = (
-        _quantile([n for n in notionals if n > 0], 0.90) if any(notionals) else 0.0
-    )
+    count_q90 = _quantile([float(c) for c in counts if c > 0], 0.90) if any(counts) else 0.0
+    notional_q90 = _quantile([n for n in notionals if n > 0], 0.90) if any(notionals) else 0.0
 
     markers: list[PnlMarker] = []
     for t in grid_times:
