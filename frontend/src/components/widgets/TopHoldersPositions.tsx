@@ -19,7 +19,6 @@ import {
 import Link from "next/link";
 import { Market, TopHolderAnalysis } from "@/lib/models/api.models";
 import { useOrderbookQuery } from "@/lib/queries/orderbook.query";
-import { POLYMARKET_URL } from "@/lib/api.const";
 import { useTopHoldersPositionsQuery } from "@/lib/queries/top-holders-positions.query";
 import { generateHolderTagsMap } from "@/lib/utils/holder-tags.utils";
 import type { HolderTagIcon } from "@/lib/utils/holder-tags.utils";
@@ -32,6 +31,12 @@ import {
 } from "@/components/ui/tooltip";
 import * as TooltipPrimitive from "@radix-ui/react-tooltip";
 import Image from "next/image";
+import {
+  TABLE_CONTENT_CONTAINER_CLASSES,
+  TABLE_HEADER_CLASSES,
+  TABLE_HEADER_CONTAINER_CLASSES,
+  TABLE_ROW_CLASSES,
+} from "@/components/widgets/shared-table-styles";
 
 const HOLDER_ROW_GRID_CLASSES =
   // "grid grid-cols-[24px_auto_3rem_6.5rem_4.5rem] items-center gap-3";
@@ -60,11 +65,12 @@ function OutcomeColumn({
   outcomeIndex: number;
 }) {
   return (
-    <div className={cn("flex flex-col px-3 py-3", bgColor)}>
+    <div className={cn("flex flex-col", bgColor)}>
       <div
         className={cn(
           HOLDER_ROW_GRID_CLASSES,
-          "text-xs text-brand-foreground font-bold"
+          TABLE_HEADER_CLASSES,
+          TABLE_HEADER_CONTAINER_CLASSES
         )}
       >
         <div className="text-center">{label.toUpperCase()}</div>
@@ -296,7 +302,8 @@ export function TopHoldersPositions({
         key={`${holder.proxyWallet}-${holder.outcomeIndex}-${index}`}
         className={cn(
           HOLDER_ROW_GRID_CLASSES,
-          "py-2 border-b border-border/50 last:border-0 text-xs"
+          TABLE_ROW_CLASSES,
+          TABLE_CONTENT_CONTAINER_CLASSES
         )}
       >
         <div className="flex items-center justify-center">
@@ -324,7 +331,7 @@ export function TopHoldersPositions({
             // href={`${POLYMARKET_URL}/profile/${holder.proxyWallet}`}
             href={`/user/${holder.proxyWallet}`}
             target="_blank"
-            className="block truncate hover:underline"
+            className="block truncate hover:underline cursor-pointer"
           >
             {displayName}
           </Link>
