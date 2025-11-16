@@ -172,19 +172,62 @@
         "summary": "Get Markets By Condition Ids Endpoint",
         "description": "Get multiple markets by their condition IDs from Polymarket Gamma API.\n\nOfficial docs: https://docs.polymarket.com/api-reference/markets/list-markets",
         "operationId": "get_markets_by_condition_ids_endpoint_markets_by_condition_ids_get",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "items": {
-                  "type": "string"
-                },
-                "type": "array",
-                "title": "Condition Ids"
+        "parameters": [
+          {
+            "name": "condition_ids",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "Repeat the query param per ID",
+              "title": "Condition Ids"
+            },
+            "description": "Repeat the query param per ID"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Market"
+                  },
+                  "title": "Response Get Markets By Condition Ids Endpoint Markets By Condition Ids Get"
+                }
               }
             }
           },
-          "required": true
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Post Markets By Condition Ids Endpoint",
+        "description": "POST variant that accepts condition IDs in the JSON body.",
+        "operationId": "post_markets_by_condition_ids_endpoint_markets_by_condition_ids_post",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Body_post_markets_by_condition_ids_endpoint_markets_by_condition_ids_post"
+              }
+            }
+          }
         },
         "responses": {
           "200": {
@@ -192,11 +235,11 @@
             "content": {
               "application/json": {
                 "schema": {
+                  "type": "array",
                   "items": {
                     "$ref": "#/components/schemas/Market"
                   },
-                  "type": "array",
-                  "title": "Response Get Markets By Condition Ids Endpoint Markets By Condition Ids Get"
+                  "title": "Response Post Markets By Condition Ids Endpoint Markets By Condition Ids Post"
                 }
               }
             }
@@ -398,6 +441,68 @@
           }
         }
       }
+    },
+    "/users/{user_address}/pnl-with-markers": {
+      "get": {
+        "summary": "Get User Pnl With Markers",
+        "description": "Returns user PnL points and chart-aligned markers (swings and trade clusters).",
+        "operationId": "get_user_pnl_with_markers_users__user_address__pnl_with_markers_get",
+        "parameters": [
+          {
+            "name": "user_address",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "User Address"
+            }
+          },
+          {
+            "name": "interval",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "1m",
+              "title": "Interval"
+            }
+          },
+          {
+            "name": "max_trades",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 100000,
+              "minimum": 100,
+              "default": 10000,
+              "title": "Max Trades"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PnlWithMarkersResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -420,6 +525,23 @@
         ],
         "title": "AncillaryDataUpdate",
         "description": "Ancillary data update from UMA CTF Adapter."
+      },
+      "Body_post_markets_by_condition_ids_endpoint_markets_by_condition_ids_post": {
+        "properties": {
+          "condition_ids": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Condition Ids",
+            "description": "JSON body: { \"condition_ids\": [\"id1\", ...] }"
+          }
+        },
+        "type": "object",
+        "required": [
+          "condition_ids"
+        ],
+        "title": "Body_post_markets_by_condition_ids_endpoint_markets_by_condition_ids_post"
       },
       "ClobReward": {
         "properties": {
@@ -533,6 +655,183 @@
         ],
         "title": "HealthResponse",
         "description": "Health check response."
+      },
+      "MarkerMarketInfo": {
+        "properties": {
+          "title": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Title"
+          },
+          "outcome": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Outcome"
+          },
+          "tradesCount": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Tradescount"
+          },
+          "totalSize": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Totalsize"
+          },
+          "avgPrice": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Avgprice"
+          },
+          "notional": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Notional"
+          },
+          "side": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Side"
+          }
+        },
+        "type": "object",
+        "title": "MarkerMarketInfo"
+      },
+      "MarkerTradeInfo": {
+        "properties": {
+          "hash": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Hash"
+          },
+          "title": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Title"
+          },
+          "outcome": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Outcome"
+          },
+          "side": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Side"
+          },
+          "size": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Size"
+          },
+          "price": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Price"
+          },
+          "notional": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Notional"
+          },
+          "timestamp": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Timestamp"
+          }
+        },
+        "type": "object",
+        "title": "MarkerTradeInfo"
       },
       "Market": {
         "properties": {
@@ -801,6 +1100,163 @@
         ],
         "title": "MessageResponse",
         "description": "Generic message response."
+      },
+      "PnlMarker": {
+        "properties": {
+          "t": {
+            "type": "integer",
+            "title": "T"
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "swing",
+              "trade_cluster"
+            ],
+            "title": "Kind"
+          },
+          "delta": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Delta"
+          },
+          "direction": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "up",
+                  "down"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Direction"
+          },
+          "severity": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "large",
+                  "extreme"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Severity"
+          },
+          "tradesCount": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Tradescount"
+          },
+          "notional": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Notional"
+          },
+          "markets": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/MarkerMarketInfo"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Markets"
+          },
+          "trades": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/MarkerTradeInfo"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Trades"
+          }
+        },
+        "type": "object",
+        "required": [
+          "t",
+          "kind"
+        ],
+        "title": "PnlMarker",
+        "description": "Marker aligned to PnL chart timestamps."
+      },
+      "PnlPoint": {
+        "properties": {
+          "t": {
+            "type": "integer",
+            "title": "T"
+          },
+          "p": {
+            "type": "number",
+            "title": "P"
+          }
+        },
+        "type": "object",
+        "required": [
+          "t",
+          "p"
+        ],
+        "title": "PnlPoint",
+        "description": "Single PnL point for user PnL chart."
+      },
+      "PnlWithMarkersResponse": {
+        "properties": {
+          "points": {
+            "items": {
+              "$ref": "#/components/schemas/PnlPoint"
+            },
+            "type": "array",
+            "title": "Points"
+          },
+          "markers": {
+            "items": {
+              "$ref": "#/components/schemas/PnlMarker"
+            },
+            "type": "array",
+            "title": "Markers"
+          }
+        },
+        "type": "object",
+        "required": [
+          "points",
+          "markers"
+        ],
+        "title": "PnlWithMarkersResponse"
       },
       "SearchEventItem": {
         "properties": {

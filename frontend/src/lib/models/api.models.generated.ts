@@ -117,7 +117,11 @@ export interface paths {
          */
         get: operations["get_markets_by_condition_ids_endpoint_markets_by_condition_ids_get"];
         put?: never;
-        post?: never;
+        /**
+         * Post Markets By Condition Ids Endpoint
+         * @description POST variant that accepts condition IDs in the JSON body.
+         */
+        post: operations["post_markets_by_condition_ids_endpoint_markets_by_condition_ids_post"];
         delete?: never;
         options?: never;
         head?: never;
@@ -213,6 +217,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/users/{user_address}/pnl-with-markers": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get User Pnl With Markers
+         * @description Returns user PnL points and chart-aligned markers (swings and trade clusters).
+         */
+        get: operations["get_user_pnl_with_markers_users__user_address__pnl_with_markers_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -226,6 +250,14 @@ export interface components {
             timestamp: number;
             /** Text */
             text: string;
+        };
+        /** Body_post_markets_by_condition_ids_endpoint_markets_by_condition_ids_post */
+        Body_post_markets_by_condition_ids_endpoint_markets_by_condition_ids_post: {
+            /**
+             * Condition Ids
+             * @description JSON body: { "condition_ids": ["id1", ...] }
+             */
+            condition_ids: string[];
         };
         /**
          * ClobReward
@@ -272,6 +304,42 @@ export interface components {
         HealthResponse: {
             /** Status */
             status: string;
+        };
+        /** MarkerMarketInfo */
+        MarkerMarketInfo: {
+            /** Title */
+            title?: string | null;
+            /** Outcome */
+            outcome?: string | null;
+            /** Tradescount */
+            tradesCount?: number | null;
+            /** Totalsize */
+            totalSize?: number | null;
+            /** Avgprice */
+            avgPrice?: number | null;
+            /** Notional */
+            notional?: number | null;
+            /** Side */
+            side?: string | null;
+        };
+        /** MarkerTradeInfo */
+        MarkerTradeInfo: {
+            /** Hash */
+            hash?: string | null;
+            /** Title */
+            title?: string | null;
+            /** Outcome */
+            outcome?: string | null;
+            /** Side */
+            side?: string | null;
+            /** Size */
+            size?: number | null;
+            /** Price */
+            price?: number | null;
+            /** Notional */
+            notional?: number | null;
+            /** Timestamp */
+            timestamp?: number | null;
         };
         /** Market */
         Market: {
@@ -358,6 +426,50 @@ export interface components {
         MessageResponse: {
             /** Message */
             message: string;
+        };
+        /**
+         * PnlMarker
+         * @description Marker aligned to PnL chart timestamps.
+         */
+        PnlMarker: {
+            /** T */
+            t: number;
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "swing" | "trade_cluster";
+            /** Delta */
+            delta?: number | null;
+            /** Direction */
+            direction?: ("up" | "down") | null;
+            /** Severity */
+            severity?: ("large" | "extreme") | null;
+            /** Tradescount */
+            tradesCount?: number | null;
+            /** Notional */
+            notional?: number | null;
+            /** Markets */
+            markets?: components["schemas"]["MarkerMarketInfo"][] | null;
+            /** Trades */
+            trades?: components["schemas"]["MarkerTradeInfo"][] | null;
+        };
+        /**
+         * PnlPoint
+         * @description Single PnL point for user PnL chart.
+         */
+        PnlPoint: {
+            /** T */
+            t: number;
+            /** P */
+            p: number;
+        };
+        /** PnlWithMarkersResponse */
+        PnlWithMarkersResponse: {
+            /** Points */
+            points: components["schemas"]["PnlPoint"][];
+            /** Markers */
+            markers: components["schemas"]["PnlMarker"][];
         };
         /**
          * SearchEventItem
@@ -745,6 +857,38 @@ export interface operations {
     };
     get_markets_by_condition_ids_endpoint_markets_by_condition_ids_get: {
         parameters: {
+            query: {
+                /** @description Repeat the query param per ID */
+                condition_ids: string[];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Market"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    post_markets_by_condition_ids_endpoint_markets_by_condition_ids_post: {
+        parameters: {
             query?: never;
             header?: never;
             path?: never;
@@ -752,7 +896,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": string[];
+                "application/json": components["schemas"]["Body_post_markets_by_condition_ids_endpoint_markets_by_condition_ids_post"];
             };
         };
         responses: {
@@ -907,18 +1051,58 @@ export interface operations {
             };
         };
     };
+    get_user_pnl_with_markers_users__user_address__pnl_with_markers_get: {
+        parameters: {
+            query?: {
+                interval?: string;
+                max_trades?: number;
+            };
+            header?: never;
+            path: {
+                user_address: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PnlWithMarkersResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
 }
 
 
 // Clean type exports (no need to access via components["schemas"])
 export type AncillaryDataUpdate = components["schemas"]["AncillaryDataUpdate"];
+export type Body_post_markets_by_condition_ids_endpoint_markets_by_condition_ids_post = components["schemas"]["Body_post_markets_by_condition_ids_endpoint_markets_by_condition_ids_post"];
 export type ClobReward = components["schemas"]["ClobReward"];
 export type Event = components["schemas"]["Event"];
 export type HTTPValidationError = components["schemas"]["HTTPValidationError"];
 export type HealthResponse = components["schemas"]["HealthResponse"];
+export type MarkerMarketInfo = components["schemas"]["MarkerMarketInfo"];
+export type MarkerTradeInfo = components["schemas"]["MarkerTradeInfo"];
 export type Market = components["schemas"]["Market"];
 export type MarketEvent = components["schemas"]["MarketEvent"];
 export type MessageResponse = components["schemas"]["MessageResponse"];
+export type PnlMarker = components["schemas"]["PnlMarker"];
+export type PnlPoint = components["schemas"]["PnlPoint"];
+export type PnlWithMarkersResponse = components["schemas"]["PnlWithMarkersResponse"];
 export type SearchEventItem = components["schemas"]["SearchEventItem"];
 export type SearchMarketItem = components["schemas"]["SearchMarketItem"];
 export type SearchResponse = components["schemas"]["SearchResponse"];
