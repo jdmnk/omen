@@ -6,6 +6,8 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { TEXTS } from "./texts.const";
 
+const REFERRAL_STORAGE_KEY = "referral-source";
+
 export default function Home() {
   const [email, setEmail] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -20,6 +22,7 @@ export default function Home() {
 
     if (referral) {
       setReferralSource(referral);
+      localStorage.setItem(REFERRAL_STORAGE_KEY, referral);
       url.searchParams.delete("ref");
 
       const updatedSearch = url.searchParams.toString();
@@ -28,6 +31,12 @@ export default function Home() {
       }${url.hash}`;
 
       window.history.replaceState(null, "", newUrl);
+      return;
+    }
+
+    const storedReferral = localStorage.getItem(REFERRAL_STORAGE_KEY);
+    if (storedReferral) {
+      setReferralSource(storedReferral);
     }
   }, []);
 
