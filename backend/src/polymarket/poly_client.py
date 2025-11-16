@@ -7,6 +7,7 @@ from py_clob_client.client import ClobClient
 from py_clob_client.constants import POLYGON
 from py_clob_client.exceptions import PolyApiException
 
+from src.models.activity import parse_activity_trade
 from src.models.event import Event, parse_event_from_api
 from src.models.market import Market, parse_market_from_api
 from src.models.search import SearchEventItem, SearchMarketItem, SearchResponse
@@ -262,6 +263,77 @@ class PolyClient:
         # Parse raw API trades into typed TradeSchema objects
         parsed_trades = [t for t in (parse_trade_from_api(t) for t in all_trades) if t is not None]
         return parsed_trades
+
+    async def get_user_activity_trades(
+        self,
+        user: str,
+        *,
+        min_amount: float = 0,
+        count: int = 500,
+    ) -> list[Trade]:
+        """
+        Fetch user trades via the activity endpoint (supports user filtering).
+        Falls back to /trades endpoint if activity is unavailable.
+        """
+
+        async def _fetch() -> list[Trade]:
+            offset = 0
+            per_page = 250
+            trades: list[Trade] = []
+            timeout = httpx.Timeout(10.0, read=10.0)
+            async with httpx.AsyncClient(timeout=timeout) as client:
+                while len(trades) < count:
+                    page_limit = min(per_page, count - len(trades))
+                    params: dict[str, object] = {
+                        "user": user,
+                        "limit": page_limit,
+                        "offset": offset,
+                        "type": "TRADE",
+                        # default sorted by timestamp descending
+                        # "sort": "TIMESTAMP",
+                        # "sortDirection": "DESC",
+                    }
+                    if min_amount > 0:
+                        params["minAmount"] = int(max(1, min_amount))
+                    response = await client.get(f"{DATA_API_HOST}/activity", params=params)
+                    response.raise_for_status()
+                    payload = response.json()
+                    entries = []
+                    if isinstance(payload, dict) and "activity" in payload:
+                        entries = payload.get("activity") or []
+                    elif isinstance(payload, list):
+                        entries = payload
+                    if not entries:
+                        break
+                    for entry in entries:
+                        parsed = parse_activity_trade(entry)
+                        if not parsed:
+                            continue
+                        if min_amount > 0 and (parsed.size * parsed.price) < min_amount:
+                            continue
+                        trades.append(parsed)
+                        if len(trades) >= count:
+                            break
+                    if len(entries) < page_limit:
+                        break
+                    offset += page_limit
+                    await asyncio.sleep(0.2)
+            return trades
+
+        try:
+            return await _fetch()
+        except Exception as exc:
+            logger.warning(
+                "Falling back to /trades endpoint for user=%s due to activity error: %s",
+                user,
+                exc,
+            )
+            return await self.get_market_trades(
+                None,
+                min_amount=int(max(1, min_amount)),
+                count=count,
+                user=user,
+            )
 
     async def get_top_holders(
         self, condition_ids: list[str], min_balance: int = 1
