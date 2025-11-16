@@ -24,6 +24,7 @@ import { areaSeriesBaseOptions } from "@/lib/ui/chart.config";
 type UserPnlChartProps = {
   data: ChartPoint[];
   closedPositions?: ClosedPosition[];
+  analyticsMarkers?: AnalyticsMarker[];
   error?: Error | null;
   isLoading?: boolean;
 };
@@ -79,17 +80,30 @@ type ChartPoint = {
   value: number;
 };
 
+type AnalyticsMarker = {
+  t: number;
+  kind: "swing" | "trade_cluster";
+  delta?: number;
+  direction?: "up" | "down";
+  severity?: "large" | "extreme";
+  tradesCount?: number;
+  notional?: number;
+};
+
 export function UserPnlChart({
   data,
   closedPositions = [],
+  analyticsMarkers = [],
   error,
   isLoading,
 }: UserPnlChartProps) {
   const chartContainerRef = useRef<HTMLDivElement>(null);
   const chartRef = useRef<IChartApi | null>(null);
   const seriesRef = useRef<ISeriesApi<"Area"> | null>(null);
-  const markersPluginRef = useRef<ISeriesMarkersPluginApi<Time> | null>(null);
+  const closedMarkersPluginRef = useRef<ISeriesMarkersPluginApi<Time> | null>(null);
+  const analyticsMarkersPluginRef = useRef<ISeriesMarkersPluginApi<Time> | null>(null);
   const markerIdToPositionRef = useRef<Record<string, ClosedPosition>>({});
+  const markerIdToAnalyticsRef = useRef<Record<string, AnalyticsMarker>>({});
   const crosshairHandlerRef = useRef<((param: any) => void) | null>(null);
   const tooltipRef = useRef<HTMLDivElement | null>(null);
 
@@ -165,13 +179,21 @@ export function UserPnlChart({
       // Remove existing series if it exists to clear old markers
       if (seriesRef.current) {
         // detach markers plugin if any
-        if (markersPluginRef.current) {
+        if (closedMarkersPluginRef.current) {
           try {
-            markersPluginRef.current.detach();
+            closedMarkersPluginRef.current.detach();
           } catch {
             // ignore
           }
-          markersPluginRef.current = null;
+          closedMarkersPluginRef.current = null;
+        }
+        if (analyticsMarkersPluginRef.current) {
+          try {
+            analyticsMarkersPluginRef.current.detach();
+          } catch {
+            // ignore
+          }
+          analyticsMarkersPluginRef.current = null;
         }
         // unsubscribe old crosshair handler if any
         if (crosshairHandlerRef.current) {
@@ -220,33 +242,71 @@ export function UserPnlChart({
           }
         );
         markerIdToPositionRef.current = idToPosition;
-        markersPluginRef.current = createSeriesMarkers(lineSeries, markers, {
+        closedMarkersPluginRef.current = createSeriesMarkers(lineSeries, markers, {
           zOrder: "top",
         });
+      }
 
-        // Tooltip handling on marker hover
-        const handler = (param: any) => {
-          const tooltipEl = tooltipRef.current;
-          if (!tooltipEl) return;
-
-          // Hide if not on chart
-          if (!param?.point) {
-            tooltipEl.classList.add("hidden");
-            return;
+      // Create markers for analytics (swing/trade clusters)
+      if (analyticsMarkers && analyticsMarkers.length > 0) {
+        const idToAnalytics: Record<string, AnalyticsMarker> = {};
+        const markers: SeriesMarker<Time>[] = analyticsMarkers.map((mk, idx) => {
+          const id = `am-${mk.t}-${idx}`;
+          idToAnalytics[id] = mk;
+          if (mk.kind === "swing") {
+            const isUp = mk.direction === "up";
+            const color = isUp ? "#22c55e" : "#ef4444";
+            const text =
+              (mk.delta !== undefined ? `${isUp ? "+" : ""}${formatCompactCurrency(mk.delta)}` : "") +
+              (mk.severity ? ` ${mk.severity === "extreme" ? "!" : ""}` : "");
+            return {
+              id,
+              time: mk.t as Time,
+              position: isUp ? "belowBar" : "aboveBar",
+              color,
+              shape: isUp ? "circle" : "circle",
+              text: text.trim(),
+            };
+          } else {
+            // trade_cluster
+            const color = "#60a5fa"; // blue
+            const text = mk.tradesCount ? `${mk.tradesCount}T` : "";
+            return {
+              id,
+              time: mk.t as Time,
+              position: "aboveBar",
+              color,
+              shape: "square",
+              text,
+            };
           }
+        });
+        markerIdToAnalyticsRef.current = idToAnalytics;
+        analyticsMarkersPluginRef.current = createSeriesMarkers(lineSeries, markers, {
+          zOrder: "top",
+        });
+      }
 
-          const hoveredId = param.hoveredObjectId as string | undefined;
-          if (!hoveredId) {
-            tooltipEl.classList.add("hidden");
-            return;
-          }
+      // Tooltip handling on marker hover
+      const handler = (param: any) => {
+        const tooltipEl = tooltipRef.current;
+        if (!tooltipEl) return;
 
-          const pos = markerIdToPositionRef.current[hoveredId];
-          if (!pos) {
-            tooltipEl.classList.add("hidden");
-            return;
-          }
+        // Hide if not on chart
+        if (!param?.point) {
+          tooltipEl.classList.add("hidden");
+          return;
+        }
 
+        const hoveredId = param.hoveredObjectId as string | undefined;
+        if (!hoveredId) {
+          tooltipEl.classList.add("hidden");
+          return;
+        }
+
+        // Closed position tooltip
+        const pos = markerIdToPositionRef.current[hoveredId];
+        if (pos) {
           // Build tooltip content
           const isProfit = pos.realizedPnl >= 0;
           const dateStr = new Date(pos.timestamp * 1000).toLocaleString();
@@ -274,39 +334,82 @@ export function UserPnlChart({
               </div>
             </div>
           `;
-
-          // Position tooltip relative to container
-          const container = chartContainerRef.current!;
-          const containerRect = container.getBoundingClientRect();
-          // param.point is relative to the chart pane
-          const margin = 12;
-          let left = param.point.x + margin;
-          let top = param.point.y + margin;
-
-          // Pre-display to measure
-          tooltipEl.style.left = "0px";
-          tooltipEl.style.top = "0px";
-          tooltipEl.classList.remove("hidden");
-          const tooltipRect = tooltipEl.getBoundingClientRect();
-
-          if (left + tooltipRect.width > containerRect.width) {
-            left = Math.max(0, param.point.x - tooltipRect.width - margin);
+        } else {
+          // Analytics tooltip
+          const am = markerIdToAnalyticsRef.current[hoveredId];
+          if (!am) {
+            tooltipEl.classList.add("hidden");
+            return;
           }
-          if (top + tooltipRect.height > containerRect.height) {
-            top = Math.max(0, param.point.y - tooltipRect.height - margin);
+          const dateStr = new Date(am.t * 1000).toLocaleString();
+          if (am.kind === "swing") {
+            const isUp = am.direction === "up";
+            const deltaStr =
+              am.delta !== undefined
+                ? `${isUp ? "+" : ""}${formatCurrency(am.delta, 2)}`
+                : "";
+            tooltipEl.innerHTML = `
+              <div class="flex flex-col gap-1">
+                <div class="font-medium">PnL Swing ${am.severity === "extreme" ? "(extreme)" : ""}</div>
+                <div class="text-[11px] text-zinc-300">${dateStr}</div>
+                <div class="mt-1 grid grid-cols-2 gap-x-3 gap-y-1">
+                  <div class="text-zinc-400">Direction</div>
+                  <div class="text-zinc-100 text-right">${isUp ? "Up" : "Down"}</div>
+                  <div class="text-zinc-400">Change</div>
+                  <div class="text-zinc-100 text-right">${deltaStr}</div>
+                </div>
+              </div>
+            `;
+          } else {
+            const cnt = am.tradesCount ?? 0;
+            const ntoStr =
+              am.notional !== undefined ? formatCurrency(am.notional, 2) : "-";
+            tooltipEl.innerHTML = `
+              <div class="flex flex-col gap-1">
+                <div class="font-medium">Trade Activity</div>
+                <div class="text-[11px] text-zinc-300">${dateStr}</div>
+                <div class="mt-1 grid grid-cols-2 gap-x-3 gap-y-1">
+                  <div class="text-zinc-400">Trades</div>
+                  <div class="text-zinc-100 text-right">${cnt}</div>
+                  <div class="text-zinc-400">Notional</div>
+                  <div class="text-zinc-100 text-right">${ntoStr}</div>
+                </div>
+              </div>
+            `;
           }
+        }
 
-          tooltipEl.style.left = `${left}px`;
-          tooltipEl.style.top = `${top}px`;
-        };
+        // Position tooltip relative to container
+        const container = chartContainerRef.current!;
+        const containerRect = container.getBoundingClientRect();
+        // param.point is relative to the chart pane
+        const margin = 12;
+        let left = param.point.x + margin;
+        let top = param.point.y + margin;
 
-        crosshairHandlerRef.current = handler;
-        chartRef.current.subscribeCrosshairMove(handler);
-      }
+        // Pre-display to measure
+        tooltipEl.style.left = "0px";
+        tooltipEl.style.top = "0px";
+        tooltipEl.classList.remove("hidden");
+        const tooltipRect = tooltipEl.getBoundingClientRect();
+
+        if (left + tooltipRect.width > containerRect.width) {
+          left = Math.max(0, param.point.x - tooltipRect.width - margin);
+        }
+        if (top + tooltipRect.height > containerRect.height) {
+          top = Math.max(0, param.point.y - tooltipRect.height - margin);
+        }
+
+        tooltipEl.style.left = `${left}px`;
+        tooltipEl.style.top = `${top}px`;
+      };
+
+      crosshairHandlerRef.current = handler;
+      chartRef.current.subscribeCrosshairMove(handler);
 
       chartRef.current.timeScale().fitContent();
     }
-  }, [data, closedPositions]);
+  }, [data, closedPositions, analyticsMarkers]);
 
   if (error) {
     return (

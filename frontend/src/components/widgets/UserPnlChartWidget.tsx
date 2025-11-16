@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import { useUserPnlQuery, UserPnlInterval } from "@/lib/queries/user-pnl.query";
+import { UserPnlInterval } from "@/lib/queries/user-pnl.query";
+import { useUserPnlWithMarkersQuery } from "@/lib/queries/user-pnl-markers.query";
 import { useClosedPositionsInfiniteQuery } from "@/lib/queries/closed-positions.query";
 import { UserPnlChart } from "./UserPnlChart";
 import { formatCompactCurrency } from "@/lib/ui/format.utils";
@@ -31,24 +32,27 @@ export function UserPnlChartWidget({ userId }: { userId: string }) {
   const [interval, setInterval] = useState<UserPnlInterval>("1w");
   const [minSize, setMinSize] = useState<number>(500);
   const isMounted = useIsMounted();
-  const { data, isLoading, error } = useUserPnlQuery(userId, interval);
+  const { data, isLoading, error } = useUserPnlWithMarkersQuery(
+    userId,
+    interval
+  );
 
   // Fetch closed positions
   const { data: closedPositionsData } = useClosedPositionsInfiniteQuery(userId);
 
   const chartData =
-    data?.map((item) => ({
+    data?.points.map((item) => ({
       time: item.t,
       value: item.p,
     })) || [];
 
   // Filter closed positions to only those within the chart time range and above minimum size
   const filteredClosedPositions = useMemo(() => {
-    if (!closedPositionsData || !data || data.length === 0) return [];
+    if (!closedPositionsData || !data || data.points.length === 0) return [];
 
     const allClosedPositions = closedPositionsData.pages.flat();
-    const minTime = data[0].t;
-    const maxTime = data[data.length - 1].t;
+    const minTime = data.points[0].t;
+    const maxTime = data.points[data.points.length - 1].t;
 
     return allClosedPositions.filter((position) => {
       const inTimeRange =
@@ -58,7 +62,8 @@ export function UserPnlChartWidget({ userId }: { userId: string }) {
     });
   }, [closedPositionsData, data, minSize]);
 
-  const currentPnl = data && data.length > 0 ? data[data.length - 1].p : 0;
+  const currentPnl =
+    data && data.points.length > 0 ? data.points[data.points.length - 1].p : 0;
   const isPositive = currentPnl >= 0;
 
   if (!isMounted) {
@@ -138,6 +143,7 @@ export function UserPnlChartWidget({ userId }: { userId: string }) {
         <UserPnlChart
           data={chartData}
           closedPositions={filteredClosedPositions}
+          analyticsMarkers={data?.markers || []}
           isLoading={isLoading}
           error={error}
         />
