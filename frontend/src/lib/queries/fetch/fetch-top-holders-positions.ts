@@ -30,7 +30,9 @@ export async function fetchTopHoldersPositions(
             const status = (error as any)?.status;
             if (status === 429) {
               rateLimited = true;
-              // Cancel all remaining queued tasks; running tasks will complete
+              // Pause queue to prevent new tasks from starting
+              queue.pause();
+              // Clear all pending tasks
               queue.clear();
               throw error;
             }
@@ -46,6 +48,9 @@ export async function fetchTopHoldersPositions(
     );
   } catch (error) {
     if (rateLimited) {
+      // Ensure queue is paused and cleared (in case multiple 429s occurred)
+      queue.pause();
+      queue.clear();
       // Propagate the error so callers can keep previous data (React Query) or handle gracefully
       throw error;
     }
