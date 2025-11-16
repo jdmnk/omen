@@ -223,7 +223,7 @@ async def get_user_pnl_with_markers(
     """
     try:
         result = await build_user_pnl_and_markers(
-            user_address=user_address, interval=interval, max_trades=1000
+            user_address=user_address, interval=interval, max_trades=5000
         )
         # Map raw dicts to response models
         points = [PnlPoint(t=int(p["t"]), p=float(p["p"])) for p in result["points"]]
