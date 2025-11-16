@@ -97,7 +97,6 @@ function buildMarketDetailsHtml(markets?: MarkerMarketInfo[]): string {
   }
 
   const sections = markets
-    .slice(0, 2)
     .map((market) => {
       const title = market.title ?? "Market";
       const outcome = market.outcome ? `∙ ${market.outcome}` : "";
@@ -135,7 +134,7 @@ function buildTradeDetailsHtml(trades?: MarkerTradeInfo[]): string {
     return "";
   }
   const sections = trades
-    .slice(0, 3)
+    // .slice(0, 3)
     .map((trade, idx) => {
       const side = (trade.side ?? "").toUpperCase();
       const sideClass = side === "BUY" ? "text-emerald-400" : "text-red-400";
@@ -145,7 +144,7 @@ function buildTradeDetailsHtml(trades?: MarkerTradeInfo[]): string {
       const sizeStr = formatNumber(sizeValue, sizeValue >= 1 ? 0 : 2);
       const priceCents =
         trade.price !== undefined && trade.price !== null
-          ? `${Math.round(trade.price * 100)}¢`
+          ? `${(trade.price * 100).toFixed(0)}¢`
           : "-";
       const fallbackNotional = (trade.size ?? 0) * (trade.price ?? 0);
       const notional = trade.notional ?? fallbackNotional;
@@ -154,16 +153,18 @@ function buildTradeDetailsHtml(trades?: MarkerTradeInfo[]): string {
         trade.title ?? (outcome ? `${side} ${outcome}` : `Trade #${idx + 1}`);
 
       return `
-        <div class="border-t border-zinc-800 pt-1 text-[11px] space-y-0.5">
+        <div class="border-t border-zinc-800 pt-1 text-[11px] flex flex-col gap-1">
           <div class="flex items-center justify-between gap-2">
-            <span class="${sideClass} font-semibold">${side || "TRADE"}</span>
-            <span class="text-zinc-100">${sizeStr}${
+            <span>  
+              <span class="${sideClass} font-semibold">${side || "TRADE"}</span>
+              <span class="text-zinc-100">${sizeStr}${
         outcome ? ` ${outcome}` : ""
       } @ ${priceCents}</span>
+            </span>
+            <span>${notionalStr}</span>
           </div>
           <div class="flex items-center justify-between text-zinc-400 gap-2">
             <span class="truncate">${label}</span>
-            <span>${notionalStr}</span>
           </div>
         </div>
       `;
@@ -366,7 +367,7 @@ export function UserPnlChart({
         }
         const dateStr = new Date(am.t * 1000).toLocaleString();
         const marketsHtml = buildMarketDetailsHtml(am.markets ?? undefined);
-        // const tradesHtml = buildTradeDetailsHtml(am.trades ?? undefined);
+        const tradesHtml = buildTradeDetailsHtml(am.trades ?? undefined);
         if (am.kind === "swing") {
           const isUp = am.direction === "up";
           const directionLabel = isUp ? "UP" : "DOWN";
@@ -385,7 +386,7 @@ export function UserPnlChart({
                 <span class="text-zinc-100">${deltaStr}</span>
               </div>
               ${marketsHtml}
-              
+              ${tradesHtml}              
             </div>
           `;
         } else {
@@ -404,7 +405,7 @@ export function UserPnlChart({
                 <span>${cnt} trades</span>
               </div>
               ${marketsHtml}
-              
+              ${tradesHtml}              
             </div>
           `;
         }
