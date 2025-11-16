@@ -26,6 +26,7 @@ export function useUserPnlWithMarkersQuery(
       data.markers.sort((a, b) => a.t - b.t);
       return data;
     },
-    staleTime: 60_000,
+    staleTime: 120_000,
+    retry: 1,
   });
 }
