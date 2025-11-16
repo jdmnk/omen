@@ -222,6 +222,12 @@ async def get_user_pnl_with_markers(
     Returns user PnL points and chart-aligned markers (swings and trade clusters).
     """
     try:
+        cache_key = f"user-pnl-markers:{user_address}:{interval}"
+        cached = redis_client.get(cache_key)
+        if cached is not None:
+            logger.info("Cache hit for %s", cache_key)
+            return PnlWithMarkersResponse(**cached)
+
         result = await build_user_pnl_and_markers(
             user_address=user_address, interval=interval, max_trades=5000
         )
@@ -241,7 +247,9 @@ async def get_user_pnl_with_markers(
             )
             for m in result["markers"]
         ]
-        return PnlWithMarkersResponse(points=points, markers=markers)
+        response = PnlWithMarkersResponse(points=points, markers=markers)
+        redis_client.set(cache_key, response.model_dump(), expiry_seconds=300)
+        return response
     except Exception as exc:
         logger.error(f"Error in get_user_pnl_with_markers: {exc!s}", exc_info=True)
         raise HTTPException(status_code=500, detail=f"Internal server error: {exc!s}") from exc
