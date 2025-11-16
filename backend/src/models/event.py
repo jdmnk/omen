@@ -1,8 +1,22 @@
 from __future__ import annotations
 
 from pydantic import BaseModel
+from sqlalchemy import Boolean, String
+from sqlalchemy.dialects.postgresql import JSONB
+from sqlalchemy.orm import Mapped, mapped_column
 
+from src.models.base import Base
 from src.models.market import Market, parse_market_from_api
+
+
+class EventDB(Base):
+    __tablename__ = "events"
+
+    id: Mapped[str] = mapped_column(String, primary_key=True)
+    slug: Mapped[str] = mapped_column(String, nullable=False)
+    title: Mapped[str] = mapped_column(String, nullable=False)
+    closed: Mapped[bool] = mapped_column(Boolean, nullable=False)
+    markets: Mapped[list[Market]] = mapped_column(JSONB, nullable=False)
 
 
 class Event(BaseModel):
