@@ -1,4 +1,5 @@
 import asyncio
+import time
 
 from src.db.inserts import InsertsClient
 from src.models.price_history import PriceHistory
@@ -11,6 +12,7 @@ quiet_httpx_logging()
 
 
 async def main() -> None:
+    start_time = time.time()
     poly_client = PolyClient()
     poly_client_prices = PolyClientPrices()
     inserts = InsertsClient()
@@ -44,6 +46,9 @@ async def main() -> None:
 
     inserted_price_histories = await inserts.insert_price_histories(price_histories)
     logger.info("Inserted/updated %d price histories", inserted_price_histories)
+
+    duration = time.time() - start_time
+    logger.info("Total execution time: %.2f seconds", duration)
 
 
 if __name__ == "__main__":
