@@ -16,7 +16,11 @@ import {
   ISeriesMarkersPluginApi,
 } from "lightweight-charts";
 import { Spinner } from "@/components/ui/spinner";
-import { formatCompactCurrency, formatCurrency } from "@/lib/ui/format.utils";
+import {
+  formatCompactCurrency,
+  formatCurrency,
+  formatNumber,
+} from "@/lib/ui/format.utils";
 import { cn } from "@/lib/utils";
 import { areaSeriesBaseOptions } from "@/lib/ui/chart.config";
 import type {
@@ -93,16 +97,11 @@ function buildMarketDetailsHtml(markets?: MarkerMarketInfo[]): string {
   }
 
   const sections = markets
+    .slice(0, 2)
     .map((market) => {
       const title = market.title ?? "Market";
-      const outcomeLine = market.outcome
-        ? `<div class="text-[11px] text-zinc-400">Outcome: ${market.outcome}</div>`
-        : "";
+      const outcome = market.outcome ? `∙ ${market.outcome}` : "";
       const tradesCount = market.tradesCount ?? 0;
-      const sizeStr =
-        market.totalSize !== undefined && market.totalSize !== null
-          ? sizeFormatter.format(market.totalSize)
-          : "-";
       let avgPriceStr = "-";
       if (market.avgPrice !== undefined && market.avgPrice !== null) {
         const truncated = Math.trunc(market.avgPrice * 100) / 100;
@@ -110,78 +109,68 @@ function buildMarketDetailsHtml(markets?: MarkerMarketInfo[]): string {
       }
       const notionalStr =
         market.notional !== undefined && market.notional !== null
-          ? formatCurrency(market.notional, 2)
+          ? formatCompactCurrency(market.notional, 2)
           : "-";
-      const side = market.side ?? "-";
 
       return `
-        <div class="border-t border-zinc-800 pt-2">
-          <div class="text-[12px] font-medium text-zinc-100">${title}</div>
-          ${outcomeLine}
-          <div class="mt-1 grid grid-cols-2 gap-x-3 gap-y-1 text-[11px]">
-            <div class="text-zinc-400">Trades</div>
-            <div class="text-right text-zinc-100">${tradesCount}</div>
-            <div class="text-zinc-400">Size</div>
-            <div class="text-right text-zinc-100">${sizeStr}</div>
-            <div class="text-zinc-400">Avg Price</div>
-            <div class="text-right text-zinc-100">${avgPriceStr}</div>
-            <div class="text-zinc-400">Notional</div>
-            <div class="text-right text-zinc-100">${notionalStr}</div>
-            <div class="text-zinc-400">Last Side</div>
-            <div class="text-right text-zinc-100">${side}</div>
+        <div class="flex flex-col gap-0.5 border-t border-zinc-800 pt-1 text-[11px]">
+          <div class="flex items-center justify-between gap-2">
+            <span class="text-zinc-100 font-medium truncate">${title}</span>
+            <span class="text-zinc-400">${notionalStr}</span>
+          </div>
+          <div class="flex items-center justify-between text-zinc-400">
+            <span>${tradesCount} trades ${outcome}</span>
+            <span>${avgPriceStr}</span>
           </div>
         </div>
       `;
     })
     .join("");
 
-  return `<div class="mt-2 flex flex-col gap-2">${sections}</div>`;
+  return `<div class="mt-2 flex flex-col gap-1">${sections}</div>`;
 }
 
-// Not currently used
 function buildTradeDetailsHtml(trades?: MarkerTradeInfo[]): string {
   if (!trades || trades.length === 0) {
     return "";
   }
   const sections = trades
+    .slice(0, 3)
     .map((trade, idx) => {
-      const title =
-        trade.title ??
-        (trade.outcome ? `Trade: ${trade.outcome}` : `Trade #${idx + 1}`);
-      const outcome = trade.outcome ? ` (${trade.outcome})` : "";
-      const side = trade.side ?? "-";
-      const sizeStr =
-        trade.size !== undefined && trade.size !== null
-          ? sizeFormatter.format(trade.size)
-          : "-";
-      const priceStr =
+      const side = (trade.side ?? "").toUpperCase();
+      const sideClass = side === "BUY" ? "text-emerald-400" : "text-red-400";
+      const outcome = trade.outcome ?? "";
+      const sizeValue =
+        trade.size !== undefined && trade.size !== null ? trade.size : 0;
+      const sizeStr = formatNumber(sizeValue, sizeValue >= 1 ? 0 : 2);
+      const priceCents =
         trade.price !== undefined && trade.price !== null
-          ? formatCurrency(trade.price, 2)
+          ? `${Math.round(trade.price * 100)}¢`
           : "-";
-      const notionalStr =
-        trade.notional !== undefined && trade.notional !== null
-          ? formatCurrency(trade.notional, 2)
-          : "-";
+      const fallbackNotional = (trade.size ?? 0) * (trade.price ?? 0);
+      const notional = trade.notional ?? fallbackNotional;
+      const notionalStr = formatCompactCurrency(notional ?? 0, 2);
+      const label =
+        trade.title ?? (outcome ? `${side} ${outcome}` : `Trade #${idx + 1}`);
 
       return `
-        <div class="border-t border-zinc-800 pt-2">
-          <div class="text-[12px] font-medium text-zinc-100">${title}${outcome}</div>
-          <div class="mt-1 grid grid-cols-2 gap-x-3 gap-y-1 text-[11px]">
-            <div class="text-zinc-400">Side</div>
-            <div class="text-right text-zinc-100">${side}</div>
-            <div class="text-zinc-400">Size</div>
-            <div class="text-right text-zinc-100">${sizeStr}</div>
-            <div class="text-zinc-400">Price</div>
-            <div class="text-right text-zinc-100">${priceStr}</div>
-            <div class="text-zinc-400">Notional</div>
-            <div class="text-right text-zinc-100">${notionalStr}</div>
+        <div class="border-t border-zinc-800 pt-1 text-[11px] space-y-0.5">
+          <div class="flex items-center justify-between gap-2">
+            <span class="${sideClass} font-semibold">${side || "TRADE"}</span>
+            <span class="text-zinc-100">${sizeStr}${
+        outcome ? ` ${outcome}` : ""
+      } @ ${priceCents}</span>
+          </div>
+          <div class="flex items-center justify-between text-zinc-400 gap-2">
+            <span class="truncate">${label}</span>
+            <span>${notionalStr}</span>
           </div>
         </div>
       `;
     })
     .join("");
 
-  return `<div class="mt-2 flex flex-col gap-2">${sections}</div>`;
+  return `<div class="mt-2 flex flex-col gap-1">${sections}</div>`;
 }
 
 export function UserPnlChart({
@@ -380,38 +369,42 @@ export function UserPnlChart({
         // const tradesHtml = buildTradeDetailsHtml(am.trades ?? undefined);
         if (am.kind === "swing") {
           const isUp = am.direction === "up";
+          const directionLabel = isUp ? "UP" : "DOWN";
+          const directionClass = isUp ? "text-emerald-400" : "text-red-400";
           const deltaStr = am.delta
-            ? `${isUp ? "+" : ""}${formatCurrency(am.delta, 2)}`
+            ? `${isUp ? "+" : ""}${formatCompactCurrency(am.delta, 2)}`
             : "";
           tooltipEl.innerHTML = `
-            <div class="flex flex-col gap-1">
-              <div class="font-medium">PnL Swing</div>
-              <div class="text-[11px] text-zinc-300">${dateStr}</div>
-              <div class="mt-1 grid grid-cols-2 gap-x-3 gap-y-1">
-                <div class="text-zinc-400">Direction</div>
-                <div class="text-zinc-100 text-right">${
-                  isUp ? "Up" : "Down"
-                }</div>
-                <div class="text-zinc-400">Change</div>
-                <div class="text-zinc-100 text-right">${deltaStr}</div>
+            <div class="flex flex-col gap-1 text-[11px]">
+              <div class="flex items-center justify-between">
+                <span class="font-semibold text-zinc-100">PnL Swing</span>
+                <span class="${directionClass} font-semibold">${directionLabel}</span>
+              </div>
+              <div class="flex items-center justify-between text-zinc-400">
+                <span>${dateStr}</span>
+                <span class="text-zinc-100">${deltaStr}</span>
               </div>
               ${marketsHtml}
+              
             </div>
           `;
         } else {
           const cnt = am.tradesCount ?? 0;
-          const ntoStr = am.notional ? formatCurrency(am.notional, 2) : "-";
+          const ntoStr = am.notional
+            ? formatCompactCurrency(am.notional, 2)
+            : "-";
           tooltipEl.innerHTML = `
-            <div class="flex flex-col gap-1">
-              <div class="font-medium">Trade Activity</div>
-              <div class="text-[11px] text-zinc-300">${dateStr}</div>
-              <div class="mt-1 grid grid-cols-2 gap-x-3 gap-y-1">
-                <div class="text-zinc-400">Trades</div>
-                <div class="text-zinc-100 text-right">${cnt}</div>
-                <div class="text-zinc-400">Notional</div>
-                <div class="text-zinc-100 text-right">${ntoStr}</div>
+            <div class="flex flex-col gap-1 text-[11px]">
+              <div class="flex items-center justify-between">
+                <span class="font-semibold text-zinc-100">Trade Cluster</span>
+                <span class="text-sky-300 font-semibold">${ntoStr}</span>
+              </div>
+              <div class="flex items-center justify-between text-zinc-400">
+                <span>${dateStr}</span>
+                <span>${cnt} trades</span>
               </div>
               ${marketsHtml}
+              
             </div>
           `;
         }
