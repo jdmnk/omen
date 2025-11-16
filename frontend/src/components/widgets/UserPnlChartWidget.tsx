@@ -24,8 +24,7 @@ export function UserPnlChartWidget({ userId }: { userId: string }) {
   const isMounted = useIsMounted();
   const { data, isLoading, error } = useUserPnlWithMarkersQuery(
     userId,
-    interval,
-    500
+    interval
   );
 
   const chartData =
