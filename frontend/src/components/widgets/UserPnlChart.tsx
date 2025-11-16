@@ -387,11 +387,9 @@ export function UserPnlChart({
             <div class="flex flex-col gap-1 text-[11px]">
               <div class="flex items-center justify-between">
                 <span class="font-semibold text-zinc-100">PnL Swing</span>
-                <span class="${directionClass} font-semibold">${directionLabel}</span>
+                <span class="${directionClass} font-semibold">${deltaStr}</span>
               </div>
-              <div class="flex items-center justify-between text-zinc-400">
-                <span class="text-zinc-100 self-end">${deltaStr}</span>
-              </div>
+
               ${marketsHtml}
               ${tradesHtml}              
             </div>
