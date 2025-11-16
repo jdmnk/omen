@@ -103,10 +103,11 @@ function buildMarketDetailsHtml(markets?: MarkerMarketInfo[]): string {
         market.totalSize !== undefined && market.totalSize !== null
           ? sizeFormatter.format(market.totalSize)
           : "-";
-      const avgPriceStr =
-        market.avgPrice !== undefined && market.avgPrice !== null
-          ? formatCurrency(market.avgPrice, 2)
-          : "-";
+      let avgPriceStr = "-";
+      if (market.avgPrice !== undefined && market.avgPrice !== null) {
+        const truncated = Math.trunc(market.avgPrice * 100) / 100;
+        avgPriceStr = formatCurrency(truncated, 2);
+      }
       const notionalStr =
         market.notional !== undefined && market.notional !== null
           ? formatCurrency(market.notional, 2)
