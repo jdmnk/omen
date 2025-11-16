@@ -95,7 +95,7 @@ export function UserProfile({ userId }: { userId: string }) {
               Closed Positions
             </TabsTrigger>
             <TabsTrigger value="trades" className="uppercase">
-              Top Trades
+              Recent Trades
             </TabsTrigger>
           </TabsList>
 

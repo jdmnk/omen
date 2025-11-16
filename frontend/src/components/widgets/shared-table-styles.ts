@@ -1,8 +1,3 @@
-/**
- * Shared table styling constants for user profile tables
- * (Positions, Closed Positions, Top Trades)
- */
-
 export const TABLE_HEADER_CLASSES = "text-xs text-brand-foreground font-bold";
 
 export const TABLE_ROW_CLASSES = "py-2 text-xs hover:bg-muted/20";
