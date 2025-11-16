@@ -130,7 +130,7 @@ class PolyClient:
         exclude_tag_ids: list[int] | None = None,
         count: int | None = None,
         api_params: dict | None = None,
-    ) -> list[dict]:
+    ) -> list[Market]:
         limit = 500
         offset = 0
         all_events = []
@@ -179,14 +179,20 @@ class PolyClient:
             logger.error(traceback.format_exc())
             raise exc
 
-        markets = []
+        markets: list[Market] = []
 
         for event in all_events:
             for market in event["markets"]:
-                if market["closed"] or market["closed"] == "true":
-                    print("found a closed market in open event: ", market["question"])
+                # Skip closed markets
+                if market.get("closed") or market.get("closed") == "true":
                     continue
-                markets.append(market)
+                parsed = parse_market_from_api(market)
+                if parsed is None:
+                    continue
+                # Double-check closed flag after parsing
+                if parsed.closed:
+                    continue
+                markets.append(parsed)
 
         logger.info(
             f"Finished fetching {len(all_events)} active events, found {len(markets)} markets"
