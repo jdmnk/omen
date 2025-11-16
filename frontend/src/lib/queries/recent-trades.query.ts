@@ -1,6 +1,10 @@
 "use client";
 
-import { keepPreviousData, useQuery, useInfiniteQuery } from "@tanstack/react-query";
+import {
+  keepPreviousData,
+  useQuery,
+  useInfiniteQuery,
+} from "@tanstack/react-query";
 import { Trade } from "../models/api.models";
 import { DATA_API_HOST } from "../api.const";
 
@@ -24,6 +28,7 @@ export function useRecentTradesQuery(
       url.searchParams.set("offset", "0");
       url.searchParams.set("filterType", "CASH");
       url.searchParams.set("filterAmount", (minAmount || 10).toString());
+      url.searchParams.set("takerOnly", "false");
       const response = await fetch(url.toString());
 
       if (!response.ok) {
@@ -57,10 +62,13 @@ export function useRecentTradesInfiniteQuery(
         url.searchParams.set("user", user);
       }
       url.searchParams.set("limit", PAGE_SIZE.toString());
-      url.searchParams.set("offset", ((pageParam as number) * PAGE_SIZE).toString());
+      url.searchParams.set(
+        "offset",
+        ((pageParam as number) * PAGE_SIZE).toString()
+      );
       url.searchParams.set("filterType", "CASH");
       url.searchParams.set("filterAmount", (minAmount || 10).toString());
-      
+
       const response = await fetch(url.toString());
 
       if (!response.ok) {
