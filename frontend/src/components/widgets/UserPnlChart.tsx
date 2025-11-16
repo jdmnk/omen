@@ -19,11 +19,15 @@ import { Spinner } from "@/components/ui/spinner";
 import { formatCompactCurrency, formatCurrency } from "@/lib/ui/format.utils";
 import { cn } from "@/lib/utils";
 import { areaSeriesBaseOptions } from "@/lib/ui/chart.config";
-import type { MarkerMarketInfo } from "@/lib/queries/user-pnl-markers.query";
+import type {
+  MarkerMarketInfo,
+  MarkerTradeInfo,
+  PnlMarker,
+} from "@/lib/models/api.models";
 
 type UserPnlChartProps = {
   data: ChartPoint[];
-  analyticsMarkers?: AnalyticsMarker[];
+  analyticsMarkers?: PnlMarker[];
   error?: Error | null;
   isLoading?: boolean;
 };
@@ -77,17 +81,6 @@ const chartOptions: DeepPartial<ChartOptions> = {
 type ChartPoint = {
   time: string | number;
   value: number;
-};
-
-type AnalyticsMarker = {
-  t: number;
-  kind: "swing" | "trade_cluster";
-  delta?: number;
-  direction?: "up" | "down";
-  severity?: "large" | "extreme";
-  tradesCount?: number;
-  notional?: number;
-  markets?: MarkerMarketInfo[];
 };
 
 const sizeFormatter = new Intl.NumberFormat("en-US", {
@@ -144,6 +137,52 @@ function buildMarketDetailsHtml(markets?: MarkerMarketInfo[]): string {
   return `<div class="mt-2 flex flex-col gap-2">${sections}</div>`;
 }
 
+// Not currently used
+function buildTradeDetailsHtml(trades?: MarkerTradeInfo[]): string {
+  if (!trades || trades.length === 0) {
+    return "";
+  }
+  const sections = trades
+    .map((trade, idx) => {
+      const title =
+        trade.title ??
+        (trade.outcome ? `Trade: ${trade.outcome}` : `Trade #${idx + 1}`);
+      const outcome = trade.outcome ? ` (${trade.outcome})` : "";
+      const side = trade.side ?? "-";
+      const sizeStr =
+        trade.size !== undefined && trade.size !== null
+          ? sizeFormatter.format(trade.size)
+          : "-";
+      const priceStr =
+        trade.price !== undefined && trade.price !== null
+          ? formatCurrency(trade.price, 2)
+          : "-";
+      const notionalStr =
+        trade.notional !== undefined && trade.notional !== null
+          ? formatCurrency(trade.notional, 2)
+          : "-";
+
+      return `
+        <div class="border-t border-zinc-800 pt-2">
+          <div class="text-[12px] font-medium text-zinc-100">${title}${outcome}</div>
+          <div class="mt-1 grid grid-cols-2 gap-x-3 gap-y-1 text-[11px]">
+            <div class="text-zinc-400">Side</div>
+            <div class="text-right text-zinc-100">${side}</div>
+            <div class="text-zinc-400">Size</div>
+            <div class="text-right text-zinc-100">${sizeStr}</div>
+            <div class="text-zinc-400">Price</div>
+            <div class="text-right text-zinc-100">${priceStr}</div>
+            <div class="text-zinc-400">Notional</div>
+            <div class="text-right text-zinc-100">${notionalStr}</div>
+          </div>
+        </div>
+      `;
+    })
+    .join("");
+
+  return `<div class="mt-2 flex flex-col gap-2">${sections}</div>`;
+}
+
 export function UserPnlChart({
   data,
   analyticsMarkers = [],
@@ -155,7 +194,7 @@ export function UserPnlChart({
   const seriesRef = useRef<ISeriesApi<"Area"> | null>(null);
   const analyticsMarkersPluginRef =
     useRef<ISeriesMarkersPluginApi<Time> | null>(null);
-  const markerIdToAnalyticsRef = useRef<Record<string, AnalyticsMarker>>({});
+  const markerIdToAnalyticsRef = useRef<Record<string, PnlMarker>>({});
   const crosshairHandlerRef = useRef<((param: any) => void) | null>(null);
   const tooltipRef = useRef<HTMLDivElement | null>(null);
 
@@ -266,7 +305,7 @@ export function UserPnlChart({
 
       // Create markers for analytics (swing/trade clusters)
       if (analyticsMarkers && analyticsMarkers.length > 0) {
-        const idToAnalytics: Record<string, AnalyticsMarker> = {};
+        const idToAnalytics: Record<string, PnlMarker> = {};
         const markers: SeriesMarker<Time>[] = analyticsMarkers.map(
           (mk, idx) => {
             const id = `am-${mk.t}-${idx}`;
@@ -275,7 +314,7 @@ export function UserPnlChart({
               const isUp = mk.direction === "up";
               const color = isUp ? "#22c55e" : "#ef4444";
               const text =
-                (mk.delta !== undefined
+                (mk.delta
                   ? `${isUp ? "+" : ""}${formatCompactCurrency(mk.delta)}`
                   : "") +
                 (mk.severity ? ` ${mk.severity === "extreme" ? "!" : ""}` : "");
@@ -336,13 +375,13 @@ export function UserPnlChart({
           return;
         }
         const dateStr = new Date(am.t * 1000).toLocaleString();
-        const marketsHtml = buildMarketDetailsHtml(am.markets);
+        const marketsHtml = buildMarketDetailsHtml(am.markets ?? undefined);
+        // const tradesHtml = buildTradeDetailsHtml(am.trades ?? undefined);
         if (am.kind === "swing") {
           const isUp = am.direction === "up";
-          const deltaStr =
-            am.delta !== undefined
-              ? `${isUp ? "+" : ""}${formatCurrency(am.delta, 2)}`
-              : "";
+          const deltaStr = am.delta
+            ? `${isUp ? "+" : ""}${formatCurrency(am.delta, 2)}`
+            : "";
           tooltipEl.innerHTML = `
             <div class="flex flex-col gap-1">
               <div class="font-medium">PnL Swing ${
@@ -362,8 +401,7 @@ export function UserPnlChart({
           `;
         } else {
           const cnt = am.tradesCount ?? 0;
-          const ntoStr =
-            am.notional !== undefined ? formatCurrency(am.notional, 2) : "-";
+          const ntoStr = am.notional ? formatCurrency(am.notional, 2) : "-";
           tooltipEl.innerHTML = `
             <div class="flex flex-col gap-1">
               <div class="font-medium">Trade Activity</div>

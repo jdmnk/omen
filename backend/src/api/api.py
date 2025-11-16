@@ -238,6 +238,7 @@ async def get_user_pnl_with_markers(
                 tradesCount=m.get("tradesCount"),
                 notional=m.get("notional"),
                 markets=m.get("markets"),
+                trades=m.get("trades"),
             )
             for m in result["markers"]
         ]

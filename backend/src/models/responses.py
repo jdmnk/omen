@@ -37,6 +37,7 @@ class PnlMarker(BaseModel):
     tradesCount: int | None = None
     notional: float | None = None
     markets: list["MarkerMarketInfo"] | None = None
+    trades: list["MarkerTradeInfo"] | None = None
 
 
 class MarkerMarketInfo(BaseModel):
@@ -47,6 +48,17 @@ class MarkerMarketInfo(BaseModel):
     avgPrice: float | None = None
     notional: float | None = None
     side: str | None = None
+
+
+class MarkerTradeInfo(BaseModel):
+    hash: str | None = None
+    title: str | None = None
+    outcome: str | None = None
+    side: str | None = None
+    size: float | None = None
+    price: float | None = None
+    notional: float | None = None
+    timestamp: int | None = None
 
 
 class PnlWithMarkersResponse(BaseModel):

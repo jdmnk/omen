@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from bisect import bisect_left
 from typing import Any, Literal, TypedDict
 
 from src.analytics.user_pnl_fetch import fetch_user_pnl_and_trades_basic
@@ -22,6 +23,7 @@ class PnlMarker(TypedDict, total=False):
     notional: float
     # shared optional market details
     markets: list[MarkerMarketInfo]
+    trades: list[MarkerTradeInfo]
 
 
 class MarkerMarketInfo(TypedDict, total=False):
@@ -34,10 +36,22 @@ class MarkerMarketInfo(TypedDict, total=False):
     side: str | None
 
 
+class MarkerTradeInfo(TypedDict, total=False):
+    hash: str
+    title: str | None
+    outcome: str | None
+    side: str | None
+    size: float
+    price: float
+    notional: float
+    timestamp: int
+
+
 class TradeBucketStats(TypedDict, total=False):
     count: int
     notional: float
     markets: list[MarkerMarketInfo]
+    trades: list[MarkerTradeInfo]
 
 
 def _quantile(values: list[float], q: float) -> float:
@@ -60,9 +74,9 @@ def _median(values: list[int]) -> float:
 def _build_trade_bucket_stats(
     trades: list[Trade],
     grid_times: list[int],
-) -> dict[int, TradeBucketStats]:
+) -> tuple[dict[int, TradeBucketStats], int]:
     if not trades or len(grid_times) < 2:
-        return {}
+        return {}, 60
 
     dts = [grid_times[i] - grid_times[i - 1] for i in range(1, len(grid_times))]
     step = max(1, int(_median(dts)))
@@ -85,7 +99,7 @@ def _build_trade_bucket_stats(
 
         entry = bucket_stats.setdefault(
             nearest_t,
-            {"count": 0, "notional": 0.0, "markets": {}},
+            {"count": 0, "notional": 0.0, "markets": {}, "trades": []},
         )
         entry["count"] += 1
         notional = float(tr.size) * float(tr.price)
@@ -113,6 +127,19 @@ def _build_trade_bucket_stats(
         if tr.side:
             market_entry["side"] = tr.side
 
+        entry["trades"].append(
+            {
+                "hash": getattr(tr, "transactionHash", ""),
+                "title": tr.title,
+                "outcome": tr.outcome,
+                "side": tr.side,
+                "size": float(tr.size),
+                "price": float(tr.price),
+                "notional": notional,
+                "timestamp": tt,
+            }
+        )
+
     stats: dict[int, TradeBucketStats] = {}
     for t, entry in bucket_stats.items():
         markets_info: list[MarkerMarketInfo] = []
@@ -134,12 +161,16 @@ def _build_trade_bucket_stats(
             key=lambda m: float(m.get("notional") or 0.0),
             reverse=True,
         )
+        trades_info = sorted(
+            entry.get("trades", []), key=lambda tr: float(tr.get("notional", 0.0)), reverse=True
+        )
         stats[t] = {
             "count": int(entry.get("count", 0)),
             "notional": float(entry.get("notional", 0.0)),
             "markets": markets_info[:3],
+            "trades": trades_info[:5],
         }
-    return stats
+    return stats, step
 
 
 def _compute_swing_markers(points: list[PriceHistoryPoint]) -> list[PnlMarker]:
@@ -178,20 +209,17 @@ def _compute_swing_markers(points: list[PriceHistoryPoint]) -> list[PnlMarker]:
     return candidates[:max_markers]
 
 
-def _aggregate_trade_clusters(
-    grid_times: list[int],
-    bucket_stats: dict[int, TradeBucketStats],
-) -> list[PnlMarker]:
-    if len(grid_times) < 2 or not bucket_stats:
+def _aggregate_trade_clusters(bucket_stats: dict[int, TradeBucketStats]) -> list[PnlMarker]:
+    if not bucket_stats:
         return []
 
-    counts = [int(bucket_stats.get(t, {}).get("count", 0)) for t in grid_times]
-    notionals = [float(bucket_stats.get(t, {}).get("notional", 0.0)) for t in grid_times]
+    counts = [int(stats.get("count", 0)) for stats in bucket_stats.values()]
+    notionals = [float(stats.get("notional", 0.0)) for stats in bucket_stats.values()]
     count_q90 = _quantile([float(c) for c in counts if c > 0], 0.90) if any(counts) else 0.0
     notional_q90 = _quantile([n for n in notionals if n > 0], 0.90) if any(notionals) else 0.0
 
     markers: list[PnlMarker] = []
-    for t in grid_times:
+    for t in sorted(bucket_stats.keys()):
         stats = bucket_stats.get(t)
         if not stats:
             continue
@@ -210,6 +238,9 @@ def _aggregate_trade_clusters(
             markets_info = stats.get("markets")
             if markets_info:
                 marker["markets"] = markets_info
+            trades_info = stats.get("trades")
+            if trades_info:
+                marker["trades"] = trades_info
             markers.append(marker)
 
     # Limit to avoid clutter: top by notional then by count
@@ -220,19 +251,57 @@ def _aggregate_trade_clusters(
     return markers[:20]
 
 
-def _attach_market_info(
+def _find_nearest_bucket_stats(
+    target: int,
+    trade_times: list[int],
+    bucket_stats: dict[int, TradeBucketStats],
+    tolerance: int,
+) -> TradeBucketStats | None:
+    if not trade_times:
+        return None
+    idx = bisect_left(trade_times, target)
+    nearest_candidates: list[int] = []
+    if idx < len(trade_times):
+        nearest_candidates.append(trade_times[idx])
+    if idx > 0:
+        nearest_candidates.append(trade_times[idx - 1])
+    best_time = None
+    best_diff = None
+    for cand in nearest_candidates:
+        diff = abs(cand - target)
+        if diff > tolerance:
+            continue
+        if best_diff is None or diff < best_diff:
+            best_time = cand
+            best_diff = diff
+    if best_time is None:
+        return None
+    return bucket_stats.get(best_time)
+
+
+def _attach_trade_context(
     markers: list[PnlMarker],
     bucket_stats: dict[int, TradeBucketStats],
+    bucket_step: int,
 ) -> None:
     if not markers or not bucket_stats:
         return
+    trade_times = sorted(bucket_stats.keys())
+    tolerance = max(600, bucket_step * 2)
     for marker in markers:
+        if marker.get("markets") and marker.get("trades"):
+            continue
         stats = bucket_stats.get(int(marker["t"]))
         if not stats:
+            stats = _find_nearest_bucket_stats(
+                int(marker["t"]), trade_times, bucket_stats, tolerance
+            )
+        if not stats:
             continue
-        markets_info = stats.get("markets")
-        if markets_info:
-            marker["markets"] = markets_info
+        if not marker.get("markets") and stats.get("markets"):
+            marker["markets"] = stats["markets"]
+        if not marker.get("trades") and stats.get("trades"):
+            marker["trades"] = stats["trades"]
 
 
 class UserPnlWithMarkers(TypedDict):
@@ -272,10 +341,11 @@ async def build_user_pnl_and_markers(
             continue
 
     grid_times = [int(p["t"]) for p in points]
-    bucket_stats = _build_trade_bucket_stats(trades, grid_times)
-    trade_markers = _aggregate_trade_clusters(grid_times, bucket_stats)
-    _attach_market_info(swing_markers, bucket_stats)
+    bucket_stats, bucket_step = _build_trade_bucket_stats(trades, grid_times)
+    trade_markers = _aggregate_trade_clusters(bucket_stats)
 
-    # Merge and sort markers by time; keep both kinds
+    # Merge and sort markers by time; keep both kinds, then attach trade context
     markers = sorted([*swing_markers, *trade_markers], key=lambda m: int(m["t"]))
-    return {"points": points, "markers": markers}
+    _attach_trade_context(markers, bucket_stats, bucket_step)
+    markers_with_trades = [m for m in markers if m.get("trades")]
+    return {"points": points, "markers": markers_with_trades}
