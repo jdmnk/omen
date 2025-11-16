@@ -201,7 +201,11 @@ class PolyClient:
         return markets
 
     async def get_market_trades(
-        self, condition_ids: list[str], min_amount: int = 100, count: int | None = None
+        self,
+        condition_ids: list[str] | None = None,
+        min_amount: int = 100,
+        count: int | None = None,
+        user: str | None = None,
     ) -> list[Trade]:
         """
         Data API /trades: 75 requests / 10s	(Throttle requests over the maximum configured rate)
@@ -225,13 +229,16 @@ class PolyClient:
                     page_limit = min(MAX_LIMIT, remaining)
 
                 params = {
-                    "market": ",".join(condition_ids),  # comma separated list
                     "limit": page_limit,
                     "offset": offset,
                     "filterType": "CASH",
                     "filterAmount": int(min_amount),
                     # "takerOnly": False,
                 }
+                if condition_ids:
+                    params["market"] = ",".join(condition_ids)  # comma separated list
+                if user:
+                    params["user"] = user
                 response = await client.get(f"{DATA_API_HOST}/trades", params=params)
                 trades = response.json()
 

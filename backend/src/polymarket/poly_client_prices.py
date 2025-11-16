@@ -46,6 +46,8 @@ class PriceHistoryApiResponse(TypedDict, total=False):
 
 
 class PolyClientPrices:
+    USER_PNL_HOST = "https://user-pnl-api.polymarket.com"
+
     async def get_market_prices_by_request(
         self, requests: list[PriceRequest]
     ) -> dict[str, dict[str, str]]:
@@ -153,5 +155,56 @@ class PolyClientPrices:
                 return data
         except PolyApiException as exc:
             logger.error(f"get_price_history_for_token: error: {exc}")
+            logger.error(traceback.format_exc())
+            raise exc
+
+    async def get_user_pnl_points(
+        self,
+        user_address: str,
+        *,
+        interval: Literal["12h", "1d", "1w", "1m", "max"] = "1m",
+        fidelity: str | None = None,
+    ) -> list[PriceHistoryPoint]:
+        """
+        Fetch user's PnL time series from Polymarket's user PnL API.
+        Defaults to last month with 12h fidelity to match frontend.
+        """
+        fidelity_map: dict[str, str] = {
+            "12h": "1h",
+            "1d": "1h",
+            "1w": "3h",
+            "1m": "12h",
+            "max": "1d",
+        }
+        final_fidelity = fidelity or fidelity_map.get(interval, "12h")
+        params = {
+            "user_address": user_address,
+            "interval": interval,
+            "fidelity": final_fidelity,
+        }
+        try:
+            async with httpx.AsyncClient() as client:
+                response = await client.get(f"{self.USER_PNL_HOST}/user-pnl", params=params)
+                if response.status_code != 200:
+                    logger.error(
+                        f"get_user_pnl_points: non-200 status {response.status_code}: {response.text}"
+                    )
+                    return []
+                data: list[PriceHistoryPoint] = response.json() or []
+                # Basic normalization: sort asc and drop exact duplicate timestamps
+                data.sort(key=lambda d: d.get("t", 0))
+                deduped: list[PriceHistoryPoint] = []
+                last_t: int | None = None
+                for pt in data:
+                    t = int(pt.get("t", 0))
+                    if last_t is None or t != last_t:
+                        deduped.append({"t": t, "p": float(pt.get("p", 0))})
+                        last_t = t
+                    else:
+                        # replace previous point at same timestamp
+                        deduped[-1] = {"t": t, "p": float(pt.get("p", 0))}
+                return deduped
+        except PolyApiException as exc:
+            logger.error(f"get_user_pnl_points: error: {exc}")
             logger.error(traceback.format_exc())
             raise exc
