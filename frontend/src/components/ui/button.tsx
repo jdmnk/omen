@@ -20,7 +20,9 @@ const buttonVariants = cva(
         ghost: "hover:bg-accent hover:text-accent-foreground",
         link: "text-primary underline-offset-4 hover:underline",
         branded:
-          "bg-gradient-to-r from-[color:var(--brand-primary)] to-[color:var(--brand-highlight)] text-white hover:opacity-90 transition-all duration-200",
+          "bg-gradient-to-r from-brand-primary to-brand-highlight text-white hover:opacity-90 transition-all duration-200",
+        "branded-ghost":
+          "cursor-pointer text-brand-foreground bg-transparent hover:bg-transparent hover:text-brand-foreground/80",
       },
       size: {
         default: "h-9 px-4 py-2",

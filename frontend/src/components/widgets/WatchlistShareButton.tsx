@@ -2,7 +2,6 @@
 
 import { useState, useRef } from "react";
 import { Share2, Copy, Download, Check } from "lucide-react";
-import { cn } from "@/lib/utils";
 import {
   generateWatchlistShareImage,
   shareWatchlistImage,
@@ -23,13 +22,9 @@ import { WatchlistShareImage } from "./WatchlistShareImage";
 
 interface WatchlistShareButtonProps {
   markets: WatchlistMarket[];
-  className?: string;
 }
 
-export function WatchlistShareButton({
-  markets,
-  className,
-}: WatchlistShareButtonProps) {
+export function WatchlistShareButton({ markets }: WatchlistShareButtonProps) {
   const [isGenerating, setIsGenerating] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [shareImageUrl, setShareImageUrl] = useState<string | null>(null);
@@ -91,14 +86,8 @@ export function WatchlistShareButton({
       <Button
         onClick={handleShareClick}
         disabled={isGenerating}
-        variant="ghost"
         size="icon"
-        className={cn(
-          "cursor-pointer",
-          "text-brand-foreground hover:text-brand-highlight",
-          "hover:bg-transparent",
-          className
-        )}
+        variant="branded-ghost"
         aria-label="Share watchlist"
         title="Share watchlist"
       >

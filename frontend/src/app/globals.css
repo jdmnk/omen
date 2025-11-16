@@ -139,8 +139,6 @@
   --sidebar-accent-foreground: oklch(0.985 0 0);
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: oklch(0.556 0 0);
-  --brand-primary: #6322fe;
-  --brand-background-deeper: #0a0514;
 }
 
 @layer base {
