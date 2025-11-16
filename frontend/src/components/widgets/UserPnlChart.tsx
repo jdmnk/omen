@@ -110,23 +110,34 @@ function buildMarketDetailsHtml(markets?: MarkerMarketInfo[]): string {
         market.notional !== undefined && market.notional !== null
           ? formatCompactCurrency(market.notional, 2)
           : "-";
+      const sizeStr =
+        market.totalSize !== undefined && market.totalSize !== null
+          ? sizeFormatter.format(market.totalSize)
+          : "";
 
       return `
         <div class="flex flex-col gap-0.5 border-t border-zinc-800 pt-1 text-[11px]">
           <div class="flex items-center justify-between gap-2">
             <span class="text-zinc-100 font-medium truncate">${title}</span>
-            <span class="text-zinc-400">${notionalStr}</span>
+            <span class="text-zinc-400">Volume ${notionalStr}</span>
           </div>
-          <div class="flex items-center justify-between text-zinc-400">
+          <div class="flex items-center justify-between text-zinc-500">
             <span>${tradesCount} trades ${outcome}</span>
+            <span>Avg price</span>
+          </div>
+          <div class="flex items-center justify-between text-zinc-100">
             <span>${avgPriceStr}</span>
+            <span>${sizeStr ? `${sizeStr} size` : ""}</span>
           </div>
         </div>
       `;
     })
     .join("");
 
-  return `<div class="mt-2 flex flex-col gap-1">${sections}</div>`;
+  const note = `<div class="text-[10px] text-zinc-500 uppercase tracking-wide">
+    Top markets in this window
+  </div>`;
+  return `<div class="mt-2 flex flex-col gap-1">${note}${sections}</div>`;
 }
 
 function buildTradeDetailsHtml(trades?: MarkerTradeInfo[]): string {
@@ -134,7 +145,7 @@ function buildTradeDetailsHtml(trades?: MarkerTradeInfo[]): string {
     return "";
   }
   const sections = trades
-    // .slice(0, 3)
+    .slice(0, 3)
     .map((trade, idx) => {
       const side = (trade.side ?? "").toUpperCase();
       const sideClass = side === "BUY" ? "text-emerald-400" : "text-red-400";
@@ -171,7 +182,10 @@ function buildTradeDetailsHtml(trades?: MarkerTradeInfo[]): string {
     })
     .join("");
 
-  return `<div class="mt-2 flex flex-col gap-1">${sections}</div>`;
+  const note = `<div class="text-[10px] text-zinc-500 uppercase tracking-wide">
+    Highlighted trades in this window
+  </div>`;
+  return `<div class="mt-2 flex flex-col gap-1">${note}${sections}</div>`;
 }
 
 export function UserPnlChart({
