@@ -119,15 +119,10 @@ function buildMarketDetailsHtml(markets?: MarkerMarketInfo[]): string {
         <div class="flex flex-col gap-0.5 border-t border-zinc-800 pt-1 text-[11px]">
           <div class="flex items-center justify-between gap-2">
             <span class="text-zinc-100 font-medium truncate">${title}</span>
-            <span class="text-zinc-400">Volume ${notionalStr}</span>
+            <span class="text-zinc-400">${notionalStr}</span>
           </div>
           <div class="flex items-center justify-between text-zinc-500">
             <span>${tradesCount} trades ${outcome}</span>
-            <span>Avg price</span>
-          </div>
-          <div class="flex items-center justify-between text-zinc-100">
-            <span>${avgPriceStr}</span>
-            <span>${sizeStr ? `${sizeStr} size` : ""}</span>
           </div>
         </div>
       `;
@@ -396,8 +391,7 @@ export function UserPnlChart({
                 <span class="${directionClass} font-semibold">${directionLabel}</span>
               </div>
               <div class="flex items-center justify-between text-zinc-400">
-                <span>${dateStr}</span>
-                <span class="text-zinc-100">${deltaStr}</span>
+                <span class="text-zinc-100 self-end">${deltaStr}</span>
               </div>
               ${marketsHtml}
               ${tradesHtml}              
@@ -415,8 +409,8 @@ export function UserPnlChart({
                 <span class="text-sky-300 font-semibold">${ntoStr}</span>
               </div>
               <div class="flex items-center justify-between text-zinc-400">
-                <span>${dateStr}</span>
-                <span>${cnt} trades</span>
+                
+                <span class="self-end">${cnt} trades</span>
               </div>
               ${marketsHtml}
               ${tradesHtml}              
