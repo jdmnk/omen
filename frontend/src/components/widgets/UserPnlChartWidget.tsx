@@ -101,47 +101,49 @@ export function UserPnlChartWidget({ userId }: { userId: string }) {
       </div>
 
       {/* Controls */}
-      <div className="flex flex-col gap-2 px-2 mt-2 mb-2">
+      <div className="flex gap-2 px-2 mt-2 mb-2 justify-between">
         {/* Marker Controls */}
-        <div className="flex flex-col gap-1">
-          <span className="text-xs text-muted-foreground">Markers</span>
-          <div className="flex flex-wrap gap-2">
-            <button
-              type="button"
-              onClick={() => toggleVisibility("positiveSwings")}
-              className={cn(
-                "px-2 py-0.5 text-xs rounded border transition-colors",
-                markerVisibility.positiveSwings
-                  ? "bg-brand-highlight text-secondary-foreground border-brand-highlight"
-                  : "bg-brand-background text-brand-foreground border-brand-stroke hover:bg-brand-highlight/30"
-              )}
-            >
-              Positive Swings
-            </button>
-            <button
-              type="button"
-              onClick={() => toggleVisibility("negativeSwings")}
-              className={cn(
-                "px-2 py-0.5 text-xs rounded border transition-colors",
-                markerVisibility.negativeSwings
-                  ? "bg-brand-highlight text-secondary-foreground border-brand-highlight"
-                  : "bg-brand-background text-brand-foreground border-brand-stroke hover:bg-brand-highlight/30"
-              )}
-            >
-              Negative Swings
-            </button>
-            <button
-              type="button"
-              onClick={() => toggleVisibility("tradeClusters")}
-              className={cn(
-                "px-2 py-0.5 text-xs rounded border transition-colors",
-                markerVisibility.tradeClusters
-                  ? "bg-brand-highlight text-secondary-foreground border-brand-highlight"
-                  : "bg-brand-background text-brand-foreground border-brand-stroke hover:bg-brand-highlight/30"
-              )}
-            >
-              Trade Clusters
-            </button>
+        <div className="flex gap-2 flex-col">
+          <div className="flex items-center gap-2">
+            <span className="text-xs text-muted-foreground">Marker type: </span>
+            <div className="flex flex-wrap gap-2">
+              <button
+                type="button"
+                onClick={() => toggleVisibility("positiveSwings")}
+                className={cn(
+                  "px-2 py-0.5 text-xs rounded border transition-colors",
+                  markerVisibility.positiveSwings
+                    ? "bg-brand-highlight text-secondary-foreground border-brand-highlight"
+                    : "bg-brand-background text-brand-foreground border-brand-stroke hover:bg-brand-highlight/30"
+                )}
+              >
+                Positive Swings
+              </button>
+              <button
+                type="button"
+                onClick={() => toggleVisibility("negativeSwings")}
+                className={cn(
+                  "px-2 py-0.5 text-xs rounded border transition-colors",
+                  markerVisibility.negativeSwings
+                    ? "bg-brand-highlight text-secondary-foreground border-brand-highlight"
+                    : "bg-brand-background text-brand-foreground border-brand-stroke hover:bg-brand-highlight/30"
+                )}
+              >
+                Negative Swings
+              </button>
+              <button
+                type="button"
+                onClick={() => toggleVisibility("tradeClusters")}
+                className={cn(
+                  "px-2 py-0.5 text-xs rounded border transition-colors",
+                  markerVisibility.tradeClusters
+                    ? "bg-brand-highlight text-secondary-foreground border-brand-highlight"
+                    : "bg-brand-background text-brand-foreground border-brand-stroke hover:bg-brand-highlight/30"
+                )}
+              >
+                Trade Clusters
+              </button>
+            </div>
           </div>
           <div className="flex items-center gap-2 flex-wrap">
             <label className="flex items-center gap-2 text-xs text-muted-foreground">
@@ -158,7 +160,7 @@ export function UserPnlChartWidget({ userId }: { userId: string }) {
         </div>
 
         {/* Interval Selector */}
-        <div className="flex items-center justify-end gap-2">
+        <div className="flex items-center gap-2 self-start">
           <div className="flex items-center gap-1">
             {INTERVALS.map((int) => (
               <button
