@@ -22,9 +22,13 @@ import { WatchlistShareImage } from "./WatchlistShareImage";
 
 interface WatchlistShareButtonProps {
   markets: WatchlistMarket[];
+  className?: string;
 }
 
-export function WatchlistShareButton({ markets }: WatchlistShareButtonProps) {
+export function WatchlistShareButton({
+  markets,
+  className,
+}: WatchlistShareButtonProps) {
   const [isGenerating, setIsGenerating] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [shareImageUrl, setShareImageUrl] = useState<string | null>(null);
@@ -86,8 +90,9 @@ export function WatchlistShareButton({ markets }: WatchlistShareButtonProps) {
       <Button
         onClick={handleShareClick}
         disabled={isGenerating}
+        variant="brand-ghost"
         size="icon"
-        variant="branded-ghost"
+        className={className}
         aria-label="Share watchlist"
         title="Share watchlist"
       >
@@ -153,7 +158,7 @@ export function WatchlistShareButton({ markets }: WatchlistShareButtonProps) {
             </Button>
             <Button
               onClick={handleShare}
-              variant="branded"
+              variant="brand-gradient"
               size="lg"
               className="flex-1 cursor-pointer"
             >
