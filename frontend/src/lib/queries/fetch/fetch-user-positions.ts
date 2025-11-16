@@ -20,7 +20,11 @@ export async function fetchUserPositions(
     url.searchParams.set("offset", offset.toString());
     const response = await fetch(url.toString());
     if (!response.ok) {
-      throw new Error(`Failed to fetch positions: ${response.statusText}`);
+      const error = new Error(
+        `Failed to fetch positions: ${response.status} ${response.statusText}`
+      ) as Error & { status?: number };
+      (error as any).status = response.status;
+      throw error;
     }
     const data = await response.json();
     allPositions.push(...data);

@@ -103,18 +103,15 @@ export function TopHoldersPositions({
   } = useTopHoldersQuery(market.conditionId);
 
   // Step 2a: Get PnL data for holders
-  const {
-    data: pnlHolders,
-    isLoading: isLoadingPnl,
-    error: pnlError,
-  } = useTopHoldersPnlQuery(rawHolders, market.token1, market.token2);
+  const { data: pnlHolders, isLoading: isLoadingPnl } = useTopHoldersPnlQuery(
+    rawHolders,
+    market.token1,
+    market.token2
+  );
 
   // Step 2b: Get wallet info for holders
-  const {
-    data: walletInfoHolders,
-    isLoading: isLoadingWalletInfo,
-    error: walletInfoError,
-  } = useTopHoldersWalletInfoQuery(rawHolders, true); // disable for now, unused
+  const { data: walletInfoHolders, isLoading: isLoadingWalletInfo } =
+    useTopHoldersWalletInfoQuery(rawHolders, true); // disable for now, unused
 
   // Merge raw holders with PnL and wallet info data
   const topHolders = useMemo(() => {
@@ -161,7 +158,7 @@ export function TopHoldersPositions({
 
   const isLoading = isLoadingHolders;
   const isLoadingEnrichment = isLoadingPnl || isLoadingWalletInfo;
-  const error = holdersError || pnlError || walletInfoError;
+  const error = holdersError;
 
   const { data: topHoldersPositions } = useTopHoldersPositionsQuery(
     topHolders?.map((h) => h.proxyWallet),
