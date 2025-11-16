@@ -7,9 +7,9 @@ from sqlalchemy.ext.asyncio import create_async_engine
 from src.models import (
     event as _ensure_event_model_import,  # noqa: F401
     event_market as _ensure_event_market_import,  # noqa: F401
-    position as _ensure_position_model_import,  # noqa: F401
     trade as _ensure_trade_model_import,  # noqa: F401
     user_position as _ensure_user_position_model_import,  # noqa: F401
+    price_history as _ensure_price_history_model_import,  # noqa: F401
 )
 from src.models.market import Base
 from src.settings import settings

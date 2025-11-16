@@ -9,6 +9,7 @@ from src.models.event_market import EventMarket
 from src.models.market import Market, MarketDB
 from src.models.trade import Trade, TradeDB
 from src.models.user_position import UserPosition, UserPositionDB
+from src.models.price_history import PriceHistory, PriceHistoryDB
 from src.utils.logging_config import get_logger
 
 logger = get_logger(__name__)
@@ -36,6 +37,36 @@ class InsertsClient:
                 update_fields["fetched_at"] = text("now()")
                 stmt = stmt.on_conflict_do_update(
                     index_elements=["condition_id"], set_=update_fields
+                )
+
+                await session.execute(stmt)
+                total += len(batch)
+                await session.commit()
+        return total
+
+    async def insert_price_histories(
+        self, histories: list[PriceHistory], chunk_size: int = 1000
+    ) -> int:
+        """
+        Upsert full price history point arrays keyed by clob_token_id.
+        """
+        if not histories:
+            return 0
+        total = 0
+        async with self.core.async_session() as session:
+            for start in range(0, len(histories), chunk_size):
+                batch = histories[start : start + chunk_size]
+                values = [h.model_dump() for h in batch]
+
+                stmt = pg_insert(PriceHistoryDB).values(values)
+                update_fields = {
+                    col: stmt.excluded[col]
+                    for col in PriceHistoryDB.__table__.columns.keys()
+                    if col not in ["clob_token_id", "fetched_at"]
+                }
+                update_fields["fetched_at"] = text("now()")
+                stmt = stmt.on_conflict_do_update(
+                    index_elements=["clob_token_id"], set_=update_fields
                 )
 
                 await session.execute(stmt)

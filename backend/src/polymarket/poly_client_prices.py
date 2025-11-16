@@ -36,6 +36,15 @@ class OrderBookSummaryResponse(TypedDict, total=False):
     neg_risk: bool
 
 
+class PriceHistoryPoint(TypedDict):
+    t: int  # UTC timestamp (seconds)
+    p: float  # price
+
+
+class PriceHistoryApiResponse(TypedDict, total=False):
+    history: list[PriceHistoryPoint]
+
+
 class PolyClientPrices:
     async def get_market_prices_by_request(
         self, requests: list[PriceRequest]
@@ -94,5 +103,55 @@ class PolyClientPrices:
                 return data
         except PolyApiException as exc:
             logger.error(f"get_order_books_by_request: error: {exc}")
+            logger.error(traceback.format_exc())
+            raise exc
+
+    async def get_price_history_for_token(
+        self,
+        token_id: str,
+        *,
+        start_ts: int | None = None,
+        end_ts: int | None = None,
+        interval: Literal["1m", "1h", "6h", "1d", "1w", "max"] = "1m",
+        fidelity: int = 60,
+    ) -> PriceHistoryApiResponse:
+        """
+        Fetch historical price data for a specific CLOB token via GET /prices-history.
+
+        Docs: https://docs.polymarket.com/api-reference/pricing/get-price-history-for-a-traded-token
+
+        Args:
+            token_id: The CLOB token ID (aka market token id)
+            start_ts: Optional start timestamp (UTC seconds)
+            end_ts: Optional end timestamp (UTC seconds)
+            interval: Bucket interval when start/end are not provided (default: "1m")
+            fidelity: Resolution of data in minutes (default: 60)
+        """
+        params: dict[str, str | int] = {"market": token_id}
+        # interval is mutually exclusive with startTs/endTs
+        if start_ts is not None or end_ts is not None:
+            if start_ts is not None:
+                params["startTs"] = int(start_ts)
+            if end_ts is not None:
+                params["endTs"] = int(end_ts)
+        else:
+            params["interval"] = interval
+        params["fidelity"] = int(fidelity)
+
+        try:
+            async with httpx.AsyncClient() as client:
+                response = await client.get(f"{CLOB_HOST}/prices-history", params=params)
+                if response.status_code != 200:
+                    logger.error(
+                        f"get_price_history_for_token: non-200 status {response.status_code}: {response.text}"
+                    )
+                    return {"history": []}
+                data: PriceHistoryApiResponse = response.json() or {"history": []}
+                # Normalize shape if API returns empty object
+                if "history" not in data or data["history"] is None:
+                    data["history"] = []
+                return data
+        except PolyApiException as exc:
+            logger.error(f"get_price_history_for_token: error: {exc}")
             logger.error(traceback.format_exc())
             raise exc
