@@ -16,14 +16,12 @@ import {
   ISeriesMarkersPluginApi,
 } from "lightweight-charts";
 import { Spinner } from "@/components/ui/spinner";
-import { ClosedPosition } from "@/lib/models/frontend.models";
 import { formatCompactCurrency, formatCurrency } from "@/lib/ui/format.utils";
 import { cn } from "@/lib/utils";
 import { areaSeriesBaseOptions } from "@/lib/ui/chart.config";
 
 type UserPnlChartProps = {
   data: ChartPoint[];
-  closedPositions?: ClosedPosition[];
   analyticsMarkers?: AnalyticsMarker[];
   error?: Error | null;
   isLoading?: boolean;
@@ -92,7 +90,6 @@ type AnalyticsMarker = {
 
 export function UserPnlChart({
   data,
-  closedPositions = [],
   analyticsMarkers = [],
   error,
   isLoading,
@@ -100,12 +97,8 @@ export function UserPnlChart({
   const chartContainerRef = useRef<HTMLDivElement>(null);
   const chartRef = useRef<IChartApi | null>(null);
   const seriesRef = useRef<ISeriesApi<"Area"> | null>(null);
-  const closedMarkersPluginRef = useRef<ISeriesMarkersPluginApi<Time> | null>(
-    null
-  );
   const analyticsMarkersPluginRef =
     useRef<ISeriesMarkersPluginApi<Time> | null>(null);
-  const markerIdToPositionRef = useRef<Record<string, ClosedPosition>>({});
   const markerIdToAnalyticsRef = useRef<Record<string, AnalyticsMarker>>({});
   const crosshairHandlerRef = useRef<((param: any) => void) | null>(null);
   const tooltipRef = useRef<HTMLDivElement | null>(null);
@@ -182,14 +175,6 @@ export function UserPnlChart({
       // Remove existing series if it exists to clear old markers
       if (seriesRef.current) {
         // detach markers plugin if any
-        if (closedMarkersPluginRef.current) {
-          try {
-            closedMarkersPluginRef.current.detach();
-          } catch {
-            // ignore
-          }
-          closedMarkersPluginRef.current = null;
-        }
         if (analyticsMarkersPluginRef.current) {
           try {
             analyticsMarkersPluginRef.current.detach();
@@ -222,37 +207,6 @@ export function UserPnlChart({
 
       // Set the data
       lineSeries.setData(data as LineData<Time>[]);
-
-      // Create markers for closed positions (no in-chart text; tooltip on hover)
-      if (closedPositions && closedPositions.length > 0) {
-        const idToPosition: Record<string, ClosedPosition> = {};
-        const markers: SeriesMarker<Time>[] = closedPositions.map(
-          (position, idx) => {
-            const isProfit = position.realizedPnl >= 0;
-            const id = `cp-${position.timestamp}-${idx}`;
-            idToPosition[id] = position;
-            const pnlText = `${isProfit ? "+" : ""}${formatCompactCurrency(
-              position.realizedPnl
-            )}`;
-            return {
-              id,
-              time: position.timestamp as Time,
-              position: isProfit ? "belowBar" : "aboveBar",
-              color: isProfit ? "#22c55e" : "#ef4444",
-              shape: isProfit ? "arrowUp" : "arrowDown",
-              text: pnlText,
-            };
-          }
-        );
-        markerIdToPositionRef.current = idToPosition;
-        closedMarkersPluginRef.current = createSeriesMarkers(
-          lineSeries,
-          markers,
-          {
-            zOrder: "top",
-          }
-        );
-      }
 
       // Create markers for analytics (swing/trade clusters)
       if (analyticsMarkers && analyticsMarkers.length > 0) {
@@ -319,83 +273,51 @@ export function UserPnlChart({
           return;
         }
 
-        // Closed position tooltip
-        const pos = markerIdToPositionRef.current[hoveredId];
-        if (pos) {
-          // Build tooltip content
-          const isProfit = pos.realizedPnl >= 0;
-          const dateStr = new Date(pos.timestamp * 1000).toLocaleString();
-          const pnlStr = formatCurrency(pos.realizedPnl, 2);
-          const avgStr = formatCurrency(pos.avgPrice, 2);
-          const curStr = formatCurrency(pos.curPrice, 2);
-          const title = pos.title;
-          const outcome = pos.outcome;
-
+        // Analytics tooltip
+        const am = markerIdToAnalyticsRef.current[hoveredId];
+        if (!am) {
+          tooltipEl.classList.add("hidden");
+          return;
+        }
+        const dateStr = new Date(am.t * 1000).toLocaleString();
+        if (am.kind === "swing") {
+          const isUp = am.direction === "up";
+          const deltaStr =
+            am.delta !== undefined
+              ? `${isUp ? "+" : ""}${formatCurrency(am.delta, 2)}`
+              : "";
           tooltipEl.innerHTML = `
             <div class="flex flex-col gap-1">
-              <div class="font-medium">${title}</div>
+              <div class="font-medium">PnL Swing ${
+                am.severity === "extreme" ? "(extreme)" : ""
+              }</div>
               <div class="text-[11px] text-zinc-300">${dateStr}</div>
               <div class="mt-1 grid grid-cols-2 gap-x-3 gap-y-1">
-                <div class="text-zinc-400">Outcome</div>
-                <div class="text-zinc-100 text-right">${outcome}</div>
-                <div class="text-zinc-400">Avg Price</div>
-                <div class="text-zinc-100 text-right">${avgStr}</div>
-                <div class="text-zinc-400">Close Price</div>
-                <div class="text-zinc-100 text-right">${curStr}</div>
-                <div class="text-zinc-400">Realized PnL</div>
-                <div class="${
-                  isProfit ? "text-emerald-400" : "text-red-400"
-                } text-right font-medium">${pnlStr}</div>
+                <div class="text-zinc-400">Direction</div>
+                <div class="text-zinc-100 text-right">${
+                  isUp ? "Up" : "Down"
+                }</div>
+                <div class="text-zinc-400">Change</div>
+                <div class="text-zinc-100 text-right">${deltaStr}</div>
               </div>
             </div>
           `;
         } else {
-          // Analytics tooltip
-          const am = markerIdToAnalyticsRef.current[hoveredId];
-          if (!am) {
-            tooltipEl.classList.add("hidden");
-            return;
-          }
-          const dateStr = new Date(am.t * 1000).toLocaleString();
-          if (am.kind === "swing") {
-            const isUp = am.direction === "up";
-            const deltaStr =
-              am.delta !== undefined
-                ? `${isUp ? "+" : ""}${formatCurrency(am.delta, 2)}`
-                : "";
-            tooltipEl.innerHTML = `
-              <div class="flex flex-col gap-1">
-                <div class="font-medium">PnL Swing ${
-                  am.severity === "extreme" ? "(extreme)" : ""
-                }</div>
-                <div class="text-[11px] text-zinc-300">${dateStr}</div>
-                <div class="mt-1 grid grid-cols-2 gap-x-3 gap-y-1">
-                  <div class="text-zinc-400">Direction</div>
-                  <div class="text-zinc-100 text-right">${
-                    isUp ? "Up" : "Down"
-                  }</div>
-                  <div class="text-zinc-400">Change</div>
-                  <div class="text-zinc-100 text-right">${deltaStr}</div>
-                </div>
+          const cnt = am.tradesCount ?? 0;
+          const ntoStr =
+            am.notional !== undefined ? formatCurrency(am.notional, 2) : "-";
+          tooltipEl.innerHTML = `
+            <div class="flex flex-col gap-1">
+              <div class="font-medium">Trade Activity</div>
+              <div class="text-[11px] text-zinc-300">${dateStr}</div>
+              <div class="mt-1 grid grid-cols-2 gap-x-3 gap-y-1">
+                <div class="text-zinc-400">Trades</div>
+                <div class="text-zinc-100 text-right">${cnt}</div>
+                <div class="text-zinc-400">Notional</div>
+                <div class="text-zinc-100 text-right">${ntoStr}</div>
               </div>
-            `;
-          } else {
-            const cnt = am.tradesCount ?? 0;
-            const ntoStr =
-              am.notional !== undefined ? formatCurrency(am.notional, 2) : "-";
-            tooltipEl.innerHTML = `
-              <div class="flex flex-col gap-1">
-                <div class="font-medium">Trade Activity</div>
-                <div class="text-[11px] text-zinc-300">${dateStr}</div>
-                <div class="mt-1 grid grid-cols-2 gap-x-3 gap-y-1">
-                  <div class="text-zinc-400">Trades</div>
-                  <div class="text-zinc-100 text-right">${cnt}</div>
-                  <div class="text-zinc-400">Notional</div>
-                  <div class="text-zinc-100 text-right">${ntoStr}</div>
-                </div>
-              </div>
-            `;
-          }
+            </div>
+          `;
         }
 
         // Position tooltip relative to container
@@ -428,7 +350,7 @@ export function UserPnlChart({
 
       chartRef.current.timeScale().fitContent();
     }
-  }, [data, closedPositions, analyticsMarkers]);
+  }, [data, analyticsMarkers]);
 
   if (error) {
     return (
