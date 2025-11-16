@@ -6,6 +6,7 @@ const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 // Maximum email length (RFC 5321)
 const MAX_EMAIL_LENGTH = 320;
+const MAX_REFERRAL_LENGTH = 100;
 
 /**
  * Sanitize email to prevent formula injection
@@ -16,6 +17,19 @@ function sanitizeEmail(email: string): string {
   return email.trim().toLowerCase();
 
   // return `'${trimmed}`; // Add single quote to force text mode in Google Sheets
+}
+
+function sanitizeReferral(referral: unknown): string | null {
+  if (!referral || typeof referral !== "string") {
+    return null;
+  }
+
+  const trimmed = referral.trim();
+  if (!trimmed) {
+    return null;
+  }
+
+  return trimmed.slice(0, MAX_REFERRAL_LENGTH);
 }
 
 /**
@@ -36,7 +50,7 @@ function isValidEmail(email: string): boolean {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { email } = body;
+    const { email, referralSource } = body;
 
     // Validate email
     if (!isValidEmail(email)) {
@@ -48,6 +62,7 @@ export async function POST(request: NextRequest) {
 
     // Sanitize email to prevent formula injection
     const sanitizedEmail = sanitizeEmail(email);
+    const sanitizedReferral = sanitizeReferral(referralSource);
 
     // Load credentials from environment variable (base64 encoded)
     const credentialsBase64 = process.env.GOOGLE_CREDENTIALS;
@@ -71,14 +86,16 @@ export async function POST(request: NextRequest) {
     const spreadsheetId = process.env.GOOGLE_SHEET_ID;
 
     // Append email to the sheet
-    // Column A: email, Column B: timestamp
+    // Column A: email, Column B: timestamp, Column C: referral
     // Using RAW mode to prevent formula execution, then formatting as text
     await sheets.spreadsheets.values.append({
       spreadsheetId,
-      range: "A:B", // Columns A and B
+      range: "A:C", // Columns A through C
       valueInputOption: "RAW", // Use RAW to prevent formula execution
       requestBody: {
-        values: [[sanitizedEmail, new Date().toISOString()]], // Email and timestamp
+        values: [
+          [sanitizedEmail, new Date().toISOString(), sanitizedReferral ?? ""],
+        ], // Email, timestamp, referral source
       },
     });
 

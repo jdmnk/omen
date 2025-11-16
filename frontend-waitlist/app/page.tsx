@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { TEXTS } from "./texts.const";
@@ -12,6 +12,24 @@ export default function Home() {
   const [isSuccess, setIsSuccess] = useState(false);
   const [error, setError] = useState("");
   const [copied, setCopied] = useState(false);
+  const [referralSource, setReferralSource] = useState<string | null>(null);
+
+  useEffect(() => {
+    const url = new URL(window.location.href);
+    const referral = url.searchParams.get("ref");
+
+    if (referral) {
+      setReferralSource(referral);
+      url.searchParams.delete("ref");
+
+      const updatedSearch = url.searchParams.toString();
+      const newUrl = `${url.pathname}${
+        updatedSearch ? `?${updatedSearch}` : ""
+      }${url.hash}`;
+
+      window.history.replaceState(null, "", newUrl);
+    }
+  }, []);
 
   const validateEmail = (emailValue: string): boolean => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -67,7 +85,7 @@ export default function Home() {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ email }),
+        body: JSON.stringify({ email, referralSource }),
       });
 
       if (response.ok) {
