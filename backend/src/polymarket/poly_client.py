@@ -270,6 +270,8 @@ class PolyClient:
         *,
         min_amount: float = 0,
         count: int = 500,
+        start_ts: int | None = None,
+        end_ts: int | None = None,
     ) -> list[Trade]:
         """
         Fetch user trades via the activity endpoint (supports user filtering).
@@ -278,12 +280,20 @@ class PolyClient:
 
         async def _fetch() -> list[Trade]:
             offset = 0
-            per_page = 250
+            per_page = min(500, max(1, count))
+            max_pages = max(1, (count + per_page - 1) // per_page)
             trades: list[Trade] = []
+            reached_start_window = False
             timeout = httpx.Timeout(10.0, read=10.0)
             async with httpx.AsyncClient(timeout=timeout) as client:
-                while len(trades) < count:
-                    page_limit = min(per_page, count - len(trades))
+                pages_fetched = 0
+                while (
+                    len(trades) < count and not reached_start_window and pages_fetched < max_pages
+                ):
+                    remaining = max(0, count - len(trades))
+                    if remaining == 0:
+                        break
+                    page_limit = max(1, min(per_page, remaining))
                     params: dict[str, object] = {
                         "user": user,
                         "limit": page_limit,
@@ -298,7 +308,7 @@ class PolyClient:
                     response = await client.get(f"{DATA_API_HOST}/activity", params=params)
                     response.raise_for_status()
                     payload = response.json()
-                    entries = []
+                    entries: list[dict] = []
                     if isinstance(payload, dict) and "activity" in payload:
                         entries = payload.get("activity") or []
                     elif isinstance(payload, list):
@@ -311,9 +321,17 @@ class PolyClient:
                             continue
                         if min_amount > 0 and (parsed.size * parsed.price) < min_amount:
                             continue
+                        if end_ts is not None and parsed.timestamp > end_ts:
+                            continue
+                        if start_ts is not None and parsed.timestamp < start_ts:
+                            reached_start_window = True
+                            break
                         trades.append(parsed)
                         if len(trades) >= count:
                             break
+                    pages_fetched += 1
+                    if reached_start_window:
+                        break
                     if len(entries) < page_limit:
                         break
                     offset += page_limit

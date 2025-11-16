@@ -6,8 +6,7 @@ export type UserPnlInterval = "12h" | "1d" | "1w" | "1m" | "max";
 
 export function useUserPnlWithMarkersQuery(
   userAddress: string,
-  interval: UserPnlInterval = "1m",
-  maxTrades: number = 5000
+  interval: UserPnlInterval = "1m"
 ) {
   return useQuery<PnlWithMarkersResponse>({
     queryKey: ["user-pnl-with-markers", userAddress, interval],
@@ -18,7 +17,6 @@ export function useUserPnlWithMarkersQuery(
       }
       const url = new URL(`/users/${userAddress}/pnl-with-markers`, base);
       url.searchParams.set("interval", interval);
-      url.searchParams.set("max_trades", maxTrades.toString());
       const res = await fetch(url.toString(), { cache: "no-cache" });
       if (!res.ok)
         throw new Error(`Failed to fetch PnL with markers: ${res.statusText}`);

@@ -43,13 +43,14 @@ async def fetch_user_pnl_and_trades_basic(
 
     def _compute_dynamic_min_amount(points: list[PriceHistoryPoint]) -> float:
         if not points:
-            return 10.0
+            return 50.0
         pnl_values = [float(p["p"]) for p in points]
-        pnl_range = max(pnl_values) - min(pnl_values)
         latest_abs = abs(pnl_values[-1])
-        avg_abs = sum(abs(v) for v in pnl_values) / max(1, len(pnl_values))
-        scale = max(pnl_range * 0.01, latest_abs * 0.02, avg_abs * 0.01)
-        return float(min(2000.0, max(10.0, scale)))
+        percentile_idx = max(0, int(0.9 * (len(pnl_values) - 1)))
+        sorted_vals = sorted(abs(v) for v in pnl_values)
+        pct90 = sorted_vals[percentile_idx]
+        scale = max(latest_abs * 0.01, pct90 * 0.01)
+        return float(min(500.0, max(50.0, scale)))
 
     min_trade_amount = _compute_dynamic_min_amount(pnl_points)
     logger.info(
@@ -66,6 +67,8 @@ async def fetch_user_pnl_and_trades_basic(
             user_address,
             min_amount=min_trade_amount,
             count=max_trades,
+            start_ts=start_ts,
+            end_ts=end_ts,
         )
     except httpx.ReadTimeout:
         logger.warning(

@@ -217,14 +217,13 @@ async def get_clarifications_endpoint(
 async def get_user_pnl_with_markers(
     user_address: str,
     interval: str = Query("1m"),
-    max_trades: int = Query(10000, ge=100, le=100000),
 ) -> PnlWithMarkersResponse:
     """
     Returns user PnL points and chart-aligned markers (swings and trade clusters).
     """
     try:
         result = await build_user_pnl_and_markers(
-            user_address=user_address, interval=interval, max_trades=max_trades
+            user_address=user_address, interval=interval, max_trades=1000
         )
         # Map raw dicts to response models
         points = [PnlPoint(t=int(p["t"]), p=float(p["p"])) for p in result["points"]]
