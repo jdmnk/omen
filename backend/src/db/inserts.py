@@ -7,9 +7,9 @@ from src.db.db_core import DbCore
 from src.models.event import Event, EventDB
 from src.models.event_market import EventMarket
 from src.models.market import Market, MarketDB
+from src.models.price_history import PriceHistory, PriceHistoryDB
 from src.models.trade import Trade, TradeDB
 from src.models.user_position import UserPosition, UserPositionDB
-from src.models.price_history import PriceHistory, PriceHistoryDB
 from src.utils.logging_config import get_logger
 
 logger = get_logger(__name__)
