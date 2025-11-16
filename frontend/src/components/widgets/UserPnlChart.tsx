@@ -384,9 +384,7 @@ export function UserPnlChart({
             : "";
           tooltipEl.innerHTML = `
             <div class="flex flex-col gap-1">
-              <div class="font-medium">PnL Swing ${
-                am.severity === "extreme" ? "(extreme)" : ""
-              }</div>
+              <div class="font-medium">PnL Swing</div>
               <div class="text-[11px] text-zinc-300">${dateStr}</div>
               <div class="mt-1 grid grid-cols-2 gap-x-3 gap-y-1">
                 <div class="text-zinc-400">Direction</div>
