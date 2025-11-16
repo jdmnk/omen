@@ -31,9 +31,6 @@ function PositionRow({ position }: { position: UserPosition }) {
   const totalValue = size * currentPrice;
   const pnl = totalValue - totalCost;
   const pnlPercent = totalCost > 0 ? (pnl / totalCost) * 100 : 0;
-  const relativeTime = position.endDate
-    ? formatRelativeTime(position.endDate)
-    : "-";
 
   const pnlColor =
     pnl > 0
@@ -74,7 +71,9 @@ function PositionRow({ position }: { position: UserPosition }) {
         </div>
       </div>
       <div className="text-xs text-muted-foreground text-right">
-        {relativeTime}
+        {position.endDate
+          ? new Date(position.endDate).toLocaleDateString()
+          : "-"}
       </div>
     </div>
   );
@@ -132,7 +131,7 @@ export function UserPositions({ userId }: { userId: string }) {
           <div>Price</div>
           <div>Value</div>
           <div>PnL</div>
-          <div className="text-right">End time</div>
+          <div className="text-right">End date</div>
         </div>
       </div>
       <div className={TABLE_CONTENT_CONTAINER_CLASSES}>
