@@ -100,8 +100,11 @@ export function UserPnlChart({
   const chartContainerRef = useRef<HTMLDivElement>(null);
   const chartRef = useRef<IChartApi | null>(null);
   const seriesRef = useRef<ISeriesApi<"Area"> | null>(null);
-  const closedMarkersPluginRef = useRef<ISeriesMarkersPluginApi<Time> | null>(null);
-  const analyticsMarkersPluginRef = useRef<ISeriesMarkersPluginApi<Time> | null>(null);
+  const closedMarkersPluginRef = useRef<ISeriesMarkersPluginApi<Time> | null>(
+    null
+  );
+  const analyticsMarkersPluginRef =
+    useRef<ISeriesMarkersPluginApi<Time> | null>(null);
   const markerIdToPositionRef = useRef<Record<string, ClosedPosition>>({});
   const markerIdToAnalyticsRef = useRef<Record<string, AnalyticsMarker>>({});
   const crosshairHandlerRef = useRef<((param: any) => void) | null>(null);
@@ -242,49 +245,61 @@ export function UserPnlChart({
           }
         );
         markerIdToPositionRef.current = idToPosition;
-        closedMarkersPluginRef.current = createSeriesMarkers(lineSeries, markers, {
-          zOrder: "top",
-        });
+        closedMarkersPluginRef.current = createSeriesMarkers(
+          lineSeries,
+          markers,
+          {
+            zOrder: "top",
+          }
+        );
       }
 
       // Create markers for analytics (swing/trade clusters)
       if (analyticsMarkers && analyticsMarkers.length > 0) {
         const idToAnalytics: Record<string, AnalyticsMarker> = {};
-        const markers: SeriesMarker<Time>[] = analyticsMarkers.map((mk, idx) => {
-          const id = `am-${mk.t}-${idx}`;
-          idToAnalytics[id] = mk;
-          if (mk.kind === "swing") {
-            const isUp = mk.direction === "up";
-            const color = isUp ? "#22c55e" : "#ef4444";
-            const text =
-              (mk.delta !== undefined ? `${isUp ? "+" : ""}${formatCompactCurrency(mk.delta)}` : "") +
-              (mk.severity ? ` ${mk.severity === "extreme" ? "!" : ""}` : "");
-            return {
-              id,
-              time: mk.t as Time,
-              position: isUp ? "belowBar" : "aboveBar",
-              color,
-              shape: isUp ? "circle" : "circle",
-              text: text.trim(),
-            };
-          } else {
-            // trade_cluster
-            const color = "#60a5fa"; // blue
-            const text = mk.tradesCount ? `${mk.tradesCount}T` : "";
-            return {
-              id,
-              time: mk.t as Time,
-              position: "aboveBar",
-              color,
-              shape: "square",
-              text,
-            };
+        const markers: SeriesMarker<Time>[] = analyticsMarkers.map(
+          (mk, idx) => {
+            const id = `am-${mk.t}-${idx}`;
+            idToAnalytics[id] = mk;
+            if (mk.kind === "swing") {
+              const isUp = mk.direction === "up";
+              const color = isUp ? "#22c55e" : "#ef4444";
+              const text =
+                (mk.delta !== undefined
+                  ? `${isUp ? "+" : ""}${formatCompactCurrency(mk.delta)}`
+                  : "") +
+                (mk.severity ? ` ${mk.severity === "extreme" ? "!" : ""}` : "");
+              return {
+                id,
+                time: mk.t as Time,
+                position: isUp ? "belowBar" : "aboveBar",
+                color,
+                shape: isUp ? "circle" : "circle",
+                text: text.trim(),
+              };
+            } else {
+              // trade_cluster
+              const color = "#60a5fa"; // blue
+              const text = mk.tradesCount ? `${mk.tradesCount}T` : "";
+              return {
+                id,
+                time: mk.t as Time,
+                position: "aboveBar",
+                color,
+                shape: "square",
+                text,
+              };
+            }
           }
-        });
+        );
         markerIdToAnalyticsRef.current = idToAnalytics;
-        analyticsMarkersPluginRef.current = createSeriesMarkers(lineSeries, markers, {
-          zOrder: "top",
-        });
+        analyticsMarkersPluginRef.current = createSeriesMarkers(
+          lineSeries,
+          markers,
+          {
+            zOrder: "top",
+          }
+        );
       }
 
       // Tooltip handling on marker hover
@@ -350,11 +365,15 @@ export function UserPnlChart({
                 : "";
             tooltipEl.innerHTML = `
               <div class="flex flex-col gap-1">
-                <div class="font-medium">PnL Swing ${am.severity === "extreme" ? "(extreme)" : ""}</div>
+                <div class="font-medium">PnL Swing ${
+                  am.severity === "extreme" ? "(extreme)" : ""
+                }</div>
                 <div class="text-[11px] text-zinc-300">${dateStr}</div>
                 <div class="mt-1 grid grid-cols-2 gap-x-3 gap-y-1">
                   <div class="text-zinc-400">Direction</div>
-                  <div class="text-zinc-100 text-right">${isUp ? "Up" : "Down"}</div>
+                  <div class="text-zinc-100 text-right">${
+                    isUp ? "Up" : "Down"
+                  }</div>
                   <div class="text-zinc-400">Change</div>
                   <div class="text-zinc-100 text-right">${deltaStr}</div>
                 </div>
