@@ -12,3 +12,25 @@ logging.basicConfig(
 
 def get_logger(name: str) -> logging.Logger:
     return logging.getLogger(name)
+
+
+def quiet_httpx_logging(level: int = logging.WARNING) -> None:
+    """Raise log level for noisy HTTP clients."""
+    logging.getLogger("httpx").setLevel(level)
+    logging.getLogger("httpcore").setLevel(level)
+
+
+def get_message_only_logger(name: str, level: int = logging.INFO) -> logging.Logger:
+    """
+    Logger that prints only the message payload (no time/level/name).
+    Does not propagate to the root to avoid basicConfig formatting.
+    """
+    logger = logging.getLogger(name)
+    logger.setLevel(level)
+    logger.propagate = False
+    if not logger.handlers:
+        handler = logging.StreamHandler()
+        handler.setLevel(level)
+        handler.setFormatter(logging.Formatter("%(message)s"))
+        logger.addHandler(handler)
+    return logger
