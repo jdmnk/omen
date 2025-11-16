@@ -313,11 +313,10 @@ export function UserPnlChart({
             if (mk.kind === "swing") {
               const isUp = mk.direction === "up";
               const color = isUp ? "#22c55e" : "#ef4444";
-              const text =
-                (mk.delta
-                  ? `${isUp ? "+" : ""}${formatCompactCurrency(mk.delta)}`
-                  : "") +
-                (mk.severity ? ` ${mk.severity === "extreme" ? "!" : ""}` : "");
+              const text = mk.delta
+                ? `${isUp ? "+" : ""}${formatCompactCurrency(mk.delta)}`
+                : "";
+              // (mk.severity ? ` ${mk.severity === "extreme" ? "!" : ""}` : "");
               return {
                 id,
                 time: mk.t as Time,
