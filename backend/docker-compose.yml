@@ -63,6 +63,18 @@ services:
       - redisdata:/data
     restart: always
 
+  # price-history-worker:
+  #   build: .
+  #   command: ["python", "-m", "src.workers.price_history_updater"]
+  #   env_file: .env
+  #   depends_on:
+  #     db:
+  #       condition: service_healthy
+  #     db-init:
+  #       condition: service_completed_successfully
+  #   restart: always
+  #   user: "1000:1000"
+
 volumes:
   pgdata:
   redisdata:

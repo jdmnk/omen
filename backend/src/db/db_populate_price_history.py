@@ -11,7 +11,7 @@ logger = get_logger(__name__)
 quiet_httpx_logging()
 
 
-async def main() -> None:
+async def refresh_price_histories() -> None:
     start_time = time.time()
     poly_client = PolyClient()
     poly_client_prices = PolyClientPrices()
@@ -49,6 +49,10 @@ async def main() -> None:
 
     duration = time.time() - start_time
     logger.info("Total execution time: %.2f seconds", duration)
+
+
+async def main() -> None:
+    await refresh_price_histories()
 
 
 if __name__ == "__main__":

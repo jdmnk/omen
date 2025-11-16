@@ -62,6 +62,23 @@ services:
     ports:
       - "6379:6379"
 
+  price-history-worker:
+    build: .
+    command: ["python", "-m", "src.workers.price_history_updater"]
+    environment:
+      API_ENV: "${API_ENV}"
+      DATABASE_URL: "${DATABASE_URL}"
+      REDIS_URL: "${REDIS_URL}"
+      POLYMARKET_PRIVATE_KEY: "${POLYMARKET_PRIVATE_KEY}"
+      WATCHFILES_FORCE_POLLING: "true"
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    volumes:
+      - .:/app
+
 volumes:
   pgdata:
   redisdata:
