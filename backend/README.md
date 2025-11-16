@@ -14,6 +14,7 @@ docker compose exec app python -m src.db.db_init --reset
 docker compose exec app python -m src.db.db_populate_markets
 docker compose exec app python -m src.db.db_populate_trades
 docker compose exec app python -m src.db.db_populate_positions
+docker compose exec app python -m src.db.db_populate_price_history
 
 # update in a loop (currently unused)
 docker compose exec app python -m src.update_markets
@@ -38,6 +39,7 @@ Database Management:
 
 ```bash
 docker compose exec db psql -U user -d mydb -c "SELECT count(condition_id) FROM markets;"
+docker compose exec db psql -U user -d mydb -c "SELECT count(clob_token_id) FROM price_histories;"
 
 docker compose exec db psql -U user -d mydb -c 'SELECT COUNT(DISTINCT "proxyWallet") FROM trades;'
 ```
