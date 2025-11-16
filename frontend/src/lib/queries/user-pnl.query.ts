@@ -9,12 +9,11 @@ export type UserPnlPoint = {
 
 // API interval values: 'max', 'all', '1m', '1w', '1d', '12h', '6h'
 // API fidelity values: '1d', '18h', '12h', '3h', '1h'
-export type UserPnlInterval = "12h" | "1d" | "3d" | "1w" | "1m" | "max";
+export type UserPnlInterval = "12h" | "1d" | "1w" | "1m" | "max";
 
 const INTERVAL_FIDELITY: Record<UserPnlInterval, string> = {
   "12h": "1h",
   "1d": "1h",
-  "3d": "1h",
   "1w": "3h",
   "1m": "12h",
   max: "1d",

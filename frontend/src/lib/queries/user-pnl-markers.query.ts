@@ -2,7 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { getBaseUrl } from "@/lib/api.const";
 import type { PnlWithMarkersResponse } from "@/lib/models/api.models";
 
-export type UserPnlInterval = "12h" | "1d" | "3d" | "1w" | "1m" | "max";
+export type UserPnlInterval = "12h" | "1d" | "1w" | "1m" | "max";
 
 export function useUserPnlWithMarkersQuery(
   userAddress: string,
