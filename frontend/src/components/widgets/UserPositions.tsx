@@ -3,7 +3,11 @@
 import React from "react";
 import { useUserPositionsInfiniteQuery } from "@/lib/queries/user-positions.query";
 import { LoadingSpinner, Spinner } from "@/components/ui/spinner";
-import { formatCompactCurrency, formatNumber } from "@/lib/ui/format.utils";
+import {
+  formatCompactCurrency,
+  formatNumber,
+  formatRelativeTime,
+} from "@/lib/ui/format.utils";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 import { UserPosition } from "@/lib/models/api.models";
@@ -16,7 +20,7 @@ import {
 } from "./shared-table-styles";
 
 const POSITION_ROW_GRID_CLASSES =
-  "grid grid-cols-[minmax(250px,2fr)_minmax(80px,0.8fr)_minmax(80px,0.8fr)_minmax(80px,0.8fr)_minmax(80px,0.8fr)_minmax(100px,1fr)] items-center gap-4";
+  "grid grid-cols-[minmax(220px,2fr)_minmax(80px,0.8fr)_minmax(80px,0.8fr)_minmax(80px,0.8fr)_minmax(80px,0.8fr)_minmax(100px,1fr)_minmax(110px,1fr)] items-center gap-4";
 
 function PositionRow({ position }: { position: UserPosition }) {
   const size = position.size || 0;
@@ -27,6 +31,9 @@ function PositionRow({ position }: { position: UserPosition }) {
   const totalValue = size * currentPrice;
   const pnl = totalValue - totalCost;
   const pnlPercent = totalCost > 0 ? (pnl / totalCost) * 100 : 0;
+  const relativeTime = position.endDate
+    ? formatRelativeTime(position.endDate)
+    : "-";
 
   const pnlColor =
     pnl > 0
@@ -65,6 +72,9 @@ function PositionRow({ position }: { position: UserPosition }) {
           {pnlPercent > 0 ? "+" : ""}
           {formatNumber(pnlPercent, 1)}%
         </div>
+      </div>
+      <div className="text-xs text-muted-foreground text-right">
+        {relativeTime}
       </div>
     </div>
   );
@@ -122,6 +132,7 @@ export function UserPositions({ userId }: { userId: string }) {
           <div>Price</div>
           <div>Value</div>
           <div>PnL</div>
+          <div className="text-right">End time</div>
         </div>
       </div>
       <div className={TABLE_CONTENT_CONTAINER_CLASSES}>

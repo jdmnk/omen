@@ -91,3 +91,46 @@ export function formatAddress(addr: string) {
   if (!addr) return "";
   return `${addr.slice(0, 6)}…${addr.slice(-4)}`;
 }
+
+function normalizeTimestamp(value: number | string | Date): number | null {
+  if (value instanceof Date) return value.getTime();
+  if (typeof value === "number") {
+    if (!Number.isFinite(value)) return null;
+    return value < 1_000_000_000_000 ? value * 1000 : value;
+  }
+  if (typeof value === "string") {
+    const parsed = Date.parse(value);
+    return Number.isNaN(parsed) ? null : parsed;
+  }
+  return null;
+}
+
+export function formatRelativeTime(
+  value: number | string | Date,
+  locale: string = getUserLocale()
+): string {
+  const timestamp = normalizeTimestamp(value);
+  if (timestamp === null) return "-";
+
+  const rtf = new Intl.RelativeTimeFormat(locale, { numeric: "auto" });
+  let duration = (timestamp - Date.now()) / 1000;
+
+  const divisions: { amount: number; unit: Intl.RelativeTimeFormatUnit }[] = [
+    { amount: 60, unit: "second" },
+    { amount: 60, unit: "minute" },
+    { amount: 24, unit: "hour" },
+    { amount: 7, unit: "day" },
+    { amount: 4.34524, unit: "week" },
+    { amount: 12, unit: "month" },
+    { amount: Infinity, unit: "year" },
+  ];
+
+  for (const division of divisions) {
+    if (Math.abs(duration) < division.amount) {
+      return rtf.format(Math.round(duration), division.unit);
+    }
+    duration /= division.amount;
+  }
+
+  return rtf.format(Math.round(duration), "year");
+}

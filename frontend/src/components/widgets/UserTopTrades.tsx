@@ -3,7 +3,11 @@
 import React from "react";
 import { useRecentTradesInfiniteQuery } from "@/lib/queries/recent-trades.query";
 import { LoadingSpinner, Spinner } from "@/components/ui/spinner";
-import { formatCompactCurrency, formatNumber } from "@/lib/ui/format.utils";
+import {
+  formatCompactCurrency,
+  formatNumber,
+  formatRelativeTime,
+} from "@/lib/ui/format.utils";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 import { Trade } from "@/lib/models/api.models";
@@ -16,12 +20,15 @@ import {
 } from "./shared-table-styles";
 
 const TRADE_ROW_GRID_CLASSES =
-  "grid grid-cols-[minmax(250px,2fr)_minmax(80px,0.8fr)_minmax(80px,0.8fr)_minmax(80px,0.8fr)_minmax(80px,0.8fr)_minmax(80px,0.8fr)] items-center gap-4";
+  "grid grid-cols-[minmax(220px,2fr)_minmax(80px,0.8fr)_minmax(70px,0.7fr)_minmax(80px,0.8fr)_minmax(80px,0.8fr)_minmax(90px,0.9fr)_minmax(110px,1fr)] items-center gap-4";
 
 function TradeRow({ trade }: { trade: Trade }) {
   const size = trade.size || 0;
   const price = trade.price || 0;
   const amount = size * price;
+  const relativeTime = trade.timestamp
+    ? formatRelativeTime(trade.timestamp)
+    : "-";
 
   const sideColor =
     trade.side === "BUY" ? "text-outcome-yes" : "text-outcome-no";
@@ -48,6 +55,9 @@ function TradeRow({ trade }: { trade: Trade }) {
       </div>
       <div>
         <div className="font-semibold">{formatCompactCurrency(amount)}</div>
+      </div>
+      <div className="text-xs text-muted-foreground text-right">
+        {relativeTime}
       </div>
     </div>
   );
@@ -105,6 +115,7 @@ export function UserTopTrades({ userId }: { userId: string }) {
           <div>Size</div>
           <div>Price</div>
           <div>Amount</div>
+          <div className="text-right">Time</div>
         </div>
       </div>
       <div className={TABLE_CONTENT_CONTAINER_CLASSES}>

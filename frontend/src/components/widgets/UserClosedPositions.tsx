@@ -3,7 +3,11 @@
 import React from "react";
 import { useClosedPositionsInfiniteQuery } from "@/lib/queries/closed-positions.query";
 import { LoadingSpinner, Spinner } from "@/components/ui/spinner";
-import { formatCompactCurrency, formatNumber } from "@/lib/ui/format.utils";
+import {
+  formatCompactCurrency,
+  formatNumber,
+  formatRelativeTime,
+} from "@/lib/ui/format.utils";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 import { ClosedPosition } from "@/lib/models/frontend.models";
@@ -16,12 +20,15 @@ import {
 } from "./shared-table-styles";
 
 const POSITION_ROW_GRID_CLASSES =
-  "grid grid-cols-[minmax(250px,2fr)_minmax(80px,0.8fr)_minmax(80px,0.8fr)_minmax(80px,0.8fr)_minmax(80px,0.8fr)_minmax(100px,1fr)] items-center gap-4";
+  "grid grid-cols-[minmax(220px,2fr)_minmax(80px,0.8fr)_minmax(80px,0.8fr)_minmax(80px,0.8fr)_minmax(80px,0.8fr)_minmax(100px,1fr)_minmax(110px,1fr)] items-center gap-4";
 
 function ClosedPositionRow({ position }: { position: ClosedPosition }) {
   const totalBought = position.totalBought || 0;
   const avgPrice = position.avgPrice || 0;
   const realizedPnl = position.realizedPnl || 0;
+  const relativeTime = position.timestamp
+    ? formatRelativeTime(position.timestamp)
+    : "-";
 
   const pnlPercent = totalBought > 0 ? (realizedPnl / totalBought) * 100 : 0;
 
@@ -66,6 +73,9 @@ function ClosedPositionRow({ position }: { position: ClosedPosition }) {
           {pnlPercent > 0 ? "+" : ""}
           {formatNumber(pnlPercent, 1)}%
         </div>
+      </div>
+      <div className="text-xs text-muted-foreground text-right">
+        {relativeTime}
       </div>
     </div>
   );
@@ -123,6 +133,7 @@ export function UserClosedPositions({ userId }: { userId: string }) {
           <div>Final Price</div>
           <div>Total Bought</div>
           <div>Realized PnL</div>
+          <div className="text-right">Time</div>
         </div>
       </div>
       <div className={TABLE_CONTENT_CONTAINER_CLASSES}>
