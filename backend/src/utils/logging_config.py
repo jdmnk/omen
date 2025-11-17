@@ -34,3 +34,13 @@ def get_message_only_logger(name: str, level: int = logging.INFO) -> logging.Log
         handler.setFormatter(logging.Formatter("%(message)s"))
         logger.addHandler(handler)
     return logger
+
+
+def to_one_line(text: str) -> str:
+    """
+    Collapse whitespace and newlines to a single space for clean one-line logs/messages.
+    """
+    try:
+        return " ".join(str(text).split())
+    except Exception:
+        return str(text)
