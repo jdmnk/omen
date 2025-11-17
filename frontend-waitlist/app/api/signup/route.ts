@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { google } from "googleapis";
+import { sendDiscordSignupNotification } from "@/lib/discord";
 
 // Email validation regex
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -88,7 +89,7 @@ export async function POST(request: NextRequest) {
     // Append email to the sheet
     // Column A: email, Column B: timestamp, Column C: referral
     // Using RAW mode to prevent formula execution, then formatting as text
-    await sheets.spreadsheets.values.append({
+    const appendResponse = await sheets.spreadsheets.values.append({
       spreadsheetId,
       range: "A:C", // Columns A through C
       valueInputOption: "RAW", // Use RAW to prevent formula execution
@@ -99,6 +100,20 @@ export async function POST(request: NextRequest) {
       },
     });
 
+    const appendedRow = getRowNumberFromRange(
+      appendResponse.data.updates?.updatedRange
+    );
+
+    try {
+      await sendDiscordSignupNotification({
+        email: sanitizedEmail,
+        rowNumber: appendedRow,
+        referral: sanitizedReferral,
+      });
+    } catch (discordError) {
+      console.error("Failed to send Discord notification:", discordError);
+    }
+
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error("Error saving email to Google Sheets:", error);
@@ -107,4 +122,19 @@ export async function POST(request: NextRequest) {
       { status: 500 }
     );
   }
+}
+
+function getRowNumberFromRange(range?: string | null): number | null {
+  if (!range) {
+    return null;
+  }
+
+  const [startCell] = range.split(":");
+  const cell = startCell.split("!").pop();
+  if (!cell) {
+    return null;
+  }
+
+  const match = cell.match(/(\d+)$/);
+  return match ? Number(match[1]) : null;
 }
