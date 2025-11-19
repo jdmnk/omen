@@ -39,9 +39,9 @@ export default async function UserPage({
   const { userId } = await params;
 
   return (
-    <div className="h-full bg-background flex flex-col overflow-hidden">
+    <div className="bg-background">
       {/* <Header /> */}
-      <main className="flex-1 w-full flex flex-col overflow-hidden min-h-0">
+      <main className="w-full">
         <UserProfile userId={userId} />
       </main>
     </div>
