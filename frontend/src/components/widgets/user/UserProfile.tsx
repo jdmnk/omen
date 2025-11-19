@@ -21,6 +21,7 @@ import type {
   PositionActivity,
   PositionActivityLookup,
 } from "./userActivity.types";
+import { UserSelectedMarketCharts } from "./UserSelectedMarketCharts";
 
 async function fetchUserPositionTrades(
   userId: string,
@@ -195,6 +196,9 @@ export function UserProfile({ userId }: { userId: string }) {
           focusedActivities={positionActivities}
         />
       </div>
+
+      {/* Selected Market Charts */}
+      <UserSelectedMarketCharts activities={positionActivities} />
 
       {/* Main Content */}
       <Card className="flex flex-col flex-1 min-h-0">
