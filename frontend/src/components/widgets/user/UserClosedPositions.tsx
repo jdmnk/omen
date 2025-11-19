@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { useUserPositionsInfiniteQuery } from "@/lib/queries/user-positions.query";
+import { useClosedPositionsInfiniteQuery } from "@/lib/queries/closed-positions.query";
 import { LoadingSpinner, Spinner } from "@/components/ui/spinner";
 import {
   formatCompactCurrency,
@@ -10,27 +10,32 @@ import {
 } from "@/lib/ui/format.utils";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
-import { UserPosition } from "@/lib/models/api.models";
+import { ClosedPosition } from "@/lib/models/frontend.models";
 import { useInfiniteScroll } from "@/lib/hooks/use-infinite-scroll";
 import {
   TABLE_HEADER_CLASSES,
   TABLE_ROW_CLASSES,
   TABLE_HEADER_CONTAINER_CLASSES,
   TABLE_CONTENT_CONTAINER_CLASSES,
-} from "./shared-table-styles";
+} from "../shared-table-styles";
 
 const POSITION_ROW_GRID_CLASSES =
   "grid grid-cols-[minmax(220px,2fr)_minmax(80px,0.8fr)_minmax(80px,0.8fr)_minmax(80px,0.8fr)_minmax(80px,0.8fr)_minmax(100px,1fr)_minmax(110px,1fr)] items-center gap-4";
 
-function PositionRow({ position }: { position: UserPosition }) {
-  const size = position.size || 0;
-  const currentPrice = position.curPrice || 0;
-  console.log(position);
+function ClosedPositionRow({ position }: { position: ClosedPosition }) {
+  const totalBought = position.totalBought || 0;
+  const avgPrice = position.avgPrice || 0;
+  const realizedPnl = position.realizedPnl || 0;
+  const relativeTime = position.timestamp
+    ? formatRelativeTime(position.timestamp)
+    : "-";
+
+  const pnlPercent = totalBought > 0 ? (realizedPnl / totalBought) * 100 : 0;
 
   const pnlColor =
-    position.cashPnl > 0
+    realizedPnl > 0
       ? "text-outcome-yes"
-      : position.cashPnl < 0
+      : realizedPnl < 0
       ? "text-outcome-no"
       : "text-muted-foreground";
 
@@ -48,37 +53,35 @@ function PositionRow({ position }: { position: UserPosition }) {
         <div className="font-semibold">{position.outcome}</div>
       </div>
       <div>
-        <div className="font-semibold">{formatNumber(size, 0)}</div>
+        <div className="font-semibold">{formatNumber(avgPrice * 100, 1)}%</div>
       </div>
       <div>
         <div className="font-semibold">
-          {formatNumber(currentPrice * 100, 1)}%
+          {formatNumber(position.curPrice * 100, 1)}%
         </div>
       </div>
       <div>
         <div className="font-semibold">
-          {formatCompactCurrency(position.currentValue)}
+          {formatCompactCurrency(totalBought)}
         </div>
       </div>
       <div className={cn("flex items-center gap-1", pnlColor)}>
         <div className="font-semibold">
-          {formatCompactCurrency(position.cashPnl)}
+          {formatCompactCurrency(realizedPnl)}
         </div>
         <div className="opacity-75">
-          {position.percentPnl > 0 ? "+" : ""}
-          {formatNumber(position.percentPnl, 1)}%
+          {pnlPercent > 0 ? "+" : ""}
+          {formatNumber(pnlPercent, 1)}%
         </div>
       </div>
       <div className="text-xs text-muted-foreground text-right">
-        {position.endDate
-          ? new Date(position.endDate).toLocaleDateString()
-          : "-"}
+        {relativeTime}
       </div>
     </div>
   );
 }
 
-export function UserPositions({ userId }: { userId: string }) {
+export function UserClosedPositions({ userId }: { userId: string }) {
   const {
     data,
     isLoading,
@@ -86,7 +89,7 @@ export function UserPositions({ userId }: { userId: string }) {
     fetchNextPage,
     hasNextPage,
     isFetchingNextPage,
-  } = useUserPositionsInfiniteQuery(userId);
+  } = useClosedPositionsInfiniteQuery(userId, "TIMESTAMP");
 
   const { scrollRef, sentinelRef } = useInfiniteScroll({
     hasNextPage: !!hasNextPage,
@@ -97,7 +100,7 @@ export function UserPositions({ userId }: { userId: string }) {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-8">
-        <LoadingSpinner message="Loading positions..." size="sm" />
+        <LoadingSpinner message="Loading closed positions..." size="sm" />
       </div>
     );
   }
@@ -105,7 +108,7 @@ export function UserPositions({ userId }: { userId: string }) {
   if (error) {
     return (
       <div className="text-center py-8 text-destructive text-sm">
-        Error loading positions
+        Error loading closed positions
       </div>
     );
   }
@@ -115,7 +118,7 @@ export function UserPositions({ userId }: { userId: string }) {
   if (allPositions.length === 0) {
     return (
       <div className="text-center py-8 text-sm text-muted-foreground">
-        No positions found
+        No closed positions found
       </div>
     );
   }
@@ -126,16 +129,19 @@ export function UserPositions({ userId }: { userId: string }) {
         <div className={cn(POSITION_ROW_GRID_CLASSES, TABLE_HEADER_CLASSES)}>
           <div>Market</div>
           <div>Outcome</div>
-          <div>Size</div>
-          <div>Price</div>
-          <div>Value</div>
-          <div>PnL</div>
-          <div className="text-right">End date</div>
+          <div>Avg Price</div>
+          <div>Final Price</div>
+          <div>Total Bought</div>
+          <div>Realized PnL</div>
+          <div className="text-right">Time</div>
         </div>
       </div>
       <div className={TABLE_CONTENT_CONTAINER_CLASSES}>
         {allPositions.map((position, index) => (
-          <PositionRow key={`${position.slug}-${index}`} position={position} />
+          <ClosedPositionRow
+            key={`${position.conditionId}-${position.outcomeIndex}-${index}`}
+            position={position}
+          />
         ))}
         {hasNextPage && <div ref={sentinelRef} className="h-4" />}
       </div>
@@ -146,7 +152,7 @@ export function UserPositions({ userId }: { userId: string }) {
       )}
       {!hasNextPage && allPositions.length > 0 && (
         <div className="text-center py-4 text-xs text-muted-foreground">
-          All {allPositions.length} positions loaded
+          All {allPositions.length} closed positions loaded
         </div>
       )}
     </div>
