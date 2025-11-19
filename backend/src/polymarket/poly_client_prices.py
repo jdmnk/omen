@@ -143,20 +143,26 @@ class PolyClientPrices:
         try:
             async with httpx.AsyncClient() as client:
                 response = await client.get(f"{CLOB_HOST}/prices-history", params=params)
-                if response.status_code != 200:
-                    logger.error(
-                        f"get_price_history_for_token: non-200 status {response.status_code}: {response.text}"
-                    )
-                    return {"history": []}
-                data: PriceHistoryApiResponse = response.json() or {"history": []}
-                # Normalize shape if API returns empty object
-                if "history" not in data or data["history"] is None:
-                    data["history"] = []
-                return data
-        except PolyApiException as exc:
-            logger.error(f"get_price_history_for_token: error: {exc}")
-            logger.error(traceback.format_exc())
-            raise exc
+        except httpx.HTTPError:
+            logger.exception(
+                "get_price_history_for_token: request exception for %s", token_id
+            )
+            raise
+
+        if response.status_code != 200:
+            body = response.text
+            logger.error(
+                "get_price_history_for_token: non-200 status %s: %s",
+                response.status_code,
+                body,
+            )
+            response.raise_for_status()
+
+        data: PriceHistoryApiResponse = response.json() or {"history": []}
+        # Normalize shape if API returns empty object
+        if "history" not in data or data["history"] is None:
+            data["history"] = []
+        return data
 
     async def get_user_pnl_points(
         self,
