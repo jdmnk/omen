@@ -23,7 +23,7 @@ import { getPositionKey } from "@/lib/utils/position.utils";
 import { getPolymarketEventUrl } from "@/lib/utils/polymarket.utils";
 
 const POSITION_ROW_GRID_CLASSES =
-  "grid grid-cols-[minmax(24px,24px)_minmax(220px,2fr)_minmax(80px,0.8fr)_minmax(80px,0.8fr)_minmax(80px,0.8fr)_minmax(80px,0.8fr)_minmax(100px,1fr)_minmax(110px,1fr)] items-center gap-4";
+  "grid grid-cols-[18px_minmax(220px,2fr)_minmax(80px,0.8fr)_minmax(80px,0.8fr)_minmax(80px,0.8fr)_minmax(80px,0.8fr)_minmax(100px,1fr)_minmax(110px,1fr)] items-center gap-4";
 
 type PositionRowProps = {
   position: UserPosition;
@@ -89,12 +89,10 @@ function PositionRow({
           <Checkbox
             aria-label="Select position"
             checked={isSelected}
-            onCheckedChange={(checked) =>
-              toggleSelection(Boolean(checked))
-            }
+            onCheckedChange={(checked) => toggleSelection(Boolean(checked))}
           />
         </div>
-        <div className="min-w-0 overflow-hidden flex">
+        <div className="flex min-w-0 overflow-hidden">
           <a
             href={marketUrl}
             target="_blank"

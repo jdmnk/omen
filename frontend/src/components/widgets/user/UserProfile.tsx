@@ -22,6 +22,9 @@ import type {
   PositionActivityLookup,
 } from "./userActivity.types";
 import { UserSelectedMarketCharts } from "./UserSelectedMarketCharts";
+import { Copy } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { copyToClipboard } from "@/lib/utils/clipboard.utils";
 
 async function fetchUserPositionTrades(
   userId: string,
@@ -113,14 +116,17 @@ export function UserProfile({ userId }: { userId: string }) {
   }, [selectedPositionsList, positionTradeQueries]);
 
   const positionActivitiesLookup: PositionActivityLookup = useMemo(() => {
-    return positionActivities.reduce<PositionActivityLookup>((acc, activity) => {
-      acc[activity.key] = {
-        trades: activity.trades,
-        isLoading: activity.isLoading,
-        isError: activity.isError,
-      };
-      return acc;
-    }, {});
+    return positionActivities.reduce<PositionActivityLookup>(
+      (acc, activity) => {
+        acc[activity.key] = {
+          trades: activity.trades,
+          isLoading: activity.isLoading,
+          isError: activity.isError,
+        };
+        return acc;
+      },
+      {}
+    );
   }, [positionActivities]);
 
   const selectedPositionKeys = useMemo(
@@ -132,6 +138,15 @@ export function UserProfile({ userId }: { userId: string }) {
     if (!valueData || valueData.length === 0) return 0;
     return valueData[0]?.value || 0;
   }, [valueData]);
+
+  const [copyMessage, setCopyMessage] = useState<string | null>(null);
+
+  const handleCopy = useCallback(async () => {
+    if (!userId) return;
+    const ok = await copyToClipboard(userId);
+    setCopyMessage(ok ? "Copied address" : "Copy failed");
+    setTimeout(() => setCopyMessage(null), 2000);
+  }, [userId]);
 
   return (
     <div className="container mx-auto max-w-7xl p-6 space-y-6 flex-1 flex flex-col min-h-0">
@@ -154,6 +169,20 @@ export function UserProfile({ userId }: { userId: string }) {
                 {userData?.name || userData?.pseudonym || formatAddress(userId)}
               </a>
             </h1>
+            <Button
+              size="icon"
+              variant="ghost"
+              className="h-6 w-6 text-muted-foreground p-0 [&_svg]:h-3 [&_svg]:w-3"
+              onClick={handleCopy}
+              aria-label="Copy address"
+            >
+              <Copy />
+            </Button>
+            {copyMessage && (
+              <span className="text-[11px] text-muted-foreground">
+                {copyMessage}
+              </span>
+            )}
           </div>
           <div className="text-[11px] text-muted-foreground">
             Joined{" "}
