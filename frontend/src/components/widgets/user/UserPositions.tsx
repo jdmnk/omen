@@ -9,7 +9,6 @@ import {
   formatRelativeTime,
 } from "@/lib/ui/format.utils";
 import { cn } from "@/lib/utils";
-import Link from "next/link";
 import { UserPosition } from "@/lib/models/api.models";
 import { useInfiniteScroll } from "@/lib/hooks/use-infinite-scroll";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -21,6 +20,7 @@ import {
 } from "../shared-table-styles";
 import type { PositionActivityLookup } from "./userActivity.types";
 import { getPositionKey } from "@/lib/utils/position.utils";
+import { getPolymarketEventUrl } from "@/lib/utils/polymarket.utils";
 
 const POSITION_ROW_GRID_CLASSES =
   "grid grid-cols-[minmax(24px,24px)_minmax(220px,2fr)_minmax(80px,0.8fr)_minmax(80px,0.8fr)_minmax(80px,0.8fr)_minmax(80px,0.8fr)_minmax(100px,1fr)_minmax(110px,1fr)] items-center gap-4";
@@ -40,7 +40,7 @@ function PositionRow({
 }: PositionRowProps) {
   const size = position.size || 0;
   const currentPrice = position.curPrice || 0;
-  console.log("opened position", position);
+  const marketUrl = getPolymarketEventUrl(position.slug);
 
   const pnlColor =
     position.cashPnl > 0
@@ -49,25 +49,61 @@ function PositionRow({
       ? "text-outcome-no"
       : "text-muted-foreground";
 
+  const toggleSelection = (next: boolean) => {
+    onTogglePosition?.(position, next);
+  };
+
+  const handleRowClick = (event: React.MouseEvent<HTMLDivElement>) => {
+    if ((event.target as HTMLElement).closest("a")) {
+      return;
+    }
+    toggleSelection(!isSelected);
+  };
+
+  const handleRowKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      toggleSelection(!isSelected);
+    }
+  };
+
   return (
     <div className="flex flex-col gap-2">
-      <div className={cn(POSITION_ROW_GRID_CLASSES, TABLE_ROW_CLASSES)}>
-        <div className="flex justify-center">
+      <div
+        className={cn(
+          POSITION_ROW_GRID_CLASSES,
+          TABLE_ROW_CLASSES,
+          "cursor-pointer"
+        )}
+        role="button"
+        tabIndex={0}
+        aria-pressed={isSelected}
+        onClick={handleRowClick}
+        onKeyDown={handleRowKeyDown}
+      >
+        <div
+          className="flex justify-center"
+          onClick={(event) => event.stopPropagation()}
+          onKeyDown={(event) => event.stopPropagation()}
+        >
           <Checkbox
             aria-label="Select position"
             checked={isSelected}
             onCheckedChange={(checked) =>
-              onTogglePosition?.(position, Boolean(checked))
+              toggleSelection(Boolean(checked))
             }
           />
         </div>
-        <div className="min-w-0 overflow-hidden">
-          <Link
-            href={`/market/${position.slug}`}
-            className="block truncate font-medium hover:underline"
+        <div className="min-w-0 overflow-hidden flex">
+          <a
+            href={marketUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex max-w-full truncate font-medium hover:underline"
+            onClick={(event) => event.stopPropagation()}
           >
             {position.title}
-          </Link>
+          </a>
         </div>
         <div>
           <div className="font-semibold">{position.outcome}</div>
