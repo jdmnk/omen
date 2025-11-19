@@ -25,7 +25,7 @@ const POSITION_ROW_GRID_CLASSES =
 function PositionRow({ position }: { position: UserPosition }) {
   const size = position.size || 0;
   const currentPrice = position.curPrice || 0;
-  console.log(position);
+  console.log("opened position", position);
 
   const pnlColor =
     position.cashPnl > 0
