@@ -149,7 +149,7 @@ export function UserProfile({ userId }: { userId: string }) {
   }, [userId]);
 
   return (
-    <div className="container mx-auto max-w-7xl p-6 space-y-6 flex-1 flex flex-col min-h-0">
+    <div className="container mx-auto max-w-7xl p-6 space-y-6">
       {/* Compact Header + Inline Stats */}
       <div className="flex items-start justify-between gap-3 flex-wrap">
         <img
@@ -230,13 +230,13 @@ export function UserProfile({ userId }: { userId: string }) {
       <UserSelectedMarketCharts activities={positionActivities} />
 
       {/* Main Content */}
-      <Card className="flex flex-col flex-1 min-h-0">
+      <Card className="flex flex-col">
         <Tabs
           value={activeTab}
           onValueChange={setActiveTab}
-          className="w-full flex flex-col h-full min-h-0"
+          className="w-full flex flex-col"
         >
-          <TabsList className="px-3 pt-2 shrink-0">
+          <TabsList className="px-3 pt-2">
             <TabsTrigger value="positions" className="uppercase">
               Open Positions
             </TabsTrigger>
@@ -248,10 +248,7 @@ export function UserProfile({ userId }: { userId: string }) {
             </TabsTrigger>
           </TabsList>
 
-          <TabsContent
-            value="positions"
-            className="flex-1 overflow-auto min-h-0 mt-0"
-          >
+          <TabsContent value="positions">
             <UserPositions
               userId={userId}
               selectedPositionKeys={selectedPositionKeys}
@@ -260,10 +257,7 @@ export function UserProfile({ userId }: { userId: string }) {
             />
           </TabsContent>
 
-          <TabsContent
-            value="closed"
-            className="flex-1 overflow-auto min-h-0 mt-0"
-          >
+          <TabsContent value="closed">
             <UserClosedPositions
               userId={userId}
               selectedPositionKeys={selectedPositionKeys}
@@ -272,10 +266,7 @@ export function UserProfile({ userId }: { userId: string }) {
             />
           </TabsContent>
 
-          <TabsContent
-            value="trades"
-            className="flex-1 overflow-auto min-h-0 mt-0"
-          >
+          <TabsContent value="trades">
             <UserTopTrades userId={userId} />
           </TabsContent>
         </Tabs>
