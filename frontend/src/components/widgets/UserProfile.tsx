@@ -38,7 +38,14 @@ export function UserProfile({ userId }: { userId: string }) {
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-2">
             <h1 className="text-sm font-bold truncate max-w-[60vw]">
-              {userData?.name || userData?.pseudonym || formatAddress(userId)}
+              <a
+                href={`https://polymarket.com/profile/${userId}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:underline"
+              >
+                {userData?.name || userData?.pseudonym || formatAddress(userId)}
+              </a>
             </h1>
           </div>
           <div className="text-[11px] text-muted-foreground">
