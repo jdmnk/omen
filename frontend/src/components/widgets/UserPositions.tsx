@@ -25,17 +25,12 @@ const POSITION_ROW_GRID_CLASSES =
 function PositionRow({ position }: { position: UserPosition }) {
   const size = position.size || 0;
   const currentPrice = position.curPrice || 0;
-  const avgPrice = position.avgPrice || 0;
-  const totalCost = position.totalBought * position.avgPrice || 0;
-
-  const totalValue = size * currentPrice;
-  const pnl = totalValue - totalCost;
-  const pnlPercent = totalCost > 0 ? (pnl / totalCost) * 100 : 0;
+  console.log(position);
 
   const pnlColor =
-    pnl > 0
+    position.cashPnl > 0
       ? "text-outcome-yes"
-      : pnl < 0
+      : position.cashPnl < 0
       ? "text-outcome-no"
       : "text-muted-foreground";
 
@@ -61,13 +56,17 @@ function PositionRow({ position }: { position: UserPosition }) {
         </div>
       </div>
       <div>
-        <div className="font-semibold">{formatCompactCurrency(totalValue)}</div>
+        <div className="font-semibold">
+          {formatCompactCurrency(position.currentValue)}
+        </div>
       </div>
       <div className={cn("flex items-center gap-1", pnlColor)}>
-        <div className="font-semibold">{formatCompactCurrency(pnl)}</div>
+        <div className="font-semibold">
+          {formatCompactCurrency(position.cashPnl)}
+        </div>
         <div className="opacity-75">
-          {pnlPercent > 0 ? "+" : ""}
-          {formatNumber(pnlPercent, 1)}%
+          {position.percentPnl > 0 ? "+" : ""}
+          {formatNumber(position.percentPnl, 1)}%
         </div>
       </div>
       <div className="text-xs text-muted-foreground text-right">
