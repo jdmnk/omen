@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import type { Time, SeriesMarker } from "lightweight-charts";
 import { Card } from "@/components/ui/card";
 import { Interval } from "@/lib/models/frontend.models";
@@ -33,6 +33,15 @@ const INTERVAL_FIDELITY: Record<Interval, number> = {
   "1w": 60,
   "1m": 240,
   max: 1440,
+};
+
+const INTERVAL_DURATION_SEC: Record<Interval, number> = {
+  "1h": 60 * 60,
+  "6h": 6 * 60 * 60,
+  "1d": 24 * 60 * 60,
+  "1w": 7 * 24 * 60 * 60,
+  "1m": 30 * 24 * 60 * 60,
+  max: Infinity,
 };
 
 function dedupeHistory(points: PriceHistoryPoint[] = []) {
@@ -79,10 +88,43 @@ function buildTradeMarkers(entries: MarketActivityEntry[] = []): SeriesMarker<Ti
     .filter(Boolean) as SeriesMarker<Time>[];
 }
 
+function pickIntervalForRange(rangeSeconds: number): Interval {
+  if (!Number.isFinite(rangeSeconds) || rangeSeconds <= 0) {
+    return "6h";
+  }
+  for (const interval of INTERVALS) {
+    if (interval === "1h") continue;
+    if (rangeSeconds <= INTERVAL_DURATION_SEC[interval]) {
+      return interval;
+    }
+  }
+  return "max";
+}
+
 function PositionChartCard({ activity }: { activity: PositionActivity }) {
-  const [interval, setInterval] = useState<Interval>("max");
+  const activityRangeSeconds = useMemo(() => {
+    const timestamps =
+      activity.entries?.map((entry) => entry.timestamp).filter(Boolean) ?? [];
+    if (timestamps.length < 2) return 0;
+    return (
+      Math.max.apply(null, timestamps) - Math.min.apply(null, timestamps)
+    );
+  }, [activity.entries]);
+
+  const suggestedInterval = useMemo(
+    () => pickIntervalForRange(activityRangeSeconds * 1.2),
+    [activityRangeSeconds]
+  );
+
+  const [interval, setInterval] = useState<Interval>(suggestedInterval);
   const tokenId = activity.position.asset;
   const { chartData, isLoading, error } = useChartData(tokenId, interval);
+  useEffect(() => {
+    setInterval((prev) =>
+      prev === suggestedInterval ? prev : suggestedInterval
+    );
+  }, [suggestedInterval]);
+
   const markers = useMemo(
     () => buildTradeMarkers(activity.entries),
     [activity.entries]
