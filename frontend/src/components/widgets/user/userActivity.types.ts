@@ -1,12 +1,13 @@
-import type { Trade } from "@/lib/models/api.models";
-import type { UserPosition, ClosedPosition } from "@/lib/models/frontend.models";
-
-export type SelectablePosition = UserPosition | ClosedPosition;
+import type {
+  ClosedPosition,
+  MarketActivityEntry,
+  UserPosition,
+} from "@/lib/models/frontend.models";
 
 export type PositionActivity = {
   key: string;
   position: SelectablePosition;
-  trades: Trade[];
+  entries: MarketActivityEntry[];
   isLoading: boolean;
   isError: boolean;
 };
@@ -14,8 +15,10 @@ export type PositionActivity = {
 export type PositionActivityLookup = Record<
   string,
   {
-    trades?: Trade[];
+    entries?: MarketActivityEntry[];
     isLoading?: boolean;
     isError?: boolean;
   }
 >;
+
+export type SelectablePosition = UserPosition | ClosedPosition;

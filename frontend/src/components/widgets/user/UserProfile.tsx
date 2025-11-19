@@ -4,7 +4,6 @@ import React, { useState, useMemo, useCallback } from "react";
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { UserPositions } from "./UserPositions";
-import { UserTopTrades } from "./UserTopTrades";
 import { UserClosedPositions } from "./UserClosedPositions";
 import { UserPnlChartWidgetV2 } from "./UserPnlChartWidgetV2";
 import { formatAddress, formatCompactCurrency } from "@/lib/ui/format.utils";
@@ -12,9 +11,7 @@ import { useUserTradedQuery } from "@/lib/queries/user-traded.query";
 import { useUserValueQuery } from "@/lib/queries/user-value.query";
 import { useIsMounted } from "@/lib/hooks/use-is-mounted";
 import { useUserDataQuery } from "@/lib/queries/user-data.query";
-import { useQueries } from "@tanstack/react-query";
-import { DATA_API_HOST } from "@/lib/api.const";
-import type { Trade } from "@/lib/models/api.models";
+import { fetchUserActivityEntries } from "@/lib/queries/user-activity.query";
 import { getPositionKey } from "@/lib/utils/position.utils";
 import type {
   PositionActivity,
@@ -22,33 +19,26 @@ import type {
   SelectablePosition,
 } from "./userActivity.types";
 import { UserSelectedMarketCharts } from "./UserSelectedMarketCharts";
+import { UserActivityFeed } from "./UserActivityFeed";
 import { Copy } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { copyToClipboard } from "@/lib/utils/clipboard.utils";
+import { useQueries } from "@tanstack/react-query";
 
-async function fetchUserPositionTrades(
+async function fetchUserPositionActivity(
   userId: string,
   position: SelectablePosition
-): Promise<Trade[]> {
-  const url = new URL(`${DATA_API_HOST}/trades`);
-  url.searchParams.set("market", position.conditionId);
-  url.searchParams.set("user", userId);
-  url.searchParams.set("limit", "500");
-  url.searchParams.set("offset", "0");
-  url.searchParams.set("filterType", "CASH");
-  url.searchParams.set("filterAmount", "0");
-  const response = await fetch(url.toString(), { cache: "no-store" });
-  if (!response.ok) {
-    throw new Error(`Failed to fetch trades for position ${position.asset}`);
-  }
-  const data = (await response.json()) as Trade[];
+) {
+  const entries = await fetchUserActivityEntries(userId, position.conditionId);
   const outcomeIndex = position.outcomeIndex;
-  return data.filter(
-    (trade) =>
-      trade.asset === position.asset ||
-      (outcomeIndex !== null &&
-        outcomeIndex !== undefined &&
-        trade.outcomeIndex === outcomeIndex)
+  if (outcomeIndex === null || outcomeIndex === undefined) {
+    return entries;
+  }
+  return entries.filter(
+    (entry) =>
+      entry.outcomeIndex === null ||
+      entry.outcomeIndex === undefined ||
+      entry.outcomeIndex === outcomeIndex
   );
 }
 
@@ -86,16 +76,15 @@ export function UserProfile({ userId }: { userId: string }) {
     [selectedPositions]
   );
 
-  const positionTradeQueries = useQueries({
+  const positionActivityQueries = useQueries({
     queries: selectedPositionsList.map((position) => ({
       queryKey: [
-        "user-position-trades",
+        "user-position-activity",
         userId,
         position.conditionId,
         position.outcomeIndex,
-        position.asset,
       ],
-      queryFn: () => fetchUserPositionTrades(userId, position),
+      queryFn: () => fetchUserPositionActivity(userId, position),
       enabled: Boolean(userId && position.conditionId),
       staleTime: 60_000,
     })),
@@ -104,22 +93,22 @@ export function UserProfile({ userId }: { userId: string }) {
   const positionActivities: PositionActivity[] = useMemo(() => {
     return selectedPositionsList.map((position, index) => {
       const key = getPositionKey(position);
-      const query = positionTradeQueries[index];
+      const query = positionActivityQueries[index];
       return {
         key,
         position,
-        trades: query?.data ?? [],
+        entries: query?.data ?? [],
         isLoading: Boolean(query?.isLoading),
         isError: Boolean(query?.isError),
       };
     });
-  }, [selectedPositionsList, positionTradeQueries]);
+  }, [selectedPositionsList, positionActivityQueries]);
 
   const positionActivitiesLookup: PositionActivityLookup = useMemo(() => {
     return positionActivities.reduce<PositionActivityLookup>(
       (acc, activity) => {
         acc[activity.key] = {
-          trades: activity.trades,
+          entries: activity.entries,
           isLoading: activity.isLoading,
           isError: activity.isError,
         };
@@ -149,7 +138,7 @@ export function UserProfile({ userId }: { userId: string }) {
   }, [userId]);
 
   return (
-    <div className="container mx-auto max-w-7xl p-6 space-y-6">
+    <div className="container mx-auto max-w-7xl p-6 space-y-6 max-h-max">
       {/* Compact Header + Inline Stats */}
       <div className="flex items-start justify-between gap-3 flex-wrap">
         <img
@@ -243,8 +232,8 @@ export function UserProfile({ userId }: { userId: string }) {
             <TabsTrigger value="closed" className="uppercase">
               Closed Positions
             </TabsTrigger>
-            <TabsTrigger value="trades" className="uppercase">
-              Recent Trades
+            <TabsTrigger value="activity" className="uppercase">
+              Activity
             </TabsTrigger>
           </TabsList>
 
@@ -266,8 +255,8 @@ export function UserProfile({ userId }: { userId: string }) {
             />
           </TabsContent>
 
-          <TabsContent value="trades">
-            <UserTopTrades userId={userId} />
+          <TabsContent value="activity">
+            <UserActivityFeed userId={userId} />
           </TabsContent>
         </Tabs>
       </Card>

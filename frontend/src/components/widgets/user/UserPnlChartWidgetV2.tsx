@@ -142,19 +142,20 @@ export function UserPnlChartWidgetV2({
     const markers: PositionMarker[] = [];
     focusedActivities.forEach((activity) => {
       const key = getPositionKey(activity.position);
-      (activity.trades || []).forEach((trade, idx) => {
-        const time = toChartTime(trade.timestamp);
+      (activity.entries || []).forEach((entry, idx) => {
+        if (entry.type !== "TRADE") return;
+        const time = toChartTime(entry.timestamp);
         if (!time) return;
-        const isBuy = (trade.side ?? "").toUpperCase() === "BUY";
+        const isBuy = (entry.side ?? "").toUpperCase() === "BUY";
         markers.push({
-          id: `trade-${key}-${trade.timestamp}-${idx}`,
+          id: `trade-${key}-${entry.timestamp}-${idx}`,
           time,
           position: isBuy ? "belowBar" : "aboveBar",
           color: isBuy ? "#22c55e" : "#ef4444",
           shape: "circle",
           text:
-            trade.price !== undefined && trade.price !== null
-              ? `${Math.round(trade.price * 100)}¢`
+            entry.price !== undefined && entry.price !== null
+              ? `${Math.round(entry.price * 100)}¢`
               : "",
         });
       });
@@ -245,7 +246,8 @@ function LegendSection({
 }) {
   if (hasFocusedActivities) {
     const totalTrades = focusedActivities.reduce(
-      (acc, activity) => acc + (activity.trades?.length ?? 0),
+      (acc, activity) =>
+        acc + (activity.entries?.filter((entry) => entry.type === "TRADE").length ?? 0),
       0
     );
     const loading = focusedActivities.some((activity) => activity.isLoading);

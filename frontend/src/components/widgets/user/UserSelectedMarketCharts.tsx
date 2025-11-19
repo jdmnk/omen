@@ -8,8 +8,8 @@ import {
   usePriceHistoryQuery,
   PriceHistoryPoint,
 } from "@/lib/queries/price-history.query";
-import type { Trade } from "@/lib/models/api.models";
 import type { PositionActivity } from "./userActivity.types";
+import type { MarketActivityEntry } from "@/lib/models/frontend.models";
 import { PositionPriceChart } from "./charts/PositionPriceChart";
 import { formatCompactCurrency } from "@/lib/ui/format.utils";
 import { getPositionKey } from "@/lib/utils/position.utils";
@@ -56,18 +56,19 @@ function useChartData(tokenId?: string | null, interval: Interval = "1w") {
   return { ...query, chartData };
 }
 
-function buildTradeMarkers(trades: Trade[] = []): SeriesMarker<Time>[] {
-  return trades
-    .map((trade, idx) => {
-      const timestamp = trade.timestamp;
+function buildTradeMarkers(entries: MarketActivityEntry[] = []): SeriesMarker<Time>[] {
+  return entries
+    .map((entry, idx) => {
+      if (entry.type !== "TRADE") return null;
+      const timestamp = entry.timestamp;
       if (!timestamp) return null;
       const priceLabel =
-        trade.price !== undefined && trade.price !== null
-          ? `${Math.round(trade.price * 100)}¢`
+        entry.price !== undefined && entry.price !== null
+          ? `${Math.round(entry.price * 100)}¢`
           : "";
-      const isBuy = (trade.side ?? "").toUpperCase() === "BUY";
+      const isBuy = (entry.side ?? "").toUpperCase() === "BUY";
       return {
-        id: `trade-${trade.transactionHash}-${idx}`,
+        id: `trade-${entry.transactionHash ?? "activity"}-${idx}`,
         time: Math.floor(timestamp) as Time,
         position: isBuy ? "belowBar" : "aboveBar",
         color: isBuy ? "#22c55e" : "#ef4444",
@@ -83,8 +84,8 @@ function PositionChartCard({ activity }: { activity: PositionActivity }) {
   const tokenId = activity.position.asset;
   const { chartData, isLoading, error } = useChartData(tokenId, interval);
   const markers = useMemo(
-    () => buildTradeMarkers(activity.trades),
-    [activity.trades]
+    () => buildTradeMarkers(activity.entries),
+    [activity.entries]
   );
   const marketUrl = getPolymarketEventUrl(activity.position.slug ?? undefined);
   const positionValue =
@@ -105,7 +106,7 @@ function PositionChartCard({ activity }: { activity: PositionActivity }) {
             {activity.position.title ?? activity.position.slug}
           </a>
           <p className="text-xs text-muted-foreground">
-            {activity.position.outcome ?? "Outcome"} ·{" "}
+              {activity.position.outcome ?? "Outcome"} ·{" "}
             {formatCompactCurrency(positionValue)}
           </p>
         </div>

@@ -3,10 +3,7 @@
 import React from "react";
 import { useUserPositionsInfiniteQuery } from "@/lib/queries/user-positions.query";
 import { LoadingSpinner, Spinner } from "@/components/ui/spinner";
-import {
-  formatCompactCurrency,
-  formatNumber,
-} from "@/lib/ui/format.utils";
+import { formatCompactCurrency, formatNumber } from "@/lib/ui/format.utils";
 import { cn } from "@/lib/utils";
 import { UserPosition } from "@/lib/models/api.models";
 import { useInfiniteScroll } from "@/lib/hooks/use-infinite-scroll";
@@ -17,10 +14,13 @@ import {
   TABLE_CONTENT_CONTAINER_CLASSES,
   TABLE_ROW_CLASSES,
 } from "../shared-table-styles";
-import type { PositionActivityLookup, SelectablePosition } from "./userActivity.types";
+import type {
+  PositionActivityLookup,
+  SelectablePosition,
+} from "./userActivity.types";
 import { getPositionKey } from "@/lib/utils/position.utils";
 import { getPolymarketEventUrl } from "@/lib/utils/polymarket.utils";
-import { PositionTradesSubRow } from "./PositionTradesSubRow";
+import { PositionActivitySubRow } from "./PositionActivitySubRow";
 
 const POSITION_ROW_GRID_CLASSES =
   "grid grid-cols-[18px_minmax(220px,2fr)_minmax(80px,0.8fr)_minmax(80px,0.8fr)_minmax(80px,0.8fr)_minmax(80px,0.8fr)_minmax(100px,1fr)_minmax(110px,1fr)] items-center gap-4";
@@ -133,7 +133,7 @@ function PositionRow({
         </div>
       </div>
       {isSelected ? (
-        <PositionTradesSubRow
+        <PositionActivitySubRow
           marketTitle={position.title}
           activityState={activityState}
         />

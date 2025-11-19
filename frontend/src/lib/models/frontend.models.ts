@@ -91,3 +91,20 @@ export type UserValue = {
   user: string;
   value: number;
 };
+
+export type MarketActivityEntry = {
+  type: string;
+  timestamp: number;
+  conditionId?: string | null;
+  asset?: string | null;
+  side?: string | null;
+  size?: number | null;
+  price?: number | null;
+  usdcSize?: number | null;
+  outcome?: string | null;
+  outcomeIndex?: number | null;
+  title?: string | null;
+  slug?: string | null;
+  eventSlug?: string | null;
+  transactionHash?: string | null;
+};
