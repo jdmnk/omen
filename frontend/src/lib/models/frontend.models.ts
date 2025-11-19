@@ -58,6 +58,8 @@ export type UserPosition = {
   oppositeAsset: string | null;
   endDate: string | null;
   negativeRisk: boolean;
+  timestamp?: number | string | null;
+  openedAt?: number | string | null;
 };
 
 export type ClosedPosition = {

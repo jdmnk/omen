@@ -6,7 +6,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { UserPositions } from "./UserPositions";
 import { UserTopTrades } from "./UserTopTrades";
 import { UserClosedPositions } from "./UserClosedPositions";
-import { UserPnlChartWidget } from "./UserPnlChartWidget";
+import { UserPnlChartWidgetV2 } from "./UserPnlChartWidgetV2";
 import { formatAddress, formatCompactCurrency } from "@/lib/ui/format.utils";
 import { useUserTradedQuery } from "@/lib/queries/user-traded.query";
 import { useUserValueQuery } from "@/lib/queries/user-value.query";
@@ -84,7 +84,7 @@ export function UserProfile({ userId }: { userId: string }) {
 
       {/* PnL Chart */}
       <div className="h-96">
-        <UserPnlChartWidget userId={userId} />
+        <UserPnlChartWidgetV2 userId={userId} />
       </div>
 
       {/* Main Content */}
