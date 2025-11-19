@@ -15,11 +15,11 @@ import { useUserDataQuery } from "@/lib/queries/user-data.query";
 import { useQueries } from "@tanstack/react-query";
 import { DATA_API_HOST } from "@/lib/api.const";
 import type { Trade } from "@/lib/models/api.models";
-import type { UserPosition } from "@/lib/models/frontend.models";
 import { getPositionKey } from "@/lib/utils/position.utils";
 import type {
   PositionActivity,
   PositionActivityLookup,
+  SelectablePosition,
 } from "./userActivity.types";
 import { UserSelectedMarketCharts } from "./UserSelectedMarketCharts";
 import { Copy } from "lucide-react";
@@ -28,7 +28,7 @@ import { copyToClipboard } from "@/lib/utils/clipboard.utils";
 
 async function fetchUserPositionTrades(
   userId: string,
-  position: UserPosition
+  position: SelectablePosition
 ): Promise<Trade[]> {
   const url = new URL(`${DATA_API_HOST}/trades`);
   url.searchParams.set("market", position.conditionId);
@@ -55,7 +55,7 @@ async function fetchUserPositionTrades(
 export function UserProfile({ userId }: { userId: string }) {
   const [activeTab, setActiveTab] = useState("positions");
   const [selectedPositions, setSelectedPositions] = useState<
-    Record<string, UserPosition>
+    Record<string, SelectablePosition>
   >({});
   const isMounted = useIsMounted();
 
@@ -64,7 +64,7 @@ export function UserProfile({ userId }: { userId: string }) {
   const { data: userData } = useUserDataQuery(userId);
 
   const handlePositionToggle = useCallback(
-    (position: UserPosition, checked: boolean) => {
+    (position: SelectablePosition, checked: boolean) => {
       setSelectedPositions((prev) => {
         const key = getPositionKey(position);
         if (checked) {
@@ -264,7 +264,12 @@ export function UserProfile({ userId }: { userId: string }) {
             value="closed"
             className="flex-1 overflow-auto min-h-0 mt-0"
           >
-            <UserClosedPositions userId={userId} />
+            <UserClosedPositions
+              userId={userId}
+              selectedPositionKeys={selectedPositionKeys}
+              onTogglePosition={handlePositionToggle}
+              positionActivities={positionActivitiesLookup}
+            />
           </TabsContent>
 
           <TabsContent

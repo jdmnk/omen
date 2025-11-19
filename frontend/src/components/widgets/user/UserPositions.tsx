@@ -6,7 +6,6 @@ import { LoadingSpinner, Spinner } from "@/components/ui/spinner";
 import {
   formatCompactCurrency,
   formatNumber,
-  formatRelativeTime,
 } from "@/lib/ui/format.utils";
 import { cn } from "@/lib/utils";
 import { UserPosition } from "@/lib/models/api.models";
@@ -18,9 +17,10 @@ import {
   TABLE_CONTENT_CONTAINER_CLASSES,
   TABLE_ROW_CLASSES,
 } from "../shared-table-styles";
-import type { PositionActivityLookup } from "./userActivity.types";
+import type { PositionActivityLookup, SelectablePosition } from "./userActivity.types";
 import { getPositionKey } from "@/lib/utils/position.utils";
 import { getPolymarketEventUrl } from "@/lib/utils/polymarket.utils";
+import { PositionTradesSubRow } from "./PositionTradesSubRow";
 
 const POSITION_ROW_GRID_CLASSES =
   "grid grid-cols-[18px_minmax(220px,2fr)_minmax(80px,0.8fr)_minmax(80px,0.8fr)_minmax(80px,0.8fr)_minmax(80px,0.8fr)_minmax(100px,1fr)_minmax(110px,1fr)] items-center gap-4";
@@ -28,7 +28,7 @@ const POSITION_ROW_GRID_CLASSES =
 type PositionRowProps = {
   position: UserPosition;
   isSelected: boolean;
-  onTogglePosition?: (position: UserPosition, checked: boolean) => void;
+  onTogglePosition?: (position: SelectablePosition, checked: boolean) => void;
   activityState?: PositionActivityLookup[string];
 };
 
@@ -142,103 +142,10 @@ function PositionRow({
   );
 }
 
-function PositionTradesSubRow({
-  marketTitle,
-  activityState,
-}: {
-  marketTitle: string | null;
-  activityState?: PositionActivityLookup[string];
-}) {
-  if (!activityState) {
-    return (
-      <div className="ml-7 rounded-md border border-dashed border-brand-stroke/60 px-4 py-3 text-xs text-muted-foreground">
-        Select a position to show its trade activity.
-      </div>
-    );
-  }
-
-  if (activityState.isLoading) {
-    return (
-      <div className="ml-7 flex items-center gap-2 rounded-md border border-dashed border-brand-stroke/60 px-4 py-3 text-xs text-muted-foreground">
-        <Spinner size="sm" /> Loading trades for {marketTitle || "position"}...
-      </div>
-    );
-  }
-
-  if (activityState.isError) {
-    return (
-      <div className="ml-7 rounded-md border border-dashed border-destructive/40 px-4 py-3 text-xs text-destructive">
-        Unable to load trade history for this position.
-      </div>
-    );
-  }
-
-  const trades = activityState.trades ?? [];
-
-  if (trades.length === 0) {
-    return (
-      <div className="ml-7 rounded-md border border-dashed border-brand-stroke/60 px-4 py-2 text-[11px] text-muted-foreground">
-        No trades found for this position.
-      </div>
-    );
-  }
-
-  return (
-    <div className="ml-7 rounded-md border border-brand-stroke/70 bg-brand-background/40 px-3 py-2 text-[11px]">
-      <div className="mb-1 flex items-center justify-between uppercase tracking-wide text-muted-foreground">
-        <span className="font-semibold">Trade Activity</span>
-        <span className="text-[10px]">
-          Showing {Math.min(trades.length, 20)} of {trades.length}
-        </span>
-      </div>
-      <div className="flex flex-col divide-y divide-brand-stroke/30">
-        {trades.slice(0, 20).map((trade) => {
-          const notional = trade.size * (trade.price ?? 0);
-          const priceCents =
-            trade.price !== undefined && trade.price !== null
-              ? `${formatNumber(trade.price * 100, 1)}¢`
-              : "-";
-          const sizeDisplay =
-            trade.size !== undefined && trade.size !== null
-              ? formatNumber(trade.size, trade.size >= 1 ? 0 : 2)
-              : "-";
-          const timestamp = trade.timestamp
-            ? formatRelativeTime(trade.timestamp)
-            : "-";
-          const isBuy = (trade.side ?? "").toUpperCase() === "BUY";
-
-          return (
-            <div
-              key={`${trade.transactionHash}-${trade.timestamp}`}
-              className="flex flex-wrap items-center gap-3 py-1 text-[11px]"
-            >
-              <span className="text-muted-foreground">{timestamp}</span>
-              <span
-                className={cn(
-                  "font-semibold",
-                  isBuy ? "text-outcome-yes" : "text-outcome-no"
-                )}
-              >
-                {trade.side?.toUpperCase()} {trade.outcome}
-              </span>
-              <span className="text-foreground">
-                {sizeDisplay} @ {priceCents}
-              </span>
-              <span className="ml-auto font-semibold text-foreground">
-                {formatCompactCurrency(notional)}
-              </span>
-            </div>
-          );
-        })}
-      </div>
-    </div>
-  );
-}
-
 type UserPositionsProps = {
   userId: string;
   selectedPositionKeys?: Set<string>;
-  onTogglePosition?: (position: UserPosition, checked: boolean) => void;
+  onTogglePosition?: (position: SelectablePosition, checked: boolean) => void;
   positionActivities?: PositionActivityLookup;
 };
 

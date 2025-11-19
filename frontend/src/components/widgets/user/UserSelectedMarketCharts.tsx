@@ -87,6 +87,10 @@ function PositionChartCard({ activity }: { activity: PositionActivity }) {
     [activity.trades]
   );
   const marketUrl = getPolymarketEventUrl(activity.position.slug ?? undefined);
+  const positionValue =
+    "currentValue" in activity.position
+      ? activity.position.currentValue
+      : activity.position.realizedPnl ?? activity.position.totalBought ?? 0;
 
   return (
     <Card className="flex h-72 flex-col gap-2 border border-brand-stroke/70 bg-brand-background/40 p-3">
@@ -96,13 +100,13 @@ function PositionChartCard({ activity }: { activity: PositionActivity }) {
             href={marketUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="truncate text-sm font-semibold text-foreground hover:underline"
+            className="block max-w-full truncate text-sm font-semibold text-foreground hover:underline"
           >
             {activity.position.title ?? activity.position.slug}
           </a>
           <p className="text-xs text-muted-foreground">
             {activity.position.outcome ?? "Outcome"} ·{" "}
-            {formatCompactCurrency(activity.position.currentValue)}
+            {formatCompactCurrency(positionValue)}
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-1">

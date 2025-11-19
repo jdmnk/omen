@@ -1,9 +1,11 @@
 import type { Trade } from "@/lib/models/api.models";
-import type { UserPosition } from "@/lib/models/frontend.models";
+import type { UserPosition, ClosedPosition } from "@/lib/models/frontend.models";
+
+export type SelectablePosition = UserPosition | ClosedPosition;
 
 export type PositionActivity = {
   key: string;
-  position: UserPosition;
+  position: SelectablePosition;
   trades: Trade[];
   isLoading: boolean;
   isError: boolean;
