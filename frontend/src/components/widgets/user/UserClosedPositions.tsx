@@ -30,6 +30,8 @@ function ClosedPositionRow({ position }: { position: ClosedPosition }) {
     ? formatRelativeTime(position.timestamp)
     : "-";
 
+  console.log("closed position", position);
+
   const pnlPercent = totalBought > 0 ? (realizedPnl / totalBought) * 100 : 0;
 
   const pnlColor =
