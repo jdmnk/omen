@@ -138,7 +138,7 @@ export function UserProfile({ userId }: { userId: string }) {
   }, [userId]);
 
   return (
-    <div className="container mx-auto max-w-7xl p-6 space-y-6 max-h-max">
+    <div className="container mx-auto max-w-7xl p-6 space-y-6">
       {/* Compact Header + Inline Stats */}
       <div className="flex items-start justify-between gap-3 flex-wrap">
         <img
@@ -219,7 +219,7 @@ export function UserProfile({ userId }: { userId: string }) {
       <UserSelectedMarketCharts activities={positionActivities} />
 
       {/* Main Content */}
-      <Card className="flex flex-col">
+      <Card className="flex flex-col max-h-[800px] overflow-hidden">
         <Tabs
           value={activeTab}
           onValueChange={setActiveTab}
@@ -238,25 +238,31 @@ export function UserProfile({ userId }: { userId: string }) {
           </TabsList>
 
           <TabsContent value="positions">
-            <UserPositions
-              userId={userId}
-              selectedPositionKeys={selectedPositionKeys}
-              onTogglePosition={handlePositionToggle}
-              positionActivities={positionActivitiesLookup}
-            />
+            <div className="h-[800px]">
+              <UserPositions
+                userId={userId}
+                selectedPositionKeys={selectedPositionKeys}
+                onTogglePosition={handlePositionToggle}
+                positionActivities={positionActivitiesLookup}
+              />
+            </div>
           </TabsContent>
 
           <TabsContent value="closed">
-            <UserClosedPositions
-              userId={userId}
-              selectedPositionKeys={selectedPositionKeys}
-              onTogglePosition={handlePositionToggle}
-              positionActivities={positionActivitiesLookup}
-            />
+            <div className="h-[800px]">
+              <UserClosedPositions
+                userId={userId}
+                selectedPositionKeys={selectedPositionKeys}
+                onTogglePosition={handlePositionToggle}
+                positionActivities={positionActivitiesLookup}
+              />
+            </div>
           </TabsContent>
 
           <TabsContent value="activity">
-            <UserActivityFeed userId={userId} />
+            <div className="h-[800px]">
+              <UserActivityFeed userId={userId} />
+            </div>
           </TabsContent>
         </Tabs>
       </Card>
