@@ -110,8 +110,8 @@ export default function Home() {
   };
 
   return (
-    <div className="flex min-h-svh items-center justify-center px-4">
-      <main className="flex w-full max-w-2xl flex-col items-center justify-center text-center">
+    <div className="flex min-h-svh flex-col items-center px-4 py-10">
+      <main className="flex w-full max-w-2xl flex-1 flex-col items-center justify-center text-center">
         {/* Main Content */}
         <div className="flex flex-col items-center text-center">
           {/* Hero Line 2 */}
@@ -182,22 +182,23 @@ export default function Home() {
           </form>
         )}
 
-        {/* Logo */}
-        <div className="absolute bottom-8 flex items-center gap-3">
-          <div className="w-9 h-9 md:w-12 md:h-12">
-            <Image
-              src="/logo.svg"
-              alt={TEXTS.branding.logoAlt}
-              width={48}
-              height={48}
-              className="w-full h-full"
-            />
-          </div>
-          <span className="text-[20px] md:text-[28px] font-bold text-white">
-            {TEXTS.branding.name}
-          </span>
-        </div>
       </main>
+
+      {/* Logo */}
+      <footer className="flex w-full max-w-2xl items-center justify-center gap-3 pb-4 pt-8">
+        <div className="w-9 h-9 md:w-12 md:h-12">
+          <Image
+            src="/logo.svg"
+            alt={TEXTS.branding.logoAlt}
+            width={48}
+            height={48}
+            className="w-full h-full"
+          />
+        </div>
+        <span className="text-[20px] md:text-[28px] font-bold text-white">
+          {TEXTS.branding.name}
+        </span>
+      </footer>
     </div>
   );
 }
