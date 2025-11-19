@@ -13,6 +13,7 @@ import type { PositionActivity } from "./userActivity.types";
 import { PositionPriceChart } from "./charts/PositionPriceChart";
 import { formatCompactCurrency } from "@/lib/ui/format.utils";
 import { getPositionKey } from "@/lib/utils/position.utils";
+import { getPolymarketEventUrl } from "@/lib/utils/polymarket.utils";
 
 const INTERVALS: Interval[] = ["1h", "6h", "1d", "1w", "1m", "max"];
 
@@ -85,14 +86,20 @@ function PositionChartCard({ activity }: { activity: PositionActivity }) {
     () => buildTradeMarkers(activity.trades),
     [activity.trades]
   );
+  const marketUrl = getPolymarketEventUrl(activity.position.slug ?? undefined);
 
   return (
     <Card className="flex h-72 flex-col gap-2 border border-brand-stroke/70 bg-brand-background/40 p-3">
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
-          <p className="truncate text-sm font-semibold text-foreground">
+          <a
+            href={marketUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="truncate text-sm font-semibold text-foreground hover:underline"
+          >
             {activity.position.title ?? activity.position.slug}
-          </p>
+          </a>
           <p className="text-xs text-muted-foreground">
             {activity.position.outcome ?? "Outcome"} ·{" "}
             {formatCompactCurrency(activity.position.currentValue)}
