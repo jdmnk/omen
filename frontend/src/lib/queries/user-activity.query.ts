@@ -52,6 +52,9 @@ export async function fetchUserActivityEntries(
   url.searchParams.set("user", userId);
   url.searchParams.set("limit", String(limit));
   url.searchParams.set("offset", "0");
+  if (conditionId) {
+    url.searchParams.set("market", conditionId);
+  }
   const response = await fetch(url.toString(), { cache: "no-store" });
   if (!response.ok) {
     throw new Error(`Failed to fetch activity: ${response.statusText}`);
