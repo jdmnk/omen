@@ -137,14 +137,14 @@ export function UserSelectedMarketCharts({
 }: {
   activities: PositionActivity[];
 }) {
-  const [isExpanded, setIsExpanded] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(true);
   if (!activities || activities.length === 0) {
     return null;
   }
 
   return (
-    <Card className="flex flex-col gap-3 border border-brand-stroke/80 bg-brand-background/60">
-      <div className="flex items-center justify-between gap-3 px-4 py-3 text-sm font-semibold">
+    <Card className="flex flex-col border border-brand-stroke/80 bg-brand-background/60">
+      <div className="flex items-center justify-between px-4 py-3 text-sm font-semibold">
         <span>Selected Market Charts ({activities.length})</span>
         <button
           type="button"
