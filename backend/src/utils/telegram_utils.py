@@ -54,9 +54,9 @@ def send_telegram_message(
         return False
 
 
-def notify(text: str) -> None:
+def notify(text: str) -> bool:
     """
     Minimal notification shim used throughout the app. Safe to call even if
     Telegram is not configured; it will no-op.
     """
-    send_telegram_message(text)
+    return send_telegram_message(text)
