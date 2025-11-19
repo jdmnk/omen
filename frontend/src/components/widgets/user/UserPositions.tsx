@@ -12,17 +12,32 @@ import { cn } from "@/lib/utils";
 import Link from "next/link";
 import { UserPosition } from "@/lib/models/api.models";
 import { useInfiniteScroll } from "@/lib/hooks/use-infinite-scroll";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   TABLE_HEADER_CLASSES,
-  TABLE_ROW_CLASSES,
   TABLE_HEADER_CONTAINER_CLASSES,
   TABLE_CONTENT_CONTAINER_CLASSES,
+  TABLE_ROW_CLASSES,
 } from "../shared-table-styles";
+import type { PositionActivityLookup } from "./userActivity.types";
+import { getPositionKey } from "@/lib/utils/position.utils";
 
 const POSITION_ROW_GRID_CLASSES =
-  "grid grid-cols-[minmax(220px,2fr)_minmax(80px,0.8fr)_minmax(80px,0.8fr)_minmax(80px,0.8fr)_minmax(80px,0.8fr)_minmax(100px,1fr)_minmax(110px,1fr)] items-center gap-4";
+  "grid grid-cols-[minmax(24px,24px)_minmax(220px,2fr)_minmax(80px,0.8fr)_minmax(80px,0.8fr)_minmax(80px,0.8fr)_minmax(80px,0.8fr)_minmax(100px,1fr)_minmax(110px,1fr)] items-center gap-4";
 
-function PositionRow({ position }: { position: UserPosition }) {
+type PositionRowProps = {
+  position: UserPosition;
+  isSelected: boolean;
+  onTogglePosition?: (position: UserPosition, checked: boolean) => void;
+  activityState?: PositionActivityLookup[string];
+};
+
+function PositionRow({
+  position,
+  isSelected,
+  onTogglePosition,
+  activityState,
+}: PositionRowProps) {
   const size = position.size || 0;
   const currentPrice = position.curPrice || 0;
   console.log("opened position", position);
@@ -35,50 +50,173 @@ function PositionRow({ position }: { position: UserPosition }) {
       : "text-muted-foreground";
 
   return (
-    <div className={cn(POSITION_ROW_GRID_CLASSES, TABLE_ROW_CLASSES)}>
-      <div className="min-w-0 overflow-hidden">
-        <Link
-          href={`/market/${position.slug}`}
-          className="block truncate hover:underline font-medium"
-        >
-          {position.title}
-        </Link>
-      </div>
-      <div>
-        <div className="font-semibold">{position.outcome}</div>
-      </div>
-      <div>
-        <div className="font-semibold">{formatNumber(size, 0)}</div>
-      </div>
-      <div>
-        <div className="font-semibold">
-          {formatNumber(currentPrice * 100, 1)}%
+    <div className="flex flex-col gap-2">
+      <div className={cn(POSITION_ROW_GRID_CLASSES, TABLE_ROW_CLASSES)}>
+        <div className="flex justify-center">
+          <Checkbox
+            aria-label="Select position"
+            checked={isSelected}
+            onCheckedChange={(checked) =>
+              onTogglePosition?.(position, Boolean(checked))
+            }
+          />
+        </div>
+        <div className="min-w-0 overflow-hidden">
+          <Link
+            href={`/market/${position.slug}`}
+            className="block truncate font-medium hover:underline"
+          >
+            {position.title}
+          </Link>
+        </div>
+        <div>
+          <div className="font-semibold">{position.outcome}</div>
+        </div>
+        <div>
+          <div className="font-semibold">{formatNumber(size, 0)}</div>
+        </div>
+        <div>
+          <div className="font-semibold">
+            {formatNumber(currentPrice * 100, 1)}%
+          </div>
+        </div>
+        <div>
+          <div className="font-semibold">
+            {formatCompactCurrency(position.currentValue)}
+          </div>
+        </div>
+        <div className={cn("flex items-center gap-1", pnlColor)}>
+          <div className="font-semibold">
+            {formatCompactCurrency(position.cashPnl)}
+          </div>
+          <div className="opacity-75">
+            {position.percentPnl > 0 ? "+" : ""}
+            {formatNumber(position.percentPnl, 1)}%
+          </div>
+        </div>
+        <div className="text-right text-xs text-muted-foreground">
+          {position.endDate ? new Date(position.endDate).toLocaleString() : "-"}
         </div>
       </div>
-      <div>
-        <div className="font-semibold">
-          {formatCompactCurrency(position.currentValue)}
-        </div>
+      {isSelected ? (
+        <PositionTradesSubRow
+          marketTitle={position.title}
+          activityState={activityState}
+        />
+      ) : null}
+    </div>
+  );
+}
+
+function PositionTradesSubRow({
+  marketTitle,
+  activityState,
+}: {
+  marketTitle: string | null;
+  activityState?: PositionActivityLookup[string];
+}) {
+  if (!activityState) {
+    return (
+      <div className="ml-7 rounded-md border border-dashed border-brand-stroke/60 px-4 py-3 text-xs text-muted-foreground">
+        Select a position to show its trade activity.
       </div>
-      <div className={cn("flex items-center gap-1", pnlColor)}>
-        <div className="font-semibold">
-          {formatCompactCurrency(position.cashPnl)}
-        </div>
-        <div className="opacity-75">
-          {position.percentPnl > 0 ? "+" : ""}
-          {formatNumber(position.percentPnl, 1)}%
-        </div>
+    );
+  }
+
+  if (activityState.isLoading) {
+    return (
+      <div className="ml-7 flex items-center gap-2 rounded-md border border-dashed border-brand-stroke/60 px-4 py-3 text-xs text-muted-foreground">
+        <Spinner size="sm" /> Loading trades for {marketTitle || "position"}...
       </div>
-      <div className="text-xs text-muted-foreground text-right">
-        {position.endDate
-          ? new Date(position.endDate).toLocaleDateString()
-          : "-"}
+    );
+  }
+
+  if (activityState.isError) {
+    return (
+      <div className="ml-7 rounded-md border border-dashed border-destructive/40 px-4 py-3 text-xs text-destructive">
+        Unable to load trade history for this position.
+      </div>
+    );
+  }
+
+  const trades = activityState.trades ?? [];
+
+  if (trades.length === 0) {
+    return (
+      <div className="ml-7 rounded-md border border-dashed border-brand-stroke/60 px-4 py-3 text-xs text-muted-foreground">
+        No trades found for this position.
+      </div>
+    );
+  }
+
+  return (
+    <div className="ml-7 rounded-md border border-brand-stroke/70 bg-brand-background/40 px-4 py-3 text-xs">
+      <div className="mb-2 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
+        Trade Activity
+      </div>
+      <div className="flex flex-col divide-y divide-brand-stroke/40">
+        {trades.slice(0, 20).map((trade) => {
+          const notional = trade.size * (trade.price ?? 0);
+          const priceCents =
+            trade.price !== undefined && trade.price !== null
+              ? `${formatNumber(trade.price * 100, 1)}¢`
+              : "-";
+          const sizeDisplay =
+            trade.size !== undefined && trade.size !== null
+              ? formatNumber(trade.size, trade.size >= 1 ? 0 : 2)
+              : "-";
+          const timestamp = trade.timestamp
+            ? formatRelativeTime(trade.timestamp)
+            : "-";
+          const isBuy = (trade.side ?? "").toUpperCase() === "BUY";
+
+          return (
+            <div
+              key={`${trade.transactionHash}-${trade.timestamp}`}
+              className="flex flex-wrap items-center justify-between gap-3 py-2"
+            >
+              <div className="flex flex-col gap-1">
+                <span className="font-semibold text-muted-foreground">
+                  {timestamp}
+                </span>
+                <span
+                  className={cn(
+                    "text-sm font-semibold",
+                    isBuy ? "text-outcome-yes" : "text-outcome-no"
+                  )}
+                >
+                  {trade.side?.toUpperCase()} {trade.outcome}
+                </span>
+              </div>
+              <div className="flex flex-col items-end gap-1 text-right">
+                <span className="text-sm font-semibold">
+                  {sizeDisplay} @ {priceCents}
+                </span>
+                <span className="text-muted-foreground">
+                  {formatCompactCurrency(notional)}
+                </span>
+              </div>
+            </div>
+          );
+        })}
       </div>
     </div>
   );
 }
 
-export function UserPositions({ userId }: { userId: string }) {
+type UserPositionsProps = {
+  userId: string;
+  selectedPositionKeys?: Set<string>;
+  onTogglePosition?: (position: UserPosition, checked: boolean) => void;
+  positionActivities?: PositionActivityLookup;
+};
+
+export function UserPositions({
+  userId,
+  selectedPositionKeys = new Set(),
+  onTogglePosition,
+  positionActivities,
+}: UserPositionsProps) {
   const {
     data,
     isLoading,
@@ -104,7 +242,7 @@ export function UserPositions({ userId }: { userId: string }) {
 
   if (error) {
     return (
-      <div className="text-center py-8 text-destructive text-sm">
+      <div className="py-8 text-center text-sm text-destructive">
         Error loading positions
       </div>
     );
@@ -114,16 +252,17 @@ export function UserPositions({ userId }: { userId: string }) {
 
   if (allPositions.length === 0) {
     return (
-      <div className="text-center py-8 text-sm text-muted-foreground">
+      <div className="py-8 text-center text-sm text-muted-foreground">
         No positions found
       </div>
     );
   }
 
   return (
-    <div ref={scrollRef} className="flex flex-col h-full overflow-auto">
+    <div ref={scrollRef} className="flex h-full flex-col overflow-auto">
       <div className={TABLE_HEADER_CONTAINER_CLASSES}>
         <div className={cn(POSITION_ROW_GRID_CLASSES, TABLE_HEADER_CLASSES)}>
+          <div></div>
           <div>Market</div>
           <div>Outcome</div>
           <div>Size</div>
@@ -134,9 +273,18 @@ export function UserPositions({ userId }: { userId: string }) {
         </div>
       </div>
       <div className={TABLE_CONTENT_CONTAINER_CLASSES}>
-        {allPositions.map((position, index) => (
-          <PositionRow key={`${position.slug}-${index}`} position={position} />
-        ))}
+        {allPositions.map((position) => {
+          const key = getPositionKey(position);
+          return (
+            <PositionRow
+              key={key}
+              position={position}
+              isSelected={selectedPositionKeys.has(key)}
+              onTogglePosition={onTogglePosition}
+              activityState={positionActivities?.[key]}
+            />
+          );
+        })}
         {hasNextPage && <div ref={sentinelRef} className="h-4" />}
       </div>
       {isFetchingNextPage && (
@@ -145,7 +293,7 @@ export function UserPositions({ userId }: { userId: string }) {
         </div>
       )}
       {!hasNextPage && allPositions.length > 0 && (
-        <div className="text-center py-4 text-xs text-muted-foreground">
+        <div className="py-4 text-center text-xs text-muted-foreground">
           All {allPositions.length} positions loaded
         </div>
       )}

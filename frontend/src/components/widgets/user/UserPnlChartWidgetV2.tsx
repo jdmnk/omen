@@ -11,6 +11,8 @@ import { formatCompactCurrency } from "@/lib/ui/format.utils";
 import { cn } from "@/lib/utils";
 import type { UserPosition, ClosedPosition } from "@/lib/models/frontend.models";
 import { UserPnlChartV2, type PositionMarker } from "./UserPnlChartV2";
+import type { PositionActivity } from "./userActivity.types";
+import { getPositionKey } from "@/lib/utils/position.utils";
 
 const INTERVALS: UserPnlInterval[] = ["12h", "1d", "1w", "1m", "max"];
 
@@ -45,7 +47,15 @@ function flattenInfiniteResult<T>(pages?: T[][]): T[] {
   return pages.flatMap((page) => page);
 }
 
-export function UserPnlChartWidgetV2({ userId }: { userId: string }) {
+type UserPnlChartWidgetV2Props = {
+  userId: string;
+  focusedActivities?: PositionActivity[];
+};
+
+export function UserPnlChartWidgetV2({
+  userId,
+  focusedActivities = [],
+}: UserPnlChartWidgetV2Props) {
   const [interval, setInterval] = useState<UserPnlInterval>("1w");
   const isMounted = useIsMounted();
 
@@ -125,6 +135,39 @@ export function UserPnlChartWidgetV2({ userId }: { userId: string }) {
     return markers;
   }, [openPositions, closedPositions]);
 
+  const hasFocusedActivities = focusedActivities.length > 0;
+
+  const tradeMarkers = useMemo<PositionMarker[]>(() => {
+    if (!hasFocusedActivities) return [];
+    const markers: PositionMarker[] = [];
+    focusedActivities.forEach((activity) => {
+      const key = getPositionKey(activity.position);
+      (activity.trades || []).forEach((trade, idx) => {
+        const time = toChartTime(trade.timestamp);
+        if (!time) return;
+        const isBuy = (trade.side ?? "").toUpperCase() === "BUY";
+        markers.push({
+          id: `trade-${key}-${trade.timestamp}-${idx}`,
+          time,
+          position: isBuy ? "belowBar" : "aboveBar",
+          color: isBuy ? "#22c55e" : "#ef4444",
+          shape: "circle",
+          text:
+            trade.price !== undefined && trade.price !== null
+              ? `${Math.round(trade.price * 100)}¢`
+              : "",
+        });
+      });
+    });
+    return markers.sort((a, b) => {
+      const aTime = typeof a.time === "number" ? a.time : Number(a.time);
+      const bTime = typeof b.time === "number" ? b.time : Number(b.time);
+      return aTime - bTime;
+    });
+  }, [focusedActivities, hasFocusedActivities]);
+
+  const markersToRender = hasFocusedActivities ? tradeMarkers : positionMarkers;
+
   if (!isMounted) {
     return null;
   }
@@ -165,36 +208,92 @@ export function UserPnlChartWidgetV2({ userId }: { userId: string }) {
         </div>
       </div>
 
-      <div className="flex flex-wrap items-center justify-between gap-3 px-3 py-2 text-[11px] text-muted-foreground">
-        <div className="flex items-center gap-4">
-          <span className="flex items-center gap-1">
-            <span className="h-2 w-2 rounded-full bg-sky-400" />
-            Open position
-          </span>
-          <span className="flex items-center gap-1">
-            <span className="h-2 w-2 rounded-full bg-emerald-400" />
-            Closed (profit)
-          </span>
-          <span className="flex items-center gap-1">
-            <span className="h-2 w-2 rounded-full bg-red-400" />
-            Closed (loss)
-          </span>
-        </div>
-        <div className="text-xs text-muted-foreground">
-          {openPositionsLoading || closedPositionsLoading
-            ? "Loading position markers…"
-            : `Tracking ${openPositions.length} open & ${closedPositions.length} closed`}
-        </div>
-      </div>
+      <LegendSection
+        hasFocusedActivities={hasFocusedActivities}
+        focusedActivities={focusedActivities}
+        positionStats={{
+          loading: openPositionsLoading || closedPositionsLoading,
+          openCount: openPositions.length,
+          closedCount: closedPositions.length,
+        }}
+      />
 
       <div className="flex-1 min-h-0 w-full">
         <UserPnlChartV2
           data={chartData}
-          markers={positionMarkers}
+          markers={markersToRender}
           isLoading={isPnlLoading}
           error={pnlError}
         />
       </div>
     </Card>
+  );
+}
+
+function LegendSection({
+  hasFocusedActivities,
+  focusedActivities,
+  positionStats,
+}: {
+  hasFocusedActivities: boolean;
+  focusedActivities: PositionActivity[];
+  positionStats: {
+    loading: boolean;
+    openCount: number;
+    closedCount: number;
+  };
+}) {
+  if (hasFocusedActivities) {
+    const totalTrades = focusedActivities.reduce(
+      (acc, activity) => acc + (activity.trades?.length ?? 0),
+      0
+    );
+    const loading = focusedActivities.some((activity) => activity.isLoading);
+
+    return (
+      <div className="flex flex-col gap-2 px-3 py-2 text-[11px] text-muted-foreground">
+        <div className="flex flex-wrap items-center gap-4">
+          <span className="flex items-center gap-1">
+            <span className="h-2 w-2 rounded-full bg-emerald-400" />
+            Buy trade
+          </span>
+          <span className="flex items-center gap-1">
+            <span className="h-2 w-2 rounded-full bg-red-400" />
+            Sell trade
+          </span>
+        </div>
+        <div className="text-xs">
+          {loading
+            ? "Loading trade activity…"
+            : `Showing ${totalTrades} trades across ${focusedActivities.length} selected position${
+                focusedActivities.length === 1 ? "" : "s"
+              }`}
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex flex-wrap items-center justify-between gap-3 px-3 py-2 text-[11px] text-muted-foreground">
+      <div className="flex items-center gap-4">
+        <span className="flex items-center gap-1">
+          <span className="h-2 w-2 rounded-full bg-sky-400" />
+          Open position
+        </span>
+        <span className="flex items-center gap-1">
+          <span className="h-2 w-2 rounded-full bg-emerald-400" />
+          Closed (profit)
+        </span>
+        <span className="flex items-center gap-1">
+          <span className="h-2 w-2 rounded-full bg-red-400" />
+          Closed (loss)
+        </span>
+      </div>
+      <div className="text-xs text-muted-foreground">
+        {positionStats.loading
+          ? "Loading position markers…"
+          : `Tracking ${positionStats.openCount} open & ${positionStats.closedCount} closed`}
+      </div>
+    </div>
   );
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useCallback } from "react";
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { UserPositions } from "./UserPositions";
@@ -12,14 +12,120 @@ import { useUserTradedQuery } from "@/lib/queries/user-traded.query";
 import { useUserValueQuery } from "@/lib/queries/user-value.query";
 import { useIsMounted } from "@/lib/hooks/use-is-mounted";
 import { useUserDataQuery } from "@/lib/queries/user-data.query";
+import { useQueries } from "@tanstack/react-query";
+import { DATA_API_HOST } from "@/lib/api.const";
+import type { Trade } from "@/lib/models/api.models";
+import type { UserPosition } from "@/lib/models/frontend.models";
+import { getPositionKey } from "@/lib/utils/position.utils";
+import type {
+  PositionActivity,
+  PositionActivityLookup,
+} from "./userActivity.types";
+
+async function fetchUserPositionTrades(
+  userId: string,
+  position: UserPosition
+): Promise<Trade[]> {
+  const url = new URL(`${DATA_API_HOST}/trades`);
+  url.searchParams.set("market", position.conditionId);
+  url.searchParams.set("user", userId);
+  url.searchParams.set("limit", "500");
+  url.searchParams.set("offset", "0");
+  url.searchParams.set("filterType", "CASH");
+  url.searchParams.set("filterAmount", "0");
+  const response = await fetch(url.toString(), { cache: "no-store" });
+  if (!response.ok) {
+    throw new Error(`Failed to fetch trades for position ${position.asset}`);
+  }
+  const data = (await response.json()) as Trade[];
+  const outcomeIndex = position.outcomeIndex;
+  return data.filter(
+    (trade) =>
+      trade.asset === position.asset ||
+      (outcomeIndex !== null &&
+        outcomeIndex !== undefined &&
+        trade.outcomeIndex === outcomeIndex)
+  );
+}
 
 export function UserProfile({ userId }: { userId: string }) {
   const [activeTab, setActiveTab] = useState("positions");
+  const [selectedPositions, setSelectedPositions] = useState<
+    Record<string, UserPosition>
+  >({});
   const isMounted = useIsMounted();
 
   const { data: tradedData } = useUserTradedQuery(userId);
   const { data: valueData } = useUserValueQuery(userId);
   const { data: userData } = useUserDataQuery(userId);
+
+  const handlePositionToggle = useCallback(
+    (position: UserPosition, checked: boolean) => {
+      setSelectedPositions((prev) => {
+        const key = getPositionKey(position);
+        if (checked) {
+          return {
+            ...prev,
+            [key]: position,
+          };
+        }
+        const next = { ...prev };
+        delete next[key];
+        return next;
+      });
+    },
+    []
+  );
+
+  const selectedPositionsList = useMemo(
+    () => Object.values(selectedPositions),
+    [selectedPositions]
+  );
+
+  const positionTradeQueries = useQueries({
+    queries: selectedPositionsList.map((position) => ({
+      queryKey: [
+        "user-position-trades",
+        userId,
+        position.conditionId,
+        position.outcomeIndex,
+        position.asset,
+      ],
+      queryFn: () => fetchUserPositionTrades(userId, position),
+      enabled: Boolean(userId && position.conditionId),
+      staleTime: 60_000,
+    })),
+  });
+
+  const positionActivities: PositionActivity[] = useMemo(() => {
+    return selectedPositionsList.map((position, index) => {
+      const key = getPositionKey(position);
+      const query = positionTradeQueries[index];
+      return {
+        key,
+        position,
+        trades: query?.data ?? [],
+        isLoading: Boolean(query?.isLoading),
+        isError: Boolean(query?.isError),
+      };
+    });
+  }, [selectedPositionsList, positionTradeQueries]);
+
+  const positionActivitiesLookup: PositionActivityLookup = useMemo(() => {
+    return positionActivities.reduce<PositionActivityLookup>((acc, activity) => {
+      acc[activity.key] = {
+        trades: activity.trades,
+        isLoading: activity.isLoading,
+        isError: activity.isError,
+      };
+      return acc;
+    }, {});
+  }, [positionActivities]);
+
+  const selectedPositionKeys = useMemo(
+    () => new Set(Object.keys(selectedPositions)),
+    [selectedPositions]
+  );
 
   const totalValue = useMemo(() => {
     if (!valueData || valueData.length === 0) return 0;
@@ -84,7 +190,10 @@ export function UserProfile({ userId }: { userId: string }) {
 
       {/* PnL Chart */}
       <div className="h-96">
-        <UserPnlChartWidgetV2 userId={userId} />
+        <UserPnlChartWidgetV2
+          userId={userId}
+          focusedActivities={positionActivities}
+        />
       </div>
 
       {/* Main Content */}
@@ -110,7 +219,12 @@ export function UserProfile({ userId }: { userId: string }) {
             value="positions"
             className="flex-1 overflow-auto min-h-0 mt-0"
           >
-            <UserPositions userId={userId} />
+            <UserPositions
+              userId={userId}
+              selectedPositionKeys={selectedPositionKeys}
+              onTogglePosition={handlePositionToggle}
+              positionActivities={positionActivitiesLookup}
+            />
           </TabsContent>
 
           <TabsContent
