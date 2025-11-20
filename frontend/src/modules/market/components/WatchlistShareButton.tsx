@@ -8,7 +8,7 @@ import {
   copyImageToClipboard,
   downloadWatchlistImage,
   type WatchlistMarket,
-} from "@/lib/utils/share-watchlist.utils";
+} from "../lib/share-watchlist.utils";
 import {
   Dialog,
   DialogContent,

@@ -20,8 +20,8 @@ import Link from "next/link";
 import { Market, TopHolderAnalysis } from "@/lib/models/api.models";
 import { useOrderbookQuery } from "../lib/queries/orderbook.query";
 import { useTopHoldersPositionsQuery } from "../lib/queries/top-holders-positions.query";
-import { generateHolderTagsMap } from "@/lib/utils/holder-tags.utils";
-import type { HolderTagIcon } from "@/lib/utils/holder-tags.utils";
+import { generateHolderTagsMap } from "../lib/holder-tags.utils";
+import type { HolderTagIcon } from "../lib/holder-tags.utils";
 import { formatAddress } from "@/lib/ui/format.utils";
 import { cn } from "@/lib/utils";
 import {

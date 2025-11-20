@@ -1,6 +1,6 @@
 "use client";
 
-import type { WatchlistMarket } from "@/lib/utils/share-watchlist.utils";
+import type { WatchlistMarket } from "../lib/share-watchlist.utils";
 
 interface WatchlistShareImageProps {
   markets: WatchlistMarket[];
