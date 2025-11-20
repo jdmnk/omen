@@ -18,9 +18,13 @@ import { fetchUserActivityEntries } from "@/lib/queries/user-activity.query";
 import { LoadingSpinner } from "@/components/ui/spinner";
 import { getPolymarketEventUrl } from "@/lib/utils/polymarket.utils";
 import type { MarketActivityEntry } from "@/lib/models/frontend.models";
+import {
+  getActivityMarketLabel,
+  getActivityTypeLabel,
+} from "@/lib/utils/activity.utils";
 
 const ACTIVITY_ROW_GRID_CLASSES =
-  "grid grid-cols-[minmax(220px,2fr)_minmax(80px,0.8fr)_minmax(70px,0.7fr)_minmax(80px,0.8fr)_minmax(80px,0.8fr)_minmax(90px,0.9fr)_minmax(110px,1fr)] items-center gap-4";
+  "grid grid-cols-[minmax(70px,0.7fr)_minmax(200px,1.8fr)_minmax(180px,1.4fr)_minmax(140px,1fr)] items-center gap-4";
 
 function ActivityRow({ entry }: { entry: MarketActivityEntry }) {
   const size = entry.size ?? 0;
@@ -33,50 +37,81 @@ function ActivityRow({ entry }: { entry: MarketActivityEntry }) {
     : "-";
   const marketUrl = getPolymarketEventUrl(entry.slug ?? undefined);
   const isTrade = entry.type === "TRADE";
-  const sideColor =
-    entry.side?.toUpperCase() === "BUY"
+  const typeLabel = getActivityTypeLabel(entry);
+  const marketLabel = getActivityMarketLabel(entry);
+  const typeUpper = entry.type?.toUpperCase() ?? "";
+  const isYield = typeUpper === "YIELD";
+  const isRedeem = typeUpper === "REDEEM";
+  const outcomeLabel = isYield ? "-" : entry.outcome ?? "-";
+  const sharesLabel =
+    !isYield && entry.size !== undefined && entry.size !== null
+      ? `${formatNumber(size, size >= 1 ? 0 : 2)} shares`
+      : null;
+  const priceLabel =
+    !isRedeem && entry.price !== undefined && entry.price !== null
+      ? `${formatNumber(price * 100, 1)}¢`
+      : "-";
+  const typeColor =
+    isTrade && entry.side?.toUpperCase() === "BUY"
       ? "text-outcome-yes"
-      : entry.side?.toUpperCase() === "SELL"
+      : isTrade && entry.side?.toUpperCase() === "SELL"
       ? "text-outcome-no"
       : "text-muted-foreground";
+  const combinedOutcomeLabel =
+    outcomeLabel === "-" ? priceLabel : `${outcomeLabel} ${priceLabel}`;
 
   return (
     <div className={cn(ACTIVITY_ROW_GRID_CLASSES, TABLE_ROW_CLASSES)}>
+      <div
+        className={cn(
+          "text-xs font-semibold uppercase tracking-wide",
+          typeColor
+        )}
+      >
+        {typeLabel}
+      </div>
       <div className="min-w-0 overflow-hidden">
-        <a
-          href={marketUrl}
-          className="block truncate font-medium hover:underline"
-          target="_blank"
-          rel="noopener noreferrer"
+        {entry.slug ? (
+          <a
+            href={marketUrl}
+            className="block truncate font-medium hover:underline"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            {marketLabel}
+          </a>
+        ) : (
+          <span className="block truncate font-medium text-foreground">
+            {marketLabel}
+          </span>
+        )}
+      </div>
+      <div className="flex flex-col text-sm">
+        <span
+          className={cn(
+            "font-semibold",
+            outcomeLabel.toLowerCase().includes("yes")
+              ? "text-outcome-yes"
+              : outcomeLabel.toLowerCase().includes("no")
+              ? "text-outcome-no"
+              : "text-foreground"
+          )}
         >
-          {entry.title ?? entry.slug ?? "Market"}
-        </a>
+          {combinedOutcomeLabel}
+        </span>
+        {sharesLabel && (
+          <span className="text-[11px] text-muted-foreground">
+            {sharesLabel}
+          </span>
+        )}
       </div>
-      <div>
-        <div className="font-semibold">{entry.outcome ?? "-"}</div>
-      </div>
-      <div className="font-semibold text-xs text-muted-foreground">
-        {entry.type}
-      </div>
-      <div>
-        <div className="font-semibold">
-          {entry.size !== undefined && entry.size !== null
-            ? formatNumber(size, size >= 1 ? 0 : 2)
-            : "-"}
-        </div>
-      </div>
-      <div>
-        <div className="font-semibold">
-          {entry.price !== undefined && entry.price !== null
-            ? `${formatNumber(price * 100, 1)}%`
-            : "-"}
-        </div>
-      </div>
-      <div className="font-semibold">
-        {amount ? formatCompactCurrency(amount) : "-"}
-      </div>
-      <div className={cn("text-xs text-muted-foreground text-right", sideColor)}>
-        {isTrade ? entry.side?.toUpperCase() : relativeTime}
+      <div className="flex flex-col text-right text-sm">
+        <span className="font-semibold">
+          {amount ? formatCompactCurrency(amount) : "-"}
+        </span>
+        <span className="text-[11px] text-muted-foreground">
+          {relativeTime}
+        </span>
       </div>
     </div>
   );
@@ -120,18 +155,18 @@ export function UserActivityFeed({ userId }: { userId: string }) {
     <div className="flex h-full flex-col overflow-auto">
       <div className={TABLE_HEADER_CONTAINER_CLASSES}>
         <div className={cn(ACTIVITY_ROW_GRID_CLASSES, TABLE_HEADER_CLASSES)}>
-          <div>Market</div>
-          <div>Outcome</div>
           <div>Type</div>
-          <div>Size</div>
-          <div>Price</div>
-          <div>Amount</div>
-          <div className="text-right">Side/Time</div>
+          <div>Market</div>
+          <div>Outcome / Size</div>
+          <div className="text-right">Amount / Time</div>
         </div>
       </div>
       <div className={TABLE_CONTENT_CONTAINER_CLASSES}>
         {entries.map((entry, index) => (
-          <ActivityRow key={`${entry.transactionHash ?? index}-${index}`} entry={entry} />
+          <ActivityRow
+            key={`${entry.transactionHash ?? entry.type}-${index}`}
+            entry={entry}
+          />
         ))}
       </div>
     </div>
