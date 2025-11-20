@@ -8,7 +8,7 @@ import {
   usePriceHistoryQuery,
   PriceHistoryPoint,
 } from "@/lib/queries/price-history.query";
-import type { PositionActivity } from "./userActivity.types";
+import type { PositionActivity } from "../userActivity.types";
 import type { MarketActivityEntry } from "@/lib/models/frontend.models";
 import { PositionPriceChart } from "./charts/PositionPriceChart";
 import { formatCompactCurrency } from "@/lib/ui/format.utils";
@@ -65,7 +65,9 @@ function useChartData(tokenId?: string | null, interval: Interval = "1w") {
   return { ...query, chartData };
 }
 
-function buildTradeMarkers(entries: MarketActivityEntry[] = []): SeriesMarker<Time>[] {
+function buildTradeMarkers(
+  entries: MarketActivityEntry[] = []
+): SeriesMarker<Time>[] {
   return entries
     .map((entry, idx) => {
       if (entry.type !== "TRADE") return null;
@@ -151,7 +153,7 @@ function PositionChartCard({ activity }: { activity: PositionActivity }) {
             {activity.position.title ?? activity.position.slug}
           </a>
           <p className="text-xs text-muted-foreground">
-              {activity.position.outcome ?? "Outcome"} ·{" "}
+            {activity.position.outcome ?? "Outcome"} ·{" "}
             {formatCompactCurrency(positionValue)}
           </p>
         </div>

@@ -7,7 +7,7 @@ import {
   formatNumber,
   formatRelativeTime,
 } from "@/lib/ui/format.utils";
-import type { PositionActivityLookup } from "./userActivity.types";
+import type { PositionActivityLookup } from "../userActivity.types";
 
 type PositionActivitySubRowProps = {
   marketTitle: string | null;

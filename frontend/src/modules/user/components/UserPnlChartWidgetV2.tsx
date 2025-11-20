@@ -9,9 +9,12 @@ import { useUserPositionsInfiniteQuery } from "@/lib/queries/user-positions.quer
 import { useClosedPositionsInfiniteQuery } from "@/lib/queries/closed-positions.query";
 import { formatCompactCurrency } from "@/lib/ui/format.utils";
 import { cn } from "@/lib/utils";
-import type { UserPosition, ClosedPosition } from "@/lib/models/frontend.models";
+import type {
+  UserPosition,
+  ClosedPosition,
+} from "@/lib/models/frontend.models";
 import { UserPnlChartV2, type PositionMarker } from "./UserPnlChartV2";
-import type { PositionActivity } from "./userActivity.types";
+import type { PositionActivity } from "../userActivity.types";
 import { getPositionKey } from "@/lib/utils/position.utils";
 
 const INTERVALS: UserPnlInterval[] = ["12h", "1d", "1w", "1m", "max"];
@@ -27,9 +30,9 @@ const INTERVAL_LABELS: Record<UserPnlInterval, string> = {
 function toChartTime(value?: number | string | null): Time | null {
   if (value === undefined || value === null) return null;
   if (typeof value === "number") {
-    return (value > 1_000_000_000_000
-      ? Math.floor(value / 1000)
-      : Math.floor(value)) as Time;
+    return (
+      value > 1_000_000_000_000 ? Math.floor(value / 1000) : Math.floor(value)
+    ) as Time;
   }
   const parsed = Date.parse(value);
   if (Number.isNaN(parsed)) return null;
@@ -65,15 +68,11 @@ export function UserPnlChartWidgetV2({
     error: pnlError,
   } = useUserPnlQuery(userId, interval);
 
-  const {
-    data: openPositionsData,
-    isLoading: openPositionsLoading,
-  } = useUserPositionsInfiniteQuery(userId);
+  const { data: openPositionsData, isLoading: openPositionsLoading } =
+    useUserPositionsInfiniteQuery(userId);
 
-  const {
-    data: closedPositionsData,
-    isLoading: closedPositionsLoading,
-  } = useClosedPositionsInfiniteQuery(userId, "TIMESTAMP");
+  const { data: closedPositionsData, isLoading: closedPositionsLoading } =
+    useClosedPositionsInfiniteQuery(userId, "TIMESTAMP");
 
   const chartData =
     pnlPoints?.map((point) => ({
@@ -247,7 +246,9 @@ function LegendSection({
   if (hasFocusedActivities) {
     const totalTrades = focusedActivities.reduce(
       (acc, activity) =>
-        acc + (activity.entries?.filter((entry) => entry.type === "TRADE").length ?? 0),
+        acc +
+        (activity.entries?.filter((entry) => entry.type === "TRADE").length ??
+          0),
       0
     );
     const loading = focusedActivities.some((activity) => activity.isLoading);
@@ -267,9 +268,9 @@ function LegendSection({
         <div className="text-xs">
           {loading
             ? "Loading trade activity…"
-            : `Showing ${totalTrades} trades across ${focusedActivities.length} selected position${
-                focusedActivities.length === 1 ? "" : "s"
-              }`}
+            : `Showing ${totalTrades} trades across ${
+                focusedActivities.length
+              } selected position${focusedActivities.length === 1 ? "" : "s"}`}
         </div>
       </div>
     );

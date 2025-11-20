@@ -17,7 +17,7 @@ import type {
   PositionActivity,
   PositionActivityLookup,
   SelectablePosition,
-} from "./userActivity.types";
+} from "../userActivity.types";
 import { UserSelectedMarketCharts } from "./UserSelectedMarketCharts";
 import { UserActivityFeed } from "./UserActivityFeed";
 import { Copy } from "lucide-react";

@@ -1,27 +1,23 @@
 "use client";
 
 import React from "react";
-import { useClosedPositionsInfiniteQuery } from "@/lib/queries/closed-positions.query";
+import { useUserPositionsInfiniteQuery } from "@/lib/queries/user-positions.query";
 import { LoadingSpinner, Spinner } from "@/components/ui/spinner";
-import {
-  formatCompactCurrency,
-  formatNumber,
-  formatRelativeTime,
-} from "@/lib/ui/format.utils";
+import { formatCompactCurrency, formatNumber } from "@/lib/ui/format.utils";
 import { cn } from "@/lib/utils";
-import { ClosedPosition } from "@/lib/models/frontend.models";
+import { UserPosition } from "@/lib/models/api.models";
 import { useInfiniteScroll } from "@/lib/hooks/use-infinite-scroll";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
   TABLE_HEADER_CLASSES,
-  TABLE_ROW_CLASSES,
   TABLE_HEADER_CONTAINER_CLASSES,
   TABLE_CONTENT_CONTAINER_CLASSES,
-} from "../../components/widgets/shared-table-styles";
+  TABLE_ROW_CLASSES,
+} from "../../../components/widgets/shared-table-styles";
 import type {
   PositionActivityLookup,
   SelectablePosition,
-} from "./userActivity.types";
+} from "../userActivity.types";
 import { getPositionKey } from "@/lib/utils/position.utils";
 import { getPolymarketEventUrl } from "@/lib/utils/polymarket.utils";
 import { PositionActivitySubRow } from "./PositionActivitySubRow";
@@ -29,33 +25,27 @@ import { PositionActivitySubRow } from "./PositionActivitySubRow";
 const POSITION_ROW_GRID_CLASSES =
   "grid grid-cols-[18px_minmax(220px,2fr)_minmax(80px,0.8fr)_minmax(80px,0.8fr)_minmax(80px,0.8fr)_minmax(80px,0.8fr)_minmax(100px,1fr)_minmax(110px,1fr)] items-center gap-4";
 
-type ClosedPositionRowProps = {
-  position: ClosedPosition;
+type PositionRowProps = {
+  position: UserPosition;
   isSelected: boolean;
   onTogglePosition?: (position: SelectablePosition, checked: boolean) => void;
   activityState?: PositionActivityLookup[string];
 };
 
-function ClosedPositionRow({
+function PositionRow({
   position,
   isSelected,
   onTogglePosition,
   activityState,
-}: ClosedPositionRowProps) {
-  const totalBought = position.totalBought || 0;
-  const avgPrice = position.avgPrice || 0;
-  const realizedPnl = position.realizedPnl || 0;
-  const relativeTime = position.timestamp
-    ? formatRelativeTime(position.timestamp)
-    : "-";
-
-  const pnlPercent = totalBought > 0 ? (realizedPnl / totalBought) * 100 : 0;
+}: PositionRowProps) {
+  const size = position.size || 0;
+  const currentPrice = position.curPrice || 0;
   const marketUrl = getPolymarketEventUrl(position.slug);
 
   const pnlColor =
-    realizedPnl > 0
+    position.cashPnl > 0
       ? "text-outcome-yes"
-      : realizedPnl < 0
+      : position.cashPnl < 0
       ? "text-outcome-no"
       : "text-muted-foreground";
 
@@ -64,7 +54,9 @@ function ClosedPositionRow({
   };
 
   const handleRowClick = (event: React.MouseEvent<HTMLDivElement>) => {
-    if ((event.target as HTMLElement).closest("a")) return;
+    if ((event.target as HTMLElement).closest("a")) {
+      return;
+    }
     toggleSelection(!isSelected);
   };
 
@@ -95,7 +87,7 @@ function ClosedPositionRow({
           onKeyDown={(event) => event.stopPropagation()}
         >
           <Checkbox
-            aria-label="Select closed position"
+            aria-label="Select position"
             checked={isSelected}
             onCheckedChange={(checked) => toggleSelection(Boolean(checked))}
           />
@@ -115,31 +107,29 @@ function ClosedPositionRow({
           <div className="font-semibold">{position.outcome}</div>
         </div>
         <div>
+          <div className="font-semibold">{formatNumber(size, 0)}</div>
+        </div>
+        <div>
           <div className="font-semibold">
-            {formatNumber(avgPrice * 100, 1)}%
+            {formatNumber(currentPrice * 100, 1)}%
           </div>
         </div>
         <div>
           <div className="font-semibold">
-            {formatNumber(position.curPrice * 100, 1)}%
-          </div>
-        </div>
-        <div>
-          <div className="font-semibold">
-            {formatCompactCurrency(totalBought)}
+            {formatCompactCurrency(position.currentValue)}
           </div>
         </div>
         <div className={cn("flex items-center gap-1", pnlColor)}>
           <div className="font-semibold">
-            {formatCompactCurrency(realizedPnl)}
+            {formatCompactCurrency(position.cashPnl)}
           </div>
           <div className="opacity-75">
-            {pnlPercent > 0 ? "+" : ""}
-            {formatNumber(pnlPercent, 1)}%
+            {position.percentPnl > 0 ? "+" : ""}
+            {formatNumber(position.percentPnl, 1)}%
           </div>
         </div>
-        <div className="text-xs text-muted-foreground text-right">
-          {relativeTime}
+        <div className="text-right text-xs text-muted-foreground">
+          {position.endDate ? new Date(position.endDate).toLocaleString() : "-"}
         </div>
       </div>
       {isSelected ? (
@@ -152,19 +142,19 @@ function ClosedPositionRow({
   );
 }
 
-type UserClosedPositionsProps = {
+type UserPositionsProps = {
   userId: string;
   selectedPositionKeys?: Set<string>;
   onTogglePosition?: (position: SelectablePosition, checked: boolean) => void;
   positionActivities?: PositionActivityLookup;
 };
 
-export function UserClosedPositions({
+export function UserPositions({
   userId,
   selectedPositionKeys = new Set(),
   onTogglePosition,
   positionActivities,
-}: UserClosedPositionsProps) {
+}: UserPositionsProps) {
   const {
     data,
     isLoading,
@@ -172,7 +162,7 @@ export function UserClosedPositions({
     fetchNextPage,
     hasNextPage,
     isFetchingNextPage,
-  } = useClosedPositionsInfiniteQuery(userId, "TIMESTAMP");
+  } = useUserPositionsInfiniteQuery(userId);
 
   const { scrollRef, sentinelRef } = useInfiniteScroll({
     hasNextPage: !!hasNextPage,
@@ -183,15 +173,15 @@ export function UserClosedPositions({
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-8">
-        <LoadingSpinner message="Loading closed positions..." size="sm" />
+        <LoadingSpinner message="Loading positions..." size="sm" />
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="text-center py-8 text-destructive text-sm">
-        Error loading closed positions
+      <div className="py-8 text-center text-sm text-destructive">
+        Error loading positions
       </div>
     );
   }
@@ -200,31 +190,31 @@ export function UserClosedPositions({
 
   if (allPositions.length === 0) {
     return (
-      <div className="text-center py-8 text-sm text-muted-foreground">
-        No closed positions found
+      <div className="py-8 text-center text-sm text-muted-foreground">
+        No positions found
       </div>
     );
   }
 
   return (
-    <div ref={scrollRef} className="flex flex-col h-full overflow-auto">
+    <div ref={scrollRef} className="flex h-full flex-col overflow-auto">
       <div className={TABLE_HEADER_CONTAINER_CLASSES}>
         <div className={cn(POSITION_ROW_GRID_CLASSES, TABLE_HEADER_CLASSES)}>
           <div></div>
           <div>Market</div>
           <div>Outcome</div>
-          <div>Avg Price</div>
-          <div>Final Price</div>
-          <div>Total Bought</div>
-          <div>Realized PnL</div>
-          <div className="text-right">Time</div>
+          <div>Size</div>
+          <div>Price</div>
+          <div>Value</div>
+          <div>PnL</div>
+          <div className="text-right">End date</div>
         </div>
       </div>
       <div className={TABLE_CONTENT_CONTAINER_CLASSES}>
         {allPositions.map((position) => {
           const key = getPositionKey(position);
           return (
-            <ClosedPositionRow
+            <PositionRow
               key={key}
               position={position}
               isSelected={selectedPositionKeys.has(key)}
@@ -241,8 +231,8 @@ export function UserClosedPositions({
         </div>
       )}
       {!hasNextPage && allPositions.length > 0 && (
-        <div className="text-center py-4 text-xs text-muted-foreground">
-          All {allPositions.length} closed positions loaded
+        <div className="py-4 text-center text-xs text-muted-foreground">
+          All {allPositions.length} positions loaded
         </div>
       )}
     </div>
