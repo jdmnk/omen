@@ -48,9 +48,14 @@ function ActivityRow({ entry }: { entry: MarketActivityEntry }) {
     !isYield && entry.size !== undefined && entry.size !== null
       ? `${formatNumber(size, size >= 1 ? 0 : 2)} shares`
       : null;
-  const shouldShowPrice = !["YIELD", "REDEEM", "MERGE", "REWARD"].includes(
-    typeUpper
-  );
+  const shouldShowPrice = ![
+    "YIELD",
+    "REDEEM",
+    "MERGE",
+    "REWARD",
+    "SPLIT",
+    "CONVERSION",
+  ].includes(typeUpper);
   const priceLabel =
     entry.price !== undefined && entry.price !== null
       ? `${formatNumber(price * 100, 1)}¢`
