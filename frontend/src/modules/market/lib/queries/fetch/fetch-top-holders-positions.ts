@@ -1,6 +1,6 @@
 import PQueue from "p-queue";
 import { UserPosition } from "@/lib/models/api.models";
-import { fetchUserPositions } from "@/modules/market/lib/queries/fetch/fetch-user-positions";
+import { fetchUserPositions } from "./fetch-user-positions";
 
 /**
  * Fetches positions for multiple top holders with controlled concurrency to avoid API rate limits.
