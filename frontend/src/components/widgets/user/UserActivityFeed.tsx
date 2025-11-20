@@ -62,6 +62,13 @@ function ActivityRow({ entry }: { entry: MarketActivityEntry }) {
   const combinedOutcomeLabel =
     outcomeLabel === "-" ? priceLabel : `${outcomeLabel} ${priceLabel}`;
 
+  const outcomeColor =
+    entry.outcomeIndex === 0
+      ? "text-outcome-yes"
+      : entry.outcomeIndex === 1
+      ? "text-outcome-no"
+      : "text-foreground";
+
   return (
     <div className={cn(ACTIVITY_ROW_GRID_CLASSES, TABLE_ROW_CLASSES)}>
       <div
@@ -90,16 +97,7 @@ function ActivityRow({ entry }: { entry: MarketActivityEntry }) {
       </div>
       <div className="flex items-center gap-2 text-xs">
         {shouldShowPrice && (
-          <span
-            className={cn(
-              "font-semibold",
-              outcomeLabel.toLowerCase().includes("yes")
-                ? "text-outcome-yes"
-                : outcomeLabel.toLowerCase().includes("no")
-                ? "text-outcome-no"
-                : "text-foreground"
-            )}
-          >
+          <span className={cn("font-semibold", outcomeColor)}>
             {combinedOutcomeLabel}
           </span>
         )}
