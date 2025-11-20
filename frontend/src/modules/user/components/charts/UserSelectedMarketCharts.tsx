@@ -155,7 +155,7 @@ function PositionChartCard({
   return (
     <Card
       className={cn(
-        "flex min-h-[18rem] flex-col gap-2 border border-brand-stroke/70 bg-brand-background/40 p-3",
+        "flex min-h-72 flex-col gap-2 border border-brand-stroke/70 bg-brand-background/40 p-3",
         className
       )}
     >
