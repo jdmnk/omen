@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import type { Time, SeriesMarker } from "lightweight-charts";
 import { Card } from "@/components/ui/card";
 import { Interval } from "@/lib/models/frontend.models";
 import {
@@ -9,7 +8,6 @@ import {
   PriceHistoryPoint,
 } from "@/lib/queries/price-history.query";
 import type { PositionActivity } from "../../userActivity.types";
-import type { MarketActivityEntry } from "@/lib/models/frontend.models";
 import { PositionPriceChart } from "./PositionPriceChart";
 import { formatCompactCurrency } from "@/lib/ui/format.utils";
 import { getPositionKey } from "@/modules/user/lib/position.utils";
@@ -20,6 +18,7 @@ import {
   ResizablePanelGroup,
 } from "@/components/ui/resizable";
 import { cn } from "@/lib/utils";
+import { buildGroupedTradeMarkers } from "@/modules/user/lib/markers.utils";
 
 const INTERVALS: Interval[] = ["1h", "6h", "1d", "1w", "1m", "max"];
 
@@ -55,9 +54,10 @@ function dedupeHistory(points: PriceHistoryPoint[] = []) {
 }
 
 function useChartData(tokenId?: string | null, interval: Interval = "1w") {
-  const fidelity = INTERVAL_FIDELITY[interval] ?? 3600;
+  const fidelityMinutes = INTERVAL_FIDELITY[interval] ?? 3600;
+  const fidelitySeconds = fidelityMinutes * 60;
   const enabled = Boolean(tokenId);
-  const query = usePriceHistoryQuery(tokenId || "", interval, fidelity, {
+  const query = usePriceHistoryQuery(tokenId || "", interval, fidelityMinutes, {
     enabled,
   });
   const chartData = useMemo(
@@ -68,32 +68,7 @@ function useChartData(tokenId?: string | null, interval: Interval = "1w") {
       })),
     [query.data?.history]
   );
-  return { ...query, chartData };
-}
-
-function buildTradeMarkers(
-  entries: MarketActivityEntry[] = []
-): SeriesMarker<Time>[] {
-  return entries
-    .map((entry, idx) => {
-      if (entry.type !== "TRADE") return null;
-      const timestamp = entry.timestamp;
-      if (!timestamp) return null;
-      const priceLabel =
-        entry.price !== undefined && entry.price !== null
-          ? `${Math.round(entry.price * 100)}¢`
-          : "";
-      const isBuy = (entry.side ?? "").toUpperCase() === "BUY";
-      return {
-        id: `trade-${entry.transactionHash ?? "activity"}-${idx}`,
-        time: Math.floor(timestamp) as Time,
-        position: isBuy ? "belowBar" : "aboveBar",
-        color: isBuy ? "#22c55e" : "#ef4444",
-        shape: "circle",
-        text: priceLabel,
-      } satisfies SeriesMarker<Time>;
-    })
-    .filter(Boolean) as SeriesMarker<Time>[];
+  return { ...query, chartData, fidelitySeconds };
 }
 
 function pickIntervalForRange(rangeSeconds: number): Interval {
@@ -135,7 +110,10 @@ function PositionChartCard({
 
   const [interval, setInterval] = useState<Interval>(suggestedInterval);
   const tokenId = activity.position.asset;
-  const { chartData, isLoading, error } = useChartData(tokenId, interval);
+  const { chartData, isLoading, error, fidelitySeconds } = useChartData(
+    tokenId,
+    interval
+  );
   useEffect(() => {
     setInterval((prev) =>
       prev === suggestedInterval ? prev : suggestedInterval
@@ -143,8 +121,8 @@ function PositionChartCard({
   }, [suggestedInterval]);
 
   const markers = useMemo(
-    () => buildTradeMarkers(activity.entries),
-    [activity.entries]
+    () => buildGroupedTradeMarkers(activity.entries, fidelitySeconds),
+    [activity.entries, fidelitySeconds]
   );
   const marketUrl = getPolymarketEventUrl(activity.position.slug ?? undefined);
   const positionValue =
