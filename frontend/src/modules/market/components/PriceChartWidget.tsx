@@ -10,7 +10,7 @@ import { useOrderbookQuery } from "@/lib/queries/orderbook.query";
 import { PriceChart } from "./PriceChart";
 import { formatCompactNumber, formatNumber } from "@/lib/ui/format.utils";
 import { cn } from "@/lib/utils";
-import { Card } from "../ui/card";
+import { Card } from "../../../components/ui/card";
 import { WatchlistButton } from "./WatchlistButton";
 import { useIsMounted } from "@/lib/hooks/use-is-mounted";
 

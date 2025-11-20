@@ -1,7 +1,7 @@
 "use client";
 
 import { useParams } from "next/navigation";
-import { Header } from "../Header";
+import { Header } from "../../../components/Header";
 import {
   ResizablePanel,
   ResizablePanelGroup,

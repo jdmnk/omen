@@ -1,4 +1,4 @@
-import { TerminalLayout } from "@/components/widgets/TerminalLayout";
+import { TerminalLayout } from "@/modules/market/components/TerminalLayout";
 import type { Metadata } from "next";
 import { Market } from "@/lib/models/api.models";
 import { METADATA } from "@/lib/metadata.const";
