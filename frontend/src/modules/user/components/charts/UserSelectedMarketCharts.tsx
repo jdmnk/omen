@@ -121,7 +121,7 @@ function PositionChartCard({
   }, [suggestedInterval]);
 
   const markers = useMemo(
-    () => buildGroupedTradeMarkers(activity.entries, fidelitySeconds),
+    () => buildGroupedTradeMarkers(activity.entries, fidelitySeconds, 5),
     [activity.entries, fidelitySeconds]
   );
   const marketUrl = getPolymarketEventUrl(activity.position.slug ?? undefined);
