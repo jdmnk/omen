@@ -1,7 +1,7 @@
 "use client";
 
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
-import { getBaseUrl } from "../api.const";
+import { getBaseUrl } from "@/lib/api.const";
 
 export interface AncillaryDataUpdate {
   timestamp: number;

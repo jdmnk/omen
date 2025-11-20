@@ -2,7 +2,7 @@
 
 import { useQuery } from "@tanstack/react-query";
 import { Market } from "@/lib/models/api.models";
-import { getBaseUrl } from "../api.const";
+import { getBaseUrl } from "@/lib/api.const";
 
 export function useMarketsByConditionIdsQuery(
   conditionIds: string[],

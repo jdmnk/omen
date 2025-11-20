@@ -1,7 +1,7 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import { getBaseUrl } from "../api.const";
+import { getBaseUrl } from "@/lib/api.const";
 
 type MarketSuggestion = {
   slug: string;

@@ -6,7 +6,7 @@ import {
   PriceHistoryPoint,
   usePriceHistoryQuery,
 } from "@/lib/queries/price-history.query";
-import { useOrderbookQuery } from "@/lib/queries/orderbook.query";
+import { useOrderbookQuery } from "../lib/queries/orderbook.query";
 import { PriceChart } from "./PriceChart";
 import { formatCompactNumber, formatNumber } from "@/lib/ui/format.utils";
 import { cn } from "@/lib/utils";

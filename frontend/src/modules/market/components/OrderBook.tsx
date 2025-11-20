@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import { LoadingSpinner } from "@/components/ui/spinner";
-import { useOrderbookQuery } from "@/lib/queries/orderbook.query";
+import { useOrderbookQuery } from "../lib/queries/orderbook.query";
 import { formatCurrency, formatNumber } from "@/lib/ui/format.utils";
 
 type OrderBookProps = {

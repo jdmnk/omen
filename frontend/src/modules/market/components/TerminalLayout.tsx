@@ -8,7 +8,7 @@ import {
   ResizableHandle,
 } from "@/components/ui/resizable";
 import { SearchWidget } from "./SearchWidget";
-import { useMarketBySlugQuery } from "@/lib/queries/market-by-slug.query";
+import { useMarketBySlugQuery } from "../lib/queries/market-by-slug.query";
 import { PriceChartWidget } from "./PriceChartWidget";
 import { EmptyState, LoadingState, ErrorState } from "./WidgetHelpers";
 import { TopHoldersWidget } from "./TopHoldersWidget";

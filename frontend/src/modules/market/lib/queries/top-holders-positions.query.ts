@@ -1,7 +1,7 @@
 "use client";
 
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
-import { fetchTopHoldersPositions } from "./fetch/fetch-top-holders-positions";
+import { fetchTopHoldersPositions } from "@/lib/queries/fetch/fetch-top-holders-positions";
 import { UserPosition } from "@/lib/models/api.models";
 
 export function useTopHoldersPositionsQuery(

@@ -1,7 +1,7 @@
 "use client";
 
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
-import { DATA_API_HOST } from "../api.const";
+import { DATA_API_HOST } from "@/lib/api.const";
 
 // Blacklist of wallet addresses to exclude from top holders (same as backend)
 const BLACKLISTED_WALLETS: Set<string> = new Set([

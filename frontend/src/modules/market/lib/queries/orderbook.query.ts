@@ -5,7 +5,7 @@ import {
   fetchOrderbook,
   OrderBookLevel,
   OrderBookResponse,
-} from "./fetch/fetch-orderbook";
+} from "@/lib/queries/fetch/fetch-orderbook";
 
 export type OrderBookViewModel = {
   sortedBids: OrderBookLevel[];

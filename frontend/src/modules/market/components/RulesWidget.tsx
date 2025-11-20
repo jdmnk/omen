@@ -2,7 +2,7 @@
 
 import React from "react";
 import Linkify from "linkify-react";
-import { useClarificationsQuery } from "@/lib/queries/clarifications.query";
+import { useClarificationsQuery } from "../lib/queries/clarifications.query";
 import { Market } from "@/lib/models/api.models";
 
 interface RulesWidgetProps {

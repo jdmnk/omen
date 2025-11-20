@@ -1,23 +1,26 @@
 "use client";
 
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
-import { getBaseUrl } from "../api.const";
+import { getBaseUrl } from "@/lib/api.const";
 import type { TopHolder } from "../queries/top-holders.query";
 
-export interface TopHolderWalletInfo extends TopHolder {
-  walletCreatedAt: string | null;
-  walletLastTransfer: string | null;
-  walletBalance: number | null;
+export interface TopHolderPnl extends TopHolder {
+  avgPrice: number | null;
+  realizedPnl: number | null;
+  totalBought: number | null;
 }
 
-export function useTopHoldersWalletInfoQuery(
+export function useTopHoldersPnlQuery(
   holders: TopHolder[] | undefined,
-  enabled: boolean = true
+  token1: string,
+  token2: string
 ) {
-  return useQuery<TopHolderWalletInfo[]>({
+  return useQuery<TopHolderPnl[]>({
     queryKey: [
-      "top-holders-wallet-info",
+      "top-holders-pnl",
       holders?.map((h) => h.proxyWallet).join(","),
+      token1,
+      token2,
     ],
     queryFn: async () => {
       if (!holders || holders.length === 0) {
@@ -25,7 +28,7 @@ export function useTopHoldersWalletInfoQuery(
       }
 
       const base = getBaseUrl();
-      const url = `${base}/markets/top-holders-wallet-info`;
+      const url = `${base}/markets/top-holders-pnl`;
 
       const res = await fetch(url, {
         method: "POST",
@@ -34,18 +37,20 @@ export function useTopHoldersWalletInfoQuery(
         },
         body: JSON.stringify({
           holders,
+          token1,
+          token2,
         }),
         cache: "no-store",
       });
 
       if (!res.ok) {
-        throw new Error("Failed to fetch top holders wallet info");
+        throw new Error("Failed to fetch top holders PnL");
       }
 
-      const data = (await res.json()) as TopHolderWalletInfo[];
+      const data = (await res.json()) as TopHolderPnl[];
       return data ?? [];
     },
-    enabled: enabled && !!holders && holders.length > 0,
+    enabled: !!holders && holders.length > 0 && !!token1 && !!token2,
     staleTime: 120000, // 2 minutes
     retry: 2,
     placeholderData: keepPreviousData,

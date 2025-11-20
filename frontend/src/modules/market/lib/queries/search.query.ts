@@ -1,8 +1,8 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import { getBaseUrl } from "../api.const";
-import type { SearchResponse } from "../models/api.models";
+import { getBaseUrl } from "@/lib/api.const";
+import type { SearchResponse } from "@/lib/models/api.models";
 
 export function useMarketSearchQuery(query: string, enabled: boolean = true) {
   return useQuery<SearchResponse>({

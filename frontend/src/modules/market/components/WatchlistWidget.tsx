@@ -4,7 +4,7 @@ import { useMemo, useState } from "react";
 import { ChevronDown, ChevronUp } from "lucide-react";
 import Link from "next/link";
 import { useWatchlist } from "@/lib/hooks/use-watchlist";
-import { useMarketsByConditionIdsQuery } from "@/lib/queries/markets-by-condition-ids.query";
+import { useMarketsByConditionIdsQuery } from "../lib/queries/markets-by-condition-ids.query";
 import { Market } from "@/lib/models/api.models";
 import { cn } from "@/lib/utils";
 import { parseOutcomePrice } from "@/lib/api-parse.utils";

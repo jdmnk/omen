@@ -2,15 +2,15 @@
 
 import React, { useMemo } from "react";
 import { Spinner, LoadingSpinner } from "@/components/ui/spinner";
-import { useTopHoldersQuery } from "@/lib/queries/top-holders.query";
+import { useTopHoldersQuery } from "../lib/queries/top-holders.query";
 import {
   useTopHoldersPnlQuery,
   type TopHolderPnl,
-} from "@/lib/queries/top-holders-pnl.query";
+} from "../lib/queries/top-holders-pnl.query";
 import {
   useTopHoldersWalletInfoQuery,
   type TopHolderWalletInfo,
-} from "@/lib/queries/top-holders-wallet-info.query";
+} from "../lib/queries/top-holders-wallet-info.query";
 import {
   formatCompactCurrency,
   formatCompactNumber,
@@ -18,8 +18,8 @@ import {
 } from "@/lib/ui/format.utils";
 import Link from "next/link";
 import { Market, TopHolderAnalysis } from "@/lib/models/api.models";
-import { useOrderbookQuery } from "@/lib/queries/orderbook.query";
-import { useTopHoldersPositionsQuery } from "@/lib/queries/top-holders-positions.query";
+import { useOrderbookQuery } from "../lib/queries/orderbook.query";
+import { useTopHoldersPositionsQuery } from "../lib/queries/top-holders-positions.query";
 import { generateHolderTagsMap } from "@/lib/utils/holder-tags.utils";
 import type { HolderTagIcon } from "@/lib/utils/holder-tags.utils";
 import { formatAddress } from "@/lib/ui/format.utils";
