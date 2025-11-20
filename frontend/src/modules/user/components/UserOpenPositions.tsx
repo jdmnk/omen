@@ -18,7 +18,7 @@ import type {
   PositionActivityLookup,
   SelectablePosition,
 } from "../userActivity.types";
-import { getPositionKey } from "@/lib/utils/position.utils";
+import { getPositionKey } from "@/modules/user/lib/position.utils";
 import { getPolymarketEventUrl } from "@/lib/utils/polymarket.utils";
 import { PositionActivitySubRow } from "./PositionActivitySubRow";
 

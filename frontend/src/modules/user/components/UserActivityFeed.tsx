@@ -21,7 +21,7 @@ import type { MarketActivityEntry } from "@/lib/models/frontend.models";
 import {
   getActivityMarketLabel,
   getActivityTypeLabel,
-} from "@/lib/utils/activity.utils";
+} from "@/modules/user/lib/activity.utils";
 import { useInfiniteScroll } from "@/lib/hooks/use-infinite-scroll";
 
 const ACTIVITY_ROW_GRID_CLASSES =

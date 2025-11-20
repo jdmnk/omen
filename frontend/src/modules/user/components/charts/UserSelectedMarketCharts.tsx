@@ -12,7 +12,7 @@ import type { PositionActivity } from "../../userActivity.types";
 import type { MarketActivityEntry } from "@/lib/models/frontend.models";
 import { PositionPriceChart } from "./PositionPriceChart";
 import { formatCompactCurrency } from "@/lib/ui/format.utils";
-import { getPositionKey } from "@/lib/utils/position.utils";
+import { getPositionKey } from "@/modules/user/lib/position.utils";
 import { getPolymarketEventUrl } from "@/lib/utils/polymarket.utils";
 
 const INTERVALS: Interval[] = ["1h", "6h", "1d", "1w", "1m", "max"];

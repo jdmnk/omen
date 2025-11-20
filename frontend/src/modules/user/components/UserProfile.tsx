@@ -12,7 +12,7 @@ import { useUserValueQuery } from "@/modules/user/lib/queries/user-value.query";
 import { useIsMounted } from "@/lib/hooks/use-is-mounted";
 import { useUserDataQuery } from "@/modules/user/lib/queries/user-data.query";
 import { fetchUserActivityEntries } from "@/modules/user/lib/queries/user-activity.query";
-import { getPositionKey } from "@/lib/utils/position.utils";
+import { getPositionKey } from "@/modules/user/lib/position.utils";
 import type {
   PositionActivity,
   PositionActivityLookup,

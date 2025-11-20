@@ -18,7 +18,7 @@ import type {
 } from "@/lib/models/frontend.models";
 import { UserPnlChartV2, type PositionMarker } from "./charts/UserPnlChartV2";
 import type { PositionActivity } from "../userActivity.types";
-import { getPositionKey } from "@/lib/utils/position.utils";
+import { getPositionKey } from "@/modules/user/lib/position.utils";
 
 const INTERVALS: UserPnlInterval[] = ["12h", "1d", "1w", "1m", "max"];
 
