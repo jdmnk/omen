@@ -24,7 +24,7 @@ import {
 } from "@/lib/utils/activity.utils";
 
 const ACTIVITY_ROW_GRID_CLASSES =
-  "grid grid-cols-[minmax(70px,0.7fr)_minmax(200px,1.8fr)_minmax(180px,1.4fr)_minmax(140px,1fr)] items-center gap-4";
+  "grid grid-cols-[minmax(70px,0.7fr)_minmax(200px,1.6fr)_minmax(200px,1.4fr)_minmax(120px,0.9fr)_minmax(120px,0.9fr)] items-center gap-4";
 
 function ActivityRow({ entry }: { entry: MarketActivityEntry }) {
   const size = entry.size ?? 0;
@@ -86,7 +86,7 @@ function ActivityRow({ entry }: { entry: MarketActivityEntry }) {
           </span>
         )}
       </div>
-      <div className="flex flex-col text-sm">
+      <div className="flex items-center gap-2 text-xs">
         <span
           className={cn(
             "font-semibold",
@@ -105,13 +105,11 @@ function ActivityRow({ entry }: { entry: MarketActivityEntry }) {
           </span>
         )}
       </div>
-      <div className="flex flex-col text-right text-sm">
-        <span className="font-semibold">
-          {amount ? formatCompactCurrency(amount) : "-"}
-        </span>
-        <span className="text-[11px] text-muted-foreground">
-          {relativeTime}
-        </span>
+      <div className="font-semibold">
+        {amount ? formatCompactCurrency(amount) : "-"}
+      </div>
+      <div className="text-xs text-muted-foreground text-right">
+        {relativeTime}
       </div>
     </div>
   );
@@ -158,7 +156,8 @@ export function UserActivityFeed({ userId }: { userId: string }) {
           <div>Type</div>
           <div>Market</div>
           <div>Outcome / Size</div>
-          <div className="text-right">Amount / Time</div>
+          <div>Amount</div>
+          <div className="text-right">Time</div>
         </div>
       </div>
       <div className={TABLE_CONTENT_CONTAINER_CLASSES}>
