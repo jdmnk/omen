@@ -14,6 +14,12 @@ import { PositionPriceChart } from "./PositionPriceChart";
 import { formatCompactCurrency } from "@/lib/ui/format.utils";
 import { getPositionKey } from "@/modules/user/lib/position.utils";
 import { getPolymarketEventUrl } from "@/lib/utils/polymarket.utils";
+import {
+  ResizableHandle,
+  ResizablePanel,
+  ResizablePanelGroup,
+} from "@/components/ui/resizable";
+import { cn } from "@/lib/utils";
 
 const INTERVALS: Interval[] = ["1h", "6h", "1d", "1w", "1m", "max"];
 
@@ -103,7 +109,13 @@ function pickIntervalForRange(rangeSeconds: number): Interval {
   return "max";
 }
 
-function PositionChartCard({ activity }: { activity: PositionActivity }) {
+function PositionChartCard({
+  activity,
+  className,
+}: {
+  activity: PositionActivity;
+  className?: string;
+}) {
   const activityRangeSeconds = useMemo(() => {
     const timestamps =
       activity.entries?.map((entry) => entry.timestamp).filter(Boolean) ?? [];
@@ -141,7 +153,12 @@ function PositionChartCard({ activity }: { activity: PositionActivity }) {
       : activity.position.realizedPnl ?? activity.position.totalBought ?? 0;
 
   return (
-    <Card className="flex h-72 flex-col gap-2 border border-brand-stroke/70 bg-brand-background/40 p-3">
+    <Card
+      className={cn(
+        "flex min-h-[18rem] flex-col gap-2 border border-brand-stroke/70 bg-brand-background/40 p-3",
+        className
+      )}
+    >
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
           <a
@@ -197,6 +214,15 @@ export function UserSelectedMarketCharts({
   activities: PositionActivity[];
 }) {
   const [isExpanded, setIsExpanded] = useState(true);
+
+  const chartRows = useMemo(() => {
+    const rows: PositionActivity[][] = [];
+    for (let i = 0; i < activities.length; i += 2) {
+      rows.push(activities.slice(i, i + 2));
+    }
+    return rows;
+  }, [activities]);
+
   if (!activities || activities.length === 0) {
     return null;
   }
@@ -214,13 +240,60 @@ export function UserSelectedMarketCharts({
         </button>
       </div>
       {isExpanded ? (
-        <div className="grid gap-4 border-t border-brand-stroke/60 px-4 pb-4 pt-3 md:grid-cols-2">
-          {activities.map((activity) => (
-            <PositionChartCard
-              key={getPositionKey(activity.position)}
-              activity={activity}
-            />
-          ))}
+        <div className="border-t border-brand-stroke/60 px-4 pb-4 pt-3">
+          <div className="flex flex-col gap-4">
+            {chartRows.map((row, rowIdx) => {
+              const rowKey =
+                row.map((item) => getPositionKey(item.position)).join("-") ||
+                rowIdx.toString();
+              return (
+                <div key={rowKey} className="flex flex-col gap-3">
+                  <div className="flex flex-col gap-3 md:hidden">
+                    {row.map((activity) => (
+                      <PositionChartCard
+                        key={getPositionKey(activity.position)}
+                        activity={activity}
+                        className="h-full"
+                      />
+                    ))}
+                  </div>
+                  <div className="hidden md:block">
+                    {row.length === 1 ? (
+                      <PositionChartCard
+                        key={getPositionKey(row[0].position)}
+                        activity={row[0]}
+                        className="w-full"
+                      />
+                    ) : (
+                      <ResizablePanelGroup
+                        direction="horizontal"
+                        className="w-full items-stretch gap-3"
+                      >
+                        <ResizablePanel defaultSize={50} minSize={35}>
+                          <PositionChartCard
+                            key={getPositionKey(row[0].position)}
+                            activity={row[0]}
+                            className="h-full"
+                          />
+                        </ResizablePanel>
+                        <ResizableHandle
+                          withHandle
+                          className="bg-brand-stroke/50"
+                        />
+                        <ResizablePanel defaultSize={50} minSize={35}>
+                          <PositionChartCard
+                            key={getPositionKey(row[1].position)}
+                            activity={row[1]}
+                            className="h-full"
+                          />
+                        </ResizablePanel>
+                      </ResizablePanelGroup>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
         </div>
       ) : (
         <div className="px-4 pb-4 text-xs text-muted-foreground">

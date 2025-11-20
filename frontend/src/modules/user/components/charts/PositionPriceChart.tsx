@@ -95,6 +95,7 @@ export function PositionPriceChart({
           width: nextWidth,
           height: nextHeight,
         });
+        chartRef.current.timeScale().fitContent();
       }
     });
     resizeObserver.observe(containerRef.current);
