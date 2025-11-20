@@ -105,14 +105,17 @@ function PositionChartCard({ activity }: { activity: PositionActivity }) {
   const activityRangeSeconds = useMemo(() => {
     const timestamps =
       activity.entries?.map((entry) => entry.timestamp).filter(Boolean) ?? [];
-    if (timestamps.length < 2) return 0;
-    return (
-      Math.max.apply(null, timestamps) - Math.min.apply(null, timestamps)
-    );
+    if (timestamps.length === 0) return 0;
+    const minTs = Math.min(...timestamps);
+    const maxTs = Math.max(...timestamps);
+    const nowSec = Math.floor(Date.now() / 1000);
+    const spanWithinEntries = maxTs - minTs;
+    const spanSinceEarliest = nowSec - minTs;
+    return Math.max(spanWithinEntries, spanSinceEarliest);
   }, [activity.entries]);
 
   const suggestedInterval = useMemo(
-    () => pickIntervalForRange(activityRangeSeconds * 1.2),
+    () => pickIntervalForRange(activityRangeSeconds * 1.1),
     [activityRangeSeconds]
   );
 
