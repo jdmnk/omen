@@ -149,7 +149,7 @@ type UserPositionsProps = {
   positionActivities?: PositionActivityLookup;
 };
 
-export function UserPositions({
+export function UserOpenPositions({
   userId,
   selectedPositionKeys = new Set(),
   onTogglePosition,

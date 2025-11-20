@@ -3,7 +3,7 @@
 import React, { useState, useMemo, useCallback } from "react";
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { UserPositions } from "./UserPositions";
+import { UserOpenPositions } from "./UserOpenPositions";
 import { UserClosedPositions } from "./UserClosedPositions";
 import { UserPnlChartWidgetV2 } from "./UserPnlChartWidgetV2";
 import { formatAddress, formatCompactCurrency } from "@/lib/ui/format.utils";
@@ -18,7 +18,7 @@ import type {
   PositionActivityLookup,
   SelectablePosition,
 } from "../userActivity.types";
-import { UserSelectedMarketCharts } from "./UserSelectedMarketCharts";
+import { UserSelectedMarketCharts } from "./charts/UserSelectedMarketCharts";
 import { UserActivityFeed } from "./UserActivityFeed";
 import { Copy } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -239,7 +239,7 @@ export function UserProfile({ userId }: { userId: string }) {
 
           <TabsContent value="positions">
             <div className="h-[800px]">
-              <UserPositions
+              <UserOpenPositions
                 userId={userId}
                 selectedPositionKeys={selectedPositionKeys}
                 onTogglePosition={handlePositionToggle}

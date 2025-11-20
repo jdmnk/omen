@@ -13,7 +13,7 @@ import type {
   UserPosition,
   ClosedPosition,
 } from "@/lib/models/frontend.models";
-import { UserPnlChartV2, type PositionMarker } from "./UserPnlChartV2";
+import { UserPnlChartV2, type PositionMarker } from "./charts/UserPnlChartV2";
 import type { PositionActivity } from "../userActivity.types";
 import { getPositionKey } from "@/lib/utils/position.utils";
 
