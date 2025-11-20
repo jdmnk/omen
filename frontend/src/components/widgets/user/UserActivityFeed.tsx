@@ -41,14 +41,16 @@ function ActivityRow({ entry }: { entry: MarketActivityEntry }) {
   const marketLabel = getActivityMarketLabel(entry);
   const typeUpper = entry.type?.toUpperCase() ?? "";
   const isYield = typeUpper === "YIELD";
-  const isRedeem = typeUpper === "REDEEM";
   const outcomeLabel = isYield ? "-" : entry.outcome ?? "-";
   const sharesLabel =
     !isYield && entry.size !== undefined && entry.size !== null
       ? `${formatNumber(size, size >= 1 ? 0 : 2)} shares`
       : null;
+  const shouldShowPrice = !["YIELD", "REDEEM", "MERGE", "REWARD"].includes(
+    typeUpper
+  );
   const priceLabel =
-    !isRedeem && entry.price !== undefined && entry.price !== null
+    entry.price !== undefined && entry.price !== null
       ? `${formatNumber(price * 100, 1)}¢`
       : "-";
   const typeColor =
@@ -87,18 +89,20 @@ function ActivityRow({ entry }: { entry: MarketActivityEntry }) {
         )}
       </div>
       <div className="flex items-center gap-2 text-xs">
-        <span
-          className={cn(
-            "font-semibold",
-            outcomeLabel.toLowerCase().includes("yes")
-              ? "text-outcome-yes"
-              : outcomeLabel.toLowerCase().includes("no")
-              ? "text-outcome-no"
-              : "text-foreground"
-          )}
-        >
-          {combinedOutcomeLabel}
-        </span>
+        {shouldShowPrice && (
+          <span
+            className={cn(
+              "font-semibold",
+              outcomeLabel.toLowerCase().includes("yes")
+                ? "text-outcome-yes"
+                : outcomeLabel.toLowerCase().includes("no")
+                ? "text-outcome-no"
+                : "text-foreground"
+            )}
+          >
+            {combinedOutcomeLabel}
+          </span>
+        )}
         {sharesLabel && (
           <span className="text-[11px] text-muted-foreground">
             {sharesLabel}
