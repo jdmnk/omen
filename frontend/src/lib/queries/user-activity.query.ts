@@ -45,13 +45,14 @@ function mapActivityEntry(entry: RawActivityEntry): MarketActivityEntry | null {
 export async function fetchUserActivityEntries(
   userId: string,
   conditionId?: string,
-  limit: number = 500
+  limit: number = 500,
+  offset: number = 0
 ): Promise<MarketActivityEntry[]> {
   if (!userId) return [];
   const url = new URL(`${DATA_API_HOST}/activity`);
   url.searchParams.set("user", userId);
   url.searchParams.set("limit", String(limit));
-  url.searchParams.set("offset", "0");
+  url.searchParams.set("offset", String(offset));
   if (conditionId) {
     url.searchParams.set("market", conditionId);
   }

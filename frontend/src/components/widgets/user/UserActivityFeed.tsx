@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useInfiniteQuery } from "@tanstack/react-query";
 import {
   TABLE_HEADER_CLASSES,
   TABLE_ROW_CLASSES,
@@ -22,9 +22,11 @@ import {
   getActivityMarketLabel,
   getActivityTypeLabel,
 } from "@/lib/utils/activity.utils";
+import { useInfiniteScroll } from "@/lib/hooks/use-infinite-scroll";
 
 const ACTIVITY_ROW_GRID_CLASSES =
   "grid grid-cols-[minmax(70px,0.7fr)_minmax(200px,1.6fr)_minmax(200px,1.4fr)_minmax(120px,0.9fr)_minmax(120px,0.9fr)] items-center gap-4";
+const PAGE_SIZE = 100;
 
 function ActivityRow({ entry }: { entry: MarketActivityEntry }) {
   const size = entry.size ?? 0;
@@ -118,11 +120,35 @@ function ActivityRow({ entry }: { entry: MarketActivityEntry }) {
 }
 
 export function UserActivityFeed({ userId }: { userId: string }) {
-  const { data, isLoading, error } = useQuery({
+  const {
+    data,
+    isLoading,
+    error,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  } = useInfiniteQuery({
     queryKey: ["user-activity", userId],
-    queryFn: () => fetchUserActivityEntries(userId, undefined, 500),
+    queryFn: ({ pageParam = 0 }) =>
+      fetchUserActivityEntries(
+        userId,
+        undefined,
+        PAGE_SIZE,
+        pageParam as number
+      ),
     enabled: Boolean(userId),
     staleTime: 60_000,
+    getNextPageParam: (lastPage, allPages) => {
+      if (lastPage.length < PAGE_SIZE) return undefined;
+      return allPages.length * PAGE_SIZE;
+    },
+    initialPageParam: 0,
+  });
+
+  const { scrollRef, sentinelRef } = useInfiniteScroll({
+    hasNextPage: !!hasNextPage,
+    isFetchingNextPage,
+    fetchNextPage,
   });
 
   if (isLoading) {
@@ -141,7 +167,7 @@ export function UserActivityFeed({ userId }: { userId: string }) {
     );
   }
 
-  const entries = data ?? [];
+  const entries = data?.pages.flat() ?? [];
 
   if (entries.length === 0) {
     return (
@@ -152,7 +178,7 @@ export function UserActivityFeed({ userId }: { userId: string }) {
   }
 
   return (
-    <div className="flex h-full flex-col overflow-auto">
+    <div ref={scrollRef} className="flex h-full flex-col overflow-auto">
       <div className={TABLE_HEADER_CONTAINER_CLASSES}>
         <div className={cn(ACTIVITY_ROW_GRID_CLASSES, TABLE_HEADER_CLASSES)}>
           <div>Type</div>
@@ -169,7 +195,13 @@ export function UserActivityFeed({ userId }: { userId: string }) {
             entry={entry}
           />
         ))}
+        {hasNextPage && <div ref={sentinelRef} className="h-4" />}
       </div>
+      {isFetchingNextPage && (
+        <div className="flex items-center justify-center py-4">
+          <LoadingSpinner message="Loading activity..." size="sm" />
+        </div>
+      )}
     </div>
   );
 }

@@ -3,7 +3,11 @@
 import React from "react";
 import { useClosedPositionsInfiniteQuery } from "@/lib/queries/closed-positions.query";
 import { LoadingSpinner, Spinner } from "@/components/ui/spinner";
-import { formatCompactCurrency, formatNumber, formatRelativeTime } from "@/lib/ui/format.utils";
+import {
+  formatCompactCurrency,
+  formatNumber,
+  formatRelativeTime,
+} from "@/lib/ui/format.utils";
 import { cn } from "@/lib/utils";
 import { ClosedPosition } from "@/lib/models/frontend.models";
 import { useInfiniteScroll } from "@/lib/hooks/use-infinite-scroll";
@@ -14,7 +18,10 @@ import {
   TABLE_HEADER_CONTAINER_CLASSES,
   TABLE_CONTENT_CONTAINER_CLASSES,
 } from "../shared-table-styles";
-import type { PositionActivityLookup, SelectablePosition } from "./userActivity.types";
+import type {
+  PositionActivityLookup,
+  SelectablePosition,
+} from "./userActivity.types";
 import { getPositionKey } from "@/lib/utils/position.utils";
 import { getPolymarketEventUrl } from "@/lib/utils/polymarket.utils";
 import { PositionActivitySubRow } from "./PositionActivitySubRow";
@@ -108,7 +115,9 @@ function ClosedPositionRow({
           <div className="font-semibold">{position.outcome}</div>
         </div>
         <div>
-          <div className="font-semibold">{formatNumber(avgPrice * 100, 1)}%</div>
+          <div className="font-semibold">
+            {formatNumber(avgPrice * 100, 1)}%
+          </div>
         </div>
         <div>
           <div className="font-semibold">
