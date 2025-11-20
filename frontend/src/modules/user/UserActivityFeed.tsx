@@ -7,7 +7,7 @@ import {
   TABLE_ROW_CLASSES,
   TABLE_HEADER_CONTAINER_CLASSES,
   TABLE_CONTENT_CONTAINER_CLASSES,
-} from "../shared-table-styles";
+} from "../../components/widgets/shared-table-styles";
 import {
   formatCompactCurrency,
   formatNumber,

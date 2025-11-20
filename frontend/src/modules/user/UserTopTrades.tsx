@@ -17,7 +17,7 @@ import {
   TABLE_ROW_CLASSES,
   TABLE_HEADER_CONTAINER_CLASSES,
   TABLE_CONTENT_CONTAINER_CLASSES,
-} from "../shared-table-styles";
+} from "../../components/widgets/shared-table-styles";
 
 const TRADE_ROW_GRID_CLASSES =
   "grid grid-cols-[minmax(220px,2fr)_minmax(80px,0.8fr)_minmax(70px,0.7fr)_minmax(80px,0.8fr)_minmax(80px,0.8fr)_minmax(90px,0.9fr)_minmax(110px,1fr)] items-center gap-4";

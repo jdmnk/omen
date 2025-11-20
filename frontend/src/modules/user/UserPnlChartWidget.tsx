@@ -6,7 +6,7 @@ import { useUserPnlWithMarkersQuery } from "@/lib/queries/user-pnl-markers.query
 import { UserPnlChart } from "./UserPnlChart";
 import { formatCompactCurrency } from "@/lib/ui/format.utils";
 import { cn } from "@/lib/utils";
-import { Card } from "../../ui/card";
+import { Card } from "../../components/ui/card";
 import { useIsMounted } from "@/lib/hooks/use-is-mounted";
 
 const INTERVALS: UserPnlInterval[] = ["12h", "1d", "1w", "1m", "max"];

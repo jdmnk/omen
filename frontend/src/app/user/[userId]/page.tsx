@@ -1,4 +1,4 @@
-import { UserProfile } from "@/components/widgets/user/UserProfile";
+import { UserProfile } from "@/modules/user/UserProfile";
 import type { Metadata } from "next";
 import { METADATA } from "@/lib/metadata.const";
 import { getSiteUrl } from "@/lib/app.const";
