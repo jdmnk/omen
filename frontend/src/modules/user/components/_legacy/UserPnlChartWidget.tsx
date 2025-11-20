@@ -1,8 +1,8 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import { UserPnlInterval } from "@/lib/queries/user-pnl.query";
-import { useUserPnlWithMarkersQuery } from "@/lib/queries/user-pnl-markers.query";
+import { UserPnlInterval } from "@/modules/user/lib/queries/user-pnl.query";
+import { useUserPnlWithMarkersQuery } from "@/modules/user/lib/queries/user-pnl-markers.query";
 import { UserPnlChart } from "./UserPnlChart";
 import { formatCompactCurrency } from "@/lib/ui/format.utils";
 import { cn } from "@/lib/utils";

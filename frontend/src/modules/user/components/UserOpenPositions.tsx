@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { useUserPositionsInfiniteQuery } from "@/lib/queries/user-positions.query";
+import { useUserPositionsInfiniteQuery } from "@/modules/user/lib/queries/user-positions.query";
 import { LoadingSpinner, Spinner } from "@/components/ui/spinner";
 import { formatCompactCurrency, formatNumber } from "@/lib/ui/format.utils";
 import { cn } from "@/lib/utils";

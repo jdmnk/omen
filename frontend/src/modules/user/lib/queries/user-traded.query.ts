@@ -1,8 +1,8 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import { UserTraded } from "../models/frontend.models";
-import { DATA_API_HOST } from "../api.const";
+import { UserTraded } from "../../../../lib/models/frontend.models";
+import { DATA_API_HOST } from "../../../../lib/api.const";
 
 export function useUserTradedQuery(userId: string) {
   return useQuery<UserTraded>({
@@ -23,4 +23,3 @@ export function useUserTradedQuery(userId: string) {
     staleTime: 300000, // 5 minutes
   });
 }
-

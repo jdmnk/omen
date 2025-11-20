@@ -4,8 +4,11 @@ import { useMemo, useState } from "react";
 import type { Time } from "lightweight-charts";
 import { Card } from "@/components/ui/card";
 import { useIsMounted } from "@/lib/hooks/use-is-mounted";
-import { useUserPnlQuery, UserPnlInterval } from "@/lib/queries/user-pnl.query";
-import { useUserPositionsInfiniteQuery } from "@/lib/queries/user-positions.query";
+import {
+  useUserPnlQuery,
+  UserPnlInterval,
+} from "@/modules/user/lib/queries/user-pnl.query";
+import { useUserPositionsInfiniteQuery } from "@/modules/user/lib/queries/user-positions.query";
 import { useClosedPositionsInfiniteQuery } from "@/lib/queries/closed-positions.query";
 import { formatCompactCurrency } from "@/lib/ui/format.utils";
 import { cn } from "@/lib/utils";

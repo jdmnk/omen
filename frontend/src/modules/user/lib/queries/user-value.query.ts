@@ -1,8 +1,8 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import { UserValue } from "../models/frontend.models";
-import { DATA_API_HOST } from "../api.const";
+import { UserValue } from "../../../../lib/models/frontend.models";
+import { DATA_API_HOST } from "../../../../lib/api.const";
 
 export function useUserValueQuery(userId: string) {
   return useQuery<UserValue[]>({
@@ -23,4 +23,3 @@ export function useUserValueQuery(userId: string) {
     staleTime: 60000, // 1 minute
   });
 }
-
