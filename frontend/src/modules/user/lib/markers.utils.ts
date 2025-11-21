@@ -5,6 +5,14 @@ const BUY_COLOR = "#22c55e";
 const SELL_COLOR = "#ef4444";
 const DEFAULT_BUCKET_SECONDS = 60;
 const DEFAULT_NEARBY_BUCKETS = 5;
+const MIN_MARKER_SIZE = 1;
+const MAX_MARKER_SIZE = 4;
+
+function getMarkerSize(count: number) {
+  if (count <= 1) return MIN_MARKER_SIZE;
+  const growth = Math.log2(Math.max(1, count));
+  return Math.min(MIN_MARKER_SIZE + growth * 0.6, MAX_MARKER_SIZE);
+}
 
 function bucketTimestamp(timestamp: number, bucketSeconds?: number) {
   const size =
@@ -81,6 +89,7 @@ export function buildGroupedTradeMarkers(
     Array.from(bucketMap.values()).map(({ marker, count }) => ({
       ...marker,
       text: count > 1 && marker.text ? `${marker.text}` : marker.text,
+      size: getMarkerSize(count),
     }))
   );
 }
