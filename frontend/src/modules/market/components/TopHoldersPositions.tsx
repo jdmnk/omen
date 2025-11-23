@@ -36,7 +36,7 @@ import {
   TABLE_HEADER_CLASSES,
   TABLE_HEADER_CONTAINER_CLASSES,
   TABLE_ROW_CLASSES,
-} from "@/components/widgets/shared-table-styles";
+} from "@/components/shared-table-styles";
 
 const HOLDER_ROW_GRID_CLASSES =
   // "grid grid-cols-[24px_auto_3rem_6.5rem_4.5rem] items-center gap-3";

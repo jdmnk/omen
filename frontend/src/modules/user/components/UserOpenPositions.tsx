@@ -13,7 +13,7 @@ import {
   TABLE_HEADER_CONTAINER_CLASSES,
   TABLE_CONTENT_CONTAINER_CLASSES,
   TABLE_ROW_CLASSES,
-} from "../../../components/widgets/shared-table-styles";
+} from "../../../components/shared-table-styles";
 import type {
   PositionActivityLookup,
   SelectablePosition,
