@@ -207,7 +207,7 @@ export function UserSelectedMarketCharts({
 
   return (
     <Card className="flex flex-col border border-brand-stroke/80 bg-brand-background/60">
-      <div className="flex items-center justify-between px-4 py-3 text-sm font-semibold">
+      <div className="flex items-center justify-between px-3 py-2 text-xs font-semibold">
         <span>Selected Market Charts ({activities.length})</span>
         <button
           type="button"
@@ -274,7 +274,7 @@ export function UserSelectedMarketCharts({
           </div>
         </div>
       ) : (
-        <div className="px-4 pb-4 text-xs text-muted-foreground">
+        <div className="px-3 pb-3 text-xs text-muted-foreground">
           Charts hidden. Select positions above and click “Show” to review each
           market’s price action with your trades overlaid.
         </div>
