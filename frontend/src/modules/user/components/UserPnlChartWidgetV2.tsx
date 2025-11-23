@@ -42,12 +42,6 @@ function toChartTime(value?: number | string | null): Time | null {
   return Math.floor(parsed / 1000) as Time;
 }
 
-function getPositionOpenedAt(position: UserPosition): number | string | null {
-  if (position.timestamp) return position.timestamp;
-  if (position.openedAt) return position.openedAt;
-  return null;
-}
-
 function flattenInfiniteResult<T>(pages?: T[][]): T[] {
   if (!pages) return [];
   return pages.flatMap((page) => page);
@@ -99,20 +93,6 @@ export function UserPnlChartWidgetV2({
 
   const positionMarkers = useMemo<PositionMarker[]>(() => {
     const markers: PositionMarker[] = [];
-
-    openPositions.forEach((position, index) => {
-      const timestamp = toChartTime(getPositionOpenedAt(position));
-      if (!timestamp) return;
-
-      markers.push({
-        id: `open-${position.conditionId}-${position.outcomeIndex}-${index}`,
-        time: timestamp,
-        position: "belowBar",
-        color: "#38bdf8",
-        shape: "arrowUp",
-        text: "O",
-      });
-    });
 
     closedPositions.forEach((position, index) => {
       const timestamp = toChartTime(position.timestamp);
@@ -282,10 +262,6 @@ function LegendSection({
   return (
     <div className="flex flex-wrap items-center justify-between gap-3 px-3 py-2 text-[11px] text-muted-foreground">
       <div className="flex items-center gap-4">
-        <span className="flex items-center gap-1">
-          <span className="h-2 w-2 rounded-full bg-sky-400" />
-          Open position
-        </span>
         <span className="flex items-center gap-1">
           <span className="h-2 w-2 rounded-full bg-emerald-400" />
           Closed (profit)
