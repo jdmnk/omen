@@ -1,8 +1,8 @@
 "use client";
 
 import { useInfiniteQuery } from "@tanstack/react-query";
-import { ClosedPosition } from "../models/frontend.models";
-import { DATA_API_HOST } from "../api.const";
+import { ClosedPosition } from "@/lib/models/frontend.models";
+import { DATA_API_HOST } from "@/lib/api.const";
 
 const PAGE_SIZE = 50;
 

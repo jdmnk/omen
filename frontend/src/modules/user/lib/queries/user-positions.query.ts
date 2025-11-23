@@ -33,6 +33,6 @@ export function useUserPositionsInfiniteQuery(userId: string) {
       return allPages.length;
     },
     initialPageParam: 0,
-    staleTime: 60000, // 1 minute
+    staleTime: 120000, // 2 minutes
   });
 }

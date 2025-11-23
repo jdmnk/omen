@@ -9,7 +9,7 @@ import {
   UserPnlInterval,
 } from "@/modules/user/lib/queries/user-pnl.query";
 import { useUserPositionsInfiniteQuery } from "@/modules/user/lib/queries/user-positions.query";
-import { useClosedPositionsInfiniteQuery } from "@/lib/queries/closed-positions.query";
+import { useClosedPositionsInfiniteQuery } from "@/modules/user/lib/queries/closed-positions.query";
 import { formatCompactCurrency } from "@/lib/ui/format.utils";
 import { cn } from "@/lib/utils";
 import type {

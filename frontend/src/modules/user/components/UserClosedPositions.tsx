@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { useClosedPositionsInfiniteQuery } from "@/lib/queries/closed-positions.query";
+import { useClosedPositionsInfiniteQuery } from "@/modules/user/lib/queries/closed-positions.query";
 import { LoadingSpinner, Spinner } from "@/components/ui/spinner";
 import {
   formatCompactCurrency,
