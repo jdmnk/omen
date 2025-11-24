@@ -13,6 +13,8 @@ import { useIsMounted } from "@/lib/hooks/use-is-mounted";
 import { useUserDataQuery } from "@/modules/user/lib/queries/user-data.query";
 import { fetchUserActivityEntries } from "@/modules/user/lib/queries/user-activity.query";
 import { getPositionKey } from "@/modules/user/lib/position.utils";
+import { fetchClosedPositionsByMarkets } from "@/modules/user/lib/queries/closed-positions.query";
+import { buildPositionActivityTimeline } from "@/modules/user/lib/position-activity.utils";
 import type {
   PositionActivity,
   PositionActivityLookup,
@@ -30,17 +32,30 @@ async function fetchUserPositionActivity(
   userId: string,
   position: SelectablePosition
 ) {
-  const entries = await fetchUserActivityEntries(userId, position.conditionId);
-  const outcomeIndex = position.outcomeIndex;
-  if (outcomeIndex === null || outcomeIndex === undefined) {
-    return entries;
-  }
-  return entries.filter(
-    (entry) =>
-      entry.outcomeIndex === null ||
-      entry.outcomeIndex === undefined ||
-      entry.outcomeIndex === outcomeIndex
+  const [entries, closedPositions] = await Promise.all([
+    fetchUserActivityEntries(userId, position.conditionId),
+    fetchClosedPositionsByMarkets(userId, [position.conditionId]),
+  ]);
+
+  const closedPositionsForOutcome = closedPositions.filter(
+    (closed) =>
+      position.outcomeIndex === null ||
+      position.outcomeIndex === undefined ||
+      closed.outcomeIndex === position.outcomeIndex
   );
+
+  return buildPositionActivityTimeline({
+    entries,
+    closedPositions: closedPositionsForOutcome,
+    context: {
+      conditionId: position.conditionId,
+      outcome: position.outcome,
+      outcomeIndex: position.outcomeIndex,
+      title: position.title,
+      slug: position.slug,
+      eventSlug: position.eventSlug,
+    },
+  });
 }
 
 export function UserProfile({ userId }: { userId: string }) {
