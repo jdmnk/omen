@@ -9,6 +9,7 @@ const TYPE_LABEL_MAP: Record<string, string> = {
 
 const MARKET_LABEL_MAP: Record<string, string> = {
   YIELD: "4% Rewards",
+  REWARD: "LP Rewards",
 };
 
 export function getActivityTypeLabel(entry: MarketActivityEntry): string {
