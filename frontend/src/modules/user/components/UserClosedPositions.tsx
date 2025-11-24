@@ -24,11 +24,11 @@ import type {
   SelectablePosition,
 } from "../userActivity.types";
 import { getPositionKey } from "@/modules/user/lib/position.utils";
-import { getPolymarketEventUrl } from "@/lib/utils/polymarket.utils";
 import { PositionActivitySubRow } from "./PositionActivitySubRow";
+import { PositionMarketLinkButton } from "./PositionMarketLinkButton";
 
 const POSITION_ROW_GRID_CLASSES =
-  "grid grid-cols-[18px_minmax(220px,2fr)_minmax(80px,0.8fr)_minmax(80px,0.8fr)_minmax(80px,0.8fr)_minmax(80px,0.8fr)_minmax(100px,1fr)_minmax(110px,1fr)] items-center gap-4";
+  "grid grid-cols-[18px_minmax(220px,2fr)_minmax(80px,0.8fr)_minmax(80px,0.8fr)_minmax(80px,0.8fr)_minmax(80px,0.8fr)_minmax(100px,1fr)_minmax(110px,1fr)_36px] items-center gap-4";
 
 type ClosedPositionRowProps = {
   position: ClosedPosition;
@@ -51,8 +51,6 @@ function ClosedPositionRow({
     : "-";
 
   const pnlPercent = totalBought > 0 ? (realizedPnl / totalBought) * 100 : 0;
-  const marketUrl = getPolymarketEventUrl(position.slug);
-
   const pnlColor =
     realizedPnl > 0
       ? "text-outcome-yes"
@@ -64,8 +62,7 @@ function ClosedPositionRow({
     onTogglePosition?.(position, next);
   };
 
-  const handleRowClick = (event: React.MouseEvent<HTMLDivElement>) => {
-    if ((event.target as HTMLElement).closest("a")) return;
+  const handleRowClick = () => {
     toggleSelection(!isSelected);
   };
 
@@ -102,15 +99,9 @@ function ClosedPositionRow({
           />
         </div>
         <div className="flex min-w-0 overflow-hidden">
-          <a
-            href={marketUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex max-w-full truncate font-medium hover:underline"
-            onClick={(event) => event.stopPropagation()}
-          >
+          <span className="inline-flex max-w-full truncate font-medium">
             {position.title}
-          </a>
+          </span>
         </div>
         <div>
           <div className="font-semibold">{position.outcome}</div>
@@ -141,6 +132,9 @@ function ClosedPositionRow({
         </div>
         <div className="text-xs text-muted-foreground text-right">
           {relativeTime}
+        </div>
+        <div className="flex justify-end">
+          <PositionMarketLinkButton slug={position.slug} />
         </div>
       </div>
       {isSelected ? (
@@ -219,6 +213,7 @@ export function UserClosedPositions({
           <div>Total Bought</div>
           <div>Realized PnL</div>
           <div className="text-right">Time</div>
+          <div className="text-right">Link</div>
         </div>
       </div>
       <div className={TABLE_CONTENT_CONTAINER_CLASSES}>

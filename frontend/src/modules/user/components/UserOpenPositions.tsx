@@ -23,11 +23,11 @@ import type {
   SelectablePosition,
 } from "../userActivity.types";
 import { getPositionKey } from "@/modules/user/lib/position.utils";
-import { getPolymarketEventUrl } from "@/lib/utils/polymarket.utils";
 import { PositionActivitySubRow } from "./PositionActivitySubRow";
+import { PositionMarketLinkButton } from "./PositionMarketLinkButton";
 
 const POSITION_ROW_GRID_CLASSES =
-  "grid grid-cols-[18px_minmax(220px,2fr)_minmax(80px,0.8fr)_minmax(80px,0.8fr)_minmax(80px,0.8fr)_minmax(80px,0.8fr)_minmax(100px,1fr)_minmax(110px,1fr)] items-center gap-4";
+  "grid grid-cols-[18px_minmax(220px,2fr)_minmax(80px,0.8fr)_minmax(80px,0.8fr)_minmax(80px,0.8fr)_minmax(80px,0.8fr)_minmax(100px,1fr)_minmax(110px,1fr)_36px] items-center gap-4";
 
 type PositionRowProps = {
   position: UserPosition;
@@ -44,8 +44,6 @@ function PositionRow({
 }: PositionRowProps) {
   const size = position.size || 0;
   const currentPrice = position.curPrice || 0;
-  const marketUrl = getPolymarketEventUrl(position.slug);
-
   const pnlColor =
     position.cashPnl > 0
       ? "text-outcome-yes"
@@ -58,9 +56,6 @@ function PositionRow({
   };
 
   const handleRowClick = (event: React.MouseEvent<HTMLDivElement>) => {
-    if ((event.target as HTMLElement).closest("a")) {
-      return;
-    }
     toggleSelection(!isSelected);
   };
 
@@ -97,15 +92,9 @@ function PositionRow({
           />
         </div>
         <div className="flex min-w-0 overflow-hidden">
-          <a
-            href={marketUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex max-w-full truncate font-medium hover:underline"
-            onClick={(event) => event.stopPropagation()}
-          >
+          <span className="inline-flex max-w-full truncate font-medium">
             {position.title}
-          </a>
+          </span>
         </div>
         <div>
           <div className="font-semibold">{position.outcome}</div>
@@ -134,6 +123,9 @@ function PositionRow({
         </div>
         <div className="text-right text-xs text-muted-foreground">
           {position.endDate ? new Date(position.endDate).toLocaleString() : "-"}
+        </div>
+        <div className="flex justify-end">
+          <PositionMarketLinkButton slug={position.slug} />
         </div>
       </div>
       {isSelected ? (
@@ -212,6 +204,7 @@ export function UserOpenPositions({
           <div>Value</div>
           <div>PnL</div>
           <div className="text-right">End date</div>
+          <div className="text-right">Link</div>
         </div>
       </div>
       <div className={TABLE_CONTENT_CONTAINER_CLASSES}>
