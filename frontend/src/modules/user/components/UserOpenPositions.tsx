@@ -125,7 +125,7 @@ function PositionRow({
           {position.endDate ? new Date(position.endDate).toLocaleString() : "-"}
         </div>
         <div className="flex justify-end">
-          <PositionMarketLinkButton slug={position.slug} />
+          <PositionMarketLinkButton slug={position.eventSlug} />
         </div>
       </div>
       {isSelected ? (
