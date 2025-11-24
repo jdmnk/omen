@@ -23,8 +23,8 @@ import type {
   SelectablePosition,
 } from "../userActivity.types";
 import { getPositionKey } from "@/modules/user/lib/position.utils";
-import { PositionActivitySubRow } from "./PositionActivitySubRow";
-import { PositionMarketLinkButton } from "./PositionMarketLinkButton";
+import { PositionActivitySubRow } from "./positions/PositionActivitySubRow";
+import { PositionMarketLinkButton } from "./positions/PositionMarketLinkButton";
 
 const POSITION_ROW_GRID_CLASSES =
   "grid grid-cols-[18px_minmax(220px,2fr)_minmax(80px,0.8fr)_minmax(80px,0.8fr)_minmax(80px,0.8fr)_minmax(80px,0.8fr)_minmax(100px,1fr)_minmax(110px,1fr)_36px] items-center gap-4";
