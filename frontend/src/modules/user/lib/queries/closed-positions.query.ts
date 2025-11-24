@@ -1,6 +1,7 @@
 "use client";
 
 import { useInfiniteQuery } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { ClosedPosition } from "@/lib/models/frontend.models";
 import { DATA_API_HOST } from "@/lib/api.const";
 
@@ -55,5 +56,49 @@ export function useClosedPositionsInfiniteQuery(
     },
     initialPageParam: 0,
     staleTime: 60000, // 1 minute
+  });
+}
+
+export async function fetchClosedPositionsByMarkets(
+  userId: string,
+  markets: string[],
+  sortBy: ClosedPositionSortBy = "TIMESTAMP",
+  limit: number = 200
+): Promise<ClosedPosition[]> {
+  if (!userId || markets.length === 0) return [];
+
+  const url = new URL(`${DATA_API_HOST}/closed-positions`);
+  url.searchParams.set("user", userId);
+  url.searchParams.set("limit", limit.toString());
+  url.searchParams.set("sortBy", sortBy);
+  url.searchParams.set("sortDirection", "DESC");
+  markets.forEach((marketId) => url.searchParams.append("market", marketId));
+
+  const response = await fetch(url.toString());
+  if (!response.ok) {
+    throw new Error(`Failed to fetch closed positions: ${response.statusText}`);
+  }
+  const data = await response.json();
+  return Array.isArray(data) ? data : [];
+}
+
+export function useClosedPositionsByMarketsQuery(
+  userId: string,
+  markets: string[],
+  sortBy: ClosedPositionSortBy = "TIMESTAMP",
+  limit?: number
+) {
+  return useQuery<ClosedPosition[], Error>({
+    queryKey: [
+      "closed-positions-by-market",
+      userId,
+      [...markets].sort(),
+      sortBy,
+      limit,
+    ],
+    queryFn: () =>
+      fetchClosedPositionsByMarkets(userId, markets, sortBy, limit ?? 200),
+    enabled: Boolean(userId && markets.length > 0),
+    staleTime: 60000,
   });
 }
