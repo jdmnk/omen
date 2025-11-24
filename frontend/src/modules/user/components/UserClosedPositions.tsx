@@ -5,6 +5,7 @@ import { useClosedPositionsInfiniteQuery } from "@/modules/user/lib/queries/clos
 import { LoadingSpinner, Spinner } from "@/components/ui/spinner";
 import {
   formatCompactCurrency,
+  formatPrice,
   formatNumber,
   formatRelativeTime,
 } from "@/lib/ui/format.utils";
@@ -116,12 +117,12 @@ function ClosedPositionRow({
         </div>
         <div>
           <div className="font-semibold">
-            {formatNumber(avgPrice * 100, 1)}%
+            {formatPrice(avgPrice, { maximumFractionDigits: 1 })}
           </div>
         </div>
         <div>
           <div className="font-semibold">
-            {formatNumber(position.curPrice * 100, 1)}%
+            {formatPrice(position.curPrice, { maximumFractionDigits: 1 })}
           </div>
         </div>
         <div>

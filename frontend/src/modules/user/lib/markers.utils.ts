@@ -1,5 +1,6 @@
 import type { MarketActivityEntry } from "@/lib/models/frontend.models";
 import type { SeriesMarker, Time } from "lightweight-charts";
+import { formatPrice } from "@/lib/ui/format.utils";
 
 const BUY_COLOR = "#22c55e";
 const SELL_COLOR = "#ef4444";
@@ -42,7 +43,7 @@ export function buildGroupedTradeMarkers(
     const side = (entry.side ?? "").toUpperCase();
     const isBuy = side === "BUY";
     const priceInCents = Math.round(entry.price * 100);
-    const priceLabel = `${priceInCents}¢`;
+    const priceLabel = formatPrice(entry.price, { maximumFractionDigits: 0 });
     const bucketedTime = bucketTimestamp(entry.timestamp, bucketSize);
     const bucketIndex = Math.floor(bucketedTime / bucketSize);
     const priceSideKey = `${side || "TRADE"}-${priceInCents}`;

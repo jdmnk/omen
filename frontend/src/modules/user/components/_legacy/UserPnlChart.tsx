@@ -20,6 +20,7 @@ import {
   formatCompactCurrency,
   formatCurrency,
   formatNumber,
+  formatPrice,
 } from "@/lib/ui/format.utils";
 import { cn } from "@/lib/utils";
 import { areaSeriesBaseOptions } from "@/lib/ui/chart.config";
@@ -150,7 +151,7 @@ function buildTradeDetailsHtml(trades?: MarkerTradeInfo[]): string {
       const sizeStr = formatNumber(sizeValue, sizeValue >= 1 ? 0 : 2);
       const priceCents =
         trade.price !== undefined && trade.price !== null
-          ? `${(trade.price * 100).toFixed(0)}¢`
+          ? formatPrice(trade.price, { maximumFractionDigits: 0 })
           : "-";
       const fallbackNotional = (trade.size ?? 0) * (trade.price ?? 0);
       const notional = trade.notional ?? fallbackNotional;

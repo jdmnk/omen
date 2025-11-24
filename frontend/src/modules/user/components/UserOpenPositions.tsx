@@ -3,7 +3,11 @@
 import React from "react";
 import { useUserPositionsInfiniteQuery } from "@/modules/user/lib/queries/user-positions.query";
 import { LoadingSpinner, Spinner } from "@/components/ui/spinner";
-import { formatCompactCurrency, formatNumber } from "@/lib/ui/format.utils";
+import {
+  formatCompactCurrency,
+  formatNumber,
+  formatPrice,
+} from "@/lib/ui/format.utils";
 import { cn } from "@/lib/utils";
 import { UserPosition } from "@/lib/models/api.models";
 import { useInfiniteScroll } from "@/lib/hooks/use-infinite-scroll";
@@ -111,7 +115,7 @@ function PositionRow({
         </div>
         <div>
           <div className="font-semibold">
-            {formatNumber(currentPrice * 100, 1)}%
+            {formatPrice(currentPrice, { maximumFractionDigits: 1 })}
           </div>
         </div>
         <div>

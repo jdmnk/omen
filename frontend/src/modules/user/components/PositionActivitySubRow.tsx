@@ -4,6 +4,7 @@ import { Spinner } from "@/components/ui/spinner";
 import { cn } from "@/lib/utils";
 import {
   formatCompactCurrency,
+  formatPrice,
   formatNumber,
   formatRelativeTime,
 } from "@/lib/ui/format.utils";
@@ -79,7 +80,7 @@ export function PositionActivitySubRow({
               : null;
           const priceDisplay =
             entry.price !== undefined && entry.price !== null
-              ? `${formatNumber(entry.price * 100, 1)}¢`
+              ? formatPrice(entry.price, { maximumFractionDigits: 1 })
               : null;
           const notional =
             entry.usdcSize ??

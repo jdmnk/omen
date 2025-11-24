@@ -14,6 +14,29 @@ export function formatNumber(
   return n.toLocaleString(undefined, { maximumFractionDigits });
 }
 
+export function formatPrice(
+  price: number | string | null | undefined,
+  options?: {
+    maximumFractionDigits?: number;
+    fromCents?: boolean;
+    fallback?: string;
+  }
+) {
+  const {
+    maximumFractionDigits = 1,
+    fromCents = false,
+    fallback = "-",
+  } = options ?? {};
+  if (price === null || price === undefined) return fallback;
+
+  const numericPrice = typeof price === "string" ? Number(price) : price;
+  if (!Number.isFinite(numericPrice)) return fallback;
+
+  const normalizedPrice = fromCents ? numericPrice : numericPrice * 100;
+  const formatted = formatNumber(normalizedPrice, maximumFractionDigits);
+  return `${formatted}¢`;
+}
+
 export function formatCurrency(
   value: number | string,
   maximumFractionDigits = 2,

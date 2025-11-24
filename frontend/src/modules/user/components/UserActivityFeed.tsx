@@ -10,6 +10,7 @@ import {
 } from "../../../components/shared-table-styles";
 import {
   formatCompactCurrency,
+  formatPrice,
   formatNumber,
   formatRelativeTime,
 } from "@/lib/ui/format.utils";
@@ -56,10 +57,7 @@ function ActivityRow({ entry }: { entry: MarketActivityEntry }) {
     "SPLIT",
     "CONVERSION",
   ].includes(typeUpper);
-  const priceLabel =
-    entry.price !== undefined && entry.price !== null
-      ? `${formatNumber(price * 100, 1)}¢`
-      : "-";
+  const priceLabel = formatPrice(entry.price, { maximumFractionDigits: 1 });
   const typeColor =
     isTrade && entry.side?.toUpperCase() === "BUY"
       ? "text-outcome-yes"

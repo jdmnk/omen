@@ -3,7 +3,11 @@
 import { useEffect, useRef } from "react";
 import { LoadingSpinner } from "@/components/ui/spinner";
 import { useOrderbookQuery } from "../lib/queries/orderbook.query";
-import { formatCurrency, formatNumber } from "@/lib/ui/format.utils";
+import {
+  formatCurrency,
+  formatNumber,
+  formatPrice,
+} from "@/lib/ui/format.utils";
 
 type OrderBookProps = {
   tokenId: string;
@@ -86,13 +90,16 @@ export function OrderBook({ tokenId }: OrderBookProps) {
               </div>
             ) : (
               sortedAsks.map((ask, index) => {
-                const price = Number(ask.price) * 100;
+                const price = Number(ask.price);
                 const size = Number(ask.size);
                 const cumulativeSize = cumulativeAskSizes[index];
                 const sizePercentage =
                   maxCumulativeSize > 0
                     ? (cumulativeSize / maxCumulativeSize) * 100
                     : 0;
+                const priceDisplay = formatPrice(price, {
+                  maximumFractionDigits: 1,
+                });
 
                 // Calculate cumulative total from this level down to midpoint
                 const cumulativeTotal = sortedAsks
@@ -119,7 +126,7 @@ export function OrderBook({ tokenId }: OrderBookProps) {
                     </div>
                     {/* Content */}
                     <div className="relative text-left text-rose-500 font-medium pl-1">
-                      {formatNumber(price, 1)}
+                      {priceDisplay}
                     </div>
                     <div className="relative text-right">
                       {formatNumber(size, 1)}
@@ -141,12 +148,12 @@ export function OrderBook({ tokenId }: OrderBookProps) {
             >
               <div className="grid grid-cols-2 text-xs">
                 <div className="font-bold">
-                  {formatNumber(midpointPrice * 100, 1)}
+                  {formatPrice(midpointPrice, { maximumFractionDigits: 1 })}
                 </div>
                 <div className="">
                   <span className="pr-2">Spread</span>
                   <span className="font-bold">
-                    {formatNumber(spread * 100, 1)}
+                    {formatPrice(spread, { maximumFractionDigits: 1 })}
                   </span>
                 </div>
               </div>
@@ -161,13 +168,16 @@ export function OrderBook({ tokenId }: OrderBookProps) {
               </div>
             ) : (
               sortedBids.map((bid, index) => {
-                const price = Number(bid.price) * 100;
+                const price = Number(bid.price);
                 const size = Number(bid.size);
                 const cumulativeSize = cumulativeBidSizes[index];
                 const sizePercentage =
                   maxCumulativeSize > 0
                     ? (cumulativeSize / maxCumulativeSize) * 100
                     : 0;
+                const priceDisplay = formatPrice(price, {
+                  maximumFractionDigits: 1,
+                });
 
                 // Calculate cumulative total from this level up to midpoint
                 const cumulativeTotal = sortedBids
@@ -194,7 +204,7 @@ export function OrderBook({ tokenId }: OrderBookProps) {
                     </div>
                     {/* Content */}
                     <div className="relative text-left text-emerald-500 font-medium pl-1">
-                      {formatNumber(price, 1)}
+                      {priceDisplay}
                     </div>
                     <div className="relative text-right">
                       {formatNumber(size, 2)}

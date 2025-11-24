@@ -8,7 +8,11 @@ import {
 } from "@/lib/queries/price-history.query";
 import { useOrderbookQuery } from "../lib/queries/orderbook.query";
 import { PriceChart } from "./PriceChart";
-import { formatCompactNumber, formatNumber } from "@/lib/ui/format.utils";
+import {
+  formatCompactNumber,
+  formatNumber,
+  formatPrice,
+} from "@/lib/ui/format.utils";
 import { cn } from "@/lib/utils";
 import { Card } from "../../../components/ui/card";
 import { WatchlistButton } from "./WatchlistButton";
@@ -100,7 +104,10 @@ export function PriceChartWidget({ market }: { market: Market }) {
           </span>
         </div>
         <div>
-          s: <span className="font-bold">{formatNumber(spread)}</span>
+          s:{" "}
+          <span className="font-bold">
+            {formatPrice(spread, { fromCents: true })}
+          </span>
         </div>
         <div>
           oi:{" "}
