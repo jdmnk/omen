@@ -57,7 +57,7 @@ async function fetchUserPositionActivity(
       slug: position.slug,
       eventSlug: position.eventSlug,
     },
-    combineConsecutiveEvents: true,
+    combineConsecutiveEvents: false,
   });
 }
 
