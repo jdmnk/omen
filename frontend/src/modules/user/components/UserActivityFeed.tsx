@@ -133,12 +133,7 @@ export function UserActivityFeed({ userId }: { userId: string }) {
   } = useInfiniteQuery({
     queryKey: ["user-activity", userId],
     queryFn: ({ pageParam = 0 }) =>
-      fetchUserActivityPage(
-        userId,
-        undefined,
-        PAGE_SIZE,
-        pageParam as number
-      ),
+      fetchUserActivityPage(userId, undefined, PAGE_SIZE, pageParam as number),
     enabled: Boolean(userId),
     staleTime: 60_000,
     getNextPageParam: (lastPage, allPages) => {
