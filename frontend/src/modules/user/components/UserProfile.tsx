@@ -14,7 +14,6 @@ import { useUserDataQuery } from "@/modules/user/lib/queries/user-data.query";
 import { fetchUserActivityEntries } from "@/modules/user/lib/queries/user-activity.query";
 import { getPositionKey } from "@/modules/user/lib/position.utils";
 import { fetchClosedPositionsByMarkets } from "@/modules/user/lib/queries/closed-positions.query";
-import { buildPositionActivityTimeline } from "@/modules/user/lib/position-activity.utils";
 import type {
   PositionActivity,
   PositionActivityLookup,
@@ -27,25 +26,28 @@ import { Button } from "@/components/ui/button";
 import { copyToClipboard } from "@/lib/utils/clipboard.utils";
 import { useQueries } from "@tanstack/react-query";
 import { UserPnlChartWidget } from "./_legacy/UserPnlChartWidget";
+import { buildPositionActivityTimeline } from "../lib/positions-activity-new.utils";
 
 async function fetchUserPositionActivity(
   userId: string,
   position: SelectablePosition
 ) {
+  // both sorted by timestamp DESC
   const [entries, closedPositions] = await Promise.all([
     fetchUserActivityEntries(userId, position.conditionId),
     fetchClosedPositionsByMarkets(userId, [position.conditionId]),
   ]);
 
+  const entriesForOutcome = entries.filter(
+    (entry) => entry.outcomeIndex === position.outcomeIndex || !entry.outcome // e.g. REDEEM has no outcome
+  );
+
   const closedPositionsForOutcome = closedPositions.filter(
-    (closed) =>
-      position.outcomeIndex === null ||
-      position.outcomeIndex === undefined ||
-      closed.outcomeIndex === position.outcomeIndex
+    (closed) => closed.outcomeIndex === position.outcomeIndex
   );
 
   return buildPositionActivityTimeline({
-    entries,
+    activityEntries: entriesForOutcome,
     closedPositions: closedPositionsForOutcome,
     context: {
       conditionId: position.conditionId,
@@ -55,6 +57,7 @@ async function fetchUserPositionActivity(
       slug: position.slug,
       eventSlug: position.eventSlug,
     },
+    combineConsecutiveEvents: true,
   });
 }
 
