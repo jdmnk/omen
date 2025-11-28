@@ -42,16 +42,15 @@ function mapActivityEntry(entry: RawActivityEntry): MarketActivityEntry | null {
   };
 }
 
-export async function fetchUserActivityEntries(
+export async function fetchUserActivityPage(
   userId: string,
-  conditionId?: string,
-  limit: number = 500,
-  offset: number = 0
+  conditionId: string | undefined,
+  pageSize: number,
+  offset: number
 ): Promise<MarketActivityEntry[]> {
-  if (!userId) return [];
   const url = new URL(`${DATA_API_HOST}/activity`);
   url.searchParams.set("user", userId);
-  url.searchParams.set("limit", String(limit));
+  url.searchParams.set("limit", String(pageSize));
   url.searchParams.set("offset", String(offset));
   if (conditionId) {
     url.searchParams.set("market", conditionId);
@@ -68,9 +67,35 @@ export async function fetchUserActivityEntries(
     : [];
   return entries
     .map(mapActivityEntry)
-    .filter(
-      (entry): entry is MarketActivityEntry =>
-        Boolean(entry && (!conditionId || entry.conditionId === conditionId))
+    .filter((entry): entry is MarketActivityEntry =>
+      Boolean(entry && (!conditionId || entry.conditionId === conditionId))
     )
     .sort((a, b) => b.timestamp - a.timestamp);
+}
+
+export async function fetchUserActivityEntries(
+  userId: string,
+  conditionId?: string,
+  limit: number = 500
+): Promise<MarketActivityEntry[]> {
+  if (!userId) return [];
+  const PAGE_SIZE = 500;
+  const allEntries: MarketActivityEntry[] = [];
+  let offset = 0;
+
+  while (allEntries.length < limit) {
+    const pageEntries = await fetchUserActivityPage(
+      userId,
+      conditionId,
+      PAGE_SIZE,
+      offset
+    );
+    if (pageEntries.length === 0) break;
+    allEntries.push(...pageEntries);
+    if (pageEntries.length < PAGE_SIZE) break;
+    if (allEntries.length >= limit) break;
+    offset += PAGE_SIZE;
+  }
+
+  return allEntries.slice(0, limit).sort((a, b) => b.timestamp - a.timestamp);
 }

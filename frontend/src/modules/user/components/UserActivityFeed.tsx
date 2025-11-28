@@ -15,7 +15,7 @@ import {
   formatRelativeTime,
 } from "@/lib/ui/format.utils";
 import { cn } from "@/lib/utils";
-import { fetchUserActivityEntries } from "@/modules/user/lib/queries/user-activity.query";
+import { fetchUserActivityPage } from "@/modules/user/lib/queries/user-activity.query";
 import { LoadingSpinner } from "@/components/ui/spinner";
 import { getPolymarketEventUrl } from "@/lib/utils/polymarket.utils";
 import type { MarketActivityEntry } from "@/lib/models/frontend.models";
@@ -133,7 +133,7 @@ export function UserActivityFeed({ userId }: { userId: string }) {
   } = useInfiniteQuery({
     queryKey: ["user-activity", userId],
     queryFn: ({ pageParam = 0 }) =>
-      fetchUserActivityEntries(
+      fetchUserActivityPage(
         userId,
         undefined,
         PAGE_SIZE,
