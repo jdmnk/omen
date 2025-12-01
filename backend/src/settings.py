@@ -22,6 +22,9 @@ class Settings(BaseSettings):
     # Polymarket
     polymarket_private_key: str | None = None
 
+    # CORS
+    cors_allow_origin: str | None = None
+
     model_config = SettingsConfigDict(
         env_file=".env", env_file_encoding="utf-8", case_sensitive=False, extra="ignore"
     )

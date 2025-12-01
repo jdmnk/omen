@@ -31,20 +31,33 @@ from src.models.trade import Trade
 from src.polymarket.poly_client import PolyClient
 from src.polymarket.poly_client_graphs import PolyClientGraphs
 from src.polymarket.poly_client_onchain import PolyClientOnchain
+from src.settings import settings
 from src.utils.logging_config import get_logger
 from src.utils.redis_client import redis_client
 
 logger = get_logger(__name__)
 app = FastAPI()
 
-# Allow cross-origin requests from anywhere in dev; restrict in prod via env later if needed
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+allowed_origin = settings.cors_allow_origin.strip() if settings.cors_allow_origin else ""
+
+if settings.api_env.lower() != "dev" and allowed_origin:
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=[allowed_origin],
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
+elif settings.api_env.lower() == "dev":
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=["*"],
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
+else:
+    logger.info("CORS middleware disabled for environment %s", settings.api_env)
 
 selects = SelectsClient()
 poly_client = PolyClient()
