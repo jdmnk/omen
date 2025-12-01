@@ -1,5 +1,7 @@
 "use client";
 
+import { useEffect, useState } from "react";
+
 import { Spinner } from "@/components/ui/spinner";
 import { cn } from "@/lib/utils";
 import {
@@ -15,10 +17,24 @@ type PositionActivitySubRowProps = {
   activityState?: PositionActivityLookup[string];
 };
 
+const PAGE_SIZE = 20;
+
 export function PositionActivitySubRow({
   marketTitle,
   activityState,
 }: PositionActivitySubRowProps) {
+  const [page, setPage] = useState(1);
+  const entries = activityState?.entries ?? [];
+  const totalPages = Math.max(1, Math.ceil(entries.length / PAGE_SIZE));
+
+  useEffect(() => {
+    setPage(1);
+  }, [activityState]);
+
+  useEffect(() => {
+    setPage((prev) => Math.min(Math.max(prev, 1), totalPages));
+  }, [totalPages]);
+
   if (!activityState) {
     return (
       <div className="ml-7 rounded-md border border-dashed border-brand-stroke/60 px-4 py-2 text-[11px] text-muted-foreground">
@@ -44,8 +60,6 @@ export function PositionActivitySubRow({
     );
   }
 
-  const entries = activityState.entries ?? [];
-
   if (entries.length === 0) {
     return (
       <div className="ml-7 rounded-md border border-dashed border-brand-stroke/60 px-4 py-2 text-[11px] text-muted-foreground">
@@ -54,16 +68,21 @@ export function PositionActivitySubRow({
     );
   }
 
+  const startIndex = (page - 1) * PAGE_SIZE;
+  const endIndex = Math.min(startIndex + PAGE_SIZE, entries.length);
+  const pageEntries = entries.slice(startIndex, endIndex);
+
   return (
     <div className="ml-7 rounded-md border border-brand-stroke/70 bg-brand-background/40 px-3 py-2 text-[11px]">
       <div className="mb-1 flex items-center justify-between uppercase tracking-wide text-muted-foreground">
         <span className="font-semibold">Recent Activity</span>
         <span className="text-[10px]">
-          Showing {Math.min(entries.length, 20)} of {entries.length}
+          Showing {entries.length === 0 ? 0 : startIndex + 1}-{endIndex} of{" "}
+          {entries.length}
         </span>
       </div>
       <div className="flex flex-col divide-y divide-brand-stroke/30">
-        {entries.slice(0, 20).map((entry, idx) => {
+        {pageEntries.map((entry, idx) => {
           const timestamp = entry.timestamp
             ? formatRelativeTime(entry.timestamp)
             : "-";
@@ -130,6 +149,28 @@ export function PositionActivitySubRow({
           );
         })}
       </div>
+      {totalPages > 1 ? (
+        <div className="mt-2 flex items-center justify-center gap-1 text-[10px]">
+          {Array.from({ length: totalPages }, (_, pageIdx) => pageIdx + 1).map(
+            (pageNumber) => (
+              <button
+                key={pageNumber}
+                type="button"
+                onClick={() => setPage(pageNumber)}
+                aria-current={pageNumber === page ? "page" : undefined}
+                className={cn(
+                  "h-6 min-w-[26px] rounded border px-2 font-semibold transition-colors cursor-pointer",
+                  pageNumber === page
+                    ? "border-brand-primary bg-brand-primary/10 text-brand-primary"
+                    : "border-transparent text-muted-foreground hover:border-brand-stroke hover:bg-brand-background/70"
+                )}
+              >
+                {pageNumber}
+              </button>
+            )
+          )}
+        </div>
+      ) : null}
     </div>
   );
 }
