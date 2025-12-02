@@ -32,7 +32,8 @@ docker compose logs --tail 100 app
 docker compose down --rmi all --volumes --remove-orphans
 
 # rebuild/redeploy app
-git pull && docker compose up -d --build --no-deps app
+git pull
+docker compose up -d --build --no-deps app
 ```
 
 Database Management:
@@ -47,7 +48,7 @@ docker compose exec db psql -U user -d mydb -c 'SELECT COUNT(DISTINCT "proxyWall
 VPS general:
 
 ```bash
-scp .env jure@46.224.29.26:/home/jure/polyapp/backend/.env
+scp .env.prod jure@46.224.29.26:/home/jure/polyapp/backend/.env
 ```
 
 Workflows:
