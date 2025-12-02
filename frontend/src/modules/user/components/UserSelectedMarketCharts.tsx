@@ -7,8 +7,8 @@ import {
   usePriceHistoryQuery,
   PriceHistoryPoint,
 } from "@/lib/queries/price-history.query";
-import type { PositionActivity } from "../../userActivity.types";
-import { PositionPriceChart } from "./PositionPriceChart";
+import type { PositionActivity } from "../userActivity.types";
+import { PositionPriceChart } from "./charts/PositionPriceChart";
 import { formatCompactCurrency } from "@/lib/ui/format.utils";
 import { getPositionKey } from "@/modules/user/lib/position.utils";
 import { getPolymarketEventUrl } from "@/lib/utils/polymarket.utils";
