@@ -14,6 +14,7 @@ import {
   formatNumber,
   formatRelativeTime,
 } from "@/lib/ui/format.utils";
+import { getOutcomeColorClass } from "@/lib/ui/color.utils";
 import { cn } from "@/lib/utils";
 import { fetchUserActivityPage } from "@/modules/user/lib/queries/user-activity.query";
 import { LoadingSpinner } from "@/components/ui/spinner";
@@ -67,12 +68,7 @@ function ActivityRow({ entry }: { entry: MarketActivityEntry }) {
   const combinedOutcomeLabel =
     outcomeLabel === "-" ? priceLabel : `${outcomeLabel} ${priceLabel}`;
 
-  const outcomeColor =
-    entry.outcomeIndex === 0
-      ? "text-outcome-yes"
-      : entry.outcomeIndex === 1
-      ? "text-outcome-no"
-      : "text-foreground";
+  const outcomeColor = getOutcomeColorClass(entry.outcomeIndex, "text-foreground");
 
   return (
     <div className={cn(ACTIVITY_ROW_GRID_CLASSES, TABLE_ROW_CLASSES)}>

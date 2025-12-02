@@ -19,6 +19,7 @@ import {
 } from "@/components/ui/resizable";
 import { cn } from "@/lib/utils";
 import { buildGroupedTradeMarkers } from "@/modules/user/lib/markers.utils";
+import { getOutcomeColorClass } from "@/lib/ui/color.utils";
 
 const INTERVALS: Interval[] = ["1h", "6h", "1d", "1w", "1m", "max"];
 
@@ -73,7 +74,7 @@ function useChartData(tokenId?: string | null, interval: Interval = "1w") {
 
 function pickIntervalForRange(rangeSeconds: number): Interval {
   if (!Number.isFinite(rangeSeconds) || rangeSeconds <= 0) {
-    return "6h";
+    return "max";
   }
   for (const interval of INTERVALS) {
     if (interval === "1h") continue;
@@ -129,6 +130,7 @@ function PositionChartCard({
     "currentValue" in activity.position
       ? activity.position.currentValue
       : activity.position.realizedPnl ?? activity.position.totalBought ?? 0;
+  const outcomeColor = getOutcomeColorClass(activity.position.outcomeIndex);
 
   return (
     <Card
@@ -147,7 +149,7 @@ function PositionChartCard({
           >
             {activity.position.title ?? activity.position.slug}
           </a>
-          <p className="text-xs text-muted-foreground">
+          <p className={cn("text-xs", outcomeColor)}>
             {activity.position.outcome ?? "Outcome"} ·{" "}
             {formatCompactCurrency(positionValue)}
           </p>
