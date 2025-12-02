@@ -48,17 +48,20 @@ class SearchProfileImageOptimized(BaseModel):
     imageUrlOptimized: str
 
 
+# This should all exist but most fields don't
 class SearchProfileItem(BaseModel):
-    id: str
     name: str
-    user: int
-    createdAt: str
-    updatedAt: str
     pseudonym: str
-    profileImage: str
-    bio: str
     proxyWallet: str
-    profileImageOptimized: SearchProfileImageOptimized
+    displayUsernamePublic: bool
+    createdAt: str | None = None
+    updatedAt: str | None = None
+    profileImage: str | None = None
+    bio: str | None = None
+    profileImageOptimized: SearchProfileImageOptimized | None = None
+    # These are supposed to exist but don't
+    # id: str | None = None
+    # user: int | None = None
 
 
 class SearchResponse(BaseModel):
