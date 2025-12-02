@@ -152,7 +152,7 @@ export function buildPositionActivityTimeline({
       currentOpenAmount === 0
     ) {
       newActivityEntries.push(
-        createPositionOpenedEntry(context, entry.timestamp)
+        createPositionOpenedEntry(context, entry.timestamp - 1)
       );
     }
     // BUYS add to open amount
@@ -191,7 +191,7 @@ export function buildPositionActivityTimeline({
     // REDEEM also triggers here
     if (currentActivityCount > 0 && currentOpenAmount === 0) {
       newActivityEntries.push(
-        createPositionClosedEntry(context, entry.timestamp)
+        createPositionClosedEntry(context, entry.timestamp + 1)
       );
     }
   }
