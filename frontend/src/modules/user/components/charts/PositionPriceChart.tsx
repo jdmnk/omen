@@ -51,8 +51,8 @@ const chartOptions: DeepPartial<ChartOptions> = {
       bottom: 0.05,
     },
   },
-  handleScale: false,
-  handleScroll: false,
+  handleScale: true,
+  handleScroll: true,
 };
 
 export function PositionPriceChart({

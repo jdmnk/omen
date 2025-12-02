@@ -1,13 +1,13 @@
 import type {
   ClosedPosition,
-  MarketActivityEntry,
+  MarketActivityChartModel,
   UserPosition,
 } from "@/lib/models/frontend.models";
 
 export type PositionActivity = {
   key: string;
   position: SelectablePosition;
-  entries: MarketActivityEntry[];
+  entries: MarketActivityChartModel[];
   isLoading: boolean;
   isError: boolean;
 };
@@ -15,7 +15,7 @@ export type PositionActivity = {
 export type PositionActivityLookup = Record<
   string,
   {
-    entries?: MarketActivityEntry[];
+    entries?: MarketActivityChartModel[];
     isLoading?: boolean;
     isError?: boolean;
   }

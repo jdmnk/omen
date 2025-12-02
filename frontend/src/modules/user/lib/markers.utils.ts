@@ -1,4 +1,4 @@
-import type { MarketActivityEntry } from "@/lib/models/frontend.models";
+import type { MarketActivityChartModel } from "@/lib/models/frontend.models";
 import type { SeriesMarker, Time } from "lightweight-charts";
 import { formatPrice } from "@/lib/ui/format.utils";
 
@@ -9,10 +9,16 @@ const DEFAULT_NEARBY_BUCKETS = 5;
 const MIN_MARKER_SIZE = 1;
 const MAX_MARKER_SIZE = 4;
 
-function getMarkerSize(count: number) {
-  if (count <= 1) return MIN_MARKER_SIZE;
-  const growth = Math.log2(Math.max(1, count));
-  return Math.min(MIN_MARKER_SIZE + growth * 0.6, MAX_MARKER_SIZE);
+function getMarkerSizeFromExposure(
+  exposure: number,
+  maxExposure: number
+): number {
+  if (!Number.isFinite(exposure) || exposure <= 0 || maxExposure <= 0) {
+    return MIN_MARKER_SIZE;
+  }
+  const normalized = Math.min(1, exposure / maxExposure);
+  const eased = Math.sqrt(normalized); // soften the jump between exposures
+  return MIN_MARKER_SIZE + eased * (MAX_MARKER_SIZE - MIN_MARKER_SIZE);
 }
 
 function bucketTimestamp(timestamp: number, bucketSeconds?: number) {
@@ -22,17 +28,21 @@ function bucketTimestamp(timestamp: number, bucketSeconds?: number) {
 }
 
 export function buildGroupedTradeMarkers(
-  entries: MarketActivityEntry[] = [],
+  entries: MarketActivityChartModel[] = [],
   bucketSeconds?: number,
   nearbyBuckets?: number
 ): SeriesMarker<Time>[] {
   const bucketSize =
     bucketSeconds && bucketSeconds > 0 ? bucketSeconds : DEFAULT_BUCKET_SECONDS;
   const range = Math.max(0, nearbyBuckets ?? DEFAULT_NEARBY_BUCKETS);
+  let maxExposure = 0;
 
   const groups = new Map<
     string,
-    Map<number, { marker: SeriesMarker<Time>; count: number }>
+    Map<
+      number,
+      { marker: SeriesMarker<Time>; exposure: number; price: number | null }
+    >
   >();
 
   entries.forEach((entry) => {
@@ -42,6 +52,9 @@ export function buildGroupedTradeMarkers(
 
     const side = (entry.side ?? "").toUpperCase();
     const isBuy = side === "BUY";
+    const exposure = Math.abs(entry.cumExposure ?? 0);
+    maxExposure = Math.max(maxExposure, exposure);
+
     const priceInCents = Math.round(entry.price * 100);
     const priceLabel = formatPrice(entry.price, { maximumFractionDigits: 0 });
     const bucketedTime = bucketTimestamp(entry.timestamp, bucketSize);
@@ -59,10 +72,13 @@ export function buildGroupedTradeMarkers(
 
     const bucketMap =
       groups.get(priceSideKey) ??
-      new Map<number, { marker: SeriesMarker<Time>; count: number }>();
+      new Map<
+        number,
+        { marker: SeriesMarker<Time>; exposure: number; price: number | null }
+      >();
 
     let existingGroup:
-      | { marker: SeriesMarker<Time>; count: number }
+      | { marker: SeriesMarker<Time>; exposure: number; price: number | null }
       | undefined;
 
     for (let offset = 0; offset <= range; offset++) {
@@ -79,18 +95,29 @@ export function buildGroupedTradeMarkers(
     }
 
     if (existingGroup) {
-      existingGroup.count += 1;
+      existingGroup.exposure = Math.max(existingGroup.exposure, exposure);
+      existingGroup.price = entry.price ?? existingGroup.price;
     } else {
-      bucketMap.set(bucketIndex, { marker, count: 1 });
+      bucketMap.set(bucketIndex, {
+        marker,
+        exposure,
+        price: entry.price ?? null,
+      });
       groups.set(priceSideKey, bucketMap);
     }
   });
 
   return Array.from(groups.values()).flatMap((bucketMap) =>
-    Array.from(bucketMap.values()).map(({ marker, count }) => ({
-      ...marker,
-      text: count > 1 && marker.text ? `${marker.text}` : marker.text,
-      size: getMarkerSize(count),
-    }))
+    Array.from(bucketMap.values()).map(({ marker, exposure, price }) => {
+      const size = getMarkerSizeFromExposure(exposure, maxExposure);
+      return {
+        ...marker,
+        text:
+          price !== null && price !== undefined
+            ? formatPrice(price, { maximumFractionDigits: 0 })
+            : marker.text,
+        size,
+      };
+    })
   );
 }
