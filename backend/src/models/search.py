@@ -42,11 +42,30 @@ class SearchEventItem(BaseModel):
     markets: list[SearchMarketItem] | None = None
 
 
+class SearchProfileImageOptimized(BaseModel):
+    id: str
+    imageUrlSource: str
+    imageUrlOptimized: str
+
+
+class SearchProfileItem(BaseModel):
+    id: str
+    name: str
+    user: int
+    createdAt: str
+    updatedAt: str
+    pseudonym: str
+    profileImage: str
+    bio: str
+    proxyWallet: str
+    profileImageOptimized: SearchProfileImageOptimized
+
+
 class SearchResponse(BaseModel):
     """Response from Polymarket search API."""
 
     events: list[SearchEventItem] | None = None
     markets: list[SearchMarketItem] | None = None
     tags: list[dict] | None = None
-    profiles: list[dict] | None = None
+    profiles: list[SearchProfileItem] | None = None
     pagination: dict | None = None

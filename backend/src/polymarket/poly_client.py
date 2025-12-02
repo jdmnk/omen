@@ -10,7 +10,7 @@ from py_clob_client.exceptions import PolyApiException
 from src.models.activity import parse_activity_trade
 from src.models.event import Event, parse_event_from_api
 from src.models.market import Market, parse_market_from_api
-from src.models.search import SearchEventItem, SearchMarketItem, SearchResponse
+from src.models.search import SearchEventItem, SearchMarketItem, SearchProfileItem, SearchResponse
 from src.models.top_holders import TopHolder
 from src.models.trade import Trade, parse_trade_from_api
 from src.models.user_position import UserPosition, parse_user_position_from_api
@@ -591,5 +591,29 @@ class PolyClient:
                 )
         except Exception as exc:
             logger.error(f"search_markets: error searching markets: {exc}")
+            logger.error(traceback.format_exc())
+            raise exc
+
+    async def search_profiles(self, query: str) -> SearchResponse:
+        try:
+            async with httpx.AsyncClient() as client:
+                params = {
+                    "q": query,
+                    "limit_per_type": 50,
+                    "keep_closed_markets": 0,
+                    "search_tags": False,
+                    "search_profiles": True,
+                }
+                response = await client.get(f"{GAMMA_API_HOST}/public-search", params=params)
+                response.raise_for_status()
+                data = response.json()
+
+                # Extract only profiles
+                profiles = data.get("profiles", []) or []
+                parsed_profiles = [SearchProfileItem(**p) for p in profiles]
+
+                return SearchResponse(profiles=parsed_profiles)
+        except Exception as exc:
+            logger.error(f"search_profiles: error searching profiles: {exc}")
             logger.error(traceback.format_exc())
             raise exc

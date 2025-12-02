@@ -108,6 +108,14 @@ async def get_search_markets_endpoint(q: str = Query(min_length=1)) -> SearchRes
     return await poly_client.search_markets(q)
 
 
+@app.get("/profiles/search", response_model=SearchResponse)
+async def get_search_profiles_endpoint(q: str = Query(min_length=1)) -> SearchResponse:
+    """
+    Search for profiles using Polymarket Gamma API.
+    """
+    return await poly_client.search_profiles(q)
+
+
 @app.get("/markets/by-condition-ids", response_model=list[Market])
 async def get_markets_by_condition_ids_endpoint(
     condition_ids: Annotated[list[str], Query(description="Repeat the query param per ID")],
