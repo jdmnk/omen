@@ -1,4 +1,8 @@
-import { ClosedPosition, MarketActivityEntry } from "@/lib/models/api.models";
+import {
+  ClosedPosition,
+  MarketActivityChartModel,
+  MarketActivityEntry,
+} from "@/lib/models/api.models";
 
 type PositionContext = {
   conditionId: string;
@@ -13,7 +17,7 @@ const EPSILON = 1e-3;
 function createPositionOpenedEntry(
   context: PositionContext,
   timestamp: number
-): MarketActivityEntry {
+): MarketActivityChartModel {
   return {
     type: "POSITION_OPENED",
     timestamp,
@@ -23,13 +27,15 @@ function createPositionOpenedEntry(
     title: context.title,
     slug: context.slug,
     eventSlug: context.eventSlug,
+    cumExposure: 0,
+    countActivities: 0,
   };
 }
 
 function createPositionClosedEntry(
   context: PositionContext,
   timestamp: number
-): MarketActivityEntry {
+): MarketActivityChartModel {
   return {
     type: "POSITION_CLOSED",
     timestamp,
@@ -39,6 +45,8 @@ function createPositionClosedEntry(
     title: context.title,
     slug: context.slug,
     eventSlug: context.eventSlug,
+    cumExposure: 0,
+    countActivities: 0,
   };
 }
 
@@ -47,8 +55,9 @@ function createCombinedTradeEntry(
   timestamp: number,
   size: number,
   side: string,
-  count: number
-): MarketActivityEntry {
+  countActivities: number,
+  cumExposure: number
+): MarketActivityChartModel {
   return {
     type: "TRADE",
     timestamp,
@@ -60,7 +69,8 @@ function createCombinedTradeEntry(
     eventSlug: context.eventSlug,
     size: size,
     side: side,
-    // count: count,
+    cumExposure,
+    countActivities,
   };
 }
 
@@ -108,7 +118,7 @@ export function buildPositionActivityTimeline({
   closedPositions?: ClosedPosition[];
   context: PositionContext;
   combineConsecutiveEvents?: boolean;
-}): MarketActivityEntry[] {
+}): MarketActivityChartModel[] {
   console.log("activityEntries", activityEntries);
   console.log("closedPositions", closedPositions);
   console.log("context", context);
@@ -120,18 +130,18 @@ export function buildPositionActivityTimeline({
   }
 
   // if there's no closed positions, then all entries belong to the current open position
-  if (closedPositions.length === 0) {
-    return [
-      ...activityEntries,
-      createPositionOpenedEntry(context, activityEntries[0].timestamp),
-    ];
-  }
+  // if (closedPositions.length === 0) {
+  //   return [
+  //     ...activityEntries,
+  //     createPositionOpenedEntry(context, activityEntries[0].timestamp),
+  //   ];
+  // }
 
   // create a full projection of the position activity timeline
   let currentOpenAmount = 0;
   let currentActivityCount = 0;
   const reversedActivity = [...activityEntries].reverse();
-  const newActivityEntries: MarketActivityEntry[] = [];
+  const newActivityEntries: MarketActivityChartModel[] = [];
 
   // TODO: handle other types of events that could open a position
   for (const entry of reversedActivity) {
@@ -149,20 +159,32 @@ export function buildPositionActivityTimeline({
     if (entry.type === "TRADE" && entry.side === "BUY") {
       currentOpenAmount += entry.size ?? 0; // in TRADE we always have size tho
       currentActivityCount++;
-      newActivityEntries.push(entry);
+      newActivityEntries.push({
+        ...entry,
+        cumExposure: currentOpenAmount,
+        countActivities: currentActivityCount,
+      });
     }
     // SELLS subtract from open amount
     else if (entry.type === "TRADE" && entry.side === "SELL") {
       currentOpenAmount -= entry.size ?? 0; // in TRADE we always have size tho
       currentActivityCount++;
-      newActivityEntries.push(entry);
+      newActivityEntries.push({
+        ...entry,
+        cumExposure: currentOpenAmount,
+        countActivities: currentActivityCount,
+      });
     }
 
     // this is also a close of a position (means the event finished)
     if (entry.type === "REDEEM") {
+      newActivityEntries.push({
+        ...entry,
+        cumExposure: currentOpenAmount,
+        countActivities: currentActivityCount,
+      });
       currentOpenAmount = 0;
       currentActivityCount = 0;
-      newActivityEntries.push(entry);
     }
 
     // when current open amount drops to 0, user sold all their holdings

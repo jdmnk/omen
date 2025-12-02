@@ -106,3 +106,9 @@ export type MarketActivityEntry = {
   eventSlug?: string | null;
   transactionHash?: string | null;
 };
+
+// extends MarketActivityEntry but with chart data
+export type MarketActivityChartModel = MarketActivityEntry & {
+  cumExposure?: number; // total cumulative exposure
+  countActivities?: number; // if we have grouped trades, this is the number of trades
+};
