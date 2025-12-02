@@ -51,8 +51,8 @@ class SearchProfileImageOptimized(BaseModel):
 # This should all exist but most fields don't
 class SearchProfileItem(BaseModel):
     name: str
-    pseudonym: str
     proxyWallet: str
+    pseudonym: str | None = None
     displayUsernamePublic: bool
     createdAt: str | None = None
     updatedAt: str | None = None
