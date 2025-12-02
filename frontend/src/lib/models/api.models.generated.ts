@@ -102,6 +102,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/profiles/search": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Search Profiles Endpoint
+         * @description Search for profiles using Polymarket Gamma API.
+         */
+        get: operations["get_search_profiles_endpoint_profiles_search_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/markets/by-condition-ids": {
         parameters: {
             query?: never;
@@ -537,6 +557,37 @@ export interface components {
             /** Image */
             image?: string | null;
         };
+        /** SearchProfileImageOptimized */
+        SearchProfileImageOptimized: {
+            /** Id */
+            id: string;
+            /** Imageurlsource */
+            imageUrlSource: string;
+            /** Imageurloptimized */
+            imageUrlOptimized: string;
+        };
+        /** SearchProfileItem */
+        SearchProfileItem: {
+            /** Id */
+            id: string;
+            /** Name */
+            name: string;
+            /** User */
+            user: number;
+            /** Createdat */
+            createdAt: string;
+            /** Updatedat */
+            updatedAt: string;
+            /** Pseudonym */
+            pseudonym: string;
+            /** Profileimage */
+            profileImage: string;
+            /** Bio */
+            bio: string;
+            /** Proxywallet */
+            proxyWallet: string;
+            profileImageOptimized: components["schemas"]["SearchProfileImageOptimized"];
+        };
         /**
          * SearchResponse
          * @description Response from Polymarket search API.
@@ -551,9 +602,7 @@ export interface components {
                 [key: string]: unknown;
             }[] | null;
             /** Profiles */
-            profiles?: {
-                [key: string]: unknown;
-            }[] | null;
+            profiles?: components["schemas"]["SearchProfileItem"][] | null;
             /** Pagination */
             pagination?: {
                 [key: string]: unknown;
@@ -855,6 +904,37 @@ export interface operations {
             };
         };
     };
+    get_search_profiles_endpoint_profiles_search_get: {
+        parameters: {
+            query: {
+                q: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SearchResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     get_markets_by_condition_ids_endpoint_markets_by_condition_ids_get: {
         parameters: {
             query: {
@@ -1055,7 +1135,6 @@ export interface operations {
         parameters: {
             query?: {
                 interval?: string;
-                max_trades?: number;
             };
             header?: never;
             path: {
@@ -1105,6 +1184,8 @@ export type PnlPoint = components["schemas"]["PnlPoint"];
 export type PnlWithMarkersResponse = components["schemas"]["PnlWithMarkersResponse"];
 export type SearchEventItem = components["schemas"]["SearchEventItem"];
 export type SearchMarketItem = components["schemas"]["SearchMarketItem"];
+export type SearchProfileImageOptimized = components["schemas"]["SearchProfileImageOptimized"];
+export type SearchProfileItem = components["schemas"]["SearchProfileItem"];
 export type SearchResponse = components["schemas"]["SearchResponse"];
 export type TopHolder = components["schemas"]["TopHolder"];
 export type TopHolderPnl = components["schemas"]["TopHolderPnl"];

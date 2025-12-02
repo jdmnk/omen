@@ -167,6 +167,47 @@
         }
       }
     },
+    "/profiles/search": {
+      "get": {
+        "summary": "Get Search Profiles Endpoint",
+        "description": "Search for profiles using Polymarket Gamma API.",
+        "operationId": "get_search_profiles_endpoint_profiles_search_get",
+        "parameters": [
+          {
+            "name": "q",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "title": "Q"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SearchResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/markets/by-condition-ids": {
       "get": {
         "summary": "Get Markets By Condition Ids Endpoint",
@@ -465,18 +506,6 @@
               "type": "string",
               "default": "1m",
               "title": "Interval"
-            }
-          },
-          {
-            "name": "max_trades",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "integer",
-              "maximum": 100000,
-              "minimum": 100,
-              "default": 10000,
-              "title": "Max Trades"
             }
           }
         ],
@@ -1504,6 +1533,86 @@
         "title": "SearchMarketItem",
         "description": "Lightweight market data from search API."
       },
+      "SearchProfileImageOptimized": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "imageUrlSource": {
+            "type": "string",
+            "title": "Imageurlsource"
+          },
+          "imageUrlOptimized": {
+            "type": "string",
+            "title": "Imageurloptimized"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "imageUrlSource",
+          "imageUrlOptimized"
+        ],
+        "title": "SearchProfileImageOptimized"
+      },
+      "SearchProfileItem": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "user": {
+            "type": "integer",
+            "title": "User"
+          },
+          "createdAt": {
+            "type": "string",
+            "title": "Createdat"
+          },
+          "updatedAt": {
+            "type": "string",
+            "title": "Updatedat"
+          },
+          "pseudonym": {
+            "type": "string",
+            "title": "Pseudonym"
+          },
+          "profileImage": {
+            "type": "string",
+            "title": "Profileimage"
+          },
+          "bio": {
+            "type": "string",
+            "title": "Bio"
+          },
+          "proxyWallet": {
+            "type": "string",
+            "title": "Proxywallet"
+          },
+          "profileImageOptimized": {
+            "$ref": "#/components/schemas/SearchProfileImageOptimized"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "user",
+          "createdAt",
+          "updatedAt",
+          "pseudonym",
+          "profileImage",
+          "bio",
+          "proxyWallet",
+          "profileImageOptimized"
+        ],
+        "title": "SearchProfileItem"
+      },
       "SearchResponse": {
         "properties": {
           "events": {
@@ -1553,8 +1662,7 @@
             "anyOf": [
               {
                 "items": {
-                  "additionalProperties": true,
-                  "type": "object"
+                  "$ref": "#/components/schemas/SearchProfileItem"
                 },
                 "type": "array"
               },
