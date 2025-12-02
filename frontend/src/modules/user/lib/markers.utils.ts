@@ -107,17 +107,29 @@ export function buildGroupedTradeMarkers(
     }
   });
 
-  return Array.from(groups.values()).flatMap((bucketMap) =>
-    Array.from(bucketMap.values()).map(({ marker, exposure, price }) => {
-      const size = getMarkerSizeFromExposure(exposure, maxExposure);
-      return {
-        ...marker,
-        text:
-          price !== null && price !== undefined
-            ? formatPrice(price, { maximumFractionDigits: 0 })
-            : marker.text,
-        size,
-      };
-    })
+  const groupedMarkers = Array.from(groups.values()).flatMap((bucketMap) =>
+    Array.from(bucketMap.values()).map(({ marker, exposure, price }) => ({
+      marker,
+      price,
+      size: getMarkerSizeFromExposure(exposure, maxExposure),
+    }))
   );
+
+  const smallestSize = groupedMarkers.reduce(
+    (min, grouped) => Math.min(min, grouped.size),
+    Infinity
+  );
+  const sizeScale =
+    smallestSize > 0 && Number.isFinite(smallestSize)
+      ? MIN_MARKER_SIZE / smallestSize
+      : 1;
+
+  return groupedMarkers.map(({ marker, price, size }) => ({
+    ...marker,
+    text:
+      price !== null && price !== undefined
+        ? formatPrice(price, { maximumFractionDigits: 0 })
+        : marker.text,
+    size: Math.max(MIN_MARKER_SIZE, size * sizeScale),
+  }));
 }
