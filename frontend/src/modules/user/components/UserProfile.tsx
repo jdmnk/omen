@@ -1,6 +1,11 @@
 "use client";
 
 import React, { useState, useMemo, useCallback } from "react";
+import type {
+  PositionActivity,
+  PositionActivityLookup,
+  SelectablePosition,
+} from "../userActivity.types";
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { UserOpenPositions } from "./UserOpenPositions";
@@ -14,11 +19,6 @@ import { useUserDataQuery } from "@/modules/user/lib/queries/user-data.query";
 import { fetchUserActivityEntries } from "@/modules/user/lib/queries/user-activity.query";
 import { getPositionKey } from "@/modules/user/lib/position.utils";
 import { fetchClosedPositionsByMarkets } from "@/modules/user/lib/queries/closed-positions.query";
-import type {
-  PositionActivity,
-  PositionActivityLookup,
-  SelectablePosition,
-} from "../userActivity.types";
 import { UserSelectedMarketCharts } from "./UserSelectedMarketCharts";
 import { UserActivityFeed } from "./UserActivityFeed";
 import { Copy } from "lucide-react";
@@ -27,6 +27,7 @@ import { copyToClipboard } from "@/lib/utils/clipboard.utils";
 import { useQueries } from "@tanstack/react-query";
 import { UserPnlChartWidget } from "./_legacy/UserPnlChartWidget";
 import { buildPositionActivityTimeline } from "../lib/positions-activity-new.utils";
+import { UserSearchBar } from "./UserSearchBar";
 
 async function fetchUserPositionActivity(
   userId: string,
@@ -161,6 +162,8 @@ export function UserProfile({ userId }: { userId: string }) {
 
   return (
     <div className="container mx-auto max-w-7xl p-6 space-y-6">
+      <UserSearchBar />
+
       {/* Compact Header + Inline Stats */}
       <div className="flex items-start justify-between gap-3 flex-wrap">
         <img
