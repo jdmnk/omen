@@ -41,9 +41,9 @@ export function UserSearchBar() {
   }, []);
 
   const handleSelectProfile = useCallback(
-    (profileId: string) => {
-      if (!profileId) return;
-      router.push(`/user/${profileId}`);
+    (proxyWallet: string) => {
+      if (!proxyWallet) return;
+      router.push(`/user/${proxyWallet}`);
       setIsOpen(false);
     },
     [router]
@@ -76,7 +76,7 @@ export function UserSearchBar() {
       </div>
 
       {showDropdown && (
-        <div className="absolute z-20 mt-2 w-full overflow-hidden rounded-lg border border-brand-stroke bg-card shadow-lg">
+        <div className="absolute z-20 mt-2 w-full overflow-hidden rounded-lg border border-brand-stroke bg-brand-background-deeper shadow-lg">
           {isLoading && (
             <div className="flex items-center justify-center py-6">
               <Spinner size="sm" />
@@ -90,19 +90,15 @@ export function UserSearchBar() {
           )}
 
           {!isLoading && hasResults && (
-            <ul className="max-h-80 overflow-y-auto py-2">
+            <ul className="max-h-80 overflow-y-auto py-1">
               {profiles.map((profile) => {
-                const profileId =
-                  profile.proxyWallet ||
-                  profile.id ||
-                  (profile.user ? String(profile.user) : "");
+                const proxyWallet = profile.proxyWallet;
                 const primaryLabel =
                   profile.name ||
                   profile.pseudonym ||
-                  (profileId ? formatAddress(profileId) : "Unknown user");
-                const secondaryLabel = profileId
-                  ? formatAddress(profileId)
-                  : profile.pseudonym;
+                  (proxyWallet ? formatAddress(proxyWallet) : "Unknown user");
+                const secondaryLabel = formatAddress(proxyWallet);
+
                 const image =
                   profile.profileImageOptimized?.imageUrlOptimized ||
                   profile.profileImage ||
@@ -112,13 +108,13 @@ export function UserSearchBar() {
                   <li key={`${profile.id}-${profile.proxyWallet}`}>
                     <button
                       type="button"
-                      onClick={() => handleSelectProfile(profileId)}
+                      onClick={() => handleSelectProfile(proxyWallet)}
                       className={cn(
-                        "flex w-full items-center gap-3 px-3 py-2 text-left text-sm",
-                        "transition-colors hover:bg-muted"
+                        "flex w-full items-center gap-2.5 px-2.5 py-1.5 text-left text-sm",
+                        "transition-colors hover:bg-brand-background/70 cursor-pointer"
                       )}
                     >
-                      <div className="relative h-10 w-10 overflow-hidden rounded-full border bg-muted/40">
+                      <div className="relative h-8 w-8 overflow-hidden rounded-full border bg-muted/40">
                         {image ? (
                           <Image
                             src={image}
@@ -135,11 +131,11 @@ export function UserSearchBar() {
                       </div>
 
                       <div className="min-w-0 flex-1">
-                        <div className="truncate text-sm font-semibold">
+                        <div className="truncate text-sm font-semibold leading-tight">
                           {primaryLabel}
                         </div>
                         {secondaryLabel && (
-                          <div className="truncate text-xs text-muted-foreground">
+                          <div className="truncate text-[11px] text-muted-foreground">
                             {secondaryLabel}
                           </div>
                         )}
