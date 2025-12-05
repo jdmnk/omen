@@ -132,7 +132,9 @@ function PositionChartCard({
     () => buildGroupedTradeMarkers(activity.entries, fidelitySeconds, 5),
     [activity.entries, fidelitySeconds]
   );
-  const marketUrl = getPolymarketEventUrl(activity.position.slug ?? undefined);
+  const marketUrl = getPolymarketEventUrl(
+    activity.position.eventSlug ?? undefined
+  );
   const positionValue =
     "currentValue" in activity.position
       ? activity.position.currentValue
