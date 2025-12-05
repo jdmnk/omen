@@ -22,3 +22,15 @@ export type PositionActivityLookup = Record<
 >;
 
 export type SelectablePosition = UserPosition | ClosedPosition;
+
+export function isClosedPosition(
+  position: SelectablePosition
+): position is ClosedPosition {
+  return "endDate" in position;
+}
+
+export function isOpenPosition(
+  position: SelectablePosition
+): position is UserPosition {
+  return "cashPnl" in position;
+}
