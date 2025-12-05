@@ -10,7 +10,11 @@ import {
 } from "../../lib/share/share-metrics.utils";
 import { MarketShareChart } from "./MarketShareChart";
 import Image from "next/image";
-import { formatCompactCurrency, formatNumber } from "@/lib/ui/format.utils";
+import {
+  formatCompactCurrency,
+  formatNumber,
+  getNumberSign,
+} from "@/lib/ui/format.utils";
 
 export function MarketShareCard({
   snapshot,
@@ -55,14 +59,29 @@ export function MarketShareCard({
           markers={snapshot.markers}
         />
       </div>
-      <div className="flex items-center justify-between gap-3">
+      <div className="flex items-center justify-between gap-4 text-black px-12 font-bold">
         <div className="flex flex-col gap-1">
-          <div className="text-sm font-semibold text-black">
-            {formatCompactCurrency(absolutePnl)}
+          <div className="text-xl font-bold">
+            {getNumberSign(absolutePnl)} {formatCompactCurrency(absolutePnl)}
           </div>
-          <div className="text-sm text-muted-foreground">
-            {formatNumber(percentPnl)}
+          <div className={cn("text-xl", outcomeColor)}>
+            {getNumberSign(percentPnl)} {formatNumber(percentPnl)}%
           </div>
+        </div>
+
+        <div className="flex flex-col gap-1">
+          <div className="text-sm font-bold ">
+            APR: {formatCompactCurrency(absolutePnl)}
+          </div>
+          <div className="text-sm">Volume:{formatNumber(percentPnl)}</div>
+        </div>
+
+        <div className="flex flex-col gap-1">
+          <div className="text-sm">
+            Entry: {formatCompactCurrency(absolutePnl)}
+          </div>
+          <div className="text-sm">Exit: {formatNumber(percentPnl)}</div>
+          <div className="text-sm">Trades: 12</div>
         </div>
       </div>
     </Card>

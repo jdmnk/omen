@@ -84,6 +84,17 @@ export function MarketShareChart({
         precision: 2,
         minMove: 0.01,
       },
+      autoscaleInfoProvider: (original: any) => {
+        const ogPriceRange = original().priceRange;
+        const ogMinValue = ogPriceRange?.minValue;
+        const ogMaxValue = ogPriceRange?.maxValue;
+        return {
+          priceRange: {
+            minValue: ogMinValue < 0 ? 0 : ogMinValue,
+            maxValue: ogMaxValue > 100 ? 100 : ogMaxValue,
+          },
+        };
+      },
     });
     chartRef.current = chart;
     seriesRef.current = series;

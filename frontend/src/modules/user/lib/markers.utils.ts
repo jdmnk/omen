@@ -64,10 +64,10 @@ export function buildGroupedTradeMarkers(
     const marker: SeriesMarker<Time> = {
       id: `trade-${priceSideKey}-${bucketedTime}`,
       time: bucketedTime as Time,
-      position: isBuy ? "belowBar" : "aboveBar",
+      position: "inBar", //isBuy ? "belowBar" : "aboveBar",
       color: isBuy ? BUY_COLOR : SELL_COLOR,
       shape: "circle",
-      text: priceLabel,
+      // text: priceLabel,
     };
 
     const bucketMap =
@@ -126,10 +126,10 @@ export function buildGroupedTradeMarkers(
 
   return groupedMarkers.map(({ marker, price, size }) => ({
     ...marker,
-    text:
-      price !== null && price !== undefined
-        ? formatPrice(price, { maximumFractionDigits: 0 })
-        : marker.text,
+    // text:
+    //   price !== null && price !== undefined
+    //     ? formatPrice(price, { maximumFractionDigits: 0 })
+    //     : marker.text,
     size: Math.max(MIN_MARKER_SIZE, size * sizeScale),
   }));
 }

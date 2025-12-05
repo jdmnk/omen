@@ -157,3 +157,8 @@ export function formatRelativeTime(
 
   return rtf.format(Math.round(duration), "year");
 }
+
+export function getNumberSign(value: number) {
+  if (value === 0) return "";
+  return value >= 0 ? "+" : "-";
+}
