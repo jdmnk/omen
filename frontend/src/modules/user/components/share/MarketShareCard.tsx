@@ -71,21 +71,32 @@ export function MarketShareCard({
 
         <div className="self-stretch w-px bg-black/50" />
 
-        <div className="flex flex-col gap-1 self-center">
-          <div className="text-sm font-bold ">
-            APR: {formatCompactCurrency(absolutePnl)}
+        <div className="flex gap-4 self-center">
+          <div className="flex flex-col gap-1 text-sm">
+            <div className="font-bold text-share-gray">APR:</div>
+            <div className="text-share-gray">Volume:</div>
           </div>
-          <div className="text-sm">Volume:{formatNumber(percentPnl)}</div>
+          <div className="flex flex-col gap-1 text-sm text-left">
+            <div className="font-bold">
+              {formatCompactCurrency(absolutePnl)}
+            </div>
+            <div>{formatNumber(percentPnl)}</div>
+          </div>
         </div>
 
         <div className="self-stretch w-px bg-black/50" />
 
-        <div className="flex flex-col gap-1 self-center">
-          <div className="text-sm">
-            Entry: {formatCompactCurrency(absolutePnl)}
+        <div className="flex gap-4 self-center">
+          <div className="flex flex-col gap-1 text-sm">
+            <div className="text-share-gray">Entry:</div>
+            <div className="text-share-gray">Exit:</div>
+            <div className="text-share-gray">Trades:</div>
           </div>
-          <div className="text-sm">Exit: {formatNumber(percentPnl)}</div>
-          <div className="text-sm">Trades: 12</div>
+          <div className="flex flex-col gap-1 text-sm text-left">
+            <div>{formatCompactCurrency(absolutePnl)}</div>
+            <div>{formatNumber(percentPnl)}</div>
+            <div>12</div>
+          </div>
         </div>
       </div>
     </Card>
