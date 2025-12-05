@@ -18,26 +18,9 @@ export function MarketShareDialog() {
     <Dialog open={isOpen} onOpenChange={setOpen}>
       <DialogContent className="lg:max-w-5xl" showCloseButton>
         <DialogHeader className="gap-1">
-          <DialogTitle>Share preview</DialogTitle>
-          <DialogDescription>
-            Copy or download a snapshot of this position’s price action and PnL.
-          </DialogDescription>
+          <DialogTitle>Share</DialogTitle>
         </DialogHeader>
-        {snapshot ? (
-          <MarketShareCard snapshot={snapshot} />
-        ) : (
-          <div className="flex flex-col gap-2 text-sm text-muted-foreground">
-            <p>No market selected to share yet.</p>
-            <Button
-              variant="brand-ghost"
-              size="sm"
-              onClick={() => setOpen(false)}
-              className="w-fit"
-            >
-              Close
-            </Button>
-          </div>
-        )}
+        {snapshot && <MarketShareCard snapshot={snapshot} />}
       </DialogContent>
     </Dialog>
   );

@@ -24,7 +24,7 @@ export function MarketShareCard({
             {marketLabel}
           </p>
           <p className={cn("text-base text-muted-foreground", outcomeColor)}>
-            {snapshot.positionOutcome ?? "Outcome"}
+            {snapshot.positionOutcome}
           </p>
         </div>
       </div>
