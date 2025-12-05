@@ -22,6 +22,8 @@ import { buildGroupedTradeMarkers } from "@/modules/user/lib/markers.utils";
 import { getOutcomeColorClass } from "@/lib/ui/color.utils";
 import { Button } from "@/components/ui/button";
 import { Share2 } from "lucide-react";
+import { MarketShareDialog } from "./share/MarketShareDialog";
+import { useMarketShareStore } from "./share/share.store";
 
 const INTERVALS: Interval[] = ["1h", "6h", "1d", "1w", "1m", "max"];
 
@@ -94,6 +96,9 @@ function PositionChartCard({
   activity: PositionActivity;
   className?: string;
 }) {
+  const openShareDialog = useMarketShareStore(
+    (state) => state.openWithSnapshot
+  );
   const activityRangeSeconds = useMemo(() => {
     const timestamps =
       activity.entries?.map((entry) => entry.timestamp).filter(Boolean) ?? [];
@@ -134,7 +139,19 @@ function PositionChartCard({
       : activity.position.realizedPnl ?? activity.position.totalBought ?? 0;
   const outcomeColor = getOutcomeColorClass(activity.position.outcomeIndex);
 
-  const handleShare = () => {};
+  const handleShare = () => {
+    if (!tokenId) return;
+    openShareDialog({
+      chartData,
+      markers,
+      interval,
+      positionTitle: activity.position.title ?? activity.position.slug,
+      positionOutcome: activity.position.outcome,
+      positionValue,
+      marketUrl,
+      outcomeClassName: outcomeColor,
+    });
+  };
 
   return (
     <Card
@@ -159,7 +176,13 @@ function PositionChartCard({
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-1">
-          <Button variant="brand-ghost" size="icon" onClick={handleShare}>
+          <Button
+            variant="brand-ghost"
+            size="icon"
+            onClick={handleShare}
+            disabled={!tokenId}
+            aria-label="Share market card"
+          >
             <Share2 className="size-4" />
           </Button>
           {INTERVALS.map((int) => (
@@ -215,79 +238,82 @@ export function UserSelectedMarketCharts({
   }
 
   return (
-    <Card className="flex flex-col border border-brand-stroke/80 bg-brand-background/60">
-      <div className="flex items-center justify-between px-3 py-2 text-xs font-semibold">
-        <span>Selected Market Charts ({activities.length})</span>
-        <button
-          type="button"
-          onClick={() => setIsExpanded((prev) => !prev)}
-          className="rounded border border-brand-stroke px-2 py-1 text-xs text-brand-foreground hover:bg-brand-highlight/30"
-        >
-          {isExpanded ? "Hide" : "Show"}
-        </button>
-      </div>
-      {isExpanded ? (
-        <div className="border-t border-brand-stroke/60 px-4 pb-4 pt-3">
-          <div className="flex flex-col gap-4">
-            {chartRows.map((row, rowIdx) => {
-              const rowKey =
-                row.map((item) => getPositionKey(item.position)).join("-") ||
-                rowIdx.toString();
-              return (
-                <div key={rowKey} className="flex flex-col gap-3">
-                  <div className="flex flex-col gap-3 md:hidden">
-                    {row.map((activity) => (
-                      <PositionChartCard
-                        key={getPositionKey(activity.position)}
-                        activity={activity}
-                        className="h-full"
-                      />
-                    ))}
-                  </div>
-                  <div className="hidden md:block">
-                    {row.length === 1 ? (
-                      <PositionChartCard
-                        key={getPositionKey(row[0].position)}
-                        activity={row[0]}
-                        className="w-full"
-                      />
-                    ) : (
-                      <ResizablePanelGroup
-                        direction="horizontal"
-                        className="w-full items-stretch gap-3"
-                      >
-                        <ResizablePanel defaultSize={50} minSize={35}>
-                          <PositionChartCard
-                            key={getPositionKey(row[0].position)}
-                            activity={row[0]}
-                            className="h-full"
-                          />
-                        </ResizablePanel>
-                        <ResizableHandle
-                          withHandle
-                          className="bg-brand-stroke/50"
+    <>
+      <Card className="flex flex-col border border-brand-stroke/80 bg-brand-background/60">
+        <div className="flex items-center justify-between px-3 py-2 text-xs font-semibold">
+          <span>Selected Market Charts ({activities.length})</span>
+          <button
+            type="button"
+            onClick={() => setIsExpanded((prev) => !prev)}
+            className="rounded border border-brand-stroke px-2 py-1 text-xs text-brand-foreground hover:bg-brand-highlight/30"
+          >
+            {isExpanded ? "Hide" : "Show"}
+          </button>
+        </div>
+        {isExpanded ? (
+          <div className="border-t border-brand-stroke/60 px-4 pb-4 pt-3">
+            <div className="flex flex-col gap-4">
+              {chartRows.map((row, rowIdx) => {
+                const rowKey =
+                  row.map((item) => getPositionKey(item.position)).join("-") ||
+                  rowIdx.toString();
+                return (
+                  <div key={rowKey} className="flex flex-col gap-3">
+                    <div className="flex flex-col gap-3 md:hidden">
+                      {row.map((activity) => (
+                        <PositionChartCard
+                          key={getPositionKey(activity.position)}
+                          activity={activity}
+                          className="h-full"
                         />
-                        <ResizablePanel defaultSize={50} minSize={35}>
-                          <PositionChartCard
-                            key={getPositionKey(row[1].position)}
-                            activity={row[1]}
-                            className="h-full"
+                      ))}
+                    </div>
+                    <div className="hidden md:block">
+                      {row.length === 1 ? (
+                        <PositionChartCard
+                          key={getPositionKey(row[0].position)}
+                          activity={row[0]}
+                          className="w-full"
+                        />
+                      ) : (
+                        <ResizablePanelGroup
+                          direction="horizontal"
+                          className="w-full items-stretch gap-3"
+                        >
+                          <ResizablePanel defaultSize={50} minSize={35}>
+                            <PositionChartCard
+                              key={getPositionKey(row[0].position)}
+                              activity={row[0]}
+                              className="h-full"
+                            />
+                          </ResizablePanel>
+                          <ResizableHandle
+                            withHandle
+                            className="bg-brand-stroke/50"
                           />
-                        </ResizablePanel>
-                      </ResizablePanelGroup>
-                    )}
+                          <ResizablePanel defaultSize={50} minSize={35}>
+                            <PositionChartCard
+                              key={getPositionKey(row[1].position)}
+                              activity={row[1]}
+                              className="h-full"
+                            />
+                          </ResizablePanel>
+                        </ResizablePanelGroup>
+                      )}
+                    </div>
                   </div>
-                </div>
-              );
-            })}
+                );
+              })}
+            </div>
           </div>
-        </div>
-      ) : (
-        <div className="px-3 pb-3 text-xs text-muted-foreground">
-          Charts hidden. Select positions above and click “Show” to review each
-          market’s price action with your trades overlaid.
-        </div>
-      )}
-    </Card>
+        ) : (
+          <div className="px-3 pb-3 text-xs text-muted-foreground">
+            Charts hidden. Select positions above and click “Show” to review each
+            market’s price action with your trades overlaid.
+          </div>
+        )}
+      </Card>
+      <MarketShareDialog />
+    </>
   );
 }
