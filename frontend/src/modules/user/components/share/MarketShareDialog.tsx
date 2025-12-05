@@ -16,7 +16,7 @@ export function MarketShareDialog() {
 
   return (
     <Dialog open={isOpen} onOpenChange={setOpen}>
-      <DialogContent className="max-w-5xl" showCloseButton>
+      <DialogContent className="lg:max-w-5xl" showCloseButton>
         <DialogHeader className="gap-1">
           <DialogTitle>Share preview</DialogTitle>
           <DialogDescription>

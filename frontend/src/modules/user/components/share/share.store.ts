@@ -12,9 +12,8 @@ export type SharedMarketSnapshot = {
   interval: Interval;
   positionTitle?: string | null;
   positionOutcome?: string | null;
+  positionOutcomeIndex?: number | null;
   positionValue: number;
-  marketUrl?: string | null;
-  outcomeClassName?: string | null;
 };
 
 type MarketShareState = {

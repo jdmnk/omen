@@ -145,11 +145,10 @@ function PositionChartCard({
       chartData,
       markers,
       interval,
-      positionTitle: activity.position.title ?? activity.position.slug,
+      positionTitle: activity.position.title,
       positionOutcome: activity.position.outcome,
+      positionOutcomeIndex: activity.position.outcomeIndex,
       positionValue,
-      marketUrl,
-      outcomeClassName: outcomeColor,
     });
   };
 
@@ -308,8 +307,8 @@ export function UserSelectedMarketCharts({
           </div>
         ) : (
           <div className="px-3 pb-3 text-xs text-muted-foreground">
-            Charts hidden. Select positions above and click “Show” to review each
-            market’s price action with your trades overlaid.
+            Charts hidden. Select positions above and click “Show” to review
+            each market’s price action with your trades overlaid.
           </div>
         )}
       </Card>
