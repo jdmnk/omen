@@ -1,8 +1,12 @@
 "use client";
 
 import { create } from "zustand";
-import type { Interval } from "@/lib/models/frontend.models";
+import type {
+  Interval,
+  MarketActivityChartModel,
+} from "@/lib/models/frontend.models";
 import type { SeriesMarker, Time } from "lightweight-charts";
+import { SelectablePosition } from "../../userActivity.types";
 
 type ChartPoint = { time: number | string; value: number };
 
@@ -10,10 +14,8 @@ export type SharedMarketSnapshot = {
   chartData: ChartPoint[];
   markers: SeriesMarker<Time>[];
   interval: Interval;
-  positionTitle?: string | null;
-  positionOutcome?: string | null;
-  positionOutcomeIndex?: number | null;
-  positionValue: number;
+  position: SelectablePosition;
+  entries: MarketActivityChartModel[];
 };
 
 type MarketShareState = {

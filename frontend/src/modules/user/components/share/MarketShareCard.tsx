@@ -12,9 +12,9 @@ export function MarketShareCard({
 }: {
   snapshot: SharedMarketSnapshot;
 }) {
-  const marketLabel =
-    snapshot.positionTitle || snapshot.positionOutcome || "Market";
-  const outcomeColor = getOutcomeColorClass(snapshot.positionOutcomeIndex);
+  const marketLabel = snapshot.position.title;
+  const outcome = snapshot.position.outcome;
+  const outcomeColor = getOutcomeColorClass(snapshot.position.outcomeIndex);
 
   return (
     <Card className="flex min-h-[360px] w-full flex-col gap-3 border border-brand-stroke/80 bg-brand-background/80 p-4">
@@ -24,7 +24,7 @@ export function MarketShareCard({
             {marketLabel}
           </p>
           <p className={cn("text-base text-muted-foreground", outcomeColor)}>
-            {snapshot.positionOutcome}
+            {outcome}
           </p>
         </div>
       </div>

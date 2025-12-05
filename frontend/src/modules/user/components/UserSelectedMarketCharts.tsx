@@ -145,10 +145,8 @@ function PositionChartCard({
       chartData,
       markers,
       interval,
-      positionTitle: activity.position.title,
-      positionOutcome: activity.position.outcome,
-      positionOutcomeIndex: activity.position.outcomeIndex,
-      positionValue,
+      position: activity.position,
+      entries: activity.entries,
     });
   };
 
