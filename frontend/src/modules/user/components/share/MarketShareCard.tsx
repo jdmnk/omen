@@ -32,13 +32,14 @@ export function MarketShareCard({
         <div className="min-w-0">
           <div className="flex items-center gap-2">
             {position.icon && (
-              <Image
-                src={position.icon}
-                alt={position.title ?? ""}
-                width={50}
-                height={50}
-                className="rounded-md"
-              />
+              <div className="relative h-[50px] w-[50px] shrink-0 overflow-hidden rounded-md">
+                <Image
+                  src={position.icon}
+                  alt={position.title ?? ""}
+                  fill
+                  className="object-cover"
+                />
+              </div>
             )}
             <div className="flex flex-col gap-1">
               <div className="truncate text-lg font-semibold text-black">
