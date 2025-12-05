@@ -158,7 +158,7 @@ export function formatRelativeTime(
   return rtf.format(Math.round(duration), "year");
 }
 
-export function getNumberSign(value: number) {
-  if (value === 0) return "";
-  return value >= 0 ? "+" : "-";
+export function addSign(value: number, formatted: string) {
+  if (value === 0) return formatted;
+  return `${value > 0 ? "+" : "-"} ${formatted}`;
 }

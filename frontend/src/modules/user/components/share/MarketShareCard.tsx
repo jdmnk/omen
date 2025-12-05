@@ -11,9 +11,9 @@ import {
 import { MarketShareChart } from "./MarketShareChart";
 import Image from "next/image";
 import {
+  addSign,
   formatCompactCurrency,
   formatNumber,
-  getNumberSign,
 } from "@/lib/ui/format.utils";
 
 export function MarketShareCard({
@@ -61,10 +61,10 @@ export function MarketShareCard({
       <div className="flex items-stretch justify-between gap-4 text-black px-12 font-bold mt-4">
         <div className="flex flex-col gap-1 self-center">
           <div className="text-xl font-bold">
-            {getNumberSign(absolutePnl)} {formatCompactCurrency(absolutePnl)}
+            {addSign(absolutePnl, formatCompactCurrency(Math.abs(absolutePnl)))}
           </div>
           <div className={cn("text-xl", outcomeColor)}>
-            {getNumberSign(percentPnl)} {formatNumber(percentPnl)}%
+            {addSign(percentPnl, `${formatNumber(Math.abs(percentPnl))}%`)}
           </div>
         </div>
 
