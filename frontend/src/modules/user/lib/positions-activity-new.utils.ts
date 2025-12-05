@@ -155,6 +155,7 @@ export function buildPositionActivityTimeline({
         createPositionOpenedEntry(context, entry.timestamp - 1)
       );
     }
+    // if (entry.type === "SPLIT") {
     // BUYS add to open amount
     if (entry.type === "TRADE" && entry.side === "BUY") {
       currentOpenAmount += entry.size ?? 0; // in TRADE we always have size tho

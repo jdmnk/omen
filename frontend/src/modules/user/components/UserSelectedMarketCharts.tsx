@@ -20,6 +20,8 @@ import {
 import { cn } from "@/lib/utils";
 import { buildGroupedTradeMarkers } from "@/modules/user/lib/markers.utils";
 import { getOutcomeColorClass } from "@/lib/ui/color.utils";
+import { Button } from "@/components/ui/button";
+import { Share2 } from "lucide-react";
 
 const INTERVALS: Interval[] = ["1h", "6h", "1d", "1w", "1m", "max"];
 
@@ -132,6 +134,8 @@ function PositionChartCard({
       : activity.position.realizedPnl ?? activity.position.totalBought ?? 0;
   const outcomeColor = getOutcomeColorClass(activity.position.outcomeIndex);
 
+  const handleShare = () => {};
+
   return (
     <Card
       className={cn(
@@ -155,6 +159,9 @@ function PositionChartCard({
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-1">
+          <Button variant="brand-ghost" size="icon" onClick={handleShare}>
+            <Share2 className="size-4" />
+          </Button>
           {INTERVALS.map((int) => (
             <button
               key={int}
