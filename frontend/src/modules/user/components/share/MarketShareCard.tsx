@@ -59,8 +59,8 @@ export function MarketShareCard({
           markers={snapshot.markers}
         />
       </div>
-      <div className="flex items-center justify-between gap-4 text-black px-12 font-bold">
-        <div className="flex flex-col gap-1">
+      <div className="flex items-stretch justify-between gap-4 text-black px-12 font-bold mt-4">
+        <div className="flex flex-col gap-1 self-center">
           <div className="text-xl font-bold">
             {getNumberSign(absolutePnl)} {formatCompactCurrency(absolutePnl)}
           </div>
@@ -69,14 +69,18 @@ export function MarketShareCard({
           </div>
         </div>
 
-        <div className="flex flex-col gap-1">
+        <div className="self-stretch w-px bg-black/50" />
+
+        <div className="flex flex-col gap-1 self-center">
           <div className="text-sm font-bold ">
             APR: {formatCompactCurrency(absolutePnl)}
           </div>
           <div className="text-sm">Volume:{formatNumber(percentPnl)}</div>
         </div>
 
-        <div className="flex flex-col gap-1">
+        <div className="self-stretch w-px bg-black/50" />
+
+        <div className="flex flex-col gap-1 self-center">
           <div className="text-sm">
             Entry: {formatCompactCurrency(absolutePnl)}
           </div>
