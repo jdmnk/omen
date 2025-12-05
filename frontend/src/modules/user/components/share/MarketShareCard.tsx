@@ -41,13 +41,11 @@ export function MarketShareCard({
                 />
               </div>
             )}
-            <div className="flex flex-col gap-1">
-              <div className="truncate text-lg font-semibold text-black">
+            <div className="flex flex-col">
+              <div className="truncate text-lg font-bold text-black">
                 {position.title}
               </div>
-              <div
-                className={cn("text-base text-muted-foreground", outcomeColor)}
-              >
+              <div className={cn("text-lg font-bold", outcomeColor)}>
                 {position.outcome}
               </div>
             </div>
