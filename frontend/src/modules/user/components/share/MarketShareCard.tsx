@@ -11,7 +11,6 @@ import {
 import { MarketShareChart } from "./MarketShareChart";
 import Image from "next/image";
 import {
-  addSign,
   formatCompactCurrency,
   formatNumber,
 } from "@/lib/ui/format.utils";
@@ -25,12 +24,16 @@ export function MarketShareCard({
   const outcomeColor = getOutcomeColorClass(position.outcomeIndex);
   const absolutePnl = getAbsolutePnl(position);
   const percentPnl = getPercentPnl(position);
+  const addSign = (value: number, formatted: string) => {
+    if (value === 0) return formatted;
+    return `${value > 0 ? "+" : "-"} ${formatted}`;
+  };
 
   return (
     <Card className="flex w-full flex-col gap-3 border-none bg-white">
       <div className="flex items-start justify-between gap-3">
-        <div className="min-w-0">
-          <div className="flex items-center gap-2">
+        <div className="flex min-w-0 flex-1">
+          <div className="flex min-w-0 items-center gap-2">
             {position.icon && (
               <div className="relative h-[50px] w-[50px] shrink-0 overflow-hidden rounded-md">
                 <Image
@@ -41,7 +44,7 @@ export function MarketShareCard({
                 />
               </div>
             )}
-            <div className="flex flex-col">
+            <div className="flex min-w-0 flex-1 flex-col">
               <div className="truncate text-lg font-bold text-black">
                 {position.title}
               </div>
@@ -58,7 +61,7 @@ export function MarketShareCard({
           markers={snapshot.markers}
         />
       </div>
-      <div className="flex items-stretch justify-between gap-4 text-black px-12 font-bold mt-4">
+      <div className="mt-4 flex items-stretch justify-between gap-4 text-black font-bold">
         <div className="flex flex-col gap-1 self-center">
           <div className="text-xl font-bold">
             {addSign(absolutePnl, formatCompactCurrency(Math.abs(absolutePnl)))}
