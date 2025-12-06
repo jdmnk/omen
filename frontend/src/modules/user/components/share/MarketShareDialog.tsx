@@ -17,7 +17,7 @@ export function MarketShareDialog() {
   return (
     <Dialog open={isOpen} onOpenChange={setOpen}>
       <DialogContent className="lg:max-w-[630px] bg-white" showCloseButton>
-        <DialogHeader className="gap-1">
+        <DialogHeader className="gap-1 hidden">
           <DialogTitle>Share</DialogTitle>
         </DialogHeader>
         {snapshot && <MarketShareCard snapshot={snapshot} />}

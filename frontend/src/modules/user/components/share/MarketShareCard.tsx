@@ -38,7 +38,7 @@ export function MarketShareCard({
     <Card className="flex w-full flex-col gap-3 border-none bg-white">
       <div className="flex items-start justify-between gap-3">
         <div className="flex min-w-0 flex-1">
-          <div className="flex min-w-0 items-center gap-2">
+          <div className="flex min-w-0 items-center gap-4">
             {position.icon && (
               <div className="relative h-[50px] w-[50px] shrink-0 overflow-hidden rounded-md">
                 <Image
@@ -53,8 +53,10 @@ export function MarketShareCard({
               <div className="truncate text-lg font-bold text-black">
                 {position.title}
               </div>
-              <div className={cn("text-lg font-bold", outcomeColor)}>
-                {position.outcome}
+              <div className={"text-lg font-bold text-brand-highlight"}>
+                <span className="bg-brand-highlight/10 px-2 py-0.5 rounded-md">
+                  {position.outcome}
+                </span>
               </div>
             </div>
           </div>
@@ -128,8 +130,8 @@ export function MarketShareCard({
             </div>
           </div>
           <div className="flex items-center gap-2 mt-2">
-            <LogoIcon className="h-6 w-6 text-gray-500" />
-            <div className="text-base font-bold text-gray-500">
+            <LogoIcon className="h-6 w-6 text-share-gray" />
+            <div className="text-base font-bold text-share-gray">
               omeninsight.com
             </div>
           </div>
