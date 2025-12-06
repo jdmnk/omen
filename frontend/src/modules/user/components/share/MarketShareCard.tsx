@@ -11,15 +11,20 @@ import {
 import { MarketShareChart } from "./MarketShareChart";
 import Image from "next/image";
 import {
+  formatAddress,
   formatCompactCurrency,
   formatNumber,
 } from "@/lib/ui/format.utils";
+import { useUserDataQuery } from "../../lib/queries/user-data.query";
+import { Logo } from "@/components/Logo";
+import { LogoIcon } from "@/components/LogoIcon";
 
 export function MarketShareCard({
   snapshot,
 }: {
   snapshot: SharedMarketSnapshot;
 }) {
+  const { data: userData } = useUserDataQuery(snapshot.position.proxyWallet);
   const position = snapshot.position;
   const outcomeColor = getOutcomeColorClass(position.outcomeIndex);
   const absolutePnl = getAbsolutePnl(position);
@@ -101,6 +106,35 @@ export function MarketShareCard({
           </div>
         </div>
       </div>
+
+      {userData && (
+        <div className="flex items-center justify-between gap-2">
+          <div className="flex items-center gap-5 relative">
+            <div className="relative h-[60px] w-[60px] shrink-0 overflow-hidden rounded-full">
+              <Image
+                src={userData.profileImage ?? ""}
+                alt={userData.name ?? ""}
+                fill
+                className="object-cover"
+              />
+            </div>
+            <div className="flex flex-col text-black">
+              <div className="font-bold text-lg">
+                {userData.name || formatAddress(userData.proxyWallet ?? "")}
+              </div>
+              {userData.xUsername && (
+                <div className="text-xs">@{userData.xUsername}</div>
+              )}
+            </div>
+          </div>
+          <div className="flex items-center gap-2 mt-2">
+            <LogoIcon className="h-6 w-6 text-gray-500" />
+            <div className="text-base font-bold text-gray-500">
+              omeninsight.com
+            </div>
+          </div>
+        </div>
+      )}
     </Card>
   );
 }
