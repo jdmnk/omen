@@ -7,6 +7,8 @@ import { getOutcomeColorClass } from "@/lib/ui/color.utils";
 import {
   getAbsolutePnl,
   getPercentPnl,
+  getPositionEntryPrice,
+  getPositionExitPrice,
 } from "../../lib/share/share-metrics.utils";
 import { MarketShareChart } from "./MarketShareChart";
 import Image from "next/image";
@@ -14,9 +16,9 @@ import {
   formatAddress,
   formatCompactCurrency,
   formatNumber,
+  formatPrice,
 } from "@/lib/ui/format.utils";
 import { useUserDataQuery } from "../../lib/queries/user-data.query";
-import { Logo } from "@/components/Logo";
 import { LogoIcon } from "@/components/LogoIcon";
 
 export function MarketShareCard({
@@ -33,14 +35,16 @@ export function MarketShareCard({
     if (value === 0) return formatted;
     return `${value > 0 ? "+" : "-"} ${formatted}`;
   };
+  const entryPrice = getPositionEntryPrice(position);
+  const exitPrice = getPositionExitPrice(position);
 
   return (
     <Card className="flex w-full flex-col gap-3 border-none bg-white">
       <div className="flex items-start justify-between gap-3">
         <div className="flex min-w-0 flex-1">
-          <div className="flex min-w-0 items-center gap-4">
+          <div className="flex min-w-0 items-center gap-3">
             {position.icon && (
-              <div className="relative h-[50px] w-[50px] shrink-0 overflow-hidden rounded-md">
+              <div className="relative h-[48px] w-[48px] shrink-0 overflow-hidden rounded-md">
                 <Image
                   src={position.icon}
                   alt={position.title ?? ""}
@@ -69,7 +73,7 @@ export function MarketShareCard({
         />
       </div>
       <div className="mt-4 flex items-stretch justify-between gap-4 text-black font-bold">
-        <div className="flex flex-col gap-1 self-center">
+        <div className="flex flex-col gap-1 self-center py-3">
           <div className="text-xl font-bold">
             {addSign(absolutePnl, formatCompactCurrency(Math.abs(absolutePnl)))}
           </div>
@@ -80,7 +84,7 @@ export function MarketShareCard({
 
         <div className="self-stretch w-px bg-black/50" />
 
-        <div className="flex gap-4 self-center">
+        <div className="flex gap-4 self-center py-3">
           <div className="flex flex-col gap-1 text-sm">
             <div className="font-bold text-share-gray">APR:</div>
             <div className="text-share-gray">Volume:</div>
@@ -95,22 +99,22 @@ export function MarketShareCard({
 
         <div className="self-stretch w-px bg-black/50" />
 
-        <div className="flex gap-4 self-center">
+        <div className="flex gap-4 self-center py-3">
           <div className="flex flex-col gap-1 text-sm">
             <div className="text-share-gray">Entry:</div>
             <div className="text-share-gray">Exit:</div>
             <div className="text-share-gray">Trades:</div>
           </div>
           <div className="flex flex-col gap-1 text-sm text-left">
-            <div>{formatCompactCurrency(absolutePnl)}</div>
-            <div>{formatNumber(percentPnl)}</div>
+            <div>{formatPrice(entryPrice)}</div>
+            <div>{formatPrice(exitPrice)}</div>
             <div>12</div>
           </div>
         </div>
       </div>
 
       {userData && (
-        <div className="flex items-center justify-between gap-2">
+        <div className="flex items-center justify-between gap-2 mt-4">
           <div className="flex items-center gap-5 relative">
             <div className="relative h-[60px] w-[60px] shrink-0 overflow-hidden rounded-full">
               <Image

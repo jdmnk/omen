@@ -23,6 +23,20 @@ export function getPositionVolume(position: SelectablePosition) {
   return position.currentValue;
 }
 
+export function getPositionEntryPrice(position: SelectablePosition) {
+  if (isClosedPosition(position)) {
+    return position.avgPrice;
+  }
+  return position.avgPrice;
+}
+
+export function getPositionExitPrice(position: SelectablePosition) {
+  if (isClosedPosition(position)) {
+    return position.curPrice;
+  }
+  return position.curPrice;
+}
+
 export function getPositionApr(position: SelectablePosition) {
   return 0;
 }
