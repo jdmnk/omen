@@ -93,7 +93,9 @@ export function MarketShareCard({
             <div className="text-share-gray">Volume:</div>
           </div>
           <div className="flex flex-col gap-1 text-sm text-left">
-            <div className="font-bold">{apr ? formatNumber(apr) : "N/A"}</div>
+            <div className="font-bold">
+              {apr ? formatNumber(apr * 100, 1) + "%" : "N/A"}
+            </div>
             <div>{formatNumber(percentPnl)}</div>
           </div>
         </div>
