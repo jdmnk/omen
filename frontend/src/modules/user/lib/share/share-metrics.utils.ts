@@ -24,6 +24,7 @@ function getEntriesVwap(
 ) {
   let totalSize = 0;
   let totalCost = 0;
+  console.log("entries", entries);
 
   for (const entry of entries) {
     if (
@@ -37,10 +38,11 @@ function getEntriesVwap(
     }
     // redeem is also a sell
     if (
-      entry.side?.toUpperCase() === "SELL" &&
+      side.toUpperCase() === "SELL" &&
       entry.type === "REDEEM" &&
       entry.size
     ) {
+      console.log("redeem is also a sell", entry.size, position.curPrice);
       totalSize += entry.size;
       totalCost += entry.size * position.curPrice;
     }
