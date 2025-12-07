@@ -3,10 +3,11 @@
 import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import type { SharedMarketSnapshot } from "./share.store";
-import { getOutcomeColorClass } from "@/lib/ui/color.utils";
+import { getOutcomeColorClass, getPnlColorClass } from "@/lib/ui/color.utils";
 import {
   getAbsolutePnl,
   getPercentPnl,
+  getPositionApr,
   getPositionEntryPrice,
   getPositionExitPrice,
 } from "../../lib/share/share-metrics.utils";
@@ -28,15 +29,17 @@ export function MarketShareCard({
 }) {
   const { data: userData } = useUserDataQuery(snapshot.position.proxyWallet);
   const position = snapshot.position;
-  const outcomeColor = getOutcomeColorClass(position.outcomeIndex);
   const absolutePnl = getAbsolutePnl(position);
   const percentPnl = getPercentPnl(position);
+  const pnlColor = getPnlColorClass(percentPnl);
   const addSign = (value: number, formatted: string) => {
     if (value === 0) return formatted;
     return `${value > 0 ? "+" : "-"} ${formatted}`;
   };
   const entryPrice = getPositionEntryPrice(position);
   const exitPrice = getPositionExitPrice(position);
+  const tradesCount = snapshot.entries.length;
+  const apr = getPositionApr(position, snapshot.entries);
 
   return (
     <Card className="flex w-full flex-col gap-3 border-none bg-white">
@@ -77,7 +80,7 @@ export function MarketShareCard({
           <div className="text-xl font-bold">
             {addSign(absolutePnl, formatCompactCurrency(Math.abs(absolutePnl)))}
           </div>
-          <div className={cn("text-xl", outcomeColor)}>
+          <div className={cn("text-xl", pnlColor)}>
             {addSign(percentPnl, `${formatNumber(Math.abs(percentPnl))}%`)}
           </div>
         </div>
@@ -90,9 +93,7 @@ export function MarketShareCard({
             <div className="text-share-gray">Volume:</div>
           </div>
           <div className="flex flex-col gap-1 text-sm text-left">
-            <div className="font-bold">
-              {formatCompactCurrency(absolutePnl)}
-            </div>
+            <div className="font-bold">{apr ? formatNumber(apr) : "N/A"}</div>
             <div>{formatNumber(percentPnl)}</div>
           </div>
         </div>
@@ -108,7 +109,7 @@ export function MarketShareCard({
           <div className="flex flex-col gap-1 text-sm text-left">
             <div>{formatPrice(entryPrice)}</div>
             <div>{formatPrice(exitPrice)}</div>
-            <div>12</div>
+            <div>{tradesCount}</div>
           </div>
         </div>
       </div>
