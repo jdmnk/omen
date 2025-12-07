@@ -26,7 +26,7 @@ export type SelectablePosition = UserPosition | ClosedPosition;
 export function isClosedPosition(
   position: SelectablePosition
 ): position is ClosedPosition {
-  return "endDate" in position;
+  return "timestamp" in position;
 }
 
 export function isOpenPosition(
