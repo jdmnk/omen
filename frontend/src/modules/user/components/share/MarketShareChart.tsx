@@ -17,6 +17,7 @@ import {
 } from "lightweight-charts";
 import { Spinner } from "@/components/ui/spinner";
 import { areaSeriesBaseOptions } from "@/lib/ui/chart.config";
+import { formatNumber } from "@/lib/ui/format.utils";
 
 type ChartPoint = { time: number | string; value: number };
 
@@ -35,7 +36,7 @@ const chartOptions: DeepPartial<ChartOptions> = {
   },
   grid: {
     vertLines: { color: "#27272a", visible: false },
-    horzLines: { color: "#c3bfbf", visible: true, style: 2 },
+    horzLines: { color: "rgba(195, 191, 191, 0.55)", visible: true, style: 2 },
   },
   timeScale: {
     borderColor: "transparent",
@@ -46,10 +47,17 @@ const chartOptions: DeepPartial<ChartOptions> = {
   },
   rightPriceScale: {
     borderColor: "transparent",
+    borderVisible: false,
+    ticksVisible: false,
+    entireTextOnly: true,
+
     scaleMargins: {
       top: 0.12,
       bottom: 0.05,
     },
+  },
+  localization: {
+    priceFormatter: (price: number) => formatNumber(price, 1) + "%",
   },
   handleScale: true,
   handleScroll: true,
