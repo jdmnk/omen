@@ -3,19 +3,21 @@
 import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import type { SharedMarketSnapshot } from "./share.store";
-import { getOutcomeColorClass, getPnlColorClass } from "@/lib/ui/color.utils";
+import { getPnlColorClass } from "@/lib/ui/color.utils";
 import {
   getAbsolutePnl,
   getPercentPnl,
   getPositionApr,
-  getPositionEntryPrice,
-  getPositionExitPrice,
+  getPositionAvgBuyPrice,
+  getPositionAvgSellPrice,
+  getPositionVolume,
 } from "../../lib/share/share-metrics.utils";
 import { MarketShareChart } from "./MarketShareChart";
 import Image from "next/image";
 import {
   formatAddress,
   formatCompactCurrency,
+  formatCurrency,
   formatNumber,
   formatPrice,
 } from "@/lib/ui/format.utils";
@@ -36,11 +38,11 @@ export function MarketShareCard({
     if (value === 0) return formatted;
     return `${value > 0 ? "+" : "-"} ${formatted}`;
   };
-  const entryPrice = getPositionEntryPrice(position);
-  const exitPrice = getPositionExitPrice(position);
+  const avgBuyPrice = getPositionAvgBuyPrice(position, snapshot.entries);
+  const avgSellPrice = getPositionAvgSellPrice(position, snapshot.entries);
   const tradesCount = snapshot.entries.length;
   const apr = getPositionApr(position, snapshot.entries);
-
+  const volume = getPositionVolume(position, snapshot.entries);
   return (
     <Card className="flex w-full flex-col gap-3 border-none bg-white">
       <div className="flex items-start justify-between gap-3">
@@ -96,7 +98,7 @@ export function MarketShareCard({
             <div className="font-bold">
               {apr ? formatNumber(apr * 100, 1) + "%" : "N/A"}
             </div>
-            <div>{formatNumber(percentPnl)}</div>
+            <div>{formatCompactCurrency(volume, 1)}</div>
           </div>
         </div>
 
@@ -104,13 +106,13 @@ export function MarketShareCard({
 
         <div className="flex gap-4 self-center py-3">
           <div className="flex flex-col gap-1 text-sm">
-            <div className="text-share-gray">Entry:</div>
-            <div className="text-share-gray">Exit:</div>
+            <div className="text-share-gray">Avg. Entry:</div>
+            <div className="text-share-gray">Avg. Exit:</div>
             <div className="text-share-gray">Trades:</div>
           </div>
           <div className="flex flex-col gap-1 text-sm text-left">
-            <div>{formatPrice(entryPrice)}</div>
-            <div>{formatPrice(exitPrice)}</div>
+            <div>{formatPrice(avgBuyPrice)}</div>
+            <div>{formatPrice(avgSellPrice)}</div>
             <div>{tradesCount}</div>
           </div>
         </div>

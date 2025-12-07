@@ -17,13 +17,39 @@ export function getPercentPnl(position: SelectablePosition) {
   return position.percentPnl;
 }
 
-export function getPositionVolume(position: SelectablePosition) {
-  if (isClosedPosition(position)) {
-    return position.curPrice * position.totalBought;
+function getEntriesVwap(
+  position: SelectablePosition,
+  entries: MarketActivityChartModel[],
+  side: "BUY" | "SELL"
+) {
+  let totalSize = 0;
+  let totalCost = 0;
+
+  for (const entry of entries) {
+    if (
+      entry.type === "TRADE" &&
+      entry.side?.toUpperCase() === side &&
+      entry.size &&
+      entry.price
+    ) {
+      totalSize += entry.size;
+      totalCost += entry.size * entry.price;
+    }
+    // redeem is also a sell
+    if (
+      entry.side?.toUpperCase() === "SELL" &&
+      entry.type === "REDEEM" &&
+      entry.size
+    ) {
+      totalSize += entry.size;
+      totalCost += entry.size * position.curPrice;
+    }
   }
-  return position.currentValue;
+  if (totalSize === 0) return 0;
+  return totalCost / totalSize;
 }
 
+// this is avg buy price (both open and closed positions)
 export function getPositionEntryPrice(position: SelectablePosition) {
   if (isClosedPosition(position)) {
     return position.avgPrice;
@@ -31,11 +57,63 @@ export function getPositionEntryPrice(position: SelectablePosition) {
   return position.avgPrice;
 }
 
-export function getPositionExitPrice(position: SelectablePosition) {
-  if (isClosedPosition(position)) {
-    return position.curPrice;
+export function getPositionAvgBuyPrice(
+  position: SelectablePosition,
+  entries: MarketActivityChartModel[]
+) {
+  //   return getEntriesVwap(entries, "BUY");
+  return getPositionEntryPrice(position); // avg buy price
+}
+
+function getPositionBuyVolume(entries: MarketActivityChartModel[]) {
+  let volume = 0;
+  for (const entry of entries) {
+    if (
+      entry.type === "TRADE" &&
+      entry.side?.toUpperCase() === "BUY" &&
+      entry.size &&
+      entry.price
+    ) {
+      volume += Math.abs(entry.size * entry.price);
+    }
   }
-  return position.curPrice;
+  return volume;
+}
+
+function getPositionSellVolume(
+  position: SelectablePosition,
+  entries: MarketActivityChartModel[]
+) {
+  let volume = 0;
+  for (const entry of entries) {
+    if (
+      entry.type === "TRADE" &&
+      entry.side?.toUpperCase() === "SELL" &&
+      entry.size &&
+      entry.price
+    ) {
+      volume += Math.abs(entry.size * entry.price);
+    }
+
+    // redeem is also a sell
+    if (entry.type === "REDEEM" && entry.size) {
+      volume += Math.abs(entry.size * position.curPrice);
+    }
+  }
+  return volume;
+}
+// export function getPositionExitPrice(position: SelectablePosition) {
+//   if (isClosedPosition(position)) {
+//     return position.avgPrice;
+//   }
+//   return position.curPrice;
+// }
+
+export function getPositionAvgSellPrice(
+  position: SelectablePosition,
+  entries: MarketActivityChartModel[]
+) {
+  return getEntriesVwap(position, entries, "SELL");
 }
 
 export function getPositionApr(
@@ -56,9 +134,9 @@ export function getPositionApr(
 
   if (!endTime) return null;
   const durationMs = endTime - startTime;
-  const entryPrice = getPositionEntryPrice(position);
+  const entryPrice = getPositionAvgBuyPrice(position, entries); //getPositionEntryPrice(position);
   const finalPrice = isClosedPosition(position)
-    ? getPositionExitPrice(position)
+    ? getPositionAvgSellPrice(position, entries)
     : 1;
   const roi = (finalPrice - entryPrice) / entryPrice;
   const yearMs = 365 * 24 * 60 * 60 * 1000;
@@ -68,9 +146,24 @@ export function getPositionApr(
   console.log("duration ms", durationMs);
   console.log("entry price", entryPrice);
   console.log("final price", finalPrice);
+  console.log("buy volume", getPositionBuyVolume(entries));
+  console.log("sell volume", getPositionSellVolume(position, entries));
   console.log("roi", roi);
   console.log("year ms", yearMs);
   console.log("apr", roi * (yearMs / durationMs));
 
   return roi * (yearMs / durationMs);
+}
+
+export function getPositionVolume(
+  position: SelectablePosition,
+  entries: MarketActivityChartModel[]
+) {
+  let volume = 0;
+  for (const entry of entries) {
+    if (entry.type === "TRADE" && entry.size && entry.price) {
+      volume += Math.abs(entry.size * entry.price);
+    }
+  }
+  return volume;
 }
