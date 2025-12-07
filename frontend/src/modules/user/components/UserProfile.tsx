@@ -51,12 +51,7 @@ async function fetchUserPositionActivity(
     activityEntries: entriesForOutcome,
     closedPositions: closedPositionsForOutcome,
     context: {
-      conditionId: position.conditionId,
-      outcome: position.outcome,
-      outcomeIndex: position.outcomeIndex,
-      title: position.title,
-      slug: position.slug,
-      eventSlug: position.eventSlug,
+      ...position,
     },
     combineConsecutiveEvents: false,
   });
