@@ -21,9 +21,10 @@ import { cn } from "@/lib/utils";
 import { buildGroupedTradeMarkers } from "@/modules/user/lib/markers.utils";
 import { getOutcomeColorClass } from "@/lib/ui/color.utils";
 import { Button } from "@/components/ui/button";
-import { Share2 } from "lucide-react";
+import { Share2, X } from "lucide-react";
 import { MarketShareDialog } from "./share/MarketShareDialog";
 import { useMarketShareStore } from "./share/share.store";
+import type { SelectablePosition } from "../userActivity.types";
 
 const INTERVALS: Interval[] = ["1h", "6h", "1d", "1w", "1m", "max"];
 
@@ -92,9 +93,11 @@ function pickIntervalForRange(rangeSeconds: number): Interval {
 function PositionChartCard({
   activity,
   className,
+  onTogglePosition,
 }: {
   activity: PositionActivity;
   className?: string;
+  onTogglePosition?: (position: SelectablePosition, checked: boolean) => void;
 }) {
   const openShareDialog = useMarketShareStore(
     (state) => state.openWithSnapshot
@@ -152,6 +155,10 @@ function PositionChartCard({
     });
   };
 
+  const handleRemove = () => {
+    onTogglePosition?.(activity.position, false);
+  };
+
   return (
     <Card
       className={cn(
@@ -161,14 +168,25 @@ function PositionChartCard({
     >
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
-          <a
-            href={marketUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="block max-w-full truncate text-sm font-semibold text-foreground hover:underline"
-          >
-            {activity.position.title ?? activity.position.slug}
-          </a>
+          <div className="flex items-center">
+            <a
+              href={marketUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="block max-w-full truncate text-sm font-semibold text-foreground hover:underline"
+            >
+              {activity.position.title ?? activity.position.slug}
+            </a>
+            <Button
+              variant="brand-ghost"
+              size="icon"
+              onClick={handleRemove}
+              aria-label="Remove market from charts"
+              className="p-1"
+            >
+              <X className="size-3" />
+            </Button>
+          </div>
           <p className={cn("text-xs", outcomeColor)}>
             {activity.position.outcome ?? "Outcome"} ·{" "}
             {formatCompactCurrency(positionValue)}
@@ -219,8 +237,10 @@ function PositionChartCard({
 
 export function UserSelectedMarketCharts({
   activities,
+  onTogglePosition,
 }: {
   activities: PositionActivity[];
+  onTogglePosition?: (position: SelectablePosition, checked: boolean) => void;
 }) {
   const [isExpanded, setIsExpanded] = useState(true);
 
@@ -264,6 +284,7 @@ export function UserSelectedMarketCharts({
                           key={getPositionKey(activity.position)}
                           activity={activity}
                           className="h-full"
+                          onTogglePosition={onTogglePosition}
                         />
                       ))}
                     </div>
@@ -273,6 +294,7 @@ export function UserSelectedMarketCharts({
                           key={getPositionKey(row[0].position)}
                           activity={row[0]}
                           className="w-full"
+                          onTogglePosition={onTogglePosition}
                         />
                       ) : (
                         <ResizablePanelGroup
@@ -284,6 +306,7 @@ export function UserSelectedMarketCharts({
                               key={getPositionKey(row[0].position)}
                               activity={row[0]}
                               className="h-full"
+                              onTogglePosition={onTogglePosition}
                             />
                           </ResizablePanel>
                           <ResizableHandle
@@ -295,6 +318,7 @@ export function UserSelectedMarketCharts({
                               key={getPositionKey(row[1].position)}
                               activity={row[1]}
                               className="h-full"
+                              onTogglePosition={onTogglePosition}
                             />
                           </ResizablePanel>
                         </ResizablePanelGroup>
