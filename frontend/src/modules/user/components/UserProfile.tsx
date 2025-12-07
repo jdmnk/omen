@@ -26,7 +26,10 @@ import { Button } from "@/components/ui/button";
 import { copyToClipboard } from "@/lib/utils/clipboard.utils";
 import { useQueries } from "@tanstack/react-query";
 import { UserPnlChartWidget } from "./_legacy/UserPnlChartWidget";
-import { buildPositionActivityTimeline } from "../lib/positions-activity-new.utils";
+import {
+  buildPositionActivityTimeline,
+  buildPositionActivityTimeline2,
+} from "../lib/positions-activity-new.utils";
 import { UserSearchBar } from "./UserSearchBar";
 
 async function fetchUserPositionActivity(
@@ -47,13 +50,10 @@ async function fetchUserPositionActivity(
     (closed) => closed.outcomeIndex === position.outcomeIndex
   );
 
-  return buildPositionActivityTimeline({
+  return buildPositionActivityTimeline2({
+    position,
     activityEntries: entriesForOutcome,
     closedPositions: closedPositionsForOutcome,
-    context: {
-      ...position,
-    },
-    combineConsecutiveEvents: false,
   });
 }
 
@@ -259,7 +259,10 @@ export function UserProfile({ userId }: { userId: string }) {
       </div>
 
       {/* Selected Market Charts */}
-      <UserSelectedMarketCharts activities={positionActivities} />
+      <UserSelectedMarketCharts
+        activities={positionActivities}
+        onTogglePosition={handlePositionToggle}
+      />
 
       {/* Main Content */}
       <Card className="flex flex-col max-h-[800px] overflow-hidden">
