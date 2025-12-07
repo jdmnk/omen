@@ -111,11 +111,12 @@ function ClosedPositionRow({
             {formatPrice(avgPrice, { maximumFractionDigits: 1 })}
           </div>
         </div>
-        {/* <div>
+        <div>
           <div className="font-semibold">
-            {formatPrice(position.curPrice, { maximumFractionDigits: 1 })}
+            {/* {formatPrice(position.curPrice, { maximumFractionDigits: 1 })} */}
+            N/A
           </div>
-        </div> */}
+        </div>
         <div>
           <div className="font-semibold">
             {formatCompactCurrency(totalBought)}
@@ -209,7 +210,7 @@ export function UserClosedPositions({
           <div>Market</div>
           <div>Outcome</div>
           <div>Avg Price</div>
-          {/* <div>Final Price</div> */}
+          <div>Final Price</div>
           <div>Total Bought</div>
           <div>Realized PnL</div>
           <div className="text-right">Time</div>
