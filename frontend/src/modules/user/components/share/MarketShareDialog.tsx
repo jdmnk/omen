@@ -20,6 +20,9 @@ export function MarketShareDialog() {
         <DialogHeader className="gap-1 hidden">
           <DialogTitle>Share</DialogTitle>
         </DialogHeader>
+        <DialogDescription className="hidden">
+          {snapshot?.position.title}
+        </DialogDescription>
         {snapshot && <MarketShareCard snapshot={snapshot} />}
       </DialogContent>
     </Dialog>
