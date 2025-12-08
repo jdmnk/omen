@@ -17,47 +17,31 @@ import { useIsMounted } from "@/lib/hooks/use-is-mounted";
 import { useUserDataQuery } from "@/modules/user/lib/queries/user-data.query";
 import { fetchUserActivityEntries } from "@/modules/user/lib/queries/user-activity.query";
 import { getPositionKey } from "@/modules/user/lib/position.utils";
-import { fetchClosedPositionsByMarkets } from "@/modules/user/lib/queries/closed-positions.query";
 import { UserSelectedMarketCharts } from "./UserSelectedMarketCharts";
 import { UserActivityFeed } from "./UserActivityFeed";
 import { Copy } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { copyToClipboard } from "@/lib/utils/clipboard.utils";
 import { useQueries } from "@tanstack/react-query";
-import {
-  getPositionActivity,
-  getProcessedPositionActivity,
-} from "../lib/positions-activity-new.utils";
+import { getProcessedPositionActivity } from "../lib/positions-activity-new.utils";
 import { UserSearchBar } from "./UserSearchBar";
 import { Position } from "@/lib/models/frontend.models";
 
 async function fetchUserPositionActivity(userId: string, position: Position) {
-  // both sorted by timestamp DESC
-  const [activity, closedPositions] = await Promise.all([
-    fetchUserActivityEntries(userId, position.conditionId),
-    fetchClosedPositionsByMarkets(userId, [position.conditionId]),
-  ]);
+  // sorted by timestamp DESC
+  const activity = await fetchUserActivityEntries(userId, position.conditionId);
 
+  // we want only the activity for the specific outcome (and other non-outcome activities like SPLIT, MERGE, etc.)
   const activityForOutcome = activity.filter(
     (entry) => entry.outcomeIndex === position.outcomeIndex || !entry.outcome // e.g. REDEEM has no outcome
   );
 
-  const closedPositionsForOutcome = closedPositions.filter(
-    (closed) => closed.outcomeIndex === position.outcomeIndex
-  );
-
-  const positionActivity = getPositionActivity({
+  const positionActivity = getProcessedPositionActivity({
     position,
     activity: activityForOutcome,
-    closedPositions: closedPositionsForOutcome,
   });
 
-  const processedPositionActivity = getProcessedPositionActivity({
-    position,
-    activity: positionActivity,
-  });
-
-  return processedPositionActivity;
+  return positionActivity;
 }
 
 export function UserProfile({ userId }: { userId: string }) {
