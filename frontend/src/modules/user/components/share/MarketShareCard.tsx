@@ -26,6 +26,7 @@ import { LogoIcon } from "@/components/LogoIcon";
 import { useChartData } from "../../lib/chart/useChartData";
 import { getMarkersForShareChart } from "../../lib/chart/new-marker.utils";
 import { getExposureBars } from "../../lib/chart/exposure-bars.utils";
+import { PositionPriceChartApex } from "../charts/PositionPriceChartApex";
 
 export function MarketShareCard({
   snapshot,
@@ -83,7 +84,7 @@ export function MarketShareCard({
         </div>
       </div>
       <div className="h-64 w-full">
-        <MarketShareChart
+        <PositionPriceChartApex
           data={chartData}
           markers={markers}
           volumeBars={volumeBars}

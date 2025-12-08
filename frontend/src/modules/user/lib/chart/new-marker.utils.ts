@@ -92,7 +92,7 @@ export function getMarkersForMarketChart(
       position: isBuy ? "belowBar" : "aboveBar",
       color: isBuy ? "#22c55e" : "#ef4444",
       shape: "circle",
-      text: formatPrice(entry.price, { maximumFractionDigits: 1 }),
+      text: " ", //formatPrice(entry.price, { maximumFractionDigits: 1 }),
       size: scale(entry.size ?? 1),
     } as SeriesMarker<Time>;
   });
@@ -122,6 +122,7 @@ export function getMarkersForShareChart(
       color: isBuy ? "#22c55e" : "#ef4444",
       shape: "circle",
       size: scale(entry.size ?? 1),
+      text: " ",
     } as SeriesMarker<Time>;
   });
 }
