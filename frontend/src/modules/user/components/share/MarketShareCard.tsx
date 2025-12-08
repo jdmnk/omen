@@ -24,7 +24,7 @@ import {
 import { useUserDataQuery } from "../../lib/queries/user-data.query";
 import { LogoIcon } from "@/components/LogoIcon";
 import { useChartData } from "../../lib/chart/useChartData";
-import { getShareChartMarkers } from "../../lib/share/share-markers.utils";
+import { getMarkersForShareChart } from "../../lib/chart/new-marker.utils";
 
 export function MarketShareCard({
   snapshot,
@@ -50,7 +50,7 @@ export function MarketShareCard({
     position.asset,
     snapshot.interval
   );
-  const markers = getShareChartMarkers(snapshot.entries, fidelitySeconds, 5);
+  const markers = getMarkersForShareChart(snapshot.entries, 5, fidelitySeconds);
 
   return (
     <Card className="flex w-full flex-col gap-3 border-none bg-white">

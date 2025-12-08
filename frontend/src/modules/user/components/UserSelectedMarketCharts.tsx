@@ -14,7 +14,6 @@ import {
   ResizablePanelGroup,
 } from "@/components/ui/resizable";
 import { cn } from "@/lib/utils";
-import { getChartMarkers } from "@/modules/user/lib/markers.utils";
 import { getOutcomeColorClass } from "@/lib/ui/color.utils";
 import { Button } from "@/components/ui/button";
 import { Share2, X } from "lucide-react";
@@ -27,7 +26,7 @@ import {
   INTERVALS,
 } from "../lib/chart/chart.const";
 import { useChartData } from "../lib/chart/useChartData";
-import { getMarkers } from "../lib/chart/new-marker.utils";
+import { getMarkersForMarketChart } from "../lib/chart/new-marker.utils";
 
 function pickIntervalForRange(rangeSeconds: number): Interval {
   if (!Number.isFinite(rangeSeconds) || rangeSeconds <= 0) {
@@ -84,7 +83,7 @@ function PositionChartCard({
   }, [suggestedInterval]);
 
   const markers = useMemo(
-    () => getMarkers(activity.entries, 5, fidelitySeconds),
+    () => getMarkersForMarketChart(activity.entries, 5, fidelitySeconds),
     [activity.entries, fidelitySeconds]
   );
   const marketUrl = getPolymarketEventUrl(

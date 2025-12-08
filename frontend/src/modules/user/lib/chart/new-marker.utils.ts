@@ -72,7 +72,7 @@ export function createMarkerSizeScaler(entries: ProcessedActivity[]) {
   };
 }
 
-export function getMarkers(
+export function getMarkersForMarketChart(
   activity: ProcessedActivity[],
   maxBars: number,
   barDurationMs: number
@@ -93,6 +93,31 @@ export function getMarkers(
       color: isBuy ? "#22c55e" : "#ef4444",
       shape: "circle",
       text: formatPrice(entry.price, { maximumFractionDigits: 1 }),
+      size: scale(entry.size ?? 1),
+    } as SeriesMarker<Time>;
+  });
+}
+
+export function getMarkersForShareChart(
+  activity: ProcessedActivity[],
+  maxBars: number,
+  barDurationMs: number
+) {
+  // Step 1: merge consecutive trades based on price, side, time gap
+  const merged = mergeConsecutiveTrades(activity, maxBars, barDurationMs);
+
+  // Step 2: size scaling relative to merged data
+  const scale = createMarkerSizeScaler(merged);
+
+  // Step 3: convert to chart markers
+  return merged.map((entry) => {
+    const isBuy = entry.side === "BUY";
+
+    return {
+      time: entry.timestamp as Time,
+      position: "inBar",
+      color: isBuy ? "#22c55e" : "#ef4444",
+      shape: "circle",
       size: scale(entry.size ?? 1),
     } as SeriesMarker<Time>;
   });
