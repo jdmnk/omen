@@ -14,7 +14,7 @@ import {
   ResizablePanelGroup,
 } from "@/components/ui/resizable";
 import { cn } from "@/lib/utils";
-import { buildGroupedTradeMarkers } from "@/modules/user/lib/markers.utils";
+import { getChartMarkers } from "@/modules/user/lib/markers.utils";
 import { getOutcomeColorClass } from "@/lib/ui/color.utils";
 import { Button } from "@/components/ui/button";
 import { Share2, X } from "lucide-react";
@@ -83,7 +83,7 @@ function PositionChartCard({
   }, [suggestedInterval]);
 
   const markers = useMemo(
-    () => buildGroupedTradeMarkers(activity.entries, fidelitySeconds, 5),
+    () => getChartMarkers(activity.entries, fidelitySeconds, 5),
     [activity.entries, fidelitySeconds]
   );
   const marketUrl = getPolymarketEventUrl(

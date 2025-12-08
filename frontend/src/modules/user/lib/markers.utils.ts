@@ -27,7 +27,7 @@ function bucketTimestamp(timestamp: number, bucketSeconds?: number) {
   return Math.floor(timestamp / size) * size;
 }
 
-export function buildGroupedTradeMarkers(
+export function getChartMarkers(
   entries: ProcessedActivity[] = [],
   bucketSeconds?: number,
   nearbyBuckets?: number
