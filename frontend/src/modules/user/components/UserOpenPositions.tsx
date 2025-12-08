@@ -18,10 +18,7 @@ import {
   TABLE_CONTENT_CONTAINER_CLASSES,
   TABLE_ROW_CLASSES,
 } from "../../../components/shared-table-styles";
-import type {
-  PositionActivityLookup,
-  SelectablePosition,
-} from "../userActivity.types";
+import type { PositionActivityLookup, Position } from "../userActivity.types";
 import { getPositionKey } from "@/modules/user/lib/position.utils";
 import { PositionActivitySubRow } from "./positions/PositionActivitySubRow";
 import { PositionMarketLinkButton } from "./positions/PositionMarketLinkButton";
@@ -32,7 +29,7 @@ const POSITION_ROW_GRID_CLASSES =
 type PositionRowProps = {
   position: UserPosition;
   isSelected: boolean;
-  onTogglePosition?: (position: SelectablePosition, checked: boolean) => void;
+  onTogglePosition?: (position: Position, checked: boolean) => void;
   activityState?: PositionActivityLookup[string];
 };
 
@@ -141,7 +138,7 @@ function PositionRow({
 type UserPositionsProps = {
   userId: string;
   selectedPositionKeys?: Set<string>;
-  onTogglePosition?: (position: SelectablePosition, checked: boolean) => void;
+  onTogglePosition?: (position: Position, checked: boolean) => void;
   positionActivities?: PositionActivityLookup;
 };
 

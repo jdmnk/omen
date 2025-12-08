@@ -6,7 +6,7 @@ import type {
   MarketActivityChartModel,
 } from "@/lib/models/frontend.models";
 import type { SeriesMarker, Time } from "lightweight-charts";
-import { SelectablePosition } from "../../userActivity.types";
+import { Position } from "../../userActivity.types";
 
 type ChartPoint = { time: number | string; value: number };
 
@@ -14,7 +14,7 @@ export type SharedMarketSnapshot = {
   chartData: ChartPoint[];
   markers: SeriesMarker<Time>[];
   interval: Interval;
-  position: SelectablePosition;
+  position: Position;
   entries: MarketActivityChartModel[];
 };
 

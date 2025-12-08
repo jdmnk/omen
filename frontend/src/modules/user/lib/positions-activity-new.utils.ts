@@ -4,12 +4,12 @@ import {
   MarketActivityEntry,
   UserPosition,
 } from "@/lib/models/api.models";
-import { isOpenPosition, SelectablePosition } from "../userActivity.types";
+import { isOpenPosition, Position } from "../userActivity.types";
 
 const EPSILON = 1e-3;
 
 function createPositionOpenedEntry(
-  context: SelectablePosition,
+  context: Position,
   timestamp: number
 ): MarketActivityChartModel {
   return {
@@ -27,7 +27,7 @@ function createPositionOpenedEntry(
 }
 
 function createPositionClosedEntry(
-  context: SelectablePosition,
+  context: Position,
   timestamp: number
 ): MarketActivityChartModel {
   return {
@@ -45,7 +45,7 @@ function createPositionClosedEntry(
 }
 
 function createCombinedTradeEntry(
-  context: SelectablePosition,
+  context: Position,
   timestamp: number,
   size: number,
   side: string,
@@ -110,7 +110,7 @@ export function buildPositionActivityTimeline({
 }: {
   activityEntries: MarketActivityEntry[];
   closedPositions?: ClosedPosition[];
-  context: SelectablePosition;
+  context: Position;
   combineConsecutiveEvents?: boolean;
 }): MarketActivityChartModel[] {
   console.log("activityEntries", activityEntries);
@@ -272,7 +272,7 @@ export function buildPositionActivityTimeline2({
   activityEntries,
   closedPositions = [],
 }: {
-  position: SelectablePosition;
+  position: Position;
   activityEntries: MarketActivityEntry[];
   closedPositions?: ClosedPosition[];
 }): MarketActivityChartModel[] {

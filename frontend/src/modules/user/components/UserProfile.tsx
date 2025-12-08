@@ -4,7 +4,7 @@ import React, { useState, useMemo, useCallback } from "react";
 import type {
   PositionActivity,
   PositionActivityLookup,
-  SelectablePosition,
+  Position,
 } from "../userActivity.types";
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
@@ -32,10 +32,7 @@ import {
 } from "../lib/positions-activity-new.utils";
 import { UserSearchBar } from "./UserSearchBar";
 
-async function fetchUserPositionActivity(
-  userId: string,
-  position: SelectablePosition
-) {
+async function fetchUserPositionActivity(userId: string, position: Position) {
   // both sorted by timestamp DESC
   const [entries, closedPositions] = await Promise.all([
     fetchUserActivityEntries(userId, position.conditionId),
@@ -63,7 +60,7 @@ export function UserProfile({ userId }: { userId: string }) {
     "legacy"
   );
   const [selectedPositions, setSelectedPositions] = useState<
-    Record<string, SelectablePosition>
+    Record<string, Position>
   >({});
   const isMounted = useIsMounted();
 
@@ -72,7 +69,7 @@ export function UserProfile({ userId }: { userId: string }) {
   const { data: userData } = useUserDataQuery(userId);
 
   const handlePositionToggle = useCallback(
-    (position: SelectablePosition, checked: boolean) => {
+    (position: Position, checked: boolean) => {
       setSelectedPositions((prev) => {
         const key = getPositionKey(position);
         if (checked) {

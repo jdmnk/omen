@@ -24,7 +24,7 @@ import { Button } from "@/components/ui/button";
 import { Share2, X } from "lucide-react";
 import { MarketShareDialog } from "./share/MarketShareDialog";
 import { useMarketShareStore } from "./share/share.store";
-import type { SelectablePosition } from "../userActivity.types";
+import type { Position } from "../userActivity.types";
 
 const INTERVALS: Interval[] = ["1h", "6h", "1d", "1w", "1m", "max"];
 
@@ -97,7 +97,7 @@ function PositionChartCard({
 }: {
   activity: PositionActivity;
   className?: string;
-  onTogglePosition?: (position: SelectablePosition, checked: boolean) => void;
+  onTogglePosition?: (position: Position, checked: boolean) => void;
 }) {
   const openShareDialog = useMarketShareStore(
     (state) => state.openWithSnapshot
@@ -240,7 +240,7 @@ export function UserSelectedMarketCharts({
   onTogglePosition,
 }: {
   activities: PositionActivity[];
-  onTogglePosition?: (position: SelectablePosition, checked: boolean) => void;
+  onTogglePosition?: (position: Position, checked: boolean) => void;
 }) {
   const [isExpanded, setIsExpanded] = useState(true);
 

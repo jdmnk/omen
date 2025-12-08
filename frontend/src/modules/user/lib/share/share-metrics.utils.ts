@@ -1,14 +1,14 @@
 import { MarketActivityChartModel } from "@/lib/models/api.models";
-import { isClosedPosition, SelectablePosition } from "../../userActivity.types";
+import { isClosedPosition, Position } from "../../userActivity.types";
 
-export function getAbsolutePnl(position: SelectablePosition) {
+export function getAbsolutePnl(position: Position) {
   if (isClosedPosition(position)) {
     return position.realizedPnl;
   }
   return position.cashPnl;
 }
 
-export function getPercentPnl(position: SelectablePosition) {
+export function getPercentPnl(position: Position) {
   if (isClosedPosition(position)) {
     return position.totalBought > 0
       ? (position.realizedPnl / position.totalBought) * 100
@@ -18,7 +18,7 @@ export function getPercentPnl(position: SelectablePosition) {
 }
 
 function getEntriesVwap(
-  position: SelectablePosition,
+  position: Position,
   entries: MarketActivityChartModel[],
   side: "BUY" | "SELL"
 ) {
@@ -52,7 +52,7 @@ function getEntriesVwap(
 }
 
 // this is avg buy price (both open and closed positions)
-export function getPositionEntryPrice(position: SelectablePosition) {
+export function getPositionEntryPrice(position: Position) {
   if (isClosedPosition(position)) {
     return position.avgPrice;
   }
@@ -60,7 +60,7 @@ export function getPositionEntryPrice(position: SelectablePosition) {
 }
 
 export function getPositionAvgBuyPrice(
-  position: SelectablePosition,
+  position: Position,
   entries: MarketActivityChartModel[]
 ) {
   //   return getEntriesVwap(entries, "BUY");
@@ -83,7 +83,7 @@ function getPositionBuyVolume(entries: MarketActivityChartModel[]) {
 }
 
 function getPositionSellVolume(
-  position: SelectablePosition,
+  position: Position,
   entries: MarketActivityChartModel[]
 ) {
   let volume = 0;
@@ -112,14 +112,14 @@ function getPositionSellVolume(
 // }
 
 export function getPositionAvgSellPrice(
-  position: SelectablePosition,
+  position: Position,
   entries: MarketActivityChartModel[]
 ) {
   return getEntriesVwap(position, entries, "SELL");
 }
 
 export function getPositionApr(
-  position: SelectablePosition,
+  position: Position,
   entries: MarketActivityChartModel[]
 ): number | null {
   const startTime = entries[0].timestamp * 1000; // convert to ms
@@ -158,7 +158,7 @@ export function getPositionApr(
 }
 
 export function getPositionVolume(
-  position: SelectablePosition,
+  position: Position,
   entries: MarketActivityChartModel[]
 ) {
   let volume = 0;

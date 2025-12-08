@@ -6,7 +6,7 @@ import type {
 
 export type PositionActivity = {
   key: string;
-  position: SelectablePosition;
+  position: Position;
   entries: MarketActivityChartModel[];
   isLoading: boolean;
   isError: boolean;
@@ -21,16 +21,14 @@ export type PositionActivityLookup = Record<
   }
 >;
 
-export type SelectablePosition = UserPosition | ClosedPosition;
+export type Position = UserPosition | ClosedPosition;
 
 export function isClosedPosition(
-  position: SelectablePosition
+  position: Position
 ): position is ClosedPosition {
   return "timestamp" in position;
 }
 
-export function isOpenPosition(
-  position: SelectablePosition
-): position is UserPosition {
+export function isOpenPosition(position: Position): position is UserPosition {
   return "cashPnl" in position;
 }
