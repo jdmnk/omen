@@ -25,11 +25,7 @@ import { Copy } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { copyToClipboard } from "@/lib/utils/clipboard.utils";
 import { useQueries } from "@tanstack/react-query";
-import { UserPnlChartWidget } from "./_legacy/UserPnlChartWidget";
-import {
-  buildPositionActivityTimeline,
-  buildPositionActivityTimeline2,
-} from "../lib/positions-activity-new.utils";
+import { buildPositionActivityTimeline2 } from "../lib/positions-activity-new.utils";
 import { UserSearchBar } from "./UserSearchBar";
 
 async function fetchUserPositionActivity(userId: string, position: Position) {
@@ -56,9 +52,6 @@ async function fetchUserPositionActivity(userId: string, position: Position) {
 
 export function UserProfile({ userId }: { userId: string }) {
   const [activeTab, setActiveTab] = useState("positions");
-  const [pnlChartVariant, setPnlChartVariant] = useState<"legacy" | "v2">(
-    "legacy"
-  );
   const [selectedPositions, setSelectedPositions] = useState<
     Record<string, Position>
   >({});
@@ -225,34 +218,11 @@ export function UserProfile({ userId }: { userId: string }) {
       </div>
 
       {/* PnL Chart */}
-      <div className="space-y-3">
-        <div className="flex items-center justify-end">
-          {/* <div className="text-sm font-semibold text-muted-foreground">
-            PnL
-          </div> */}
-          <Tabs
-            value={pnlChartVariant}
-            onValueChange={(value) =>
-              setPnlChartVariant(value === "v2" ? "v2" : "legacy")
-            }
-            className="w-auto"
-          >
-            <TabsList>
-              <TabsTrigger value="legacy">Pnl Chart</TabsTrigger>
-              <TabsTrigger value="v2">Pnl Chart v2</TabsTrigger>
-            </TabsList>
-          </Tabs>
-        </div>
-        <div className="h-96">
-          {pnlChartVariant === "v2" ? (
-            <UserPnlChartWidgetV2
-              userId={userId}
-              focusedActivities={positionActivities}
-            />
-          ) : (
-            <UserPnlChartWidget userId={userId} />
-          )}
-        </div>
+      <div className="h-96">
+        <UserPnlChartWidgetV2
+          userId={userId}
+          focusedActivities={positionActivities}
+        />
       </div>
 
       {/* Selected Market Charts */}
