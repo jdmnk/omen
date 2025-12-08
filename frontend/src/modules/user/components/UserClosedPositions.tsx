@@ -10,7 +10,7 @@ import {
   formatRelativeTime,
 } from "@/lib/ui/format.utils";
 import { cn } from "@/lib/utils";
-import { ClosedPosition } from "@/lib/models/frontend.models";
+import { ClosedPosition, Position } from "@/lib/models/frontend.models";
 import { useInfiniteScroll } from "@/lib/hooks/use-infinite-scroll";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
@@ -19,7 +19,7 @@ import {
   TABLE_HEADER_CONTAINER_CLASSES,
   TABLE_CONTENT_CONTAINER_CLASSES,
 } from "../../../components/shared-table-styles";
-import type { PositionActivityLookup, Position } from "../userActivity.types";
+import type { PositionActivityLookup } from "../userActivity.types";
 import { getPositionKey } from "@/modules/user/lib/position.utils";
 import { PositionActivitySubRow } from "./positions/PositionActivitySubRow";
 import { PositionMarketLinkButton } from "./positions/PositionMarketLinkButton";

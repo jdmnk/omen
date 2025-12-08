@@ -3,8 +3,9 @@ import {
   ProcessedActivity,
   Activity,
   OpenPosition,
+  Position,
 } from "@/lib/models/api.models";
-import { isOpenPosition, Position } from "../userActivity.types";
+import { isOpenPosition } from "../userActivity.types";
 
 const EPSILON = 1e-3;
 

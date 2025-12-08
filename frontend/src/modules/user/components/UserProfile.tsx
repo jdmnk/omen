@@ -4,7 +4,6 @@ import React, { useState, useMemo, useCallback } from "react";
 import type {
   PositionActivity,
   PositionActivityLookup,
-  Position,
 } from "../userActivity.types";
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
@@ -27,6 +26,7 @@ import { copyToClipboard } from "@/lib/utils/clipboard.utils";
 import { useQueries } from "@tanstack/react-query";
 import { buildPositionActivityTimeline2 } from "../lib/positions-activity-new.utils";
 import { UserSearchBar } from "./UserSearchBar";
+import { Position } from "@/lib/models/frontend.models";
 
 async function fetchUserPositionActivity(userId: string, position: Position) {
   // both sorted by timestamp DESC

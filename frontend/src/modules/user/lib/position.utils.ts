@@ -1,10 +1,6 @@
-import type { OpenPosition } from "@/lib/models/frontend.models";
+import { Position } from "@/lib/models/frontend.models";
 
-type PositionLike = Pick<OpenPosition, "conditionId" | "outcomeIndex"> & {
-  asset?: string | null;
-};
-
-export function getPositionKey(position: PositionLike) {
+export function getPositionKey(position: Position) {
   const condition = position.conditionId || "unknown";
   const outcome =
     position.outcomeIndex === null || position.outcomeIndex === undefined

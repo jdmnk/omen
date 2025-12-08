@@ -24,7 +24,7 @@ import { Button } from "@/components/ui/button";
 import { Share2, X } from "lucide-react";
 import { MarketShareDialog } from "./share/MarketShareDialog";
 import { useMarketShareStore } from "./share/share.store";
-import type { Position } from "../userActivity.types";
+import { Position } from "@/lib/models/frontend.models";
 
 const INTERVALS: Interval[] = ["1h", "6h", "1d", "1w", "1m", "max"];
 

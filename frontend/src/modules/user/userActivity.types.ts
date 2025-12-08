@@ -2,6 +2,7 @@ import type {
   ClosedPosition,
   ProcessedActivity,
   OpenPosition,
+  Position,
 } from "@/lib/models/frontend.models";
 
 export type PositionActivity = {
@@ -20,8 +21,6 @@ export type PositionActivityLookup = Record<
     isError?: boolean;
   }
 >;
-
-export type Position = OpenPosition | ClosedPosition;
 
 export function isClosedPosition(
   position: Position

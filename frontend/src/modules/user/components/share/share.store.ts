@@ -3,7 +3,7 @@
 import { create } from "zustand";
 import type { Interval, ProcessedActivity } from "@/lib/models/frontend.models";
 import type { SeriesMarker, Time } from "lightweight-charts";
-import { Position } from "../../userActivity.types";
+import { Position } from "@/lib/models/frontend.models";
 
 type ChartPoint = { time: number | string; value: number };
 

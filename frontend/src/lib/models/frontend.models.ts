@@ -80,6 +80,8 @@ export type ClosedPosition = {
   endDate: string;
 };
 
+export type Position = OpenPosition | ClosedPosition;
+
 export type UserTraded = {
   user: string;
   traded: number;

@@ -1,5 +1,6 @@
 import { ProcessedActivity } from "@/lib/models/api.models";
-import { isClosedPosition, Position } from "../../userActivity.types";
+import { isClosedPosition } from "../../userActivity.types";
+import { Position } from "@/lib/models/frontend.models";
 
 export function getAbsolutePnl(position: Position) {
   if (isClosedPosition(position)) {
