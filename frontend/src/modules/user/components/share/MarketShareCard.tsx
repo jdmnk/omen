@@ -23,7 +23,7 @@ import {
 } from "@/lib/ui/format.utils";
 import { useUserDataQuery } from "../../lib/queries/user-data.query";
 import { LogoIcon } from "@/components/LogoIcon";
-import { useChartData } from "../../lib/chart/ useChartData";
+import { useChartData } from "../../lib/chart/useChartData";
 import { getShareChartMarkers } from "../../lib/share/share-markers.utils";
 
 export function MarketShareCard({

@@ -26,7 +26,8 @@ import {
   INTERVAL_LABELS,
   INTERVALS,
 } from "../lib/chart/chart.const";
-import { useChartData } from "../lib/chart/ useChartData";
+import { useChartData } from "../lib/chart/useChartData";
+import { getMarkers } from "../lib/chart/new-marker.utils";
 
 function pickIntervalForRange(rangeSeconds: number): Interval {
   if (!Number.isFinite(rangeSeconds) || rangeSeconds <= 0) {
@@ -83,7 +84,7 @@ function PositionChartCard({
   }, [suggestedInterval]);
 
   const markers = useMemo(
-    () => getChartMarkers(activity.entries, fidelitySeconds, 5),
+    () => getMarkers(activity.entries),
     [activity.entries, fidelitySeconds]
   );
   const marketUrl = getPolymarketEventUrl(
