@@ -19,6 +19,7 @@ type PositionPriceChartApexProps = {
   isLoading?: boolean;
   /** Chart height - number (pixels) or string (e.g. "100%"). Defaults to 360. */
   height?: number | string;
+  labelColor?: string;
 };
 
 function convertTimeToTimestamp(time: number | string | Time): number {
@@ -44,6 +45,7 @@ export function PositionPriceChartApex({
   error,
   isLoading,
   height = 360,
+  labelColor = "#949ba6",
 }: PositionPriceChartApexProps) {
   const chartData = useMemo(() => {
     const priceData = data.map((point) => [
@@ -93,6 +95,7 @@ export function PositionPriceChartApex({
 
       const markerSize = marker.size ? marker.size * 4 : 6;
       const markerColor = marker.color || "#651fff";
+      const lineColor = "#651fff"; // Same as the chart line color
       const labelOffset = 1;
 
       return {
@@ -101,8 +104,8 @@ export function PositionPriceChartApex({
         marker: {
           size: markerSize,
           fillColor: markerColor,
-          strokeColor: markerColor,
-          strokeWidth: 0,
+          strokeColor: lineColor,
+          strokeWidth: 1,
           shape: marker.shape === "square" ? "square" : "circle",
           radius: marker.size ? marker.size * 2 : 3,
         },
@@ -240,7 +243,7 @@ export function PositionPriceChartApex({
         type: "datetime",
         labels: {
           style: {
-            colors: "#9ca3af",
+            colors: labelColor,
             fontSize: "11px",
           },
           hideOverlappingLabels: true,
@@ -259,7 +262,7 @@ export function PositionPriceChartApex({
         {
           labels: {
             style: {
-              colors: "#9ca3af",
+              colors: labelColor,
               fontSize: "11px",
             },
             formatter: (val: number) => `${formatNumber(val, 1)}%`,

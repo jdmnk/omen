@@ -89,6 +89,7 @@ export function MarketShareCard({
           markers={markers}
           volumeBars={volumeBars}
           height={260}
+          labelColor="#505d7c"
         />
       </div>
       <div className="mt-4 flex items-stretch justify-between gap-4 text-black font-bold">
