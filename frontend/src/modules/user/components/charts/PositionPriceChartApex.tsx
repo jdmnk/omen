@@ -171,6 +171,9 @@ export function PositionPriceChartApex({
           enabled: false,
         },
         fontFamily: "inherit",
+        offsetX: 0,
+        offsetY: 0,
+        spacing: [0, 0, 0, 0],
       },
       dataLabels: {
         enabled: false,
@@ -225,6 +228,12 @@ export function PositionPriceChartApex({
       grid: {
         show: false,
         borderColor: "transparent",
+        padding: {
+          top: 0,
+          left: 0,
+          right: -10,
+          bottom: 0,
+        },
       },
       xaxis: {
         type: "datetime",
@@ -233,6 +242,10 @@ export function PositionPriceChartApex({
             colors: "#9ca3af",
             fontSize: "11px",
           },
+          hideOverlappingLabels: true,
+          offsetX: 0,
+          offsetY: 0,
+          trim: false,
         },
         axisBorder: {
           show: false,
@@ -249,6 +262,7 @@ export function PositionPriceChartApex({
               fontSize: "11px",
             },
             formatter: (val: number) => val.toFixed(2),
+            offsetX: -20,
           },
           opposite: true,
         },
