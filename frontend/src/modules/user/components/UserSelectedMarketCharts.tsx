@@ -84,7 +84,7 @@ function PositionChartCard({
   }, [suggestedInterval]);
 
   const markers = useMemo(
-    () => getMarkers(activity.entries),
+    () => getMarkers(activity.entries, 5, fidelitySeconds),
     [activity.entries, fidelitySeconds]
   );
   const marketUrl = getPolymarketEventUrl(
