@@ -103,8 +103,11 @@ export function getMarkersForShareChart(
   maxBars: number,
   barDurationMs: number
 ) {
-  // Step 1: merge consecutive trades based on price, side, time gap
-  const merged = mergeConsecutiveTrades(activity, maxBars, barDurationMs);
+  let merged: ProcessedActivity[] = activity;
+  if (maxBars > 0) {
+    // Step 1: merge consecutive trades based on price, side, time gap
+    merged = mergeConsecutiveTrades(activity, maxBars, barDurationMs);
+  }
 
   // Step 2: size scaling relative to merged data
   const scale = createMarkerSizeScaler(merged);
