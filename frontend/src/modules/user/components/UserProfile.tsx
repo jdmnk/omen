@@ -213,10 +213,7 @@ export function UserProfile({ userId }: { userId: string }) {
 
       {/* PnL Chart */}
       <div className="h-96">
-        <UserPnlChartWidgetV2
-          userId={userId}
-          focusedActivities={positionActivities}
-        />
+        <UserPnlChartWidgetV2 userId={userId} />
       </div>
 
       {/* Selected Market Charts */}
