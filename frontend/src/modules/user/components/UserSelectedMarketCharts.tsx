@@ -27,7 +27,7 @@ import {
 } from "../lib/chart/chart.const";
 import { useChartData } from "../lib/chart/useChartData";
 import { getMarkersForMarketChart } from "../lib/chart/new-marker.utils";
-import { getExposureBars } from "../lib/chart/exposure-bars.utils";
+import { getExposureArea } from "../lib/chart/exposure-area.utils";
 import { PositionPriceChartApex } from "./charts/PositionPriceChartApex";
 
 function pickIntervalForRange(rangeSeconds: number): Interval {
@@ -89,8 +89,8 @@ function PositionChartCard({
     [activity.entries, fidelitySeconds]
   );
   const volumeBars = useMemo(
-    () => getExposureBars(activity.entries, fidelitySeconds),
-    [activity.entries]
+    () => getExposureArea(activity.entries, fidelitySeconds),
+    [activity.entries, fidelitySeconds]
   );
   const marketUrl = getPolymarketEventUrl(
     activity.position.eventSlug ?? undefined

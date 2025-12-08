@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useRef, useEffect, useState } from "react";
+import { useMemo } from "react";
 import dynamic from "next/dynamic";
 import { SeriesMarker, Time, HistogramData } from "lightweight-charts";
 import { Spinner } from "@/components/ui/spinner";
@@ -41,21 +41,7 @@ export function PositionPriceChartApex({
   error,
   isLoading,
 }: PositionPriceChartApexProps) {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const [chartHeight, setChartHeight] = useState(260);
-
-  useEffect(() => {
-    if (!containerRef.current) return;
-    const updateHeight = () => {
-      if (containerRef.current) {
-        setChartHeight(containerRef.current.clientHeight || 260);
-      }
-    };
-    updateHeight();
-    const resizeObserver = new ResizeObserver(updateHeight);
-    resizeObserver.observe(containerRef.current);
-    return () => resizeObserver.disconnect();
-  }, []);
+  const CHART_HEIGHT = 360;
 
   const chartData = useMemo(() => {
     const priceData = data.map((point) => [
@@ -63,12 +49,12 @@ export function PositionPriceChartApex({
       point.value,
     ]);
 
-    const volumeData = volumeBars.map((bar) => [
+    const exposureData = volumeBars.map((bar) => [
       convertTimeToTimestamp(bar.time),
       bar.value,
     ]);
 
-    return { priceData, volumeData };
+    return { priceData, exposureData };
   }, [data, volumeBars]);
 
   const annotations = useMemo(() => {
@@ -148,13 +134,13 @@ export function PositionPriceChartApex({
       },
     ];
 
-    if (chartData.volumeData.length > 0) {
+    if (chartData.exposureData.length > 0) {
       seriesArray.push({
-        name: "Volume",
-        type: "column",
-        data: chartData.volumeData,
+        name: "Exposure",
+        type: "area",
+        data: chartData.exposureData,
         yAxisIndex: 1,
-      } as ApexAxisChartSeries[number]);
+      } as ApexAxisChartSeries[number] & { curve?: string });
     }
 
     return seriesArray;
@@ -164,7 +150,7 @@ export function PositionPriceChartApex({
     () => ({
       chart: {
         type: "line",
-        height: chartHeight,
+        height: CHART_HEIGHT,
         width: "100%",
         background: "transparent",
         toolbar: {
@@ -182,9 +168,15 @@ export function PositionPriceChartApex({
         enabled: false,
       },
       stroke: {
-        curve: "straight",
-        width: 2,
-        colors: ["#651fff"],
+        curve:
+          chartData.exposureData.length > 0
+            ? ["straight", "stepline"]
+            : "straight",
+        width: chartData.exposureData.length > 0 ? [2, 1] : 2,
+        colors:
+          chartData.exposureData.length > 0
+            ? ["#651fff", "#3b82f6"]
+            : ["#651fff"],
       },
       fill: {
         type: "gradient",
@@ -206,6 +198,7 @@ export function PositionPriceChartApex({
             },
           ],
         },
+        opacity: [0.7, 0.3],
       },
       grid: {
         show: false,
@@ -237,12 +230,12 @@ export function PositionPriceChartApex({
           },
           opposite: true,
         },
-        ...(chartData.volumeData.length > 0
+        ...(chartData.exposureData.length > 0
           ? [
               {
                 show: false,
                 opposite: false,
-                seriesName: "Volume",
+                seriesName: "Exposure",
               },
             ]
           : []),
@@ -255,7 +248,8 @@ export function PositionPriceChartApex({
         y: {
           formatter: (val: number, opts?: { seriesIndex?: number }) => {
             if (opts?.seriesIndex === 1) {
-              return val.toString();
+              // Format exposure value
+              return val.toLocaleString();
             }
             return val.toFixed(2);
           },
@@ -267,15 +261,12 @@ export function PositionPriceChartApex({
       legend: {
         show: false,
       },
-      plotOptions: {
-        bar: {
-          columnWidth: "80%",
-        },
-      },
       colors:
-        chartData.volumeData.length > 0 ? ["#651fff", "#3b82f6"] : ["#651fff"],
+        chartData.exposureData.length > 0
+          ? ["#651fff", "#3b82f6"]
+          : ["#651fff"],
     }),
-    [annotations, chartData.volumeData.length, chartHeight]
+    [annotations, chartData.exposureData.length]
   );
 
   if (error) {
@@ -287,7 +278,7 @@ export function PositionPriceChartApex({
   }
 
   return (
-    <div ref={containerRef} className="relative h-full w-full">
+    <div className="relative h-full w-full">
       {isLoading && (
         <div className="absolute inset-0 z-10 flex items-center justify-center bg-background/40">
           <Spinner size="sm" />
@@ -298,7 +289,7 @@ export function PositionPriceChartApex({
           options={options}
           series={series}
           type="line"
-          height={chartHeight}
+          height={CHART_HEIGHT}
           width="100%"
         />
       )}
