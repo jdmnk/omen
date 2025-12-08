@@ -31,11 +31,14 @@ export function mergeConsecutiveTrades(
       continue;
     }
 
-    const isSamePrice = entry.price === current.price;
+    // const isSamePrice = true; //entry.price === current.price;
+    const isPriceWithinPct =
+      Math.abs((entry.price ?? 0) - (current.price ?? 0)) <=
+      (current.price ?? 0) * 0.2; // 20 pct
     const isSameSide = entry.side === current.side;
     const isCloseEnough = entry.timestamp - current.timestamp <= maxGap;
 
-    if (isSamePrice && isSameSide && isCloseEnough) {
+    if (isPriceWithinPct && isSameSide && isCloseEnough) {
       // Merge rule satisfied -> accumulate size and update timestamp and price
       current.size = (current.size ?? 0) + (entry.size ?? 0);
       current.timestamp = entry.timestamp;

@@ -85,7 +85,7 @@ function PositionChartCard({
   }, [suggestedInterval]);
 
   const markers = useMemo(
-    () => getMarkersForMarketChart(activity.entries, 5, fidelitySeconds),
+    () => getMarkersForMarketChart(activity.entries, 1, fidelitySeconds),
     [activity.entries, fidelitySeconds]
   );
   const volumeBars = useMemo(

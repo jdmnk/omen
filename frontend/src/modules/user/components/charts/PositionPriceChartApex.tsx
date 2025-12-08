@@ -93,7 +93,7 @@ export function PositionPriceChartApex({
         });
       }
 
-      const markerSize = marker.size ? marker.size * 4 : 6;
+      const markerSize = marker.size ? marker.size * 6 : 6;
       const markerColor = marker.color || "#651fff";
       const lineColor = "#651fff"; // Same as the chart line color
       const labelOffset = 1;
@@ -105,7 +105,7 @@ export function PositionPriceChartApex({
           size: markerSize,
           fillColor: markerColor,
           strokeColor: lineColor,
-          strokeWidth: 1,
+          strokeWidth: 2,
           shape: marker.shape === "square" ? "square" : "circle",
           radius: marker.size ? marker.size * 2 : 3,
         },
