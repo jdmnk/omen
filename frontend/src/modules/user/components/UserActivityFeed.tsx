@@ -131,12 +131,20 @@ export function UserActivityFeed({ userId }: { userId: string }) {
     isFetchingNextPage,
   } = useInfiniteQuery({
     queryKey: ["user-activity", userId],
-    queryFn: ({ pageParam = 0 }) =>
-      fetchUserActivityPage(userId, undefined, PAGE_SIZE, pageParam as number),
+    queryFn: async ({ pageParam = 0 }) => {
+      const result = await fetchUserActivityPage(
+        userId,
+        undefined,
+        PAGE_SIZE,
+        pageParam as number
+      );
+      return result;
+    },
     enabled: Boolean(userId),
     staleTime: 60_000,
     getNextPageParam: (lastPage, allPages) => {
-      if (lastPage.length < PAGE_SIZE) return undefined;
+      // Use rawCount to determine if there are more pages
+      if (lastPage.rawCount < PAGE_SIZE) return undefined;
       return allPages.length * PAGE_SIZE;
     },
     initialPageParam: 0,
@@ -164,7 +172,7 @@ export function UserActivityFeed({ userId }: { userId: string }) {
     );
   }
 
-  const entries = data?.pages.flat() ?? [];
+  const entries = data?.pages.flatMap((page) => page.entries) ?? [];
 
   if (entries.length === 0) {
     return (

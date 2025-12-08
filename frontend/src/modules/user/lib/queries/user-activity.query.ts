@@ -3,51 +3,12 @@
 import { DATA_API_HOST } from "@/lib/api.const";
 import type { Activity } from "@/lib/models/frontend.models";
 
-type RawActivityEntry = {
-  type?: string;
-  timestamp?: number;
-  conditionId?: string;
-  asset?: string;
-  side?: string;
-  size?: number;
-  price?: number;
-  usdcSize?: number;
-  outcome?: string;
-  outcomeIndex?: number;
-  title?: string;
-  slug?: string;
-  eventSlug?: string;
-  transactionHash?: string;
-};
-
-function mapActivityEntry(entry: RawActivityEntry): Activity | null {
-  if (!entry) return null;
-  const timestamp = entry.timestamp ?? 0;
-  if (!timestamp) return null;
-  return {
-    type: (entry.type || "").toUpperCase(),
-    timestamp,
-    conditionId: entry.conditionId,
-    asset: entry.asset,
-    side: entry.side,
-    size: entry.size,
-    price: entry.price,
-    usdcSize: entry.usdcSize,
-    outcome: entry.outcome,
-    outcomeIndex: entry.outcomeIndex,
-    title: entry.title,
-    slug: entry.slug,
-    eventSlug: entry.eventSlug,
-    transactionHash: entry.transactionHash,
-  };
-}
-
 export async function fetchUserActivityPage(
   userId: string,
   conditionId: string | undefined,
   pageSize: number,
   offset: number
-): Promise<Activity[]> {
+): Promise<{ entries: Activity[]; rawCount: number }> {
   const url = new URL(`${DATA_API_HOST}/activity`);
   url.searchParams.set("user", userId);
   url.searchParams.set("limit", String(pageSize));
@@ -60,17 +21,9 @@ export async function fetchUserActivityPage(
     throw new Error(`Failed to fetch activity: ${response.statusText}`);
   }
   const payload = await response.json();
-  const entries: RawActivityEntry[] = Array.isArray(payload)
-    ? payload
-    : Array.isArray(payload?.activity)
-    ? payload.activity
-    : [];
-  return entries
-    .map(mapActivityEntry)
-    .filter((entry): entry is Activity =>
-      Boolean(entry && (!conditionId || entry.conditionId === conditionId))
-    )
-    .sort((a, b) => b.timestamp - a.timestamp);
+  const rawCount = payload.length;
+  // No filtering or mapping on API fetch side - return raw entries as-is
+  return { entries: payload, rawCount };
 }
 
 export async function fetchUserActivityEntries(
@@ -84,18 +37,28 @@ export async function fetchUserActivityEntries(
   let offset = 0;
 
   while (allEntries.length < limit) {
-    const pageEntries = await fetchUserActivityPage(
+    const { entries: pageEntries, rawCount } = await fetchUserActivityPage(
       userId,
       conditionId,
       PAGE_SIZE,
       offset
     );
-    if (pageEntries.length === 0) break;
+
+    // If we got no entries from the API, we've reached the end
+    if (rawCount === 0) break;
+
     allEntries.push(...pageEntries);
-    if (pageEntries.length < PAGE_SIZE) break;
+
+    // If we've collected enough entries, stop
     if (allEntries.length >= limit) break;
+
+    // If the API returned fewer entries than requested, we've reached the last page
+    // Use rawCount (not filtered length) to determine if there are more pages
+    if (rawCount < PAGE_SIZE) break;
+
     offset += PAGE_SIZE;
   }
 
-  return allEntries.slice(0, limit).sort((a, b) => b.timestamp - a.timestamp);
+  // Sort by timestamp descending (newest first) and limit results
+  return allEntries.sort((a, b) => b.timestamp - a.timestamp).slice(0, limit);
 }

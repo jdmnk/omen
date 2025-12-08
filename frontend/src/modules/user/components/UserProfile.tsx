@@ -29,7 +29,11 @@ import { Position } from "@/lib/models/frontend.models";
 
 async function fetchUserPositionActivity(userId: string, position: Position) {
   // sorted by timestamp DESC
-  const activity = await fetchUserActivityEntries(userId, position.conditionId);
+  const activity = await fetchUserActivityEntries(
+    userId,
+    position.conditionId,
+    1000
+  );
 
   // we want only the activity for the specific outcome (and other non-outcome activities like SPLIT, MERGE, etc.)
   const activityForOutcome = activity.filter(
