@@ -1,4 +1,4 @@
-import type { ActivityChartModel } from "@/lib/models/frontend.models";
+import type { ProcessedActivity } from "@/lib/models/frontend.models";
 import type { SeriesMarker, Time } from "lightweight-charts";
 import { formatPrice } from "@/lib/ui/format.utils";
 
@@ -28,7 +28,7 @@ function bucketTimestamp(timestamp: number, bucketSeconds?: number) {
 }
 
 export function buildGroupedTradeMarkers(
-  entries: ActivityChartModel[] = [],
+  entries: ProcessedActivity[] = [],
   bucketSeconds?: number,
   nearbyBuckets?: number
 ): SeriesMarker<Time>[] {

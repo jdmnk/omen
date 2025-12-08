@@ -1,4 +1,4 @@
-import { ActivityChartModel } from "@/lib/models/api.models";
+import { ProcessedActivity } from "@/lib/models/api.models";
 import { isClosedPosition, Position } from "../../userActivity.types";
 
 export function getAbsolutePnl(position: Position) {
@@ -19,7 +19,7 @@ export function getPercentPnl(position: Position) {
 
 function getEntriesVwap(
   position: Position,
-  entries: ActivityChartModel[],
+  entries: ProcessedActivity[],
   side: "BUY" | "SELL"
 ) {
   let totalSize = 0;
@@ -61,13 +61,13 @@ export function getPositionEntryPrice(position: Position) {
 
 export function getPositionAvgBuyPrice(
   position: Position,
-  entries: ActivityChartModel[]
+  entries: ProcessedActivity[]
 ) {
   //   return getEntriesVwap(entries, "BUY");
   return getPositionEntryPrice(position); // avg buy price
 }
 
-function getPositionBuyVolume(entries: ActivityChartModel[]) {
+function getPositionBuyVolume(entries: ProcessedActivity[]) {
   let volume = 0;
   for (const entry of entries) {
     if (
@@ -84,7 +84,7 @@ function getPositionBuyVolume(entries: ActivityChartModel[]) {
 
 function getPositionSellVolume(
   position: Position,
-  entries: ActivityChartModel[]
+  entries: ProcessedActivity[]
 ) {
   let volume = 0;
   for (const entry of entries) {
@@ -113,14 +113,14 @@ function getPositionSellVolume(
 
 export function getPositionAvgSellPrice(
   position: Position,
-  entries: ActivityChartModel[]
+  entries: ProcessedActivity[]
 ) {
   return getEntriesVwap(position, entries, "SELL");
 }
 
 export function getPositionApr(
   position: Position,
-  entries: ActivityChartModel[]
+  entries: ProcessedActivity[]
 ): number | null {
   const startTime = entries[0].timestamp * 1000; // convert to ms
   let endTime: number | null = null;
@@ -159,7 +159,7 @@ export function getPositionApr(
 
 export function getPositionVolume(
   position: Position,
-  entries: ActivityChartModel[]
+  entries: ProcessedActivity[]
 ) {
   let volume = 0;
   for (const entry of entries) {

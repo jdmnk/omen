@@ -107,8 +107,8 @@ export type Activity = {
   transactionHash?: string | null;
 };
 
-// extends Activity but with chart data
-export type ActivityChartModel = Activity & {
+// extends Activity but with additional data for e.g. charts and share card
+export type ProcessedActivity = Activity & {
   cumExposure?: number; // total cumulative exposure
   countActivities?: number; // if we have grouped trades, this is the number of trades
 };

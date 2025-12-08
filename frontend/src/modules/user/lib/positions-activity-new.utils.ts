@@ -1,6 +1,6 @@
 import {
   ClosedPosition,
-  ActivityChartModel,
+  ProcessedActivity,
   Activity,
   OpenPosition,
 } from "@/lib/models/api.models";
@@ -11,7 +11,7 @@ const EPSILON = 1e-3;
 function createPositionOpenedEntry(
   context: Position,
   timestamp: number
-): ActivityChartModel {
+): ProcessedActivity {
   return {
     type: "POSITION_OPENED",
     timestamp,
@@ -29,7 +29,7 @@ function createPositionOpenedEntry(
 function createPositionClosedEntry(
   context: Position,
   timestamp: number
-): ActivityChartModel {
+): ProcessedActivity {
   return {
     type: "POSITION_CLOSED",
     timestamp,
@@ -51,7 +51,7 @@ function createCombinedTradeEntry(
   side: string,
   countActivities: number,
   cumExposure: number
-): ActivityChartModel {
+): ProcessedActivity {
   return {
     type: "TRADE",
     timestamp,
@@ -110,7 +110,7 @@ export function buildPositionActivityTimeline({
   closedPositions?: ClosedPosition[];
   context: Position;
   combineConsecutiveEvents?: boolean;
-}): ActivityChartModel[] {
+}): ProcessedActivity[] {
   console.log("activityEntries", activityEntries);
   console.log("closedPositions", closedPositions);
   console.log("context", context);
@@ -135,7 +135,7 @@ export function buildPositionActivityTimeline({
   let currentOpenAmount = 0;
   let currentActivityCount = 0;
   const reversedActivity = [...activityEntries].reverse();
-  const newActivityEntries: ActivityChartModel[] = [];
+  const newActivityEntries: ProcessedActivity[] = [];
 
   // TODO: handle other types of events that could open a position
   for (const entry of reversedActivity) {
@@ -205,7 +205,7 @@ export function buildOpenPositionActivityTimeline({
   position: OpenPosition;
   activity: Activity[];
   closedPositions?: ClosedPosition[];
-}): ActivityChartModel[] {
+}): ProcessedActivity[] {
   /*
     If current position is open, we can simply return all position activity AFTER the last closed position's timestamp
   */
@@ -230,7 +230,7 @@ export function buildClosedPositionActivityTimeline({
   position: ClosedPosition;
   activity: Activity[];
   closedPositions?: ClosedPosition[];
-}): ActivityChartModel[] {
+}): ProcessedActivity[] {
   /*
     If current position is closed, we need to find all activity that fits between the current position's start and end timestamps
   */
@@ -273,7 +273,7 @@ export function buildPositionActivityTimeline2({
   position: Position;
   activity: Activity[];
   closedPositions?: ClosedPosition[];
-}): ActivityChartModel[] {
+}): ProcessedActivity[] {
   console.log("position", position);
   console.log("activity", activity);
   console.log("closedPositions", closedPositions);

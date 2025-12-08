@@ -1,10 +1,7 @@
 "use client";
 
 import { create } from "zustand";
-import type {
-  Interval,
-  ActivityChartModel,
-} from "@/lib/models/frontend.models";
+import type { Interval, ProcessedActivity } from "@/lib/models/frontend.models";
 import type { SeriesMarker, Time } from "lightweight-charts";
 import { Position } from "../../userActivity.types";
 
@@ -15,7 +12,7 @@ export type SharedMarketSnapshot = {
   markers: SeriesMarker<Time>[];
   interval: Interval;
   position: Position;
-  entries: ActivityChartModel[];
+  entries: ProcessedActivity[];
 };
 
 type MarketShareState = {
