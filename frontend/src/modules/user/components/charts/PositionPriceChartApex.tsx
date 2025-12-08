@@ -4,6 +4,7 @@ import { useMemo } from "react";
 import dynamic from "next/dynamic";
 import type { SeriesMarker, Time, HistogramData } from "lightweight-charts";
 import { Spinner } from "@/components/ui/spinner";
+import { formatNumber } from "@/lib/ui/format.utils";
 
 const Chart = dynamic(() => import("react-apexcharts"), { ssr: false });
 
@@ -261,7 +262,7 @@ export function PositionPriceChartApex({
               colors: "#9ca3af",
               fontSize: "11px",
             },
-            formatter: (val: number) => val.toFixed(2),
+            formatter: (val: number) => `${formatNumber(val, 1)}%`,
             offsetX: -20,
           },
           opposite: true,
@@ -289,7 +290,7 @@ export function PositionPriceChartApex({
               // Format exposure value
               return val.toLocaleString();
             }
-            return val.toFixed(2);
+            return `${formatNumber(val, 1)}%`;
           },
         },
       },
