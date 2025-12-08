@@ -262,7 +262,7 @@ export function PositionPriceChartApex({
                 opposite: false,
                 seriesName: "Exposure",
                 min: 0,
-                max: (max: number) => max * 2, // Scale to ~20% of chart height
+                max: (max: number) => max * 2.5, // Scale to ~20% of chart height
               },
             ]
           : []),
