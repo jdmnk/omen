@@ -1,7 +1,7 @@
 import {
   ClosedPosition,
-  MarketActivityChartModel,
-  MarketActivityEntry,
+  ActivityChartModel,
+  Activity,
   OpenPosition,
 } from "@/lib/models/api.models";
 import { isOpenPosition, Position } from "../userActivity.types";
@@ -11,7 +11,7 @@ const EPSILON = 1e-3;
 function createPositionOpenedEntry(
   context: Position,
   timestamp: number
-): MarketActivityChartModel {
+): ActivityChartModel {
   return {
     type: "POSITION_OPENED",
     timestamp,
@@ -29,7 +29,7 @@ function createPositionOpenedEntry(
 function createPositionClosedEntry(
   context: Position,
   timestamp: number
-): MarketActivityChartModel {
+): ActivityChartModel {
   return {
     type: "POSITION_CLOSED",
     timestamp,
@@ -51,7 +51,7 @@ function createCombinedTradeEntry(
   side: string,
   countActivities: number,
   cumExposure: number
-): MarketActivityChartModel {
+): ActivityChartModel {
   return {
     type: "TRADE",
     timestamp,
@@ -68,11 +68,9 @@ function createCombinedTradeEntry(
   };
 }
 
-function combineConsecutiveTrades(
-  list: MarketActivityEntry[]
-): MarketActivityEntry[] {
-  const result: MarketActivityEntry[] = [];
-  let buffer: MarketActivityEntry | null = null;
+function combineConsecutiveTrades(list: Activity[]): Activity[] {
+  const result: Activity[] = [];
+  let buffer: Activity | null = null;
   console.log("list", list);
 
   for (const t of list) {
@@ -108,11 +106,11 @@ export function buildPositionActivityTimeline({
   context,
   combineConsecutiveEvents,
 }: {
-  activityEntries: MarketActivityEntry[];
+  activityEntries: Activity[];
   closedPositions?: ClosedPosition[];
   context: Position;
   combineConsecutiveEvents?: boolean;
-}): MarketActivityChartModel[] {
+}): ActivityChartModel[] {
   console.log("activityEntries", activityEntries);
   console.log("closedPositions", closedPositions);
   console.log("context", context);
@@ -137,7 +135,7 @@ export function buildPositionActivityTimeline({
   let currentOpenAmount = 0;
   let currentActivityCount = 0;
   const reversedActivity = [...activityEntries].reverse();
-  const newActivityEntries: MarketActivityChartModel[] = [];
+  const newActivityEntries: ActivityChartModel[] = [];
 
   // TODO: handle other types of events that could open a position
   for (const entry of reversedActivity) {
@@ -201,13 +199,13 @@ export function buildPositionActivityTimeline({
 
 export function buildOpenPositionActivityTimeline({
   position,
-  activityEntries,
+  activity,
   closedPositions = [],
 }: {
   position: OpenPosition;
-  activityEntries: MarketActivityEntry[];
+  activity: Activity[];
   closedPositions?: ClosedPosition[];
-}): MarketActivityChartModel[] {
+}): ActivityChartModel[] {
   /*
     If current position is open, we can simply return all position activity AFTER the last closed position's timestamp
   */
@@ -217,22 +215,22 @@ export function buildOpenPositionActivityTimeline({
     closedPositions = closedPositions.sort((a, b) => b.timestamp - a.timestamp);
     const lastClosedPosition = closedPositions[closedPositions.length - 1];
     const lastClosedPositionTimestamp = lastClosedPosition.timestamp;
-    return activityEntries.filter(
+    return activity.filter(
       (entry) => entry.timestamp > lastClosedPositionTimestamp
     );
   }
-  return activityEntries;
+  return activity;
 }
 
 export function buildClosedPositionActivityTimeline({
   position,
-  activityEntries,
+  activity,
   closedPositions = [],
 }: {
   position: ClosedPosition;
-  activityEntries: MarketActivityEntry[];
+  activity: Activity[];
   closedPositions?: ClosedPosition[];
-}): MarketActivityChartModel[] {
+}): ActivityChartModel[] {
   /*
     If current position is closed, we need to find all activity that fits between the current position's start and end timestamps
   */
@@ -253,7 +251,7 @@ export function buildClosedPositionActivityTimeline({
     startTimestamp = sorted[idx - 1].timestamp;
   } else {
     // This is the newest closed position
-    startTimestamp = Math.min(...activityEntries.map((e) => e.timestamp));
+    startTimestamp = Math.min(...activity.map((e) => e.timestamp));
   }
 
   const endTimestamp = position.timestamp;
@@ -261,7 +259,7 @@ export function buildClosedPositionActivityTimeline({
   // Activity newer than the newest closed position belongs to the open position
   const newestClosedTimestamp = sorted[0].timestamp;
 
-  return activityEntries.filter((entry) => {
+  return activity.filter((entry) => {
     if (entry.timestamp > newestClosedTimestamp) return false;
     return entry.timestamp >= startTimestamp && entry.timestamp <= endTimestamp;
   });
@@ -269,26 +267,26 @@ export function buildClosedPositionActivityTimeline({
 
 export function buildPositionActivityTimeline2({
   position,
-  activityEntries,
+  activity,
   closedPositions = [],
 }: {
   position: Position;
-  activityEntries: MarketActivityEntry[];
+  activity: Activity[];
   closedPositions?: ClosedPosition[];
-}): MarketActivityChartModel[] {
+}): ActivityChartModel[] {
   console.log("position", position);
-  console.log("activityEntries", activityEntries);
+  console.log("activity", activity);
   console.log("closedPositions", closedPositions);
   if (isOpenPosition(position)) {
     return buildOpenPositionActivityTimeline({
       position,
-      activityEntries,
+      activity,
       closedPositions,
     });
   } else {
     return buildClosedPositionActivityTimeline({
       position,
-      activityEntries,
+      activity,
       closedPositions,
     });
   }

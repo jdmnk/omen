@@ -1,7 +1,7 @@
 "use client";
 
 import { DATA_API_HOST } from "@/lib/api.const";
-import type { MarketActivityEntry } from "@/lib/models/frontend.models";
+import type { Activity } from "@/lib/models/frontend.models";
 
 type RawActivityEntry = {
   type?: string;
@@ -20,7 +20,7 @@ type RawActivityEntry = {
   transactionHash?: string;
 };
 
-function mapActivityEntry(entry: RawActivityEntry): MarketActivityEntry | null {
+function mapActivityEntry(entry: RawActivityEntry): Activity | null {
   if (!entry) return null;
   const timestamp = entry.timestamp ?? 0;
   if (!timestamp) return null;
@@ -47,7 +47,7 @@ export async function fetchUserActivityPage(
   conditionId: string | undefined,
   pageSize: number,
   offset: number
-): Promise<MarketActivityEntry[]> {
+): Promise<Activity[]> {
   const url = new URL(`${DATA_API_HOST}/activity`);
   url.searchParams.set("user", userId);
   url.searchParams.set("limit", String(pageSize));
@@ -67,7 +67,7 @@ export async function fetchUserActivityPage(
     : [];
   return entries
     .map(mapActivityEntry)
-    .filter((entry): entry is MarketActivityEntry =>
+    .filter((entry): entry is Activity =>
       Boolean(entry && (!conditionId || entry.conditionId === conditionId))
     )
     .sort((a, b) => b.timestamp - a.timestamp);
@@ -77,10 +77,10 @@ export async function fetchUserActivityEntries(
   userId: string,
   conditionId?: string,
   limit: number = 500
-): Promise<MarketActivityEntry[]> {
+): Promise<Activity[]> {
   if (!userId) return [];
   const PAGE_SIZE = 500;
-  const allEntries: MarketActivityEntry[] = [];
+  const allEntries: Activity[] = [];
   let offset = 0;
 
   while (allEntries.length < limit) {

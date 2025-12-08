@@ -30,12 +30,12 @@ import { UserSearchBar } from "./UserSearchBar";
 
 async function fetchUserPositionActivity(userId: string, position: Position) {
   // both sorted by timestamp DESC
-  const [entries, closedPositions] = await Promise.all([
+  const [activity, closedPositions] = await Promise.all([
     fetchUserActivityEntries(userId, position.conditionId),
     fetchClosedPositionsByMarkets(userId, [position.conditionId]),
   ]);
 
-  const entriesForOutcome = entries.filter(
+  const activityForOutcome = activity.filter(
     (entry) => entry.outcomeIndex === position.outcomeIndex || !entry.outcome // e.g. REDEEM has no outcome
   );
 
@@ -45,7 +45,7 @@ async function fetchUserPositionActivity(userId: string, position: Position) {
 
   return buildPositionActivityTimeline2({
     position,
-    activityEntries: entriesForOutcome,
+    activity: activityForOutcome,
     closedPositions: closedPositionsForOutcome,
   });
 }

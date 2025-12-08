@@ -1,7 +1,4 @@
-import type {
-  ClosedPosition,
-  MarketActivityEntry,
-} from "@/lib/models/frontend.models";
+import type { ClosedPosition, Activity } from "@/lib/models/frontend.models";
 
 type PositionContext = {
   conditionId: string;
@@ -35,7 +32,7 @@ function normalizeTimestamp(value?: number | string | null): number | null {
 }
 
 function buildLifecycleIntervals(
-  entries: MarketActivityEntry[],
+  entries: Activity[],
   outcomeIndex?: number | null
 ) {
   const trades = entries
@@ -56,8 +53,7 @@ function buildLifecycleIntervals(
   trades.forEach((trade) => {
     const side = (trade.side ?? "").toUpperCase();
     const size = trade.size ?? 0;
-    const delta =
-      side === "BUY" ? size : side === "SELL" ? -size : 0;
+    const delta = side === "BUY" ? size : side === "SELL" ? -size : 0;
 
     const nextSize = runningSize + delta;
 
@@ -84,8 +80,8 @@ function buildLifecycleIntervals(
 function buildLifecycleEntries(
   intervals: { openedAt: number; closedAt?: number }[],
   context: PositionContext
-): MarketActivityEntry[] {
-  const entries: MarketActivityEntry[] = [];
+): Activity[] {
+  const entries: Activity[] = [];
 
   intervals.forEach((interval, index) => {
     entries.push({
@@ -122,21 +118,23 @@ function buildClosedPositionEntries(
   closedPositions: ClosedPosition[],
   context: PositionContext,
   existingClosedTimestamps: Set<number>
-): MarketActivityEntry[] {
-  return closedPositions.map((position, index) => ({
-    type: "POSITION_CLOSED",
-    timestamp: normalizeTimestamp(position.timestamp) ?? position.timestamp,
-    conditionId: position.conditionId ?? context.conditionId,
-    outcome: position.outcome ?? context.outcome ?? null,
-    outcomeIndex: position.outcomeIndex ?? context.outcomeIndex ?? null,
-    title: position.title ?? context.title ?? null,
-    slug: position.slug ?? context.slug ?? null,
-    eventSlug: position.eventSlug ?? context.eventSlug ?? null,
-    transactionHash: `closed-api-${position.conditionId}-${position.outcomeIndex}-${index}`,
-  })).filter((entry) => {
-    const ts = entry.timestamp ?? 0;
-    return !existingClosedTimestamps.has(ts);
-  });
+): Activity[] {
+  return closedPositions
+    .map((position, index) => ({
+      type: "POSITION_CLOSED",
+      timestamp: normalizeTimestamp(position.timestamp) ?? position.timestamp,
+      conditionId: position.conditionId ?? context.conditionId,
+      outcome: position.outcome ?? context.outcome ?? null,
+      outcomeIndex: position.outcomeIndex ?? context.outcomeIndex ?? null,
+      title: position.title ?? context.title ?? null,
+      slug: position.slug ?? context.slug ?? null,
+      eventSlug: position.eventSlug ?? context.eventSlug ?? null,
+      transactionHash: `closed-api-${position.conditionId}-${position.outcomeIndex}-${index}`,
+    }))
+    .filter((entry) => {
+      const ts = entry.timestamp ?? 0;
+      return !existingClosedTimestamps.has(ts);
+    });
 }
 
 export function buildPositionActivityTimeline({
@@ -144,7 +142,7 @@ export function buildPositionActivityTimeline({
   closedPositions = [],
   context,
 }: {
-  entries: MarketActivityEntry[];
+  entries: Activity[];
   closedPositions?: ClosedPosition[];
   context: PositionContext;
 }) {
@@ -166,7 +164,7 @@ export function buildPositionActivityTimeline({
 
   const combined = [...entries, ...lifecycleEntries, ...closedEntries];
 
-  const deduped = new Map<string, MarketActivityEntry>();
+  const deduped = new Map<string, Activity>();
 
   combined.forEach((entry) => {
     const key = `${entry.type}-${entry.timestamp ?? "na"}-${
@@ -178,9 +176,7 @@ export function buildPositionActivityTimeline({
   });
 
   return Array.from(deduped.values())
-    .filter((entry) =>
-      isOutcomeMatch(entry.outcomeIndex, context.outcomeIndex)
-    )
+    .filter((entry) => isOutcomeMatch(entry.outcomeIndex, context.outcomeIndex))
     .sort((a, b) => {
       const aTime = a.timestamp ?? 0;
       const bTime = b.timestamp ?? 0;

@@ -19,7 +19,7 @@ import { cn } from "@/lib/utils";
 import { fetchUserActivityPage } from "@/modules/user/lib/queries/user-activity.query";
 import { LoadingSpinner } from "@/components/ui/spinner";
 import { getPolymarketEventUrl } from "@/lib/utils/polymarket.utils";
-import type { MarketActivityEntry } from "@/lib/models/frontend.models";
+import type { Activity } from "@/lib/models/frontend.models";
 import {
   getActivityMarketLabel,
   getActivityTypeLabel,
@@ -30,7 +30,7 @@ const ACTIVITY_ROW_GRID_CLASSES =
   "grid grid-cols-[minmax(70px,0.7fr)_minmax(200px,1.6fr)_minmax(200px,1.4fr)_minmax(120px,0.9fr)_minmax(120px,0.9fr)] items-center gap-4";
 const PAGE_SIZE = 100;
 
-function ActivityRow({ entry }: { entry: MarketActivityEntry }) {
+function ActivityRow({ entry }: { entry: Activity }) {
   const size = entry.size ?? 0;
   const price = entry.price ?? 0;
   const amount =
@@ -68,7 +68,10 @@ function ActivityRow({ entry }: { entry: MarketActivityEntry }) {
   const combinedOutcomeLabel =
     outcomeLabel === "-" ? priceLabel : `${outcomeLabel} ${priceLabel}`;
 
-  const outcomeColor = getOutcomeColorClass(entry.outcomeIndex, "text-foreground");
+  const outcomeColor = getOutcomeColorClass(
+    entry.outcomeIndex,
+    "text-foreground"
+  );
 
   return (
     <div className={cn(ACTIVITY_ROW_GRID_CLASSES, TABLE_ROW_CLASSES)}>

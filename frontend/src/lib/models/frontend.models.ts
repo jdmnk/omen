@@ -90,7 +90,7 @@ export type UserValue = {
   value: number;
 };
 
-export type MarketActivityEntry = {
+export type Activity = {
   type: string;
   timestamp: number;
   conditionId?: string | null;
@@ -107,8 +107,8 @@ export type MarketActivityEntry = {
   transactionHash?: string | null;
 };
 
-// extends MarketActivityEntry but with chart data
-export type MarketActivityChartModel = MarketActivityEntry & {
+// extends Activity but with chart data
+export type ActivityChartModel = Activity & {
   cumExposure?: number; // total cumulative exposure
   countActivities?: number; // if we have grouped trades, this is the number of trades
 };
