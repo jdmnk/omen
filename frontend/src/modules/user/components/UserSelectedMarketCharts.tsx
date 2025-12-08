@@ -27,6 +27,7 @@ import {
 } from "../lib/chart/chart.const";
 import { useChartData } from "../lib/chart/useChartData";
 import { getMarkersForMarketChart } from "../lib/chart/new-marker.utils";
+import { getExposureBars } from "../lib/chart/exposure-bars.utils";
 
 function pickIntervalForRange(rangeSeconds: number): Interval {
   if (!Number.isFinite(rangeSeconds) || rangeSeconds <= 0) {
@@ -85,6 +86,10 @@ function PositionChartCard({
   const markers = useMemo(
     () => getMarkersForMarketChart(activity.entries, 5, fidelitySeconds),
     [activity.entries, fidelitySeconds]
+  );
+  const volumeBars = useMemo(
+    () => getExposureBars(activity.entries),
+    [activity.entries]
   );
   const marketUrl = getPolymarketEventUrl(
     activity.position.eventSlug ?? undefined
@@ -171,6 +176,7 @@ function PositionChartCard({
           <PositionPriceChart
             data={chartData}
             markers={markers}
+            volumeBars={volumeBars}
             isLoading={isLoading}
             error={error}
           />

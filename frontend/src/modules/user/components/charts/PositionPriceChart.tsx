@@ -6,6 +6,8 @@ import {
   ChartOptions,
   ColorType,
   DeepPartial,
+  HistogramSeries,
+  HistogramData,
   IChartApi,
   ISeriesApi,
   ISeriesMarkersPluginApi,
@@ -23,6 +25,7 @@ type ChartPoint = { time: number | string; value: number };
 type PositionPriceChartProps = {
   data: ChartPoint[];
   markers?: SeriesMarker<Time>[];
+  volumeBars?: HistogramData<Time>[];
   error?: Error | null;
   isLoading?: boolean;
 };
@@ -51,6 +54,13 @@ const chartOptions: DeepPartial<ChartOptions> = {
       bottom: 0.05,
     },
   },
+  leftPriceScale: {
+    borderColor: "transparent",
+    scaleMargins: {
+      top: 0.8,
+      bottom: 0,
+    },
+  },
   handleScale: true,
   handleScroll: true,
 };
@@ -58,12 +68,14 @@ const chartOptions: DeepPartial<ChartOptions> = {
 export function PositionPriceChart({
   data,
   markers = [],
+  volumeBars = [],
   error,
   isLoading,
 }: PositionPriceChartProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const chartRef = useRef<IChartApi | null>(null);
   const seriesRef = useRef<ISeriesApi<"Area"> | null>(null);
+  const volumeSeriesRef = useRef<ISeriesApi<"Histogram"> | null>(null);
   const markersPluginRef = useRef<ISeriesMarkersPluginApi<Time> | null>(null);
 
   useEffect(() => {
@@ -83,8 +95,16 @@ export function PositionPriceChart({
         minMove: 0.01,
       },
     });
+    const volumeSeries = chart.addSeries(HistogramSeries, {
+      color: "#3b82f6",
+      priceFormat: {
+        type: "volume",
+      },
+      priceScaleId: "",
+    });
     chartRef.current = chart;
     seriesRef.current = series;
+    volumeSeriesRef.current = volumeSeries;
 
     const resizeObserver = new ResizeObserver(() => {
       if (!containerRef.current || !chartRef.current) return;
@@ -109,6 +129,7 @@ export function PositionPriceChart({
       chart.remove();
       chartRef.current = null;
       seriesRef.current = null;
+      volumeSeriesRef.current = null;
     };
   }, []);
 
@@ -117,6 +138,11 @@ export function PositionPriceChart({
     seriesRef.current.setData((data as LineData<Time>[]) ?? []);
     chartRef.current?.timeScale().fitContent();
   }, [data]);
+
+  useEffect(() => {
+    if (!volumeSeriesRef.current) return;
+    volumeSeriesRef.current.setData(volumeBars ?? []);
+  }, [volumeBars]);
 
   useEffect(() => {
     if (!seriesRef.current) return;

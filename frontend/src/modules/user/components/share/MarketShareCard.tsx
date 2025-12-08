@@ -25,6 +25,7 @@ import { useUserDataQuery } from "../../lib/queries/user-data.query";
 import { LogoIcon } from "@/components/LogoIcon";
 import { useChartData } from "../../lib/chart/useChartData";
 import { getMarkersForShareChart } from "../../lib/chart/new-marker.utils";
+import { getExposureBars } from "../../lib/chart/exposure-bars.utils";
 
 export function MarketShareCard({
   snapshot,
@@ -51,6 +52,7 @@ export function MarketShareCard({
     snapshot.interval
   );
   const markers = getMarkersForShareChart(snapshot.entries, 5, fidelitySeconds);
+  const volumeBars = getExposureBars(snapshot.entries);
 
   return (
     <Card className="flex w-full flex-col gap-3 border-none bg-white">
@@ -81,7 +83,11 @@ export function MarketShareCard({
         </div>
       </div>
       <div className="h-64 w-full">
-        <MarketShareChart data={chartData} markers={markers} />
+        <MarketShareChart
+          data={chartData}
+          markers={markers}
+          volumeBars={volumeBars}
+        />
       </div>
       <div className="mt-4 flex items-stretch justify-between gap-4 text-black font-bold">
         <div className="flex flex-col gap-1 self-center py-3">
