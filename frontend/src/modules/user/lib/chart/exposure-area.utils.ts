@@ -84,6 +84,18 @@ export function getExposureArea(
     lastValue = current.value;
   }
 
+  // Extend bars into the future (to current time)
+  if (stepped.length > 0) {
+    const lastTime = stepped[stepped.length - 1].time as number;
+    const now = Math.floor(Date.now() / 1000);
+    if (lastTime < now) {
+      stepped.push({
+        time: now as Time,
+        value: lastValue,
+      });
+    }
+  }
+
   return stepped;
 }
 

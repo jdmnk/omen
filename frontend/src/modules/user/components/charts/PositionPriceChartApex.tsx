@@ -2,9 +2,10 @@
 
 import { useMemo } from "react";
 import dynamic from "next/dynamic";
-import type { SeriesMarker, Time, HistogramData } from "lightweight-charts";
+import type { SeriesMarker, Time } from "lightweight-charts";
 import { Spinner } from "@/components/ui/spinner";
 import { formatNumber } from "@/lib/ui/format.utils";
+import type { ExposureAreaPoint } from "../../lib/chart/exposure-area.utils";
 
 const Chart = dynamic(() => import("react-apexcharts"), { ssr: false });
 
@@ -14,7 +15,7 @@ type ChartPoint = { time: number | string; value: number };
 type PositionPriceChartApexProps = {
   data: ChartPoint[];
   markers?: SeriesMarker<Time>[];
-  volumeBars?: HistogramData<Time>[];
+  volumeBars?: ExposureAreaPoint[];
   error?: Error | null;
   isLoading?: boolean;
   /** Chart height - number (pixels) or string (e.g. "100%"). Defaults to 360. */

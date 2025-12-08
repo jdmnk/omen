@@ -25,7 +25,7 @@ import { useUserDataQuery } from "../../lib/queries/user-data.query";
 import { LogoIcon } from "@/components/LogoIcon";
 import { useChartData } from "../../lib/chart/useChartData";
 import { getMarkersForShareChart } from "../../lib/chart/new-marker.utils";
-import { getExposureBars } from "../../lib/chart/exposure-bars.utils";
+import { getExposureArea } from "../../lib/chart/exposure-area.utils";
 import { PositionPriceChartApex } from "../charts/PositionPriceChartApex";
 
 export function MarketShareCard({
@@ -53,7 +53,7 @@ export function MarketShareCard({
     snapshot.interval
   );
   const markers = getMarkersForShareChart(snapshot.entries, 5, fidelitySeconds);
-  const volumeBars = getExposureBars(snapshot.entries, fidelitySeconds);
+  const volumeBars = getExposureArea(snapshot.entries, fidelitySeconds);
 
   return (
     <Card className="flex w-full flex-col gap-3 border-none bg-white">
