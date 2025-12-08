@@ -3,10 +3,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Interval } from "@/lib/models/frontend.models";
-import {
-  usePriceHistoryQuery,
-  PriceHistoryPoint,
-} from "@/lib/queries/price-history.query";
 import type { PositionActivity } from "../userActivity.types";
 import { PositionPriceChart } from "./charts/PositionPriceChart";
 import { formatCompactCurrency } from "@/lib/ui/format.utils";
@@ -25,57 +21,12 @@ import { Share2, X } from "lucide-react";
 import { MarketShareDialog } from "./share/MarketShareDialog";
 import { useMarketShareStore } from "./share/share.store";
 import { Position } from "@/lib/models/frontend.models";
-
-const INTERVALS: Interval[] = ["1h", "6h", "1d", "1w", "1m", "max"];
-
-const INTERVAL_LABELS: Record<Interval, string> = {
-  "1h": "1H",
-  "6h": "6H",
-  "1d": "1D",
-  "1w": "1W",
-  "1m": "1M",
-  max: "MAX",
-};
-
-const INTERVAL_FIDELITY: Record<Interval, number> = {
-  "1h": 1,
-  "6h": 5,
-  "1d": 15,
-  "1w": 60,
-  "1m": 240,
-  max: 1440,
-};
-
-const INTERVAL_DURATION_SEC: Record<Interval, number> = {
-  "1h": 60 * 60,
-  "6h": 6 * 60 * 60,
-  "1d": 24 * 60 * 60,
-  "1w": 7 * 24 * 60 * 60,
-  "1m": 30 * 24 * 60 * 60,
-  max: Infinity,
-};
-
-function dedupeHistory(points: PriceHistoryPoint[] = []) {
-  return [...new Map(points.map((item) => [item.t, item])).values()];
-}
-
-function useChartData(tokenId?: string | null, interval: Interval = "1w") {
-  const fidelityMinutes = INTERVAL_FIDELITY[interval] ?? 3600;
-  const fidelitySeconds = fidelityMinutes * 60;
-  const enabled = Boolean(tokenId);
-  const query = usePriceHistoryQuery(tokenId || "", interval, fidelityMinutes, {
-    enabled,
-  });
-  const chartData = useMemo(
-    () =>
-      dedupeHistory(query.data?.history).map((point) => ({
-        time: point.t,
-        value: point.p * 100,
-      })),
-    [query.data?.history]
-  );
-  return { ...query, chartData, fidelitySeconds };
-}
+import {
+  INTERVAL_DURATION_SEC,
+  INTERVAL_LABELS,
+  INTERVALS,
+} from "../lib/chart/chart.const";
+import { useChartData } from "../lib/chart/ useChartData";
 
 function pickIntervalForRange(rangeSeconds: number): Interval {
   if (!Number.isFinite(rangeSeconds) || rangeSeconds <= 0) {
@@ -147,8 +98,6 @@ function PositionChartCard({
   const handleShare = () => {
     if (!tokenId) return;
     openShareDialog({
-      chartData,
-      markers,
       interval,
       position: activity.position,
       entries: activity.entries,
