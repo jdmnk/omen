@@ -16,6 +16,8 @@ type PositionPriceChartApexProps = {
   volumeBars?: HistogramData<Time>[];
   error?: Error | null;
   isLoading?: boolean;
+  /** Chart height - number (pixels) or string (e.g. "100%"). Defaults to 360. */
+  height?: number | string;
 };
 
 function convertTimeToTimestamp(time: number | string | Time): number {
@@ -40,9 +42,8 @@ export function PositionPriceChartApex({
   volumeBars = [],
   error,
   isLoading,
+  height = 360,
 }: PositionPriceChartApexProps) {
-  const CHART_HEIGHT = 360;
-
   const chartData = useMemo(() => {
     const priceData = data.map((point) => [
       convertTimeToTimestamp(point.time),
@@ -157,7 +158,7 @@ export function PositionPriceChartApex({
     () => ({
       chart: {
         type: "line",
-        height: CHART_HEIGHT,
+        height,
         width: "100%",
         background: "transparent",
         toolbar: {
@@ -289,7 +290,7 @@ export function PositionPriceChartApex({
           ? ["#651fff", "#3b82f6"]
           : ["#651fff"],
     }),
-    [annotations, chartData]
+    [annotations, chartData, height]
   );
 
   if (error) {
@@ -311,7 +312,7 @@ export function PositionPriceChartApex({
         options={options}
         series={series}
         type="line"
-        height={CHART_HEIGHT}
+        height={height}
         width="100%"
       />
     </div>
