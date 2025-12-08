@@ -198,7 +198,7 @@ export function buildPositionActivityTimeline({
   return reversedNewActivityEntries;
 }
 
-export function buildOpenPositionActivityTimeline({
+export function getOpenPositionActivity({
   position,
   activity,
   closedPositions = [],
@@ -223,7 +223,7 @@ export function buildOpenPositionActivityTimeline({
   return activity;
 }
 
-export function buildClosedPositionActivityTimeline({
+export function getClosedPositionActivity({
   position,
   activity,
   closedPositions = [],
@@ -266,7 +266,7 @@ export function buildClosedPositionActivityTimeline({
   });
 }
 
-export function buildPositionActivityTimeline2({
+export function getPositionActivity({
   position,
   activity,
   closedPositions = [],
@@ -279,13 +279,13 @@ export function buildPositionActivityTimeline2({
   console.log("activity", activity);
   console.log("closedPositions", closedPositions);
   if (isOpenPosition(position)) {
-    return buildOpenPositionActivityTimeline({
+    return getOpenPositionActivity({
       position,
       activity,
       closedPositions,
     });
   } else {
-    return buildClosedPositionActivityTimeline({
+    return getClosedPositionActivity({
       position,
       activity,
       closedPositions,
