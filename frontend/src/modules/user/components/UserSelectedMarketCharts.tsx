@@ -28,6 +28,7 @@ import {
 import { useChartData } from "../lib/chart/useChartData";
 import { getMarkersForMarketChart } from "../lib/chart/new-marker.utils";
 import { getExposureBars } from "../lib/chart/exposure-bars.utils";
+import { PositionPriceChartApex } from "./charts/PositionPriceChartApex";
 
 function pickIntervalForRange(rangeSeconds: number): Interval {
   if (!Number.isFinite(rangeSeconds) || rangeSeconds <= 0) {
@@ -173,7 +174,14 @@ function PositionChartCard({
       </div>
       <div className="flex-1">
         {tokenId ? (
-          <PositionPriceChart
+          // <PositionPriceChart
+          //   data={chartData}
+          //   markers={markers}
+          //   volumeBars={volumeBars}
+          //   isLoading={isLoading}
+          //   error={error}
+          // />
+          <PositionPriceChartApex
             data={chartData}
             markers={markers}
             volumeBars={volumeBars}
