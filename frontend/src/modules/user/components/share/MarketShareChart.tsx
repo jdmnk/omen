@@ -59,13 +59,6 @@ const chartOptions: DeepPartial<ChartOptions> = {
       bottom: 0.05,
     },
   },
-  leftPriceScale: {
-    borderColor: "transparent",
-    scaleMargins: {
-      top: 0.8,
-      bottom: 0,
-    },
-  },
   localization: {
     priceFormatter: (price: number) => formatNumber(price, 1) + "%",
   },
@@ -122,6 +115,16 @@ export function MarketShareChart({
         type: "volume",
       },
       priceScaleId: "",
+    });
+    volumeSeries.priceScale().applyOptions({
+      scaleMargins: {
+        top: 0.8,
+        bottom: 0,
+      },
+      borderColor: "transparent",
+      borderVisible: false,
+      ticksVisible: false,
+      entireTextOnly: true,
     });
     chartRef.current = chart;
     seriesRef.current = series;

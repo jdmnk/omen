@@ -52,7 +52,7 @@ export function MarketShareCard({
     snapshot.interval
   );
   const markers = getMarkersForShareChart(snapshot.entries, 5, fidelitySeconds);
-  const volumeBars = getExposureBars(snapshot.entries);
+  const volumeBars = getExposureBars(snapshot.entries, fidelitySeconds);
 
   return (
     <Card className="flex w-full flex-col gap-3 border-none bg-white">

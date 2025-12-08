@@ -102,6 +102,16 @@ export function PositionPriceChart({
       },
       priceScaleId: "",
     });
+    volumeSeries.priceScale().applyOptions({
+      scaleMargins: {
+        top: 0.8,
+        bottom: 0,
+      },
+      borderColor: "transparent",
+      borderVisible: false,
+      ticksVisible: false,
+      entireTextOnly: true,
+    });
     chartRef.current = chart;
     seriesRef.current = series;
     volumeSeriesRef.current = volumeSeries;

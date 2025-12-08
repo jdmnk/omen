@@ -88,7 +88,7 @@ function PositionChartCard({
     [activity.entries, fidelitySeconds]
   );
   const volumeBars = useMemo(
-    () => getExposureBars(activity.entries),
+    () => getExposureBars(activity.entries, fidelitySeconds),
     [activity.entries]
   );
   const marketUrl = getPolymarketEventUrl(
