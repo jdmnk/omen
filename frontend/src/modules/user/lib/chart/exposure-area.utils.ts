@@ -37,6 +37,14 @@ export function getExposureArea(
   // For stepped area charts, we need to create points that show the step transitions
   // ApexCharts will render this as a stepped line when curve: "stepline" is used
   const stepped: ExposureAreaPoint[] = [];
+  
+  // Start with a point at y=0 to create a left border from the bottom
+  const firstTime = entries[0].time as number;
+  stepped.push({
+    time: firstTime as Time,
+    value: 0,
+  });
+  
   let lastValue = entries[0].value;
 
   for (let i = 0; i < entries.length; i++) {
