@@ -95,18 +95,18 @@ export type UserValue = {
 export type Activity = {
   type: string;
   timestamp: number;
-  conditionId?: string | null;
-  asset?: string | null;
-  side?: string | null;
-  size?: number | null;
-  price?: number | null;
-  usdcSize?: number | null;
-  outcome?: string | null;
-  outcomeIndex?: number | null;
-  title?: string | null;
-  slug?: string | null;
-  eventSlug?: string | null;
-  transactionHash?: string | null;
+  conditionId?: string;
+  asset?: string;
+  side?: string;
+  size?: number;
+  price?: number;
+  usdcSize?: number;
+  outcome?: string;
+  outcomeIndex?: number;
+  title?: string;
+  slug?: string;
+  eventSlug?: string;
+  transactionHash?: string;
 };
 
 // extends Activity but with additional data for e.g. charts and share card
