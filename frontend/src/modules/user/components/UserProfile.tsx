@@ -24,7 +24,10 @@ import { Copy } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { copyToClipboard } from "@/lib/utils/clipboard.utils";
 import { useQueries } from "@tanstack/react-query";
-import { getPositionActivity } from "../lib/positions-activity-new.utils";
+import {
+  getPositionActivity,
+  getProcessedPositionActivity,
+} from "../lib/positions-activity-new.utils";
 import { UserSearchBar } from "./UserSearchBar";
 import { Position } from "@/lib/models/frontend.models";
 
@@ -43,11 +46,18 @@ async function fetchUserPositionActivity(userId: string, position: Position) {
     (closed) => closed.outcomeIndex === position.outcomeIndex
   );
 
-  return getPositionActivity({
+  const positionActivity = getPositionActivity({
     position,
     activity: activityForOutcome,
     closedPositions: closedPositionsForOutcome,
   });
+
+  const processedPositionActivity = getProcessedPositionActivity({
+    position,
+    activity: positionActivity,
+  });
+
+  return processedPositionActivity;
 }
 
 export function UserProfile({ userId }: { userId: string }) {

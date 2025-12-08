@@ -21,13 +21,3 @@ export type PositionActivityLookup = Record<
     isError?: boolean;
   }
 >;
-
-export function isClosedPosition(
-  position: Position
-): position is ClosedPosition {
-  return "timestamp" in position;
-}
-
-export function isOpenPosition(position: Position): position is OpenPosition {
-  return "cashPnl" in position;
-}
