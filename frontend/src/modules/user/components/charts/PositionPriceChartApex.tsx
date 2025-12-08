@@ -94,14 +94,19 @@ export function PositionPriceChartApex({
       // The position property is used for label placement, but marker is on the line
       const yPosition = y;
 
+      const markerSize = marker.size ? marker.size * 4 : 6;
+      const markerColor = marker.color || "#651fff";
+      // Offset scales with marker size to prevent overlap
+      const labelOffset = 1;
+
       return {
         x,
         y: yPosition,
         marker: {
-          size: marker.size ? marker.size * 4 : 6,
-          fillColor: marker.color || "#651fff",
-          strokeColor: marker.color || "#651fff",
-          strokeWidth: 2,
+          size: markerSize,
+          fillColor: markerColor,
+          strokeColor: markerColor,
+          strokeWidth: 0,
           shape: marker.shape === "square" ? "square" : "circle",
           radius: marker.size ? marker.size * 2 : 3,
         },
@@ -110,12 +115,21 @@ export function PositionPriceChartApex({
               text: marker.text,
               textAnchor: "middle",
               position: marker.position === "belowBar" ? "bottom" : "top",
-              offsetY: marker.position === "belowBar" ? -8 : 8,
+              offsetY:
+                marker.position === "belowBar" ? -labelOffset : labelOffset,
+              borderWidth: 0,
+              borderColor: "transparent",
               style: {
-                color: "#9ca3af",
+                color: markerColor,
                 fontSize: "11px",
-                fontWeight: 400,
+                fontWeight: 500,
                 background: "transparent",
+                padding: {
+                  left: 0,
+                  right: 0,
+                  top: 0,
+                  bottom: 0,
+                },
               },
             }
           : undefined,
