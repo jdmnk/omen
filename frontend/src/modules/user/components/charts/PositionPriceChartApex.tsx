@@ -2,13 +2,14 @@
 
 import { useMemo } from "react";
 import dynamic from "next/dynamic";
-import { SeriesMarker, Time, HistogramData } from "lightweight-charts";
+import type { SeriesMarker, Time, HistogramData } from "lightweight-charts";
 import { Spinner } from "@/components/ui/spinner";
 
 const Chart = dynamic(() => import("react-apexcharts"), { ssr: false });
 
 type ChartPoint = { time: number | string; value: number };
 
+// Accept lightweight-charts types for compatibility
 type PositionPriceChartApexProps = {
   data: ChartPoint[];
   markers?: SeriesMarker<Time>[];
@@ -30,7 +31,6 @@ function convertTimeToTimestamp(time: number | string | Time): number {
   if (typeof time === "string") {
     return new Date(time).getTime();
   }
-  // Handle BusinessDay type (shouldn't happen in practice, but handle it)
   return Date.now();
 }
 
@@ -67,41 +67,35 @@ export function PositionPriceChartApex({
       dataMap.set(timestamp, point.value);
     });
 
-    // Find min/max for positioning
-    const values = data.map((p) => p.value);
-    const minValue = Math.min(...values);
-    const maxValue = Math.max(...values);
-    const valueRange = maxValue - minValue || 1;
-
     const points = markers.map((marker) => {
       const x = convertTimeToTimestamp(marker.time);
-      // Find closest data point for y value
+
+      // Find closest data point for y value using the map
       let y = data[0]?.value ?? 0;
-      let closestTime = convertTimeToTimestamp(data[0]?.time ?? 0);
       let minDiff = Infinity;
 
-      data.forEach((point) => {
-        const pointTime = convertTimeToTimestamp(point.time);
-        const diff = Math.abs(pointTime - x);
-        if (diff < minDiff) {
-          minDiff = diff;
-          closestTime = pointTime;
-          y = point.value;
-        }
-      });
-
-      // Markers should be drawn ON THE LINE at the actual y value
-      // The position property is used for label placement, but marker is on the line
-      const yPosition = y;
+      // First try exact match
+      if (dataMap.has(x)) {
+        y = dataMap.get(x)!;
+      } else {
+        // Find closest point
+        data.forEach((point) => {
+          const pointTime = convertTimeToTimestamp(point.time);
+          const diff = Math.abs(pointTime - x);
+          if (diff < minDiff) {
+            minDiff = diff;
+            y = point.value;
+          }
+        });
+      }
 
       const markerSize = marker.size ? marker.size * 4 : 6;
       const markerColor = marker.color || "#651fff";
-      // Offset scales with marker size to prevent overlap
       const labelOffset = 1;
 
       return {
         x,
-        y: yPosition,
+        y,
         marker: {
           size: markerSize,
           fillColor: markerColor,
@@ -153,8 +147,7 @@ export function PositionPriceChartApex({
         name: "Exposure",
         type: "area",
         data: chartData.exposureData,
-        yAxisIndex: 1,
-      } as ApexAxisChartSeries[number] & { curve?: string });
+      });
     }
 
     return seriesArray;
@@ -296,7 +289,7 @@ export function PositionPriceChartApex({
           ? ["#651fff", "#3b82f6"]
           : ["#651fff"],
     }),
-    [annotations, chartData.exposureData.length]
+    [annotations, chartData]
   );
 
   if (error) {
@@ -314,15 +307,13 @@ export function PositionPriceChartApex({
           <Spinner size="sm" />
         </div>
       )}
-      {typeof window !== "undefined" && (
-        <Chart
-          options={options}
-          series={series}
-          type="line"
-          height={CHART_HEIGHT}
-          width="100%"
-        />
-      )}
+      <Chart
+        options={options}
+        series={series}
+        type="line"
+        height={CHART_HEIGHT}
+        width="100%"
+      />
     </div>
   );
 }
