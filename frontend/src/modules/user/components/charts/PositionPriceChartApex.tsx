@@ -172,34 +172,48 @@ export function PositionPriceChartApex({
           chartData.exposureData.length > 0
             ? ["straight", "stepline"]
             : "straight",
-        width: chartData.exposureData.length > 0 ? [2, 1] : 2,
+        width: 2,
         colors:
           chartData.exposureData.length > 0
             ? ["#651fff", "#3b82f6"]
             : ["#651fff"],
       },
-      fill: {
-        type: "gradient",
-        gradient: {
-          shadeIntensity: 1,
-          opacityFrom: 0.7,
-          opacityTo: 0,
-          stops: [0, 100],
-          colorStops: [
-            {
-              offset: 0,
-              color: "#341084",
-              opacity: 0.7,
+      fill:
+        chartData.exposureData.length > 0
+          ? {
+              type: ["gradient", "solid"],
+              gradient: {
+                type: "vertical",
+                shadeIntensity: 1,
+                opacityFrom: 0.85,
+                opacityTo: 0.05,
+                stops: [0, 95],
+                colorStops: [
+                  [
+                    { offset: 0, color: "#651fff", opacity: 0.6 },
+                    { offset: 50, color: "#4a1199", opacity: 0.3 },
+                    { offset: 100, color: "#1a0533", opacity: 0.05 },
+                  ],
+                ],
+              },
+              colors: ["#651fff", "#3b82f6"],
+              opacity: [0.7, 0.5],
+            }
+          : {
+              type: "gradient",
+              gradient: {
+                type: "vertical",
+                shadeIntensity: 1,
+                opacityFrom: 0.85,
+                opacityTo: 0.05,
+                stops: [0, 95],
+                colorStops: [
+                  { offset: 0, color: "#651fff", opacity: 0.6 },
+                  { offset: 50, color: "#4a1199", opacity: 0.3 },
+                  { offset: 100, color: "#1a0533", opacity: 0.05 },
+                ],
+              },
             },
-            {
-              offset: 100,
-              color: "rgba(101, 31, 255, 0)",
-              opacity: 0,
-            },
-          ],
-        },
-        opacity: [0.7, 0.3],
-      },
       grid: {
         show: false,
         borderColor: "transparent",
