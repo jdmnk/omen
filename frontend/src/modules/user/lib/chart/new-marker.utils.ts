@@ -93,7 +93,7 @@ export function getMarkers(
       color: isBuy ? "#22c55e" : "#ef4444",
       shape: "circle",
       text: formatPrice(entry.price, { maximumFractionDigits: 1 }),
-      size: scale(entry.size),
+      size: scale(entry.size ?? 1),
     } as SeriesMarker<Time>;
   });
 }
