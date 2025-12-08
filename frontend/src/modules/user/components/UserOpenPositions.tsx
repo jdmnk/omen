@@ -9,7 +9,7 @@ import {
   formatPrice,
 } from "@/lib/ui/format.utils";
 import { cn } from "@/lib/utils";
-import { UserPosition } from "@/lib/models/api.models";
+import { OpenPosition } from "@/lib/models/api.models";
 import { useInfiniteScroll } from "@/lib/hooks/use-infinite-scroll";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
@@ -27,7 +27,7 @@ const POSITION_ROW_GRID_CLASSES =
   "grid grid-cols-[18px_minmax(220px,2fr)_minmax(80px,0.8fr)_minmax(80px,0.8fr)_minmax(80px,0.8fr)_minmax(80px,0.8fr)_minmax(100px,1fr)_minmax(110px,1fr)_36px] items-center gap-4";
 
 type PositionRowProps = {
-  position: UserPosition;
+  position: OpenPosition;
   isSelected: boolean;
   onTogglePosition?: (position: Position, checked: boolean) => void;
   activityState?: PositionActivityLookup[string];

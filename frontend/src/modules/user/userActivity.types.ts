@@ -1,7 +1,7 @@
 import type {
   ClosedPosition,
   MarketActivityChartModel,
-  UserPosition,
+  OpenPosition,
 } from "@/lib/models/frontend.models";
 
 export type PositionActivity = {
@@ -21,7 +21,7 @@ export type PositionActivityLookup = Record<
   }
 >;
 
-export type Position = UserPosition | ClosedPosition;
+export type Position = OpenPosition | ClosedPosition;
 
 export function isClosedPosition(
   position: Position
@@ -29,6 +29,6 @@ export function isClosedPosition(
   return "timestamp" in position;
 }
 
-export function isOpenPosition(position: Position): position is UserPosition {
+export function isOpenPosition(position: Position): position is OpenPosition {
   return "cashPnl" in position;
 }

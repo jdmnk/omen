@@ -1,11 +1,11 @@
 import { DATA_API_HOST } from "@/lib/api.const";
-import { UserPosition } from "@/lib/models/api.models";
+import { OpenPosition } from "@/lib/models/api.models";
 
 export async function fetchUserPositions(
   userId: string,
   count: number = 500,
   limit: number = 500
-): Promise<UserPosition[]> {
+): Promise<OpenPosition[]> {
   let offset = 0;
   const allPositions = [];
   while (allPositions.length < count) {

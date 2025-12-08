@@ -32,7 +32,7 @@ export type OrderBookViewModel = {
 export type OrderBookQueryResult = OrderBookResponse & OrderBookViewModel;
 
 // UserPosition is a frontend-specific Position model, different from backend Position (graph model)
-export type UserPosition = {
+export type OpenPosition = {
   proxyWallet: string;
   asset: string;
   conditionId: string;

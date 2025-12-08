@@ -1,13 +1,13 @@
 "use client";
 
 import { useInfiniteQuery } from "@tanstack/react-query";
-import { UserPosition } from "../../../../lib/models/api.models";
+import { OpenPosition } from "../../../../lib/models/api.models";
 import { DATA_API_HOST } from "../../../../lib/api.const";
 
 const PAGE_SIZE = 50;
 
 export function useUserPositionsInfiniteQuery(userId: string) {
-  return useInfiniteQuery<UserPosition[], Error>({
+  return useInfiniteQuery<OpenPosition[], Error>({
     queryKey: ["user-positions-infinite", userId],
     queryFn: async ({ pageParam = 0 }) => {
       const url = new URL(`${DATA_API_HOST}/positions`);

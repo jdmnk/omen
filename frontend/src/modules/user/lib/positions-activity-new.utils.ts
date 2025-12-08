@@ -2,7 +2,7 @@ import {
   ClosedPosition,
   MarketActivityChartModel,
   MarketActivityEntry,
-  UserPosition,
+  OpenPosition,
 } from "@/lib/models/api.models";
 import { isOpenPosition, Position } from "../userActivity.types";
 
@@ -204,7 +204,7 @@ export function buildOpenPositionActivityTimeline({
   activityEntries,
   closedPositions = [],
 }: {
-  position: UserPosition;
+  position: OpenPosition;
   activityEntries: MarketActivityEntry[];
   closedPositions?: ClosedPosition[];
 }): MarketActivityChartModel[] {

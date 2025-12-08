@@ -1,16 +1,16 @@
 import PQueue from "p-queue";
-import { UserPosition } from "@/lib/models/api.models";
+import { OpenPosition } from "@/lib/models/api.models";
 import { fetchUserPositions } from "./fetch-user-positions";
 
 /**
  * Fetches positions for multiple top holders with controlled concurrency to avoid API rate limits.
- * Returns a map of proxyWallet -> UserPosition[]
+ * Returns a map of proxyWallet -> OpenPosition[]
  */
 export async function fetchTopHoldersPositions(
   wallets: string[],
   positionsPerHolder: number = 100
-): Promise<Record<string, UserPosition[]>> {
-  const result: Record<string, UserPosition[]> = {};
+): Promise<Record<string, OpenPosition[]>> {
+  const result: Record<string, OpenPosition[]> = {};
   const queue = new PQueue({ concurrency: 3 });
   let rateLimited = false;
 

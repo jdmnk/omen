@@ -13,7 +13,7 @@ import { useClosedPositionsInfiniteQuery } from "@/modules/user/lib/queries/clos
 import { formatCompactCurrency, formatPrice } from "@/lib/ui/format.utils";
 import { cn } from "@/lib/utils";
 import type {
-  UserPosition,
+  OpenPosition,
   ClosedPosition,
 } from "@/lib/models/frontend.models";
 import { UserPnlChartV2, type PositionMarker } from "./charts/UserPnlChartV2";
@@ -82,7 +82,7 @@ export function UserPnlChartWidgetV2({
   const isPositive = currentPnl >= 0;
 
   const openPositions = useMemo(
-    () => flattenInfiniteResult<UserPosition>(openPositionsData?.pages),
+    () => flattenInfiniteResult<OpenPosition>(openPositionsData?.pages),
     [openPositionsData?.pages]
   );
 

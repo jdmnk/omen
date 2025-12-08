@@ -1,6 +1,6 @@
-import type { UserPosition } from "@/lib/models/frontend.models";
+import type { OpenPosition } from "@/lib/models/frontend.models";
 
-type PositionLike = Pick<UserPosition, "conditionId" | "outcomeIndex"> & {
+type PositionLike = Pick<OpenPosition, "conditionId" | "outcomeIndex"> & {
   asset?: string | null;
 };
 
