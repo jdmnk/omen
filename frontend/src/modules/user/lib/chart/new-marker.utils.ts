@@ -1,6 +1,20 @@
-import { Position, ProcessedActivity } from "@/lib/models/frontend.models";
-import { formatPrice } from "@/lib/ui/format.utils";
+import { ProcessedActivity } from "@/lib/models/frontend.models";
 import { SeriesMarker, Time } from "lightweight-charts";
+
+// ============ MARKER SIZE CONFIG ============
+// Tune these values to adjust marker appearance
+const MARKER_CONFIG = {
+  // Base size multiplier (scales all markers uniformly)
+  scale: 1.0,
+  // Size for uniform markers (when trades are similar)
+  uniform: 1.2,
+  // Min/max range for variable sizing
+  min: 1.2,
+  max: 2,
+  // Ratio threshold: if max/min < this, use uniform sizing
+  similarityThreshold: 3,
+};
+// ============================================
 
 /**
  * Merge consecutive TRADE entries that:
@@ -57,21 +71,42 @@ export function mergeConsecutiveTrades(
 }
 
 export function createMarkerSizeScaler(entries: ProcessedActivity[]) {
+  const { scale, uniform, min, max, similarityThreshold } = MARKER_CONFIG;
+
   const sizes = entries
     .filter((e) => e.type === "TRADE")
     .map((e) => e.size || 1);
+
+  if (sizes.length === 0) {
+    return () => uniform * scale;
+  }
 
   const minSize = Math.min(...sizes);
   const maxSize = Math.max(...sizes);
 
   // Handle edge case where all trades are equal
   if (minSize === maxSize) {
-    return () => 1.5; // uniform medium size
+    return () => uniform * scale;
   }
 
+  // If max is less than threshold, sizes are similar enough - use uniform sizing
+  // This prevents 514 vs 515 from showing as vastly different markers
+  const ratio = maxSize / minSize;
+  if (ratio < similarityThreshold) {
+    return () => uniform * scale;
+  }
+
+  // Use logarithmic scaling for better visual representation of large ranges
+  // This compresses extreme differences while still showing meaningful variation
+  const logMin = Math.log(minSize);
+  const logMax = Math.log(maxSize);
+  const logRange = logMax - logMin;
+  const sizeRange = max - min;
+
   return (raw: number) => {
-    const normalized = (raw - minSize) / (maxSize - minSize); // 0 to 1
-    return 1 + normalized * 2; // scale to 1 to 3
+    const logValue = Math.log(Math.max(raw, 1));
+    const normalized = (logValue - logMin) / logRange; // 0 to 1
+    return (min + normalized * sizeRange) * scale;
   };
 }
 
