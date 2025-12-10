@@ -34,7 +34,14 @@ async function fetchUserPositionActivity(userId: string, position: Position) {
     position.conditionId,
     1000
   );
-
+  const splits = activity.filter((entry) => entry.type === "SPLIT");
+  const merges = activity.filter((entry) => entry.type === "MERGE");
+  const redeems = activity.filter((entry) => entry.type === "REDEEM");
+  const converts = activity.filter((entry) => entry.type === "CONVERSION");
+  console.log("splits", splits);
+  console.log("merges", merges);
+  console.log("redeems", redeems);
+  console.log("converts", converts);
   // we want only the activity for the specific outcome (and other non-outcome activities like SPLIT, MERGE, etc.)
   const activityForOutcome = activity.filter(
     (entry) => entry.outcomeIndex === position.outcomeIndex || !entry.outcome // e.g. REDEEM has no outcome
