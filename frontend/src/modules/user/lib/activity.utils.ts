@@ -4,7 +4,7 @@ const TYPE_LABEL_MAP: Record<string, string> = {
   YIELD: "REWARDS",
   REDEEM: "REDEEM",
   MERGE: "MERGE",
-  CONVERT: "CONVERT",
+  CONVERSION: "CONVERT",
 };
 
 const MARKET_LABEL_MAP: Record<string, string> = {
