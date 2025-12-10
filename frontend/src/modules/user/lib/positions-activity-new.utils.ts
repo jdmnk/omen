@@ -38,14 +38,6 @@ export function getProcessedPositionActivity({
       } else {
         console.log("entry.size is 0 or undefined", entry);
       }
-    } else if (entry.type === "CONVERT") {
-      // CONVERT decreases exposure for the position being converted FROM
-      if (entry.size && entry.size !== 0) {
-        exposure -= entry.size;
-        countNumExposureChanges++;
-      } else {
-        console.log("entry.size is 0 or undefined", entry);
-      }
     }
 
     // exposure DECREASE events
@@ -64,6 +56,16 @@ export function getProcessedPositionActivity({
         console.log("entry.size is 0 or undefined", entry);
       }
     } else if (entry.type === "REDEEM") {
+      if (entry.size && entry.size !== 0) {
+        exposure -= entry.size;
+        countNumExposureChanges++;
+      } else {
+        console.log("entry.size is 0 or undefined", entry);
+      }
+    }
+    // TODO: INCOMPLETE - this also results in an increase on other outcomes
+    else if (entry.type === "CONVERSION") {
+      // CONVERSION decreases exposure for the position being converted FROM
       if (entry.size && entry.size !== 0) {
         exposure -= entry.size;
         countNumExposureChanges++;
