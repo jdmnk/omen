@@ -32,10 +32,8 @@ export function mergeConsecutiveTrades(
   const merged: ProcessedActivity[] = [];
   const maxGap = maxBars * barDurationMs;
 
-  // Work with chronological trades only
-  const trades = activity
-    // .filter((e) => e.type === "TRADE")
-    .sort((a, b) => a.timestamp - b.timestamp);
+  // Work with chronological trades only (copy array to avoid mutating original)
+  const trades = [...activity].sort((a, b) => a.timestamp - b.timestamp);
 
   let current: ProcessedActivity | null = null;
 
