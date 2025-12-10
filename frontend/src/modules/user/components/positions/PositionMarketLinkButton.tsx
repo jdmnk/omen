@@ -15,7 +15,7 @@ export function PositionMarketLinkButton({
       href={getPolymarketEventUrl(slug)}
       target="_blank"
       rel="noopener noreferrer"
-      className="inline-flex items-center justify-center rounded hover:bg-brand-highlight/50"
+      className="inline-flex items-center justify-center rounded hover:bg-brand-highlight/50 px-1 py-0.5"
       onClick={(event) => event.stopPropagation()}
       aria-label="Open market on Polymarket"
     >
