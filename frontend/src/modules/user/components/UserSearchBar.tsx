@@ -92,6 +92,8 @@ export function UserSearchBar() {
         align="start"
         sideOffset={6}
         style={{ width: contentWidth ? `${contentWidth}px` : undefined }}
+        onOpenAutoFocus={(e) => e.preventDefault()}
+        onCloseAutoFocus={(e) => e.preventDefault()}
       >
         <Command>
           <CommandList>
