@@ -34,12 +34,16 @@ export function mergeConsecutiveTrades(
 
   // Work with chronological trades only
   const trades = activity
-    .filter((e) => e.type === "TRADE")
+    // .filter((e) => e.type === "TRADE")
     .sort((a, b) => a.timestamp - b.timestamp);
 
   let current: ProcessedActivity | null = null;
 
   for (const entry of trades) {
+    if (entry.type !== "TRADE") {
+      merged.push(entry);
+      continue;
+    }
     if (!current) {
       current = { ...entry };
       continue;
@@ -74,7 +78,7 @@ export function createMarkerSizeScaler(entries: ProcessedActivity[]) {
   const { scale, uniform, min, max, similarityThreshold } = MARKER_CONFIG;
 
   const sizes = entries
-    .filter((e) => e.type === "TRADE")
+    // .filter((e) => e.type === "TRADE")
     .map((e) => e.size || 1);
 
   if (sizes.length === 0) {
@@ -124,11 +128,13 @@ export function getMarkersForMarketChart(
   // Step 3: convert to chart markers
   return merged.map((entry) => {
     const isBuy = entry.side === "BUY";
+    const color =
+      entry.type === "TRADE" ? (isBuy ? "#22c55e" : "#ef4444") : "#acacac";
 
     return {
       time: entry.timestamp as Time,
       position: isBuy ? "belowBar" : "aboveBar",
-      color: isBuy ? "#22c55e" : "#ef4444",
+      color,
       shape: "circle",
       text: " ", //formatPrice(entry.price, { maximumFractionDigits: 1 }),
       size: scale(entry.size ?? 1),
