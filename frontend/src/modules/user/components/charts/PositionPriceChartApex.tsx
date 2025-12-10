@@ -54,16 +54,57 @@ export function PositionPriceChartApex({
       point.value,
     ]);
 
-    const exposureData = volumeBars.map((bar) => [
-      convertTimeToTimestamp(bar.time),
-      bar.value,
-    ]);
+    // Calculate price data time range for x-axis bounds
+    const priceTimestamps = priceData.map(([time]) => time as number);
+    const minPriceTime = Math.min(...priceTimestamps);
+    const maxPriceTime = Math.max(...priceTimestamps);
 
-    return { priceData, exposureData };
+    // Sort exposure data by time for proper stepline clipping
+    const allExposurePoints = volumeBars
+      .map((bar) => [convertTimeToTimestamp(bar.time), bar.value] as const)
+      .sort((a, b) => a[0] - b[0]);
+
+    // For stepline: keep one anchor point before minPriceTime (to draw the horizontal
+    // line into the visible range) plus all points from minPriceTime onwards.
+    // This clips old history while preserving correct stepline rendering.
+    const firstVisibleIdx = allExposurePoints.findIndex(
+      ([time]) => time >= minPriceTime
+    );
+    const startIdx =
+      firstVisibleIdx === -1
+        ? allExposurePoints.length // No visible points - empty result
+        : firstVisibleIdx > 0
+        ? firstVisibleIdx - 1 // Include one anchor point before
+        : 0;
+    const exposureData = allExposurePoints.slice(startIdx);
+
+    // Calculate the actual max time for x-axis (max of price data and exposure data)
+    const maxExposureTime =
+      exposureData.length > 0
+        ? Math.max(...exposureData.map(([time]) => time))
+        : maxPriceTime;
+    const actualMaxTime = Math.max(maxPriceTime, maxExposureTime);
+
+    return {
+      priceData,
+      exposureData,
+      minPriceTime,
+      maxPriceTime,
+      actualMaxTime,
+    };
   }, [data, volumeBars]);
 
   const annotations = useMemo(() => {
     if (!markers.length || !data.length) return { points: [] };
+
+    // Use the already calculated price data time range from chartData
+    const { minPriceTime, maxPriceTime } = chartData;
+
+    // Filter markers to only include those within price data range
+    const filteredMarkers = markers.filter((marker) => {
+      const markerTime = convertTimeToTimestamp(marker.time);
+      return markerTime >= minPriceTime && markerTime <= maxPriceTime;
+    });
 
     // Create a map for quick lookup of y values by time
     const dataMap = new Map<number, number>();
@@ -72,7 +113,7 @@ export function PositionPriceChartApex({
       dataMap.set(timestamp, point.value);
     });
 
-    const points = markers.map((marker) => {
+    const points = filteredMarkers.map((marker) => {
       const x = convertTimeToTimestamp(marker.time);
 
       // Find closest data point for y value using the map
@@ -137,7 +178,7 @@ export function PositionPriceChartApex({
     });
 
     return { points };
-  }, [markers, data]);
+  }, [markers, data, chartData]);
 
   const series = useMemo(() => {
     const seriesArray: ApexAxisChartSeries = [
@@ -226,6 +267,10 @@ export function PositionPriceChartApex({
       },
       xaxis: {
         type: "datetime",
+        min:
+          chartData.priceData.length > 0 ? chartData.minPriceTime : undefined,
+        max:
+          chartData.priceData.length > 0 ? chartData.actualMaxTime : undefined,
         labels: {
           style: {
             colors: labelColor,
@@ -293,7 +338,7 @@ export function PositionPriceChartApex({
           ? ["#651fff", "#3b82f6"]
           : ["#651fff"],
     }),
-    [annotations, chartData, height]
+    [annotations, chartData, height, labelColor]
   );
 
   if (error) {
