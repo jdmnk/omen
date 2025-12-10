@@ -79,7 +79,7 @@ export function MarketShareCard({
                 {position.title}
               </div>
               <div className={"text-lg font-bold text-brand-highlight"}>
-                <span className="bg-brand-highlight/10 px-2 py-0.5 rounded-md">
+                <span className="bg-brand-highlight/10 px-2 py-0.5 rounded-sm">
                   {position.outcome}
                 </span>
               </div>
@@ -96,7 +96,7 @@ export function MarketShareCard({
           labelColor="#505d7c"
         />
       </div>
-      <div className="mt-4 flex items-stretch justify-between gap-4 text-black font-bold">
+      <div className="mt-4 flex items-stretch justify-between gap-4 text-black font-bold px-3">
         <div className="flex flex-col gap-1 self-center py-3">
           <div className="text-xl font-bold">
             {addSign(absolutePnl, formatCompactCurrency(Math.abs(absolutePnl)))}
@@ -138,7 +138,7 @@ export function MarketShareCard({
       </div>
 
       {userData && (
-        <div className="flex items-center justify-between gap-2 mt-4">
+        <div className="flex items-center justify-between gap-2 mt-2">
           <div className="flex items-center gap-5 relative">
             <div className="relative h-[60px] w-[60px] shrink-0 overflow-hidden rounded-full">
               <Image
