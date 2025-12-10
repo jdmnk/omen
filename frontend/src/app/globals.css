@@ -55,6 +55,7 @@
   --color-brand-background-deeper: var(--brand-background-deeper);
   --radius-brand: var(--brand-radius);
   --color-share-gray: var(--share-gray);
+  --color-brand-dark: var(--brand-dark);
 }
 
 :root {
@@ -104,6 +105,7 @@
   --brand-primary: #6322fe;
   --brand-background-deeper: #0a0514;
   --share-gray: #505d7c;
+  --brand-dark: #240f5a;
 
   /* custom other variables */
   --brand-radius: var(--radius);
