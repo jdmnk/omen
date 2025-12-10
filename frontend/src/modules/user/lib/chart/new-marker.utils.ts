@@ -127,7 +127,7 @@ export function getMarkersForMarketChart(
   return merged.map((entry) => {
     const isBuy = entry.side === "BUY";
     const color =
-      entry.type === "TRADE" ? (isBuy ? "#22c55e" : "#ef4444") : "#acacac";
+      entry.type === "TRADE" ? (isBuy ? "#35CE8D" : "#F2545B") : "#acacac";
 
     return {
       time: entry.timestamp as Time,
@@ -157,11 +157,13 @@ export function getMarkersForShareChart(
   // Step 3: convert to chart markers
   return merged.map((entry) => {
     const isBuy = entry.side === "BUY";
+    const color =
+      entry.type === "TRADE" ? (isBuy ? "#35CE8D" : "#F2545B") : "#acacac";
 
     return {
       time: entry.timestamp as Time,
       position: "inBar",
-      color: isBuy ? "#22c55e" : "#ef4444",
+      color,
       shape: "circle",
       size: scale(entry.size ?? 1),
       text: " ",
