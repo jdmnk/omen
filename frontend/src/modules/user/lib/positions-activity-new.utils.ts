@@ -57,7 +57,7 @@ export function getProcessedPositionActivity({
       }
     } else if (entry.type === "REDEEM") {
       if (entry.size && entry.size !== 0) {
-        exposure -= entry.size;
+        exposure = 0;
         countNumExposureChanges++;
       } else {
         console.log("entry.size is 0 or undefined", entry);
