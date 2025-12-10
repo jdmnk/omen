@@ -229,11 +229,8 @@ export function PositionPriceChartApex({
           chartData.exposureData.length > 0
             ? ["straight", "stepline"]
             : "straight",
-        width: 2,
-        colors:
-          chartData.exposureData.length > 0
-            ? ["#651fff", "#3b82f6"]
-            : ["#651fff"],
+        width: chartData.exposureData.length > 0 ? [2, 1] : 2,
+        colors: ["#651fff"],
       },
       fill: {
         type: ["gradient", "solid"],
@@ -251,8 +248,8 @@ export function PositionPriceChartApex({
             ],
           ],
         },
-        colors: ["#651fff", "#3b82f6"],
-        opacity: [0.7, 0.5],
+        colors: ["#651fff", "#651fff"],
+        opacity: [0.7, 0.2],
       },
 
       grid: {
@@ -333,10 +330,7 @@ export function PositionPriceChartApex({
       legend: {
         show: false,
       },
-      colors:
-        chartData.exposureData.length > 0
-          ? ["#651fff", "#3b82f6"]
-          : ["#651fff"],
+      colors: ["#651fff"],
     }),
     [annotations, chartData, height, labelColor]
   );
