@@ -1,5 +1,6 @@
-import { ProcessedActivity } from "@/lib/models/frontend.models";
+import { Position, ProcessedActivity } from "@/lib/models/frontend.models";
 import { Time } from "lightweight-charts";
+import { isOpenPosition } from "../position.utils";
 
 export type ExposureAreaPoint = {
   time: Time;
@@ -13,6 +14,7 @@ export type ExposureAreaPoint = {
  */
 export function getExposureArea(
   activity: ProcessedActivity[],
+  position: Position,
   fidelitySeconds: number
 ): ExposureAreaPoint[] {
   const filtered = activity.filter((entry) => entry.cumExposure !== undefined);
@@ -37,14 +39,14 @@ export function getExposureArea(
   // For stepped area charts, we need to create points that show the step transitions
   // ApexCharts will render this as a stepped line when curve: "stepline" is used
   const stepped: ExposureAreaPoint[] = [];
-  
+
   // Start with a point at y=0 to create a left border from the bottom
   const firstTime = entries[0].time as number;
   stepped.push({
     time: firstTime as Time,
     value: 0,
   });
-  
+
   let lastValue = entries[0].value;
 
   for (let i = 0; i < entries.length; i++) {
@@ -92,8 +94,8 @@ export function getExposureArea(
     lastValue = current.value;
   }
 
-  // Extend bars into the future (to current time)
-  if (stepped.length > 0) {
+  // Extend bars into the future (to current time) - only on open positions
+  if (isOpenPosition(position) && stepped.length > 0) {
     const lastTime = stepped[stepped.length - 1].time as number;
     const now = Math.floor(Date.now() / 1000);
     if (lastTime < now) {
@@ -106,4 +108,3 @@ export function getExposureArea(
 
   return stepped;
 }
-
