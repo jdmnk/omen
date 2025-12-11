@@ -253,8 +253,25 @@ export function PositionPriceChartApex({
       },
 
       grid: {
-        show: false,
-        borderColor: "transparent",
+        show: true,
+        borderColor: "rgba(80, 93, 124, 0.3)",
+        strokeDashArray: 2,
+        xaxis: {
+          lines: {
+            show: false,
+          },
+        },
+        yaxis: {
+          lines: {
+            show: true,
+          },
+        },
+        row: {
+          colors: undefined,
+        },
+        column: {
+          colors: undefined,
+        },
         padding: {
           top: 0,
           left: 0,
@@ -279,7 +296,9 @@ export function PositionPriceChartApex({
           trim: false,
         },
         axisBorder: {
-          show: false,
+          show: true,
+          color: "#651fff",
+          height: 1,
         },
         axisTicks: {
           show: false,
