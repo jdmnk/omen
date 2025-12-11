@@ -87,7 +87,22 @@ export function MarketShareCard({
           </div>
         </div>
       </div>
-      <div className="h-64 w-full">
+      <div className="relative h-64 w-full">
+        <div className="absolute top-2 left-2 z-10 flex flex-col gap-1.5 bg-white/90 backdrop-blur-sm px-2 py-1.5 rounded border border-black/10">
+          <div className="flex items-center gap-1.5">
+            <div className="relative h-3 w-3 shrink-0">
+              <div className="absolute inset-0 rounded-full overflow-hidden">
+                <div className="absolute left-0 top-0 h-full w-1/2 bg-[#35CE8D]" />
+                <div className="absolute right-0 top-0 h-full w-1/2 bg-[#F2545B]" />
+              </div>
+            </div>
+            <span className="text-xs font-medium text-black">trade</span>
+          </div>
+          <div className="flex items-center gap-1.5">
+            <div className="h-3 w-3 shrink-0 bg-[#651fff]" />
+            <span className="text-xs font-medium text-black">exposure</span>
+          </div>
+        </div>
         <PositionPriceChartApex
           data={chartData}
           markers={markers}
