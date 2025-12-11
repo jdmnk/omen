@@ -131,7 +131,7 @@ export function MarketShareCard({
           </div>
           <div className="flex flex-col gap-1 text-sm text-left">
             <div>{formatPrice(avgBuyPrice)}</div>
-            <div>{formatPrice(avgSellPrice)}</div>
+            <div>{avgSellPrice ? formatPrice(avgSellPrice) : "N/A"}</div>
             <div>{tradesCount}</div>
           </div>
         </div>

@@ -37,7 +37,7 @@ function getEntriesVwap(
       totalSize += entry.size;
       totalCost += entry.size * entry.price;
     }
-    // redeem is also a sell
+    // redeem is also a sell (NEEDED FOR CLOSED POSITIONS)
     if (
       side.toUpperCase() === "SELL" &&
       entry.type === "REDEEM" &&
@@ -166,6 +166,10 @@ export function getPositionVolume(
   for (const entry of entries) {
     if (entry.type === "TRADE" && entry.size && entry.price) {
       volume += Math.abs(entry.size * entry.price);
+    } else if (entry.type === "MERGE" && entry.size && entry.usdcSize) {
+      volume += Math.abs(entry.usdcSize / 2);
+    } else if (entry.type === "SPLIT" && entry.size && entry.usdcSize) {
+      volume += Math.abs(entry.usdcSize / 2);
     }
   }
   return volume;
