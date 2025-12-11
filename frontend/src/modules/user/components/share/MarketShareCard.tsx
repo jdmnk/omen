@@ -78,7 +78,7 @@ export function MarketShareCard({
               <div className="truncate text-lg font-bold text-black">
                 {position.title}
               </div>
-              <div className={"text-lg font-bold text-brand-highlight"}>
+              <div className="text-lg font-bold text-brand-highlight">
                 <span className="bg-brand-highlight/10 px-2 py-0.5 rounded-sm">
                   {position.outcome}
                 </span>
