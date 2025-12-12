@@ -4,30 +4,8 @@ import { useEffect } from "react";
 
 const TALLY_FORM_ID = "VLGzPg";
 
-interface TallySubmitPayload {
-  formId: string;
-  submissionId: string;
-  fields: Array<{
-    id: string;
-    label: string;
-    value: string | string[] | null;
-  }>;
-}
-
 interface TallyFormProps {
   referralSource?: string | null;
-}
-
-declare global {
-  interface Window {
-    TallyConfig?: {
-      formId: string;
-      onSubmit?: (payload: TallySubmitPayload) => void;
-    };
-    Tally?: {
-      loadEmbeds: () => void;
-    };
-  }
 }
 
 export function TallyForm({ referralSource }: TallyFormProps) {
@@ -40,35 +18,12 @@ export function TallyForm({ referralSource }: TallyFormProps) {
   };
 
   useEffect(() => {
-    // Set up TallyConfig to intercept submissions
-    window.TallyConfig = {
-      formId: TALLY_FORM_ID,
-      onSubmit: (payload) => {
-        console.log("Tally submission:", payload);
-      },
-    };
-
     const scriptUrl = "https://tally.so/widgets/embed.js";
-
-    if (window.Tally) {
-      window.Tally.loadEmbeds();
-      return;
+    if (!document.querySelector(`script[src="${scriptUrl}"]`)) {
+      const script = document.createElement("script");
+      script.src = scriptUrl;
+      document.body.appendChild(script);
     }
-
-    if (document.querySelector(`script[src="${scriptUrl}"]`)) {
-      return;
-    }
-
-    const script = document.createElement("script");
-    script.src = scriptUrl;
-    script.onload = () => {
-      window.Tally?.loadEmbeds();
-    };
-    document.body.appendChild(script);
-
-    return () => {
-      delete window.TallyConfig;
-    };
   }, []);
 
   return (
