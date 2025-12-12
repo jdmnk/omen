@@ -11,15 +11,6 @@ export const TEXTS = {
     name: "OMEN",
     logoAlt: "OMEN Logo",
   },
-  form: {
-    emailPlaceholder: "Enter your email",
-    emailError: "Please enter a valid email address",
-    joinButton: "Join the waitlist",
-    joiningButton: "Joining...",
-    successMessage: "You're in!",
-    shareButton: "Share",
-    copiedButton: "URL Copied!",
-  },
   og: {
     alt: "Omen | Advanced Polymarket Analytics",
   },

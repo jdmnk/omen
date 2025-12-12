@@ -48,13 +48,81 @@ function isValidEmail(email: string): boolean {
   return EMAIL_REGEX.test(email.trim());
 }
 
+/**
+ * Extract email from Tally webhook payload
+ */
+function extractEmailFromTallyPayload(body: any): string | null {
+  if (!body.fields || !Array.isArray(body.fields)) {
+    return null;
+  }
+
+  // Find email field by type or label
+  const emailField = body.fields.find(
+    (field: any) =>
+      field.type === "email" ||
+      field.type === "EMAIL" ||
+      (field.label && field.label.toLowerCase().includes("email"))
+  );
+
+  if (emailField?.value && typeof emailField.value === "string") {
+    return emailField.value;
+  }
+
+  return null;
+}
+
+/**
+ * Extract referral source from Tally webhook payload
+ */
+function extractReferralFromTallyPayload(body: any): string | null {
+  if (!body.fields || !Array.isArray(body.fields)) {
+    return null;
+  }
+
+  // Find referral field by label or key
+  const referralField = body.fields.find(
+    (field: any) =>
+      (field.label &&
+        (field.label.toLowerCase().includes("referral") ||
+          field.label.toLowerCase().includes("ref"))) ||
+      field.key === "referral" ||
+      field.key === "referralSource"
+  );
+
+  if (referralField?.value && typeof referralField.value === "string") {
+    return referralField.value;
+  }
+
+  return null;
+}
+
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { email, referralSource } = body;
+
+    // Handle Tally webhook format
+    let email: string | undefined;
+    let referralSource: string | null = null;
+
+    if (body.fields && Array.isArray(body.fields)) {
+      // Tally webhook format
+      const extractedEmail = extractEmailFromTallyPayload(body);
+      if (!extractedEmail) {
+        return NextResponse.json(
+          { error: "Email field not found in Tally submission" },
+          { status: 400 }
+        );
+      }
+      email = extractedEmail;
+      referralSource = extractReferralFromTallyPayload(body);
+    } else {
+      // Direct API call format (backward compatibility)
+      email = body.email;
+      referralSource = body.referralSource ?? null;
+    }
 
     // Validate email
-    if (!isValidEmail(email)) {
+    if (!email || !isValidEmail(email)) {
       return NextResponse.json(
         { error: "Valid email is required" },
         { status: 400 }
