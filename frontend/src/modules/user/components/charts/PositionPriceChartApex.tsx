@@ -95,50 +95,53 @@ export function PositionPriceChartApex({
   }, [data, volumeBars]);
 
   const annotations = useMemo(() => {
-    if (!markers.length || !data.length) return { points: [] };
+    if (!markers.length || !chartData.priceData.length) return { points: [] };
 
-    // Use the already calculated price data time range from chartData
-    const { minPriceTime, maxPriceTime } = chartData;
+    const { priceData, minPriceTime, maxPriceTime } = chartData;
 
-    // Filter markers to only include those within price data range
+    // Filter markers within price data range
     const filteredMarkers = markers.filter((marker) => {
       const markerTime = convertTimeToTimestamp(marker.time);
       return markerTime >= minPriceTime && markerTime <= maxPriceTime;
     });
 
-    // Create a map for quick lookup of y values by time
-    const dataMap = new Map<number, number>();
-    data.forEach((point) => {
-      const timestamp = convertTimeToTimestamp(point.time);
-      dataMap.set(timestamp, point.value);
-    });
-
     const points = filteredMarkers.map((marker) => {
       const x = convertTimeToTimestamp(marker.time);
 
-      // Find closest data point for y value using the map
-      let y = data[0]?.value ?? 0;
-      let minDiff = Infinity;
+      // Find y-value by interpolating between adjacent data points
+      let y = priceData[0]?.[1] ?? 0;
 
-      // First try exact match
-      if (dataMap.has(x)) {
-        y = dataMap.get(x)!;
-      } else {
-        // Find closest point
-        data.forEach((point) => {
-          const pointTime = convertTimeToTimestamp(point.time);
-          const diff = Math.abs(pointTime - x);
-          if (diff < minDiff) {
-            minDiff = diff;
-            y = point.value;
+      // Find the two points that bracket the marker time
+      for (let i = 0; i < priceData.length - 1; i++) {
+        const [time1, value1] = priceData[i];
+        const [time2, value2] = priceData[i + 1];
+        const t1 = time1 as number;
+        const t2 = time2 as number;
+
+        if (x >= t1 && x <= t2) {
+          // Linear interpolation
+          if (t2 === t1) {
+            y = value1;
+          } else {
+            const ratio = (x - t1) / (t2 - t1);
+            y = value1 + (value2 - value1) * ratio;
           }
-        });
+          break;
+        } else if (x < t1 && i === 0) {
+          // Before first point
+          y = value1;
+          break;
+        } else if (x > t2 && i === priceData.length - 2) {
+          // After last point
+          y = value2;
+          break;
+        }
       }
 
-      const markerSize = marker.size ? marker.size * 6 : 6;
+      const markerSize = marker.size
+        ? Math.max(1, Math.min(marker.size * 4, 12))
+        : 6;
       const markerColor = marker.color || "#651fff";
-      const lineColor = "#651fff"; // Same as the chart line color
-      const labelOffset = 1;
 
       return {
         x,
@@ -146,18 +149,16 @@ export function PositionPriceChartApex({
         marker: {
           size: markerSize,
           fillColor: markerColor,
-          strokeColor: lineColor,
-          strokeWidth: 2,
+          strokeColor: markerColor,
+          strokeWidth: 1.5,
           shape: marker.shape === "square" ? "square" : "circle",
-          radius: marker.size ? marker.size * 2 : 3,
         },
         label: marker.text
           ? {
               text: marker.text,
               textAnchor: "middle",
               position: marker.position === "belowBar" ? "bottom" : "top",
-              offsetY:
-                marker.position === "belowBar" ? -labelOffset : labelOffset,
+              offsetY: marker.position === "belowBar" ? -8 : 8,
               borderWidth: 0,
               borderColor: "transparent",
               style: {
@@ -178,7 +179,7 @@ export function PositionPriceChartApex({
     });
 
     return { points };
-  }, [markers, data, chartData]);
+  }, [markers, chartData]);
 
   const series = useMemo(() => {
     const seriesArray: ApexAxisChartSeries = [
