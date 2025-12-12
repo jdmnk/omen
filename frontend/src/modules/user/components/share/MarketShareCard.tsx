@@ -74,8 +74,8 @@ export function MarketShareCard({
                 />
               </div>
             )}
-            <div className="flex min-w-0 flex-1 flex-col">
-              <div className="truncate text-lg font-bold text-black">
+            <div className="flex min-w-0 flex-1 flex-col gap-1">
+              <div className="text-lg font-bold text-black wrap-break-word leading-tight">
                 {position.title}
               </div>
               <div className="text-lg font-bold text-brand-highlight">
