@@ -11,6 +11,11 @@ const Chart = dynamic(() => import("react-apexcharts"), { ssr: false });
 
 type ChartPoint = { time: number | string; value: number };
 
+type ChartOptions = {
+  chartHeight: number;
+  labelColor: string;
+};
+
 // Accept lightweight-charts types for compatibility
 type PositionPriceChartApexProps = {
   data: ChartPoint[];
@@ -18,9 +23,7 @@ type PositionPriceChartApexProps = {
   volumeBars?: ExposureAreaPoint[];
   error?: Error | null;
   isLoading?: boolean;
-  /** Chart height - number (pixels) or string (e.g. "100%"). Defaults to 360. */
-  height?: number | string;
-  labelColor?: string;
+  chartOptions?: ChartOptions;
 };
 
 function convertTimeToTimestamp(time: number | string | Time): number {
@@ -45,8 +48,10 @@ export function PositionPriceChartApex({
   volumeBars = [],
   error,
   isLoading,
-  height = 360,
-  labelColor = "#949ba6",
+  chartOptions = {
+    chartHeight: 360,
+    labelColor: "#949ba6",
+  },
 }: PositionPriceChartApexProps) {
   const chartData = useMemo(() => {
     const priceData = data.map((point) => [
@@ -205,7 +210,7 @@ export function PositionPriceChartApex({
     () => ({
       chart: {
         type: "line",
-        height,
+        height: chartOptions.chartHeight,
         width: "100%",
         background: "transparent",
         toolbar: {
@@ -288,7 +293,7 @@ export function PositionPriceChartApex({
           chartData.priceData.length > 0 ? chartData.actualMaxTime : undefined,
         labels: {
           style: {
-            colors: labelColor,
+            colors: chartOptions.labelColor,
             fontSize: "11px",
           },
           hideOverlappingLabels: true,
@@ -309,7 +314,7 @@ export function PositionPriceChartApex({
         {
           labels: {
             style: {
-              colors: labelColor,
+              colors: chartOptions.labelColor,
               fontSize: "11px",
             },
             formatter: (val: number) => `${formatNumber(val, 1)}%`,
@@ -352,7 +357,7 @@ export function PositionPriceChartApex({
       },
       colors: ["#651fff"],
     }),
-    [annotations, chartData, height, labelColor]
+    [annotations, chartData, chartOptions]
   );
 
   if (error) {
@@ -374,7 +379,7 @@ export function PositionPriceChartApex({
         options={options}
         series={series}
         type="line"
-        height={height}
+        height={chartOptions.chartHeight}
         width="100%"
       />
     </div>
