@@ -78,8 +78,8 @@ export function MarketShareCard({
               <div className="text-lg font-bold text-black wrap-break-word leading-tight">
                 {position.title}
               </div>
-              <div className="text-lg font-bold text-brand-highlight">
-                <span className="bg-brand-highlight/10 px-2 py-0.5 rounded-sm">
+              <div className="text-lg font-bold text-[#240F5A]">
+                <span className="bg-[#240F5A]/10 px-2 py-0.5 rounded-sm">
                   {position.outcome}
                 </span>
               </div>
@@ -99,7 +99,7 @@ export function MarketShareCard({
             <span className="text-xs font-medium text-black">trade</span>
           </div>
           <div className="flex items-center gap-1.5">
-            <div className="h-3 w-3 shrink-0 bg-[#240F5A]" />
+            <div className="h-3 w-3 shrink-0 bg-[#240F5A]/60" />
             <span className="text-xs font-medium text-black">exposure</span>
           </div>
         </div>
