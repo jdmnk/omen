@@ -167,7 +167,7 @@ export function PositionPriceChartApex({
       }
 
       const markerSize = marker.size
-        ? Math.max(1, Math.min(marker.size * 4, 12))
+        ? Math.max(2, Math.min(marker.size * 4, 12))
         : 6;
       const markerColor = marker.color || colors.lineColor;
 

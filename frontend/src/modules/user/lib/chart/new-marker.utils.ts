@@ -7,10 +7,10 @@ const MARKER_CONFIG = {
   // Base size multiplier (scales all markers uniformly)
   scale: 1.0,
   // Size for uniform markers (when trades are similar)
-  uniform: 1.2,
+  uniform: 1.75,
   // Min/max range for variable sizing
-  min: 0.9,
-  max: 2,
+  min: 1.5,
+  max: 3,
   // Ratio threshold: if max/min < this, use uniform sizing
   similarityThreshold: 3,
 };
