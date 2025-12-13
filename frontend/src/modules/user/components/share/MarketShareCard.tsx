@@ -99,7 +99,7 @@ export function MarketShareCard({
             <span className="text-xs font-medium text-black">trade</span>
           </div>
           <div className="flex items-center gap-1.5">
-            <div className="h-3 w-3 shrink-0 bg-[#651fff]" />
+            <div className="h-3 w-3 shrink-0 bg-[#240F5A]" />
             <span className="text-xs font-medium text-black">exposure</span>
           </div>
         </div>
@@ -110,6 +110,13 @@ export function MarketShareCard({
           chartOptions={{
             chartHeight: 260,
             labelColor: "#505d7c",
+            colors: {
+              lineColor: "#240F5A",
+              gradientColors: ["#240F5A99", "#240F5A00"],
+              exposureLineColor: "#240F5A",
+              exposureFillColor: "#240F5A4D",
+              markerBorderColor: "#240F5A",
+            },
           }}
         />
       </div>

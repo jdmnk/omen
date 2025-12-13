@@ -11,9 +11,23 @@ const Chart = dynamic(() => import("react-apexcharts"), { ssr: false });
 
 type ChartPoint = { time: number | string; value: number };
 
+type ChartColors = {
+  /** Main price line color */
+  lineColor: string;
+  /** Gradient stops: [fromColor, toColor] */
+  gradientColors: [string, string];
+  /** Exposure line color */
+  exposureLineColor: string;
+  /** Exposure fill color */
+  exposureFillColor: string;
+  /** Marker border color */
+  markerBorderColor: string;
+};
+
 type ChartOptions = {
   chartHeight: number;
   labelColor: string;
+  colors?: ChartColors;
 };
 
 // Accept lightweight-charts types for compatibility
@@ -42,6 +56,14 @@ function convertTimeToTimestamp(time: number | string | Time): number {
   return Date.now();
 }
 
+const DEFAULT_COLORS: ChartColors = {
+  lineColor: "#651fff",
+  gradientColors: ["rgba(101, 31, 255, 0.6)", "rgba(26, 5, 51, 0.05)"],
+  exposureLineColor: "#651fff",
+  exposureFillColor: "rgba(101, 31, 255, 0.2)",
+  markerBorderColor: "#651fff",
+};
+
 export function PositionPriceChartApex({
   data,
   markers = [],
@@ -53,6 +75,7 @@ export function PositionPriceChartApex({
     labelColor: "#949ba6",
   },
 }: PositionPriceChartApexProps) {
+  const colors = chartOptions.colors ?? DEFAULT_COLORS;
   const chartData = useMemo(() => {
     const priceData = data.map((point) => [
       convertTimeToTimestamp(point.time),
@@ -146,7 +169,7 @@ export function PositionPriceChartApex({
       const markerSize = marker.size
         ? Math.max(1, Math.min(marker.size * 4, 12))
         : 6;
-      const markerColor = marker.color || "#651fff";
+      const markerColor = marker.color || colors.lineColor;
 
       return {
         x,
@@ -154,8 +177,8 @@ export function PositionPriceChartApex({
         marker: {
           size: markerSize,
           fillColor: markerColor,
-          strokeColor: markerColor,
-          strokeWidth: 1.5,
+          strokeColor: colors.markerBorderColor,
+          strokeWidth: 2,
           shape: marker.shape === "square" ? "square" : "circle",
         },
         label: marker.text
@@ -184,7 +207,7 @@ export function PositionPriceChartApex({
     });
 
     return { points };
-  }, [markers, chartData]);
+  }, [markers, chartData, colors]);
 
   const series = useMemo(() => {
     const seriesArray: ApexAxisChartSeries = [
@@ -236,7 +259,7 @@ export function PositionPriceChartApex({
             ? ["straight", "stepline"]
             : "straight",
         width: chartData.exposureData.length > 0 ? [2, 1] : 2,
-        colors: ["#651fff"],
+        colors: [colors.lineColor, colors.exposureLineColor],
       },
       fill: {
         type: ["gradient", "solid"],
@@ -245,17 +268,16 @@ export function PositionPriceChartApex({
           shadeIntensity: 1,
           opacityFrom: 0.85,
           opacityTo: 0.05,
-          stops: [0, 95],
+          stops: [0, 100],
           colorStops: [
             [
-              { offset: 0, color: "#651fff", opacity: 0.6 },
-              { offset: 50, color: "#4a1199", opacity: 0.3 },
-              { offset: 100, color: "#1a0533", opacity: 0.05 },
+              { offset: 0, color: colors.gradientColors[0], opacity: 1 },
+              { offset: 100, color: colors.gradientColors[1], opacity: 1 },
             ],
           ],
         },
-        colors: ["#651fff", "#651fff"],
-        opacity: [0.7, 0.2],
+        colors: [colors.lineColor, colors.exposureFillColor],
+        opacity: [1, 1],
       },
 
       grid: {
@@ -303,7 +325,7 @@ export function PositionPriceChartApex({
         },
         axisBorder: {
           show: true,
-          color: "#651fff",
+          color: colors.lineColor,
           height: 1,
         },
         axisTicks: {
@@ -355,9 +377,9 @@ export function PositionPriceChartApex({
       legend: {
         show: false,
       },
-      colors: ["#651fff"],
+      colors: [colors.lineColor],
     }),
-    [annotations, chartData, chartOptions]
+    [annotations, chartData, chartOptions, colors]
   );
 
   if (error) {
