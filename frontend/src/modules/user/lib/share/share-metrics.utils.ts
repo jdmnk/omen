@@ -18,14 +18,14 @@ export function getPercentPnl(position: Position) {
   return position.percentPnl;
 }
 
-function getEntriesVwap(
-  position: Position,
-  entries: ProcessedActivity[],
-  side: "BUY" | "SELL"
-) {
+// Redemption price is 1 for winning positions (you get $1 per share)
+const REDEMPTION_PRICE = 1;
+
+function getEntriesVwap(entries: ProcessedActivity[], side: "BUY" | "SELL") {
   let totalSize = 0;
   let totalCost = 0;
   console.log("entries", entries);
+  if (!entries || entries.length === 0) return null;
 
   for (const entry of entries) {
     if (
@@ -37,18 +37,17 @@ function getEntriesVwap(
       totalSize += entry.size;
       totalCost += entry.size * entry.price;
     }
-    // redeem is also a sell (NEEDED FOR CLOSED POSITIONS)
+    // Redeem is also a sell - redemption price is always 1 (winning position)
     if (
       side.toUpperCase() === "SELL" &&
       entry.type === "REDEEM" &&
       entry.size
     ) {
-      console.log("redeem is also a sell", entry.size, position.curPrice);
       totalSize += entry.size;
-      totalCost += entry.size * position.curPrice;
+      totalCost += entry.size * REDEMPTION_PRICE;
     }
   }
-  if (totalSize === 0) return 0;
+  if (totalSize === 0) return null;
   return totalCost / totalSize;
 }
 
@@ -68,92 +67,66 @@ export function getPositionAvgBuyPrice(
   return getPositionEntryPrice(position); // avg buy price
 }
 
-function getPositionBuyVolume(entries: ProcessedActivity[]) {
-  let volume = 0;
-  for (const entry of entries) {
-    if (
-      entry.type === "TRADE" &&
-      entry.side?.toUpperCase() === "BUY" &&
-      entry.size &&
-      entry.price
-    ) {
-      volume += Math.abs(entry.size * entry.price);
-    }
-  }
-  return volume;
-}
-
-function getPositionSellVolume(
-  position: Position,
-  entries: ProcessedActivity[]
-) {
-  let volume = 0;
-  for (const entry of entries) {
-    if (
-      entry.type === "TRADE" &&
-      entry.side?.toUpperCase() === "SELL" &&
-      entry.size &&
-      entry.price
-    ) {
-      volume += Math.abs(entry.size * entry.price);
-    }
-
-    // redeem is also a sell
-    if (entry.type === "REDEEM" && entry.size) {
-      volume += Math.abs(entry.size * position.curPrice);
-    }
-  }
-  return volume;
-}
-// export function getPositionExitPrice(position: SelectablePosition) {
-//   if (isClosedPosition(position)) {
-//     return position.avgPrice;
-//   }
-//   return position.curPrice;
-// }
-
 export function getPositionAvgSellPrice(
-  position: Position,
   entries: ProcessedActivity[]
-) {
-  return getEntriesVwap(position, entries, "SELL");
+): number | null {
+  return getEntriesVwap(entries, "SELL");
 }
 
 export function getPositionApr(
   position: Position,
   entries: ProcessedActivity[]
 ): number | null {
-  const startTime = entries[0].timestamp * 1000; // convert to ms
+  console.log("entries", entries);
+  console.log("position", position);
+  // Guard: need at least one entry
+  if (!entries || entries.length === 0) return null;
+
+  // Find the earliest BUY trade timestamp (not just any entry)
+  const buyTimestamps = entries
+    .filter(
+      (e) =>
+        e.type === "TRADE" && e.side?.toUpperCase() === "BUY" && e.timestamp
+    )
+    .map((e) => e.timestamp);
+
+  if (buyTimestamps.length === 0) return null;
+
+  const startTime = Math.min(...buyTimestamps) * 1000; // convert to ms
+  // Determine end time
   let endTime: number | null = null;
   if (isClosedPosition(position)) {
+    endTime = position.timestamp * 1000;
+  } else if (position.endDate) {
     endTime = new Date(position.endDate).getTime();
-  } else {
-    if (position.endDate) {
-      endTime = new Date(position.endDate).getTime();
-    } else {
-      endTime = null;
-    }
   }
 
-  if (!endTime) return null;
+  if (!endTime || !Number.isFinite(endTime)) return null;
+
   const durationMs = endTime - startTime;
-  const entryPrice = getPositionAvgBuyPrice(position, entries); //getPositionEntryPrice(position);
+  console.log("startTime", startTime, new Date(startTime).toISOString());
+  console.log("endTime", endTime, new Date(endTime).toISOString());
+  console.log("durationMs", durationMs);
+
+  // Guard: duration must be positive and at least 1 hour to avoid extreme APR
+  // const MIN_DURATION_MS = 60 * 60 * 1000; // 1 hour
+  // if (durationMs < MIN_DURATION_MS) return null;
+
+  const entryPrice = getPositionAvgBuyPrice(position, entries);
+
+  // Guard: entry price must be valid and > 0
+  if (!entryPrice || entryPrice <= 0) return null;
+
+  // For closed positions, use avg sell price; for open, assume exit at $1 (market resolves in favor)
   const finalPrice = isClosedPosition(position)
-    ? getPositionAvgSellPrice(position, entries)
+    ? getPositionAvgSellPrice(entries)
     : 1;
+
+  // Guard: final price must be valid
+  if (finalPrice === null || finalPrice < 0) return null;
+
   const roi = (finalPrice - entryPrice) / entryPrice;
   const yearMs = 365 * 24 * 60 * 60 * 1000;
-
-  console.log("start time", startTime);
-  console.log("end time", endTime);
-  console.log("duration ms", durationMs);
-  console.log("entry price", entryPrice);
-  console.log("final price", finalPrice);
-  console.log("buy volume", getPositionBuyVolume(entries));
-  console.log("sell volume", getPositionSellVolume(position, entries));
-  console.log("roi", roi);
-  console.log("year ms", yearMs);
-  console.log("apr", roi * (yearMs / durationMs));
 
   return roi * (yearMs / durationMs);
 }

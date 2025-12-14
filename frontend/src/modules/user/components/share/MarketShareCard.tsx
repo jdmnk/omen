@@ -43,7 +43,7 @@ export function MarketShareCard({
     return `${value > 0 ? "+" : "-"} ${formatted}`;
   };
   const avgBuyPrice = getPositionAvgBuyPrice(position, snapshot.entries);
-  const avgSellPrice = getPositionAvgSellPrice(position, snapshot.entries);
+  const avgSellPrice = getPositionAvgSellPrice(snapshot.entries);
   const tradesCount = snapshot.entries.length;
   const apr = getPositionApr(position, snapshot.entries);
   const volume = getPositionVolume(position, snapshot.entries);
