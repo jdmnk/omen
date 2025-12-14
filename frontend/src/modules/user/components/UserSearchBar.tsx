@@ -20,6 +20,7 @@ import {
 } from "@/components/ui/popover";
 import { formatAddress } from "@/lib/ui/format.utils";
 import { useUserSearchQuery } from "../lib/queries/user-search.query";
+import { UserWatchlistButton } from "./UserWatchlistButton";
 
 export function UserSearchBar() {
   const [input, setInput] = useState("");
@@ -147,17 +148,21 @@ export function UserSearchBar() {
                             </div>
                           )}
                         </div>
-                        <div className="min-w-0 flex-1 text-left">
-                          <div className="truncate text-sm font-semibold leading-tight">
-                            {primaryLabel}
-                          </div>
-                          {secondaryLabel && (
-                            <div className="truncate text-[11px] text-muted-foreground">
-                              {secondaryLabel}
-                            </div>
-                          )}
-                        </div>
-                      </CommandItem>
+<div className="min-w-0 flex-1 text-left">
+                                          <div className="truncate text-sm font-semibold leading-tight">
+                                            {primaryLabel}
+                                          </div>
+                                          {secondaryLabel && (
+                                            <div className="truncate text-[11px] text-muted-foreground">
+                                              {secondaryLabel}
+                                            </div>
+                                          )}
+                                        </div>
+                                        <UserWatchlistButton
+                                          proxyWallet={proxyWallet}
+                                          name={primaryLabel}
+                                        />
+                                      </CommandItem>
                     );
                   })}
               </>
