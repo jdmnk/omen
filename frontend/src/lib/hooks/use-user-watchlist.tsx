@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 
@@ -14,12 +15,16 @@ interface UserWatchlistState {
   removeFromWatchlist: (proxyWallet: string) => void;
   toggleWatchlist: (item: UserWatchlistItem) => void;
   isWatchlisted: (proxyWallet: string) => boolean;
+  _hasHydrated: boolean;
+  setHasHydrated: (state: boolean) => void;
 }
 
 export const useUserWatchlistStore = create<UserWatchlistState>()(
   persist(
     (set, get) => ({
       watchlist: [],
+      _hasHydrated: false,
+      setHasHydrated: (state: boolean) => set({ _hasHydrated: state }),
 
       addToWatchlist: (item: UserWatchlistItem) => {
         set((state) => {
@@ -32,7 +37,9 @@ export const useUserWatchlistStore = create<UserWatchlistState>()(
 
       removeFromWatchlist: (proxyWallet: string) => {
         set((state) => ({
-          watchlist: state.watchlist.filter((w) => w.proxyWallet !== proxyWallet),
+          watchlist: state.watchlist.filter(
+            (w) => w.proxyWallet !== proxyWallet
+          ),
         }));
       },
 
@@ -60,9 +67,24 @@ export const useUserWatchlistStore = create<UserWatchlistState>()(
     {
       name: "user-watchlist",
       storage: createJSONStorage(() => localStorage),
+      onRehydrateStorage: () => (state) => {
+        state?.setHasHydrated(true);
+      },
     }
   )
 );
+
+// Hook to track hydration state
+export function useUserWatchlistHydrated() {
+  const hasHydrated = useUserWatchlistStore((state) => state._hasHydrated);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  return mounted && hasHydrated;
+}
 
 // Hook for convenience
 export function useUserWatchlist() {
@@ -71,15 +93,19 @@ export function useUserWatchlist() {
   const removeFromWatchlist = useUserWatchlistStore(
     (state) => state.removeFromWatchlist
   );
-  const toggleWatchlist = useUserWatchlistStore((state) => state.toggleWatchlist);
+  const toggleWatchlist = useUserWatchlistStore(
+    (state) => state.toggleWatchlist
+  );
   const isWatchlisted = useUserWatchlistStore((state) => state.isWatchlisted);
+  const isHydrated = useUserWatchlistHydrated();
 
   return {
-    watchlist,
+    watchlist: isHydrated ? watchlist : [],
     addToWatchlist,
     removeFromWatchlist,
     toggleWatchlist,
-    isWatchlisted,
+    isWatchlisted: (proxyWallet: string) =>
+      isHydrated ? isWatchlisted(proxyWallet) : false,
+    isHydrated,
   };
 }
-
