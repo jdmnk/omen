@@ -2,7 +2,8 @@
 
 import { useMemo } from "react";
 import dynamic from "next/dynamic";
-import type { SeriesMarker, Time } from "lightweight-charts";
+import type { Time } from "lightweight-charts";
+import type { MarkerWithPrice } from "../../lib/chart/new-marker.utils";
 import { Spinner } from "@/components/ui/spinner";
 import { formatNumber } from "@/lib/ui/format.utils";
 import type { ExposureAreaPoint } from "../../lib/chart/exposure-area.utils";
@@ -33,7 +34,7 @@ type ChartOptions = {
 // Accept lightweight-charts types for compatibility
 type PositionPriceChartApexProps = {
   data: ChartPoint[];
-  markers?: SeriesMarker<Time>[];
+  markers?: MarkerWithPrice[];
   volumeBars?: ExposureAreaPoint[];
   error?: Error | null;
   isLoading?: boolean;
@@ -125,7 +126,7 @@ export function PositionPriceChartApex({
   const annotations = useMemo(() => {
     if (!markers.length || !chartData.priceData.length) return { points: [] };
 
-    const { priceData, minPriceTime, maxPriceTime } = chartData;
+    const { minPriceTime, maxPriceTime } = chartData;
 
     // Filter markers within price data range
     const filteredMarkers = markers.filter((marker) => {
@@ -133,78 +134,52 @@ export function PositionPriceChartApex({
       return markerTime >= minPriceTime && markerTime <= maxPriceTime;
     });
 
-    const points = filteredMarkers.map((marker) => {
-      const x = convertTimeToTimestamp(marker.time);
+    const points = filteredMarkers
+      .filter((marker) => marker.value != null)
+      .map((marker) => {
+        const x = convertTimeToTimestamp(marker.time);
+        // Use the actual execution price from the marker
+        const y = marker.value!;
 
-      // Find y-value by interpolating between adjacent data points
-      let y = priceData[0]?.[1] ?? 0;
+        const markerSize = marker.size
+          ? Math.max(2, Math.min(marker.size * 4, 12))
+          : 6;
+        const markerColor = marker.color || colors.lineColor;
 
-      // Find the two points that bracket the marker time
-      for (let i = 0; i < priceData.length - 1; i++) {
-        const [time1, value1] = priceData[i];
-        const [time2, value2] = priceData[i + 1];
-        const t1 = time1 as number;
-        const t2 = time2 as number;
-
-        if (x >= t1 && x <= t2) {
-          // Linear interpolation
-          if (t2 === t1) {
-            y = value1;
-          } else {
-            const ratio = (x - t1) / (t2 - t1);
-            y = value1 + (value2 - value1) * ratio;
-          }
-          break;
-        } else if (x < t1 && i === 0) {
-          // Before first point
-          y = value1;
-          break;
-        } else if (x > t2 && i === priceData.length - 2) {
-          // After last point
-          y = value2;
-          break;
-        }
-      }
-
-      const markerSize = marker.size
-        ? Math.max(2, Math.min(marker.size * 4, 12))
-        : 6;
-      const markerColor = marker.color || colors.lineColor;
-
-      return {
-        x,
-        y,
-        marker: {
-          size: markerSize,
-          fillColor: markerColor,
-          strokeColor: colors.markerBorderColor,
-          strokeWidth: 2,
-          shape: marker.shape === "square" ? "square" : "circle",
-        },
-        label: marker.text
-          ? {
-              text: marker.text,
-              textAnchor: "middle",
-              position: marker.position === "belowBar" ? "bottom" : "top",
-              offsetY: marker.position === "belowBar" ? -8 : 8,
-              borderWidth: 0,
-              borderColor: "transparent",
-              style: {
-                color: markerColor,
-                fontSize: "11px",
-                fontWeight: 500,
-                background: "transparent",
-                padding: {
-                  left: 0,
-                  right: 0,
-                  top: 0,
-                  bottom: 0,
+        return {
+          x,
+          y,
+          marker: {
+            size: markerSize,
+            fillColor: markerColor,
+            strokeColor: colors.markerBorderColor,
+            strokeWidth: 2,
+            shape: marker.shape === "square" ? "square" : "circle",
+          },
+          label: marker.text
+            ? {
+                text: marker.text,
+                textAnchor: "middle",
+                position: marker.position === "belowBar" ? "bottom" : "top",
+                offsetY: marker.position === "belowBar" ? -8 : 8,
+                borderWidth: 0,
+                borderColor: "transparent",
+                style: {
+                  color: markerColor,
+                  fontSize: "11px",
+                  fontWeight: 500,
+                  background: "transparent",
+                  padding: {
+                    left: 0,
+                    right: 0,
+                    top: 0,
+                    bottom: 0,
+                  },
                 },
-              },
-            }
-          : undefined,
-      };
-    });
+              }
+            : undefined,
+        };
+      });
 
     return { points };
   }, [markers, chartData, colors]);

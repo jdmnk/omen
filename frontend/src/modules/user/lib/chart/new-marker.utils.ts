@@ -55,10 +55,31 @@ export function mergeConsecutiveTrades(
     const isCloseEnough = entry.timestamp - current.timestamp <= maxGap;
 
     if (isPriceWithinPct && isSameSide && isCloseEnough) {
-      // Merge rule satisfied -> accumulate size and update timestamp and price
-      current.size = (current.size ?? 0) + (entry.size ?? 0);
-      current.timestamp = entry.timestamp;
-      current.price = entry.price;
+      // Merge rule satisfied -> accumulate size and calculate weighted averages
+      const currentSize = current.size ?? 0;
+      const entrySize = entry.size ?? 0;
+      const totalSize = currentSize + entrySize;
+
+      // Weighted average price: larger trades have more influence
+      const currentPrice = current.price ?? 0;
+      const entryPrice = entry.price ?? 0;
+      current.price =
+        totalSize > 0
+          ? (currentSize * currentPrice + entrySize * entryPrice) / totalSize
+          : entryPrice;
+
+      // Weighted average timestamp: represents the "center of mass" of the trades
+      const currentTimestamp = current.timestamp;
+      const entryTimestamp = entry.timestamp;
+      current.timestamp =
+        totalSize > 0
+          ? Math.round(
+              (currentSize * currentTimestamp + entrySize * entryTimestamp) /
+                totalSize
+            )
+          : entryTimestamp;
+
+      current.size = totalSize;
       continue;
     }
 
@@ -112,18 +133,24 @@ export function createMarkerSizeScaler(entries: ProcessedActivity[]) {
   };
 }
 
+// Extended marker type that includes the execution price for accurate positioning
+export type MarkerWithPrice = SeriesMarker<Time> & {
+  /** Execution price (0-100 scale for percentage display) */
+  value?: number;
+};
+
 export function getMarkersForMarketChart(
   activity: ProcessedActivity[],
   maxBars: number,
   barDurationMs: number
-) {
+): MarkerWithPrice[] {
   // Step 1: merge consecutive trades based on price, side, time gap
   const merged = mergeConsecutiveTrades(activity, maxBars, barDurationMs);
 
   // Step 2: size scaling relative to merged data
   const scale = createMarkerSizeScaler(merged);
 
-  // Step 3: convert to chart markers
+  // Step 3: convert to chart markers with execution price
   return merged.map((entry) => {
     const isBuy = entry.side === "BUY";
     const color =
@@ -134,9 +161,11 @@ export function getMarkersForMarketChart(
       position: isBuy ? "belowBar" : "aboveBar",
       color,
       shape: "circle",
-      text: " ", //formatPrice(entry.price, { maximumFractionDigits: 1 }),
+      text: " ",
       size: scale(entry.size ?? 1),
-    } as SeriesMarker<Time>;
+      // Include execution price (convert 0-1 to 0-100 for percentage display)
+      value: entry.price != null ? entry.price * 100 : undefined,
+    } as MarkerWithPrice;
   });
 }
 
@@ -144,7 +173,7 @@ export function getMarkersForShareChart(
   activity: ProcessedActivity[],
   maxBars: number,
   barDurationMs: number
-) {
+): MarkerWithPrice[] {
   let merged: ProcessedActivity[] = activity;
   if (maxBars > 0) {
     // Step 1: merge consecutive trades based on price, side, time gap
@@ -154,7 +183,7 @@ export function getMarkersForShareChart(
   // Step 2: size scaling relative to merged data
   const scale = createMarkerSizeScaler(merged);
 
-  // Step 3: convert to chart markers
+  // Step 3: convert to chart markers with execution price
   return merged.map((entry) => {
     const isBuy = entry.side === "BUY";
     const color =
@@ -167,6 +196,8 @@ export function getMarkersForShareChart(
       shape: "circle",
       size: scale(entry.size ?? 1),
       text: " ",
-    } as SeriesMarker<Time>;
+      // Include execution price (convert 0-1 to 0-100 for percentage display)
+      value: entry.price != null ? entry.price * 100 : undefined,
+    } as MarkerWithPrice;
   });
 }
