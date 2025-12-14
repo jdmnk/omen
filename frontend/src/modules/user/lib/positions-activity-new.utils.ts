@@ -1,4 +1,12 @@
 import { ProcessedActivity, Activity, Position } from "@/lib/models/api.models";
+import {
+  isBuyTrade,
+  isConversion,
+  isMerge,
+  isRedeem,
+  isSellTrade,
+  isSplit,
+} from "./activity-type.utils";
 
 export function getProcessedPositionActivity({
   position,
@@ -24,14 +32,14 @@ export function getProcessedPositionActivity({
       console.warn("entry.size is negative!", entry.size, entry);
     }
     // exposure INCREASE events
-    if (entry.type === "TRADE" && entry.side === "BUY") {
+    if (isBuyTrade(entry)) {
       if (entry.size && entry.size !== 0) {
         exposure += entry.size;
         countNumExposureChanges++;
       } else {
         console.log("entry.size is 0 or undefined", entry);
       }
-    } else if (entry.type === "SPLIT") {
+    } else if (isSplit(entry)) {
       if (entry.size && entry.size !== 0) {
         exposure += entry.size / 2;
         countNumExposureChanges++;
@@ -41,21 +49,21 @@ export function getProcessedPositionActivity({
     }
 
     // exposure DECREASE events
-    else if (entry.type === "TRADE" && entry.side === "SELL") {
+    else if (isSellTrade(entry)) {
       if (entry.size && entry.size !== 0) {
         exposure -= entry.size;
         countNumExposureChanges++;
       } else {
         console.log("entry.size is 0 or undefined", entry);
       }
-    } else if (entry.type === "MERGE") {
+    } else if (isMerge(entry)) {
       if (entry.size && entry.size !== 0) {
         exposure -= entry.size / 2;
         countNumExposureChanges++;
       } else {
         console.log("entry.size is 0 or undefined", entry);
       }
-    } else if (entry.type === "REDEEM") {
+    } else if (isRedeem(entry)) {
       if (entry.size && entry.size !== 0) {
         exposure = 0;
         countNumExposureChanges++;
@@ -64,7 +72,7 @@ export function getProcessedPositionActivity({
       }
     }
     // TODO: INCOMPLETE - this also results in an increase on other outcomes
-    else if (entry.type === "CONVERSION") {
+    else if (isConversion(entry)) {
       // CONVERSION decreases exposure for the position being converted FROM
       if (entry.size && entry.size !== 0) {
         exposure -= entry.size;

@@ -1,6 +1,7 @@
 import { ProcessedActivity } from "@/lib/models/api.models";
 import { isClosedPosition } from "../position.utils";
 import { Position } from "@/lib/models/frontend.models";
+import { isBuyTrade, isRedeem, isSellTrade } from "../activity-type.utils";
 
 export function getAbsolutePnl(position: Position) {
   if (isClosedPosition(position)) {
@@ -27,22 +28,15 @@ function getEntriesVwap(entries: ProcessedActivity[], side: "BUY" | "SELL") {
   console.log("entries", entries);
   if (!entries || entries.length === 0) return null;
 
+  const isSideMatch = side === "BUY" ? isBuyTrade : isSellTrade;
+
   for (const entry of entries) {
-    if (
-      entry.type === "TRADE" &&
-      entry.side?.toUpperCase() === side &&
-      entry.size &&
-      entry.price
-    ) {
+    if (isSideMatch(entry) && entry.size && entry.price) {
       totalSize += entry.size;
       totalCost += entry.size * entry.price;
     }
     // Redeem is also a sell - redemption price is always 1 (winning position)
-    if (
-      side.toUpperCase() === "SELL" &&
-      entry.type === "REDEEM" &&
-      entry.size
-    ) {
+    if (side === "SELL" && isRedeem(entry) && entry.size) {
       totalSize += entry.size;
       totalCost += entry.size * REDEMPTION_PRICE;
     }
@@ -84,10 +78,7 @@ export function getPositionApr(
 
   // Find the earliest BUY trade timestamp (not just any entry)
   const buyTimestamps = entries
-    .filter(
-      (e) =>
-        e.type === "TRADE" && e.side?.toUpperCase() === "BUY" && e.timestamp
-    )
+    .filter((e) => isBuyTrade(e) && e.timestamp)
     .map((e) => e.timestamp);
 
   if (buyTimestamps.length === 0) return null;
