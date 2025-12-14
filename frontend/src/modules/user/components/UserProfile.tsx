@@ -26,6 +26,8 @@ import { useQueries } from "@tanstack/react-query";
 import { getProcessedPositionActivity } from "../lib/positions-activity-new.utils";
 import { UserSearchBar } from "./UserSearchBar";
 import { Position } from "@/lib/models/frontend.models";
+import { UserWatchlistButton } from "./UserWatchlistButton";
+import { UserWatchlist } from "./UserWatchlist";
 
 async function fetchUserPositionActivity(userId: string, position: Position) {
   // sorted by timestamp DESC
@@ -154,6 +156,9 @@ export function UserProfile({ userId }: { userId: string }) {
     <div className="container mx-auto max-w-7xl p-6 space-y-6">
       <UserSearchBar />
 
+      {/* User Watchlist */}
+      <UserWatchlist />
+
       {/* Compact Header + Inline Stats */}
       <div className="flex items-start justify-between gap-3 flex-wrap">
         <img
@@ -173,6 +178,12 @@ export function UserProfile({ userId }: { userId: string }) {
                 {userData?.name || userData?.pseudonym || formatAddress(userId)}
               </a>
             </h1>
+            <UserWatchlistButton
+              proxyWallet={userId}
+              name={
+                userData?.name || userData?.pseudonym || formatAddress(userId)
+              }
+            />
             <Button
               size="icon"
               variant="ghost"
