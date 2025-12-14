@@ -101,7 +101,7 @@ function ClosedPositionRow({
           </span>
         </div>
         <div>
-          <div className="font-semibold">{position.outcome}</div>
+          <div className="font-semibold truncate">{position.outcome}</div>
         </div>
         <div>
           <div className="font-semibold">
