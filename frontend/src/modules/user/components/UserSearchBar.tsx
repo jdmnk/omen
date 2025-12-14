@@ -148,21 +148,21 @@ export function UserSearchBar() {
                             </div>
                           )}
                         </div>
-<div className="min-w-0 flex-1 text-left">
-                                          <div className="truncate text-sm font-semibold leading-tight">
-                                            {primaryLabel}
-                                          </div>
-                                          {secondaryLabel && (
-                                            <div className="truncate text-[11px] text-muted-foreground">
-                                              {secondaryLabel}
-                                            </div>
-                                          )}
-                                        </div>
-                                        <UserWatchlistButton
-                                          proxyWallet={proxyWallet}
-                                          name={primaryLabel}
-                                        />
-                                      </CommandItem>
+                        <div className="min-w-0 flex-1 text-left">
+                          <div className="truncate text-sm font-semibold leading-tight">
+                            {primaryLabel}
+                          </div>
+                          {secondaryLabel && (
+                            <div className="truncate text-[11px] text-muted-foreground">
+                              {secondaryLabel}
+                            </div>
+                          )}
+                        </div>
+                        <UserWatchlistButton
+                          proxyWallet={proxyWallet}
+                          name={primaryLabel}
+                        />
+                      </CommandItem>
                     );
                   })}
               </>

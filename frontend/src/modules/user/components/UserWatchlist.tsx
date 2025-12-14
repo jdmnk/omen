@@ -52,33 +52,27 @@ export function UserWatchlist() {
       </div>
 
       {/* Watchlist Items */}
-      <div className="space-y-1 pb-2">
+      <div className="flex flex-wrap gap-2 px-3 pb-3">
         {displayItems.map((user) => (
           <Link
             key={user.proxyWallet}
             href={`/user/${user.proxyWallet}`}
             className={cn(
-              "w-full text-left px-3 py-2 text-xs block",
+              "inline-flex items-center gap-1.5 px-2 py-1 text-xs rounded-md",
+              "border border-brand-stroke",
               "transition-colors",
               "hover:bg-brand-background cursor-pointer",
               "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             )}
           >
-            <div className="flex gap-3 items-center">
-              {/* Star Icon - Clickable to unwatchlist */}
-              <UserWatchlistButton
-                proxyWallet={user.proxyWallet}
-                name={user.name}
-                className="shrink-0"
-              />
-
-              {/* Name */}
-              <div className="flex-1 min-w-0">
-                <div className="font-medium truncate">
-                  {user.name || formatAddress(user.proxyWallet)}
-                </div>
-              </div>
-            </div>
+            <UserWatchlistButton
+              proxyWallet={user.proxyWallet}
+              name={user.name}
+              className="shrink-0"
+            />
+            <span className="font-medium">
+              {user.name || formatAddress(user.proxyWallet)}
+            </span>
           </Link>
         ))}
       </div>
