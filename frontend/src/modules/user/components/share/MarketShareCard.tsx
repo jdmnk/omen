@@ -88,7 +88,7 @@ export function MarketShareCard({
         </div>
       </div>
       <div className="relative h-64 w-full">
-        <div className="absolute top-2 left-2 z-10 flex flex-col gap-1.5 px-2 py-1.5">
+        <div className="absolute z-10 flex flex-col gap-1 px-1 py-1.5 opacity-60">
           <div className="flex items-center gap-1.5">
             <div className="relative h-3 w-3 shrink-0">
               <div className="absolute inset-0 rounded-full overflow-hidden">
@@ -96,11 +96,11 @@ export function MarketShareCard({
                 <div className="absolute right-0 top-0 h-full w-1/2 bg-[#F2545B]" />
               </div>
             </div>
-            <span className="text-xs font-medium text-black">Trade</span>
+            <span className="text-xs text-black font-bold">Trade</span>
           </div>
           <div className="flex items-center gap-1.5">
             <div className="h-3 w-3 shrink-0 bg-[#240F5A]/30 border border-[#240F5A]/60" />
-            <span className="text-xs font-medium text-black">Position</span>
+            <span className="text-xs text-black font-bold">Position</span>
           </div>
         </div>
         <PositionPriceChartApex
@@ -162,7 +162,7 @@ export function MarketShareCard({
       </div>
 
       {userData && (
-        <div className="flex items-center justify-between gap-2 mt-2">
+        <div className="grid grid-cols-[2fr_1fr] gap-6 mt-2">
           <div className="flex items-center gap-5 relative">
             <div className="relative h-[60px] w-[60px] shrink-0 overflow-hidden rounded-full">
               <Image
@@ -173,7 +173,7 @@ export function MarketShareCard({
               />
             </div>
             <div className="flex flex-col text-black">
-              <div className="font-bold text-lg">
+              <div className="font-bold text-lg break-all">
                 {userData.name || formatAddress(userData.proxyWallet ?? "")}
               </div>
               {userData.xUsername && (
