@@ -37,7 +37,7 @@ export function UserWatchlist() {
             "inline-flex items-center gap-1.5 px-2 py-1 text-xs rounded-md",
             "border border-brand-stroke",
             "transition-colors",
-            "hover:bg-brand-background cursor-pointer",
+            "hover:bg-brand-highlight/20 cursor-pointer",
             "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           )}
         >
