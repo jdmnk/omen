@@ -35,7 +35,7 @@ type UserPnlChartWidgetV2Props = {
 };
 
 export function UserPnlChartWidgetV2({ userId }: UserPnlChartWidgetV2Props) {
-  const [interval, setInterval] = useState<UserPnlInterval>("max");
+  const [interval, setInterval] = useState<UserPnlInterval>("1m");
   const [hoveredValue, setHoveredValue] = useState<number | null>(null);
   const isMounted = useIsMounted();
 
