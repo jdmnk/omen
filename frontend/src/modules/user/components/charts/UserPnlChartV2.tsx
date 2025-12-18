@@ -8,27 +8,20 @@ import {
   DeepPartial,
   IChartApi,
   ISeriesApi,
-  ISeriesMarkersPluginApi,
   LineData,
-  SeriesMarker,
   Time,
   createChart,
-  createSeriesMarkers,
 } from "lightweight-charts";
 import { Spinner } from "@/components/ui/spinner";
 import { areaSeriesBaseOptions } from "@/lib/ui/chart.config";
-import { formatCompactCurrency } from "@/lib/ui/format.utils";
 
 type ChartPoint = {
   time: string | number;
   value: number;
 };
 
-export type PositionMarker = SeriesMarker<Time>;
-
 type UserPnlChartV2Props = {
   data: ChartPoint[];
-  markers?: PositionMarker[];
   error?: Error | null;
   isLoading?: boolean;
 };
@@ -49,6 +42,7 @@ const chartOptions: DeepPartial<ChartOptions> = {
     rightBarStaysOnScroll: false,
     fixLeftEdge: true,
     fixRightEdge: true,
+    visible: false,
   },
   rightPriceScale: {
     borderColor: "transparent",
@@ -56,9 +50,7 @@ const chartOptions: DeepPartial<ChartOptions> = {
       top: 0.1,
       bottom: 0.1,
     },
-  },
-  localization: {
-    priceFormatter: (price: number) => formatCompactCurrency(price),
+    visible: false,
   },
   handleScale: false,
   handleScroll: false,
@@ -81,14 +73,12 @@ const chartOptions: DeepPartial<ChartOptions> = {
 
 export function UserPnlChartV2({
   data,
-  markers = [],
   error,
   isLoading,
 }: UserPnlChartV2Props) {
   const chartContainerRef = useRef<HTMLDivElement>(null);
   const chartRef = useRef<IChartApi | null>(null);
   const seriesRef = useRef<ISeriesApi<"Area"> | null>(null);
-  const markersPluginRef = useRef<ISeriesMarkersPluginApi<Time> | null>(null);
 
   useEffect(() => {
     if (!chartContainerRef.current) return;
@@ -130,14 +120,6 @@ export function UserPnlChartV2({
     return () => {
       resizeObserver.disconnect();
       window.removeEventListener("resize", handleResize);
-      if (markersPluginRef.current) {
-        try {
-          markersPluginRef.current.detach();
-        } catch {
-          // ignore plugin detach errors
-        }
-        markersPluginRef.current = null;
-      }
       chart.remove();
       chartRef.current = null;
       seriesRef.current = null;
@@ -146,25 +128,10 @@ export function UserPnlChartV2({
 
   useEffect(() => {
     if (!seriesRef.current) return;
-    const formattedData = Array.isArray(data)
-      ? (data as LineData<Time>[])
-      : [];
+    const formattedData = Array.isArray(data) ? (data as LineData<Time>[]) : [];
     seriesRef.current.setData(formattedData);
     chartRef.current?.timeScale().fitContent();
   }, [data]);
-
-  useEffect(() => {
-    if (!seriesRef.current) return;
-    if (!markersPluginRef.current) {
-      markersPluginRef.current = createSeriesMarkers(
-        seriesRef.current,
-        markers ?? [],
-        { zOrder: "top" }
-      );
-      return;
-    }
-    markersPluginRef.current.setMarkers(markers ?? []);
-  }, [markers]);
 
   if (error) {
     return (

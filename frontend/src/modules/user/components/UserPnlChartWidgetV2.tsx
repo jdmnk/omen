@@ -1,22 +1,14 @@
 "use client";
 
-import { useMemo, useState } from "react";
-import type { Time } from "lightweight-charts";
+import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { useIsMounted } from "@/lib/hooks/use-is-mounted";
 import {
   useUserPnlQuery,
   UserPnlInterval,
 } from "@/modules/user/lib/queries/user-pnl.query";
-import { useUserPositionsInfiniteQuery } from "@/modules/user/lib/queries/user-positions.query";
-import { useClosedPositionsInfiniteQuery } from "@/modules/user/lib/queries/closed-positions.query";
-import { formatCompactCurrency } from "@/lib/ui/format.utils";
 import { cn } from "@/lib/utils";
-import type {
-  OpenPosition,
-  ClosedPosition,
-} from "@/lib/models/frontend.models";
-import { UserPnlChartV2, type PositionMarker } from "./charts/UserPnlChartV2";
+import { UserPnlChartV2 } from "./charts/UserPnlChartV2";
 
 const INTERVALS: UserPnlInterval[] = ["12h", "1d", "1w", "1m", "max"];
 
@@ -27,22 +19,6 @@ const INTERVAL_LABELS: Record<UserPnlInterval, string> = {
   "1m": "1M",
   max: "ALL",
 };
-function toChartTime(value?: number | string | null): Time | null {
-  if (value === undefined || value === null) return null;
-  if (typeof value === "number") {
-    return (
-      value > 1_000_000_000_000 ? Math.floor(value / 1000) : Math.floor(value)
-    ) as Time;
-  }
-  const parsed = Date.parse(value);
-  if (Number.isNaN(parsed)) return null;
-  return Math.floor(parsed / 1000) as Time;
-}
-
-function flattenInfiniteResult<T>(pages?: T[][]): T[] {
-  if (!pages) return [];
-  return pages.flatMap((page) => page);
-}
 
 type UserPnlChartWidgetV2Props = {
   userId: string;
@@ -58,56 +34,11 @@ export function UserPnlChartWidgetV2({ userId }: UserPnlChartWidgetV2Props) {
     error: pnlError,
   } = useUserPnlQuery(userId, interval);
 
-  const { data: openPositionsData, isLoading: openPositionsLoading } =
-    useUserPositionsInfiniteQuery(userId);
-
-  const { data: closedPositionsData, isLoading: closedPositionsLoading } =
-    useClosedPositionsInfiniteQuery(userId, "TIMESTAMP");
-
   const chartData =
     pnlPoints?.map((point) => ({
       time: point.t,
       value: point.p,
     })) ?? [];
-
-  const currentPnl =
-    pnlPoints && pnlPoints.length > 0 ? pnlPoints[pnlPoints.length - 1].p : 0;
-
-  const openPositions = useMemo(
-    () => flattenInfiniteResult<OpenPosition>(openPositionsData?.pages),
-    [openPositionsData?.pages]
-  );
-
-  const closedPositions = useMemo(
-    () => flattenInfiniteResult<ClosedPosition>(closedPositionsData?.pages),
-    [closedPositionsData?.pages]
-  );
-
-  const positionMarkers = useMemo<PositionMarker[]>(() => {
-    const markers: PositionMarker[] = [];
-
-    closedPositions.forEach((position, index) => {
-      const timestamp = toChartTime(position.timestamp);
-      if (!timestamp) return;
-
-      markers.push({
-        id: `closed-${position.conditionId}-${position.outcomeIndex}-${index}`,
-        time: timestamp,
-        position: "aboveBar",
-        color: position.realizedPnl >= 0 ? "#22c55e" : "#ef4444",
-        shape: "arrowDown",
-        text: "C",
-      });
-    });
-
-    markers.sort((a, b) => {
-      const aTime = typeof a.time === "number" ? a.time : Number(a.time);
-      const bTime = typeof b.time === "number" ? b.time : Number(b.time);
-      return aTime - bTime;
-    });
-
-    return markers;
-  }, [closedPositions]);
 
   if (!isMounted) {
     return null;
@@ -136,52 +67,13 @@ export function UserPnlChartWidgetV2({ userId }: UserPnlChartWidgetV2Props) {
         </div>
       </div>
 
-      <LegendSection
-        positionStats={{
-          loading: openPositionsLoading || closedPositionsLoading,
-          openCount: openPositions.length,
-          closedCount: closedPositions.length,
-        }}
-      />
-
       <div className="flex-1 min-h-0 w-full">
         <UserPnlChartV2
           data={chartData}
-          markers={positionMarkers}
           isLoading={isPnlLoading}
           error={pnlError}
         />
       </div>
     </Card>
-  );
-}
-
-function LegendSection({
-  positionStats,
-}: {
-  positionStats: {
-    loading: boolean;
-    openCount: number;
-    closedCount: number;
-  };
-}) {
-  return (
-    <div className="flex flex-wrap items-center justify-between gap-3 px-3 py-2 text-[11px] text-muted-foreground">
-      <div className="flex items-center gap-4">
-        <span className="flex items-center gap-1">
-          <span className="h-2 w-2 rounded-full bg-emerald-400" />
-          Closed (profit)
-        </span>
-        <span className="flex items-center gap-1">
-          <span className="h-2 w-2 rounded-full bg-red-400" />
-          Closed (loss)
-        </span>
-      </div>
-      <div className="text-xs text-muted-foreground">
-        {positionStats.loading
-          ? "Loading position markers…"
-          : `Tracking ${positionStats.openCount} open & ${positionStats.closedCount} closed`}
-      </div>
-    </div>
   );
 }
