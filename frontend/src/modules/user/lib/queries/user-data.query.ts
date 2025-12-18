@@ -20,16 +20,11 @@ export type UserProfileData = {
   verifiedBadge?: boolean;
 };
 
-export function useUserDataQuery(
-  address: string,
-  enabled: boolean = true
-) {
+export function useUserDataQuery(address: string, enabled: boolean = true) {
   return useQuery<UserProfileData>({
     queryKey: ["user-data", address],
     queryFn: async () => {
-      const url = new URL(
-        "https://polymarket.com/api/profile/userData"
-      );
+      const url = new URL("https://polymarket.com/api/profile/userData");
       url.searchParams.set("address", address);
 
       const response = await fetch(url.toString());
@@ -43,5 +38,3 @@ export function useUserDataQuery(
     staleTime: 300000, // 5 minutes
   });
 }
-
-
