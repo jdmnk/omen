@@ -300,14 +300,22 @@ export function UserProfile({ userId }: { userId: string }) {
             onValueChange={setActiveTab}
             className="w-full flex flex-col"
           >
-            <TabsList className="px-3 pt-2">
-              <TabsTrigger value="positions" className="uppercase">
-                Open
-              </TabsTrigger>
-              <TabsTrigger value="closed" className="uppercase">
-                Closed
-              </TabsTrigger>
-            </TabsList>
+            <div className="px-3 pt-3 pb-2 border-b border-brand-stroke">
+              <TabsList>
+                <TabsTrigger
+                  value="positions"
+                  className="text-sm uppercase text-brand-primary font-bold"
+                >
+                  Open
+                </TabsTrigger>
+                <TabsTrigger
+                  value="closed"
+                  className="text-sm uppercase text-brand-primary font-bold"
+                >
+                  Closed
+                </TabsTrigger>
+              </TabsList>
+            </div>
 
             <TabsContent value="positions">
               <div className="h-[700px]">
