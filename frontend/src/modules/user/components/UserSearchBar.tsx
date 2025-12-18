@@ -20,7 +20,62 @@ import {
 } from "@/components/ui/popover";
 import { formatAddress } from "@/lib/ui/format.utils";
 import { useUserSearchQuery } from "../lib/queries/user-search.query";
+import {
+  useUserDataQuery,
+  type UserProfileData,
+} from "../lib/queries/user-data.query";
 import { UserWatchlistButton } from "./UserWatchlistButton";
+import type { SearchProfileItem } from "@/lib/models/api.models";
+
+type UserSearchProfile = {
+  id: string;
+  proxyWallet: string;
+  name?: string | null;
+  pseudonym?: string | null;
+  profileImage?: string | null;
+  profileImageOptimized?: {
+    imageUrlOptimized: string;
+  } | null;
+};
+
+function isWalletAddress(input: string): boolean {
+  return /^0x[a-fA-F0-9]{40}$/.test(input);
+}
+
+function mapSearchProfileToSimple(
+  profile: SearchProfileItem
+): UserSearchProfile {
+  return {
+    id: profile.id,
+    proxyWallet: profile.proxyWallet,
+    name: profile.name || null,
+    pseudonym: profile.pseudonym || null,
+    profileImage: profile.profileImage || null,
+    profileImageOptimized: profile.profileImageOptimized
+      ? {
+          imageUrlOptimized: profile.profileImageOptimized.imageUrlOptimized,
+        }
+      : null,
+  };
+}
+
+function mapUserDataToSimple(
+  userData: UserProfileData,
+  address: string
+): UserSearchProfile {
+  return {
+    id: userData.id || address,
+    proxyWallet: userData.proxyWallet || address,
+    name: userData.name || null,
+    pseudonym: userData.pseudonym || null,
+    profileImage: userData.profileImage || null,
+    profileImageOptimized: userData.profileImage
+      ? {
+          imageUrlOptimized: userData.profileImage,
+        }
+      : null,
+  };
+}
 
 export function UserSearchBar() {
   const [input, setInput] = useState("");
@@ -32,10 +87,29 @@ export function UserSearchBar() {
 
   const trimmedQuery = debouncedInput.trim();
   const shouldQuery = trimmedQuery.length > 0;
+  const isAddressSearch = isWalletAddress(trimmedQuery);
 
-  const { data, isLoading } = useUserSearchQuery(trimmedQuery, shouldQuery);
+  const { data: searchData, isLoading: isSearchLoading } = useUserSearchQuery(
+    trimmedQuery,
+    shouldQuery && !isAddressSearch
+  );
 
-  const profiles = useMemo(() => data?.profiles ?? [], [data]);
+  const { data: userData, isLoading: isUserDataLoading } = useUserDataQuery(
+    trimmedQuery,
+    shouldQuery && isAddressSearch
+  );
+
+  const isLoading = isSearchLoading || isUserDataLoading;
+
+  const profiles = useMemo(() => {
+    if (isAddressSearch && userData) {
+      return [mapUserDataToSimple(userData, trimmedQuery)];
+    }
+    if (searchData?.profiles) {
+      return searchData.profiles.map(mapSearchProfileToSimple);
+    }
+    return [];
+  }, [isAddressSearch, userData, searchData, trimmedQuery]);
 
   useEffect(() => {
     if (!containerRef.current) return;
@@ -106,7 +180,7 @@ export function UserSearchBar() {
 
             {!isLoading && (
               <>
-                <CommandEmpty className="py-6 text-muted-foreground">
+                <CommandEmpty className="py-3 text-muted-foreground text-sm px-2.5">
                   No users found.
                 </CommandEmpty>
                 {hasResults &&

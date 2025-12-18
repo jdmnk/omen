@@ -20,7 +20,10 @@ export type UserProfileData = {
   verifiedBadge?: boolean;
 };
 
-export function useUserDataQuery(address: string) {
+export function useUserDataQuery(
+  address: string,
+  enabled: boolean = true
+) {
   return useQuery<UserProfileData>({
     queryKey: ["user-data", address],
     queryFn: async () => {
@@ -36,6 +39,7 @@ export function useUserDataQuery(address: string) {
       const data = (await response.json()) as UserProfileData;
       return data;
     },
+    enabled: enabled && address.trim().length > 0,
     staleTime: 300000, // 5 minutes
   });
 }
