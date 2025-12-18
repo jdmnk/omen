@@ -1,6 +1,8 @@
 "use client";
 
 import React from "react";
+import Image from "next/image";
+import { ExternalLink } from "lucide-react";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import {
   TABLE_HEADER_CLASSES,
@@ -27,7 +29,7 @@ import {
 import { useInfiniteScroll } from "@/lib/hooks/use-infinite-scroll";
 
 const ACTIVITY_ROW_GRID_CLASSES =
-  "grid grid-cols-[minmax(70px,0.7fr)_minmax(200px,1.6fr)_minmax(200px,1.4fr)_minmax(120px,0.9fr)_minmax(120px,0.9fr)] items-center gap-4";
+  "grid grid-cols-[60px_1fr_minmax(80px,auto)] items-center gap-3";
 const PAGE_SIZE = 100;
 
 function ActivityRow({ entry }: { entry: Activity }) {
@@ -39,83 +41,89 @@ function ActivityRow({ entry }: { entry: Activity }) {
   const relativeTime = entry.timestamp
     ? formatRelativeTime(entry.timestamp)
     : "-";
-  const marketUrl = getPolymarketEventUrl(entry.slug ?? undefined);
+  const marketUrl = entry.eventSlug
+    ? getPolymarketEventUrl(entry.eventSlug)
+    : undefined;
   const isTrade = entry.type === "TRADE";
   const typeLabel = getActivityTypeLabel(entry);
   const marketLabel = getActivityMarketLabel(entry);
   const typeUpper = entry.type?.toUpperCase() ?? "";
   const isYield = typeUpper === "YIELD";
-  const outcomeLabel = isYield ? "-" : entry.outcome ?? "-";
+  const isReward = typeUpper === "REWARD";
   const sharesLabel =
-    !isYield && entry.size !== undefined && entry.size !== null
-      ? `${formatNumber(size, size >= 1 ? 0 : 2)} shares`
+    !isYield && !isReward && entry.size !== undefined && entry.size !== null
+      ? `${formatNumber(size, size >= 1 ? 1 : 2)} shares`
       : null;
-  const shouldShowPrice = ![
-    "YIELD",
-    "REDEEM",
-    "MERGE",
-    "REWARD",
-    "SPLIT",
-    "CONVERSION",
-  ].includes(typeUpper);
-  const priceLabel = formatPrice(entry.price, { maximumFractionDigits: 1 });
+  const shouldShowOutcome = !["YIELD", "REWARD"].includes(typeUpper);
+  const priceLabel = formatPrice(entry.price, { maximumFractionDigits: 0 });
   const typeColor =
     isTrade && entry.side?.toUpperCase() === "BUY"
       ? "text-outcome-yes"
       : isTrade && entry.side?.toUpperCase() === "SELL"
       ? "text-outcome-no"
       : "text-muted-foreground";
-  const combinedOutcomeLabel =
-    outcomeLabel === "-" ? priceLabel : `${outcomeLabel} ${priceLabel}`;
 
   const outcomeColor = getOutcomeColorClass(
     entry.outcomeIndex,
     "text-foreground"
   );
 
+  // Get icon URL - activity entries might have an icon field or we derive from slug
+  const iconUrl = (entry as Activity & { icon?: string }).icon;
+
   return (
     <div className={cn(ACTIVITY_ROW_GRID_CLASSES, TABLE_ROW_CLASSES)}>
-      <div
-        className={cn(
-          "text-xs font-semibold uppercase tracking-wide",
-          typeColor
-        )}
-      >
+      {/* Type */}
+      <div className={cn("text-[13px] font-medium", typeColor)}>
         {typeLabel}
       </div>
-      <div className="min-w-0 overflow-hidden">
-        {entry.slug ? (
-          <a
-            href={marketUrl}
-            className="block truncate font-medium hover:underline"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            {marketLabel}
-          </a>
-        ) : (
-          <span className="block truncate font-medium text-foreground">
-            {marketLabel}
-          </span>
+      {/* Market info: icon, title, outcome/price + shares */}
+      <div className="flex items-center gap-2 min-w-0">
+        {iconUrl && (
+          <div className="relative h-8 w-8 shrink-0">
+            <Image src={iconUrl} alt="" fill className="rounded object-cover" />
+          </div>
         )}
+        <div className="flex flex-col min-w-0">
+          {marketUrl ? (
+            <a
+              href={marketUrl}
+              className="truncate font-medium text-sm leading-tight hover:underline"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              {marketLabel}
+              <ExternalLink className="inline-block ml-1 h-3 w-3 opacity-50" />
+            </a>
+          ) : (
+            <span className="truncate font-medium text-sm leading-tight">
+              {marketLabel}
+            </span>
+          )}
+          <div className="flex items-center gap-2 text-xs text-muted-foreground">
+            {shouldShowOutcome && entry.outcome && (
+              <span
+                className={cn(
+                  "px-1.5 py-0.5 rounded text-[10px] font-medium",
+                  outcomeColor,
+                  entry.outcomeIndex === 0
+                    ? "bg-outcome-yes/15"
+                    : "bg-outcome-no/15"
+                )}
+              >
+                {entry.outcome} {priceLabel}
+              </span>
+            )}
+            {sharesLabel && <span>{sharesLabel}</span>}
+          </div>
+        </div>
       </div>
-      <div className="flex items-center gap-2 text-xs">
-        {shouldShowPrice && (
-          <span className={cn("font-semibold", outcomeColor)}>
-            {combinedOutcomeLabel}
-          </span>
-        )}
-        {sharesLabel && (
-          <span className="text-[11px] text-muted-foreground">
-            {sharesLabel}
-          </span>
-        )}
-      </div>
-      <div className="font-semibold">
-        {amount ? formatCompactCurrency(amount) : "-"}
-      </div>
-      <div className="text-xs text-muted-foreground text-right">
-        {relativeTime}
+      {/* Amount + Time */}
+      <div className="text-right">
+        <div className="font-semibold text-sm">
+          {amount ? formatCompactCurrency(amount) : "-"}
+        </div>
+        <div className="text-xs text-muted-foreground">{relativeTime}</div>
       </div>
     </div>
   );
@@ -188,9 +196,7 @@ export function UserActivityFeed({ userId }: { userId: string }) {
         <div className={cn(ACTIVITY_ROW_GRID_CLASSES, TABLE_HEADER_CLASSES)}>
           <div>Type</div>
           <div>Market</div>
-          <div>Outcome / Size</div>
-          <div>Amount</div>
-          <div className="text-right">Time</div>
+          <div className="text-right">Amount</div>
         </div>
       </div>
       <div className={TABLE_CONTENT_CONTAINER_CLASSES}>
