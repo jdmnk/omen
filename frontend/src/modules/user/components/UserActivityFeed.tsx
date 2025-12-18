@@ -29,7 +29,7 @@ import {
 import { useInfiniteScroll } from "@/lib/hooks/use-infinite-scroll";
 
 const ACTIVITY_ROW_GRID_CLASSES =
-  "grid grid-cols-[60px_1fr_minmax(80px,auto)] items-center gap-3";
+  "grid grid-cols-[72px_1fr_minmax(80px,auto)] items-center gap-3";
 const PAGE_SIZE = 100;
 
 function ActivityRow({ entry }: { entry: Activity }) {
