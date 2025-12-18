@@ -1,8 +1,6 @@
 "use client";
 
 import React from "react";
-import Image from "next/image";
-import { ExternalLink } from "lucide-react";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import {
   TABLE_HEADER_CLASSES,
@@ -12,11 +10,8 @@ import {
 } from "../../../components/shared-table-styles";
 import {
   formatCompactCurrency,
-  formatPrice,
-  formatNumber,
   formatRelativeTime,
 } from "@/lib/ui/format.utils";
-import { getOutcomeColorClass } from "@/lib/ui/color.utils";
 import { cn } from "@/lib/utils";
 import { fetchUserActivityPage } from "@/modules/user/lib/queries/user-activity.query";
 import { LoadingSpinner } from "@/components/ui/spinner";
@@ -27,6 +22,7 @@ import {
   getActivityTypeLabel,
 } from "@/modules/user/lib/activity.utils";
 import { useInfiniteScroll } from "@/lib/hooks/use-infinite-scroll";
+import { MarketInfoCell } from "./positions/MarketInfoCell";
 
 const ACTIVITY_ROW_GRID_CLASSES =
   "grid grid-cols-[72px_1fr_minmax(80px,auto)] items-center gap-3";
@@ -48,14 +44,6 @@ function ActivityRow({ entry }: { entry: Activity }) {
   const typeLabel = getActivityTypeLabel(entry);
   const marketLabel = getActivityMarketLabel(entry);
   const typeUpper = entry.type?.toUpperCase() ?? "";
-  const isYield = typeUpper === "YIELD";
-  const isReward = typeUpper === "REWARD";
-  const sharesLabel =
-    !isYield && !isReward && entry.size !== undefined && entry.size !== null
-      ? `${formatNumber(size, size >= 1 ? 1 : 2)} shares`
-      : null;
-  const shouldShowOutcome = !["YIELD", "REWARD"].includes(typeUpper);
-  const priceLabel = formatPrice(entry.price, { maximumFractionDigits: 0 });
   const typeColor =
     isTrade && entry.side?.toUpperCase() === "BUY"
       ? "text-outcome-yes"
@@ -63,13 +51,15 @@ function ActivityRow({ entry }: { entry: Activity }) {
       ? "text-outcome-no"
       : "text-muted-foreground";
 
-  const outcomeColor = getOutcomeColorClass(
-    entry.outcomeIndex,
-    "text-foreground"
-  );
-
-  // Get icon URL - activity entries might have an icon field or we derive from slug
+  // Get icon URL - activity entries might have an icon field
   const iconUrl = (entry as Activity & { icon?: string }).icon;
+
+  // Don't show shares/price for YIELD/REWARD
+  const hideSharesAndPrice = ["YIELD", "REWARD"].includes(typeUpper);
+  // Don't show price for SPLIT, MERGE, REDEEM, CONVERSION
+  const hidePrice = ["SPLIT", "MERGE", "REDEEM", "CONVERSION"].includes(
+    typeUpper
+  );
 
   return (
     <div className={cn(ACTIVITY_ROW_GRID_CLASSES, TABLE_ROW_CLASSES)}>
@@ -77,51 +67,19 @@ function ActivityRow({ entry }: { entry: Activity }) {
       <div className={cn("text-[13px] font-medium", typeColor)}>
         {typeLabel}
       </div>
-      {/* Market info: icon, title, outcome/price + shares */}
-      <div className="flex items-center gap-2 min-w-0">
-        {iconUrl && (
-          <div className="relative h-8 w-8 shrink-0">
-            <Image src={iconUrl} alt="" fill className="rounded object-cover" />
-          </div>
-        )}
-        <div className="flex flex-col min-w-0">
-          {marketUrl ? (
-            <a
-              href={marketUrl}
-              className="truncate font-medium text-sm leading-tight hover:underline"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              {marketLabel}
-              <ExternalLink className="inline-block ml-1 h-3 w-3 opacity-50" />
-            </a>
-          ) : (
-            <span className="truncate font-medium text-sm leading-tight">
-              {marketLabel}
-            </span>
-          )}
-          <div className="flex items-center gap-2 text-xs text-muted-foreground">
-            {shouldShowOutcome && entry.outcome && (
-              <span
-                className={cn(
-                  "px-1.5 py-0.5 rounded text-[10px] font-medium",
-                  outcomeColor,
-                  entry.outcomeIndex === 0
-                    ? "bg-outcome-yes/15"
-                    : "bg-outcome-no/15"
-                )}
-              >
-                {entry.outcome} {priceLabel}
-              </span>
-            )}
-            {sharesLabel && <span>{sharesLabel}</span>}
-          </div>
-        </div>
-      </div>
+      <MarketInfoCell
+        icon={iconUrl}
+        title={marketLabel}
+        outcome={hideSharesAndPrice ? undefined : entry.outcome}
+        outcomeIndex={entry.outcomeIndex}
+        shares={hideSharesAndPrice ? undefined : entry.size}
+        price={hideSharesAndPrice || hidePrice ? undefined : entry.price}
+        href={marketUrl}
+      />
       {/* Amount + Time */}
       <div className="text-right">
         <div className="font-semibold text-sm">
-          {amount ? formatCompactCurrency(amount) : "-"}
+          {amount !== undefined ? formatCompactCurrency(amount) : "-"}
         </div>
         <div className="text-xs text-muted-foreground">{relativeTime}</div>
       </div>

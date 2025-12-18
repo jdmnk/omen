@@ -1,15 +1,9 @@
 "use client";
 
 import React from "react";
-import Image from "next/image";
-import { Check, X } from "lucide-react";
 import { useClosedPositionsInfiniteQuery } from "@/modules/user/lib/queries/closed-positions.query";
 import { LoadingSpinner, Spinner } from "@/components/ui/spinner";
-import {
-  formatCompactCurrency,
-  formatPrice,
-  formatNumber,
-} from "@/lib/ui/format.utils";
+import { formatCompactCurrency, formatNumber } from "@/lib/ui/format.utils";
 import { cn } from "@/lib/utils";
 import { ClosedPosition, Position } from "@/lib/models/frontend.models";
 import { useInfiniteScroll } from "@/lib/hooks/use-infinite-scroll";
@@ -24,6 +18,7 @@ import type { PositionActivityLookup } from "../userActivity.types";
 import { getPositionKey } from "@/modules/user/lib/position.utils";
 import { PositionActivitySubRow } from "./positions/PositionActivitySubRow";
 import { PositionMarketLinkButton } from "./positions/PositionMarketLinkButton";
+import { MarketInfoCell } from "./positions/MarketInfoCell";
 
 const POSITION_ROW_GRID_CLASSES =
   "grid grid-cols-[18px_40px_1fr_80px_minmax(120px,auto)_24px] items-center gap-3";
@@ -113,28 +108,14 @@ function ClosedPositionRow({
             <span className="font-medium text-muted-foreground">Even</span>
           )}
         </div>
-        {/* Market info: icon, title, shares */}
-        <div className="flex items-center gap-2 min-w-0">
-          {position.icon && (
-            <div className="relative h-8 w-8 shrink-0">
-              <Image
-                src={position.icon}
-                alt=""
-                fill
-                className="rounded object-cover"
-              />
-            </div>
-          )}
-          <div className="flex flex-col min-w-0">
-            <span className="truncate font-medium text-sm leading-tight">
-              {position.title}
-            </span>
-            <span className="text-xs text-muted-foreground">
-              {formatNumber(shares, 1)} {position.outcome} at{" "}
-              {formatPrice(avgPrice, { maximumFractionDigits: 0 })}
-            </span>
-          </div>
-        </div>
+        <MarketInfoCell
+          icon={position.icon}
+          title={position.title}
+          outcome={position.outcome}
+          outcomeIndex={position.outcomeIndex}
+          shares={shares}
+          price={avgPrice}
+        />
         {/* Cost */}
         <div className="text-right">
           <span className="font-semibold text-sm">

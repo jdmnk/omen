@@ -1,7 +1,6 @@
 "use client";
 
 import React from "react";
-import Image from "next/image";
 import { useUserPositionsInfiniteQuery } from "@/modules/user/lib/queries/user-positions.query";
 import { LoadingSpinner, Spinner } from "@/components/ui/spinner";
 import {
@@ -23,6 +22,7 @@ import type { PositionActivityLookup } from "../userActivity.types";
 import { getPositionKey } from "@/modules/user/lib/position.utils";
 import { PositionActivitySubRow } from "./positions/PositionActivitySubRow";
 import { PositionMarketLinkButton } from "./positions/PositionMarketLinkButton";
+import { MarketInfoCell } from "./positions/MarketInfoCell";
 
 const POSITION_ROW_GRID_CLASSES =
   "grid grid-cols-[18px_1fr_60px_60px_minmax(100px,auto)_32px] items-center gap-3";
@@ -90,40 +90,14 @@ function PositionRow({
             onCheckedChange={(checked) => toggleSelection(Boolean(checked))}
           />
         </div>
-        {/* Market info: icon, title, outcome badge, shares */}
-        <div className="flex items-center gap-2 min-w-0">
-          {position.icon && (
-            <div className="relative h-8 w-8 shrink-0">
-              <Image
-                src={position.icon}
-                alt=""
-                fill
-                className="rounded object-cover"
-              />
-            </div>
-          )}
-          <div className="flex flex-col min-w-0">
-            <span className="truncate font-medium text-sm leading-tight">
-              {position.title}
-            </span>
-            <div className="flex items-center gap-2 text-xs text-muted-foreground">
-              <span
-                className={cn(
-                  "px-1.5 py-0.5 rounded text-[10px] font-medium",
-                  position.outcome === "Yes"
-                    ? "bg-outcome-yes/15 text-outcome-yes"
-                    : "bg-outcome-no/15 text-outcome-no"
-                )}
-              >
-                {position.outcome}
-              </span>
-              <span>
-                {formatNumber(size, 1)} shares at{" "}
-                {formatPrice(avgPrice, { maximumFractionDigits: 0 })}
-              </span>
-            </div>
-          </div>
-        </div>
+        <MarketInfoCell
+          icon={position.icon}
+          title={position.title ?? ""}
+          outcome={position.outcome}
+          outcomeIndex={position.outcomeIndex}
+          shares={size}
+          price={avgPrice}
+        />
         {/* AVG price */}
         <div className="text-center">
           <span className="font-semibold text-sm">
