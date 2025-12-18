@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { ChevronDown, ChevronUp, GripVertical, Star } from "lucide-react";
 import Link from "next/link";
 import {
@@ -19,6 +19,7 @@ import {
   horizontalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
+import { toast } from "sonner";
 import {
   useUserWatchlist,
   UserWatchlistItem,
@@ -27,8 +28,17 @@ import { cn } from "@/lib/utils";
 import { formatAddress } from "@/lib/ui/format.utils";
 
 const INITIAL_LIMIT = 10;
+const CONFIRM_TIMEOUT_MS = 3000;
 
-function SortableWatchlistItem({ user }: { user: UserWatchlistItem }) {
+function SortableWatchlistItem({
+  user,
+  pendingUnwatch,
+  onStarClick,
+}: {
+  user: UserWatchlistItem;
+  pendingUnwatch: boolean;
+  onStarClick: (user: UserWatchlistItem) => void;
+}) {
   const {
     attributes,
     listeners,
@@ -41,6 +51,12 @@ function SortableWatchlistItem({ user }: { user: UserWatchlistItem }) {
   const style = {
     transform: CSS.Transform.toString(transform),
     transition,
+  };
+
+  const handleStarClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    onStarClick(user);
   };
 
   return (
@@ -63,7 +79,23 @@ function SortableWatchlistItem({ user }: { user: UserWatchlistItem }) {
       >
         <GripVertical className="h-3 w-3 text-muted-foreground" />
       </div>
-      <Star className="h-3 w-3 fill-yellow-400 text-yellow-400 shrink-0" />
+      <button
+        onClick={handleStarClick}
+        className={cn(
+          "shrink-0 cursor-pointer transition-all duration-200",
+          "hover:scale-110 active:scale-95",
+          pendingUnwatch && "animate-pulse"
+        )}
+      >
+        <Star
+          className={cn(
+            "h-3 w-3 transition-colors",
+            pendingUnwatch
+              ? "fill-yellow-400/50 text-yellow-400/50"
+              : "fill-yellow-400 text-yellow-400"
+          )}
+        />
+      </button>
       <Link
         href={`/user/${user.proxyWallet}`}
         className="font-medium hover:underline"
@@ -76,7 +108,10 @@ function SortableWatchlistItem({ user }: { user: UserWatchlistItem }) {
 
 export function UserWatchlist() {
   const [isExpanded, setIsExpanded] = useState(true);
-  const { watchlist, reorderWatchlist } = useUserWatchlist();
+  const [pendingUnwatch, setPendingUnwatch] = useState<string | null>(null);
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const { watchlist, reorderWatchlist, removeFromWatchlist } =
+    useUserWatchlist();
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -113,6 +148,34 @@ export function UserWatchlist() {
     }
   }
 
+  function handleStarClick(user: UserWatchlistItem) {
+    const displayName = user.name || formatAddress(user.proxyWallet);
+
+    if (pendingUnwatch === user.proxyWallet) {
+      // Second click - confirm unwatchlist
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+        timeoutRef.current = null;
+      }
+      removeFromWatchlist(user.proxyWallet);
+      setPendingUnwatch(null);
+      toast.success(`Removed ${displayName} from watchlist`);
+    } else {
+      // First click - show warning
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+      setPendingUnwatch(user.proxyWallet);
+      toast.warning(`Click again to remove ${displayName} from watchlist`, {
+        duration: CONFIRM_TIMEOUT_MS,
+      });
+      timeoutRef.current = setTimeout(() => {
+        setPendingUnwatch(null);
+        timeoutRef.current = null;
+      }, CONFIRM_TIMEOUT_MS);
+    }
+  }
+
   return (
     <DndContext
       sensors={sensors}
@@ -125,7 +188,12 @@ export function UserWatchlist() {
           strategy={horizontalListSortingStrategy}
         >
           {displayItems.map((user) => (
-            <SortableWatchlistItem key={user.proxyWallet} user={user} />
+            <SortableWatchlistItem
+              key={user.proxyWallet}
+              user={user}
+              pendingUnwatch={pendingUnwatch === user.proxyWallet}
+              onStarClick={handleStarClick}
+            />
           ))}
         </SortableContext>
         {hasMore && (
