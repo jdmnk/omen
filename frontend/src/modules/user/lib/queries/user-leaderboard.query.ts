@@ -28,7 +28,9 @@ export function useUserLeaderboardQuery(userId: string) {
 
       const response = await fetch(url.toString());
       if (!response.ok) {
-        throw new Error(`Failed to fetch leaderboard info: ${response.statusText}`);
+        throw new Error(
+          `Failed to fetch leaderboard info: ${response.statusText}`
+        );
       }
       const data = (await response.json()) as UserLeaderboardInfo[];
       return data.length > 0 ? data[0] : null;
@@ -37,4 +39,3 @@ export function useUserLeaderboardQuery(userId: string) {
     staleTime: 300000, // 5 minutes
   });
 }
-
