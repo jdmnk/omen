@@ -31,6 +31,8 @@ import { UserWatchlistButton } from "./UserWatchlistButton";
 import { UserWatchlist } from "./UserWatchlist";
 import Link from "next/link";
 import { LogoIcon } from "@/components/LogoIcon";
+import { ThemeToggle } from "@/components/ThemeToggle";
+import { FontSizeControl } from "@/components/FontSizeControl";
 
 async function fetchUserPositionActivity(userId: string, position: Position) {
   // sorted by timestamp DESC
@@ -158,7 +160,7 @@ export function UserProfile({ userId }: { userId: string }) {
 
   return (
     <div className="container mx-auto max-w-7xl p-6 space-y-5">
-      {/* Header Row: Logo + Search Bar */}
+      {/* Header Row: Logo + Search Bar + Controls */}
       <div className="flex items-center gap-5">
         <Link href="/" className="shrink-0">
           <div className="flex items-center gap-2">
@@ -168,8 +170,12 @@ export function UserProfile({ userId }: { userId: string }) {
             </span>
           </div>
         </Link>
-        <div className="flex-1">
+        <div className="flex-1 max-w-2xl">
           <UserSearchBar />
+        </div>
+        <div className="flex items-center gap-1 ml-auto">
+          <ThemeToggle />
+          <FontSizeControl />
         </div>
       </div>
 

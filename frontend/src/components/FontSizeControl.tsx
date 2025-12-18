@@ -44,7 +44,7 @@ export function FontSizeControl() {
         <Button
           variant="ghost"
           size="icon"
-          className="text-white hover:text-white hover:bg-white/10"
+          className="text-muted-foreground hover:text-foreground hover:bg-muted"
           aria-label="Font size control"
         >
           <svg

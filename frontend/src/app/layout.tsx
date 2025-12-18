@@ -42,7 +42,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="h-screen">
+    <html lang="en" className="h-screen" suppressHydrationWarning>
       <body className={`${roboto.variable} antialiased bg-background`}>
         <ProvidersClient>{children}</ProvidersClient>
       </body>
