@@ -25,7 +25,7 @@ import { PositionMarketLinkButton } from "./positions/PositionMarketLinkButton";
 import { MarketInfoCell } from "./positions/MarketInfoCell";
 
 const POSITION_ROW_GRID_CLASSES =
-  "grid grid-cols-[18px_1fr_60px_60px_minmax(100px,auto)_32px] items-center gap-3";
+  "grid grid-cols-[18px_1fr_60px_60px_minmax(100px,auto)_24px] items-center gap-3";
 
 type PositionRowProps = {
   position: OpenPosition;

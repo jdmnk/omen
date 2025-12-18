@@ -21,7 +21,7 @@ import { PositionMarketLinkButton } from "./positions/PositionMarketLinkButton";
 import { MarketInfoCell } from "./positions/MarketInfoCell";
 
 const POSITION_ROW_GRID_CLASSES =
-  "grid grid-cols-[18px_40px_1fr_80px_minmax(120px,auto)_24px] items-center gap-3";
+  "grid grid-cols-[18px_1fr_80px_minmax(120px,auto)_24px] items-center gap-3";
 
 type ClosedPositionRowProps = {
   position: ClosedPosition;
@@ -91,22 +91,6 @@ function ClosedPositionRow({
             checked={isSelected}
             onCheckedChange={(checked) => toggleSelection(Boolean(checked))}
           />
-        </div>
-        {/* Won/Lost status */}
-        <div className="flex items-center gap-1 text-[13px]">
-          {isWin ? (
-            <>
-              {/* <Check className="h-4 w-4 text-outcome-yes" /> */}
-              <span className="font-medium text-outcome-yes">Won</span>
-            </>
-          ) : isLoss ? (
-            <>
-              {/* <X className="h-4 w-4 text-outcome-no" /> */}
-              <span className="font-medium text-outcome-no">Lost</span>
-            </>
-          ) : (
-            <span className="font-medium text-muted-foreground">Even</span>
-          )}
         </div>
         <MarketInfoCell
           icon={position.icon}
@@ -206,10 +190,9 @@ export function UserClosedPositions({
       <div className={TABLE_HEADER_CONTAINER_CLASSES}>
         <div className={cn(POSITION_ROW_GRID_CLASSES, TABLE_HEADER_CLASSES)}>
           <div></div>
-          <div></div>
           <div>Market</div>
           <div className="text-right">Total Bet</div>
-          <div className="text-right">Amount</div>
+          <div className="text-right">Value</div>
           <div></div>
         </div>
       </div>

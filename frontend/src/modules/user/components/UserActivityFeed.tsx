@@ -64,9 +64,7 @@ function ActivityRow({ entry }: { entry: Activity }) {
   return (
     <div className={cn(ACTIVITY_ROW_GRID_CLASSES, TABLE_ROW_CLASSES)}>
       {/* Type */}
-      <div className={cn("text-[13px] font-medium", typeColor)}>
-        {typeLabel}
-      </div>
+      <div className={cn("text-[13px] font-medium", "")}>{typeLabel}</div>
       <MarketInfoCell
         icon={iconUrl}
         title={marketLabel}
