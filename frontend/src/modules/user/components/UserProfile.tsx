@@ -157,7 +157,7 @@ export function UserProfile({ userId }: { userId: string }) {
   }, [userId]);
 
   return (
-    <div className="container mx-auto max-w-7xl p-6 space-y-6">
+    <div className="container mx-auto max-w-7xl p-6 space-y-5">
       {/* Header Row: Logo + Search Bar */}
       <div className="flex items-center gap-5">
         <Link href="/" className="shrink-0">
@@ -255,7 +255,7 @@ export function UserProfile({ userId }: { userId: string }) {
             </div>
           </div>
           {/* Stats */}
-          <div className="flex items-center gap-4 mt-4 pt-4 border-t border-brand-stroke">
+          <div className="flex items-center gap-4 mt-4 pt-4 border-t border-brand-stroke flex-wrap">
             <div className="flex-1">
               <div className="text-xs text-muted-foreground">Positions</div>
               <div className="text-base font-bold">

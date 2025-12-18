@@ -25,57 +25,50 @@ export function UserWatchlist() {
   const remainingCount = watchlist.length - INITIAL_LIMIT;
 
   return (
-    <div className="border border-brand-stroke rounded-lg">
-      {/* Section Header */}
-      <div className="w-full flex items-center justify-between px-3 py-2">
+    <div className="flex flex-wrap items-center gap-2">
+      {/* <span className="text-xs text-muted-foreground font-medium shrink-0">
+        Watchlist ({watchlist.length})
+      </span> */}
+      {displayItems.map((user) => (
+        <Link
+          key={user.proxyWallet}
+          href={`/user/${user.proxyWallet}`}
+          className={cn(
+            "inline-flex items-center gap-1.5 px-2 py-1 text-xs rounded-md",
+            "border border-brand-stroke",
+            "transition-colors",
+            "hover:bg-brand-background cursor-pointer",
+            "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          )}
+        >
+          <UserWatchlistButton
+            proxyWallet={user.proxyWallet}
+            name={user.name}
+            className="shrink-0"
+          />
+          <span className="font-medium">
+            {user.name || formatAddress(user.proxyWallet)}
+          </span>
+        </Link>
+      ))}
+      {hasMore && (
         <button
           onClick={() => setIsExpanded(!isExpanded)}
-          className="flex-1 flex items-center justify-between text-xs text-brand-foreground hover:text-brand-foreground/80 transition-colors cursor-pointer"
+          className="inline-flex items-center gap-1 px-2 py-1 text-xs text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
         >
-          <span className="font-medium">Watchlist ({watchlist.length})</span>
-          {hasMore && (
-            <div className="flex items-center gap-1">
-              {isExpanded ? (
-                <>
-                  <span className="text-xs">Show less</span>
-                  <ChevronUp className="h-4 w-4" />
-                </>
-              ) : (
-                <>
-                  <span className="text-xs">Show {remainingCount} more</span>
-                  <ChevronDown className="h-4 w-4" />
-                </>
-              )}
-            </div>
+          {isExpanded ? (
+            <>
+              <span>Show less</span>
+              <ChevronUp className="h-3 w-3" />
+            </>
+          ) : (
+            <>
+              <span>+{remainingCount} more</span>
+              <ChevronDown className="h-3 w-3" />
+            </>
           )}
         </button>
-      </div>
-
-      {/* Watchlist Items */}
-      <div className="flex flex-wrap gap-2 px-3 pb-3">
-        {displayItems.map((user) => (
-          <Link
-            key={user.proxyWallet}
-            href={`/user/${user.proxyWallet}`}
-            className={cn(
-              "inline-flex items-center gap-1.5 px-2 py-1 text-xs rounded-md",
-              "border border-brand-stroke",
-              "transition-colors",
-              "hover:bg-brand-background cursor-pointer",
-              "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-            )}
-          >
-            <UserWatchlistButton
-              proxyWallet={user.proxyWallet}
-              name={user.name}
-              className="shrink-0"
-            />
-            <span className="font-medium">
-              {user.name || formatAddress(user.proxyWallet)}
-            </span>
-          </Link>
-        ))}
-      </div>
+      )}
     </div>
   );
 }
