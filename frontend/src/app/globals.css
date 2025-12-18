@@ -103,7 +103,7 @@
   --brand-foreground: #8778ae;
   --brand-stroke: #c5c5c5;
 
-  --brand-highlight: #651fff;
+  --brand-highlight: #661fff7f;
   --brand-primary: #6322fe;
   --brand-background-deeper: #0a0514;
   --share-gray: #505d7c;
@@ -148,6 +148,7 @@
 
   /* custom colors */
   --brand-stroke: #382e52;
+  --brand-highlight: #651fff;
 }
 
 @layer base {

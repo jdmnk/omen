@@ -92,7 +92,7 @@ export function UserPnlChartWidgetV2({ userId }: UserPnlChartWidgetV2Props) {
                 "px-2.5 py-0.5 text-[11px] rounded border border-brand-stroke transition-colors disabled:cursor-not-allowed disabled:opacity-50",
                 interval === int
                   ? "bg-brand-highlight text-secondary-foreground"
-                  : "bg-brand-background text-brand-foreground hover:bg-brand-highlight/50"
+                  : "text-brand-foreground hover:bg-brand-highlight/50"
               )}
             >
               {INTERVAL_LABELS[int]}
