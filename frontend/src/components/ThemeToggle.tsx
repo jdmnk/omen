@@ -18,10 +18,10 @@ export function ThemeToggle() {
       <Button
         variant="ghost"
         size="icon"
-        className="text-muted-foreground hover:text-foreground hover:bg-muted"
+        className="h-10 w-10 text-muted-foreground hover:text-foreground hover:bg-muted cursor-pointer [&_svg]:size-5"
         aria-label="Toggle theme"
       >
-        <Sun className="h-4 w-4" />
+        <Sun />
       </Button>
     );
   }
@@ -30,16 +30,11 @@ export function ThemeToggle() {
     <Button
       variant="ghost"
       size="icon"
-      className="text-muted-foreground hover:text-foreground hover:bg-muted"
+      className="h-10 w-10 text-muted-foreground hover:text-foreground hover:bg-muted cursor-pointer [&_svg]:size-5"
       onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
       aria-label="Toggle theme"
     >
-      {theme === "dark" ? (
-        <Sun className="h-4 w-4" />
-      ) : (
-        <Moon className="h-4 w-4" />
-      )}
+      {theme === "dark" ? <Sun /> : <Moon />}
     </Button>
   );
 }
-

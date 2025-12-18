@@ -24,7 +24,11 @@ export function FontSizeControl() {
     const saved = localStorage.getItem(STORAGE_KEY);
     if (saved) {
       const parsed = parseFloat(saved);
-      if (!isNaN(parsed) && parsed >= FONT_SIZE_MIN && parsed <= FONT_SIZE_MAX) {
+      if (
+        !isNaN(parsed) &&
+        parsed >= FONT_SIZE_MIN &&
+        parsed <= FONT_SIZE_MAX
+      ) {
         setFontSize(parsed);
         document.documentElement.style.fontSize = `${parsed * 100}%`;
       }
@@ -44,13 +48,11 @@ export function FontSizeControl() {
         <Button
           variant="ghost"
           size="icon"
-          className="text-muted-foreground hover:text-foreground hover:bg-muted"
+          className="h-10 w-10 text-muted-foreground hover:text-foreground hover:bg-muted cursor-pointer [&_svg]:size-5"
           aria-label="Font size control"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
-            width="16"
-            height="16"
             viewBox="0 0 24 24"
             fill="none"
             stroke="currentColor"
@@ -90,4 +92,3 @@ export function FontSizeControl() {
     </Popover>
   );
 }
-
