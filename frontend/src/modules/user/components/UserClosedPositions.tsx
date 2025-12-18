@@ -26,7 +26,7 @@ import { PositionActivitySubRow } from "./positions/PositionActivitySubRow";
 import { PositionMarketLinkButton } from "./positions/PositionMarketLinkButton";
 
 const POSITION_ROW_GRID_CLASSES =
-  "grid grid-cols-[18px_60px_1fr_80px_minmax(100px,auto)_32px] items-center gap-3";
+  "grid grid-cols-[18px_40px_1fr_80px_minmax(120px,auto)_24px] items-center gap-3";
 
 type ClosedPositionRowProps = {
   position: ClosedPosition;
@@ -98,21 +98,19 @@ function ClosedPositionRow({
           />
         </div>
         {/* Won/Lost status */}
-        <div className="flex items-center gap-1">
+        <div className="flex items-center gap-1 text-[13px]">
           {isWin ? (
             <>
-              <Check className="h-4 w-4 text-outcome-yes" />
-              <span className="text-xs font-medium text-outcome-yes">Won</span>
+              {/* <Check className="h-4 w-4 text-outcome-yes" /> */}
+              <span className="font-medium text-outcome-yes">Won</span>
             </>
           ) : isLoss ? (
             <>
-              <X className="h-4 w-4 text-outcome-no" />
-              <span className="text-xs font-medium text-outcome-no">Lost</span>
+              {/* <X className="h-4 w-4 text-outcome-no" /> */}
+              <span className="font-medium text-outcome-no">Lost</span>
             </>
           ) : (
-            <span className="text-xs font-medium text-muted-foreground">
-              Even
-            </span>
+            <span className="font-medium text-muted-foreground">Even</span>
           )}
         </div>
         {/* Market info: icon, title, shares */}
@@ -138,7 +136,7 @@ function ClosedPositionRow({
           </div>
         </div>
         {/* Cost */}
-        <div className="text-center">
+        <div className="text-right">
           <span className="font-semibold text-sm">
             {formatCompactCurrency(totalBought)}
           </span>
@@ -227,10 +225,10 @@ export function UserClosedPositions({
       <div className={TABLE_HEADER_CONTAINER_CLASSES}>
         <div className={cn(POSITION_ROW_GRID_CLASSES, TABLE_HEADER_CLASSES)}>
           <div></div>
-          <div>Result</div>
+          <div></div>
           <div>Market</div>
-          <div className="text-center">Total Bet</div>
-          <div className="text-right">Amount Won</div>
+          <div className="text-right">Total Bet</div>
+          <div className="text-right">Amount</div>
           <div></div>
         </div>
       </div>
