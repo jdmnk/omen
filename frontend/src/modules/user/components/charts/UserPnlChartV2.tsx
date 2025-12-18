@@ -9,6 +9,7 @@ import {
   IChartApi,
   ISeriesApi,
   LineData,
+  MouseEventParams,
   Time,
   createChart,
 } from "lightweight-charts";
@@ -24,6 +25,7 @@ type UserPnlChartV2Props = {
   data: ChartPoint[];
   error?: Error | null;
   isLoading?: boolean;
+  onCrosshairMove?: (value: number | null) => void;
 };
 
 const chartOptions: DeepPartial<ChartOptions> = {
@@ -75,10 +77,16 @@ export function UserPnlChartV2({
   data,
   error,
   isLoading,
+  onCrosshairMove,
 }: UserPnlChartV2Props) {
   const chartContainerRef = useRef<HTMLDivElement>(null);
   const chartRef = useRef<IChartApi | null>(null);
   const seriesRef = useRef<ISeriesApi<"Area"> | null>(null);
+  const onCrosshairMoveRef = useRef(onCrosshairMove);
+
+  useEffect(() => {
+    onCrosshairMoveRef.current = onCrosshairMove;
+  }, [onCrosshairMove]);
 
   useEffect(() => {
     if (!chartContainerRef.current) return;
@@ -104,6 +112,22 @@ export function UserPnlChartV2({
     chartRef.current = chart;
     seriesRef.current = lineSeries;
 
+    const handleCrosshairMove = (param: MouseEventParams<Time>) => {
+      if (!onCrosshairMoveRef.current) return;
+
+      if (!param.time || !param.seriesData || param.seriesData.size === 0) {
+        onCrosshairMoveRef.current(null);
+        return;
+      }
+
+      const seriesData = param.seriesData.get(lineSeries);
+      if (seriesData && "value" in seriesData) {
+        onCrosshairMoveRef.current(seriesData.value);
+      }
+    };
+
+    chart.subscribeCrosshairMove(handleCrosshairMove);
+
     const handleResize = () => {
       if (!chartContainerRef.current || !chartRef.current) return;
       const width = chartContainerRef.current.clientWidth;
@@ -118,6 +142,7 @@ export function UserPnlChartV2({
     window.addEventListener("resize", handleResize);
 
     return () => {
+      chart.unsubscribeCrosshairMove(handleCrosshairMove);
       resizeObserver.disconnect();
       window.removeEventListener("resize", handleResize);
       chart.remove();

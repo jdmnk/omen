@@ -1,12 +1,14 @@
 "use client";
 
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { Card } from "@/components/ui/card";
 import { useIsMounted } from "@/lib/hooks/use-is-mounted";
 import {
   useUserPnlQuery,
   UserPnlInterval,
 } from "@/modules/user/lib/queries/user-pnl.query";
+import { formatCurrency } from "@/lib/ui/format.utils";
+import { getPnlColorClass } from "@/lib/ui/color.utils";
 import { cn } from "@/lib/utils";
 import { UserPnlChartV2 } from "./charts/UserPnlChartV2";
 
@@ -20,12 +22,21 @@ const INTERVAL_LABELS: Record<UserPnlInterval, string> = {
   max: "ALL",
 };
 
+const INTERVAL_DISPLAY_LABELS: Record<UserPnlInterval, string> = {
+  "12h": "12 Hours",
+  "1d": "24 Hours",
+  "1w": "7 Days",
+  "1m": "30 Days",
+  max: "All-Time",
+};
+
 type UserPnlChartWidgetV2Props = {
   userId: string;
 };
 
 export function UserPnlChartWidgetV2({ userId }: UserPnlChartWidgetV2Props) {
-  const [interval, setInterval] = useState<UserPnlInterval>("1w");
+  const [interval, setInterval] = useState<UserPnlInterval>("max");
+  const [hoveredValue, setHoveredValue] = useState<number | null>(null);
   const isMounted = useIsMounted();
 
   const {
@@ -40,14 +51,37 @@ export function UserPnlChartWidgetV2({ userId }: UserPnlChartWidgetV2Props) {
       value: point.p,
     })) ?? [];
 
+  const currentPnl =
+    pnlPoints && pnlPoints.length > 0 ? pnlPoints[pnlPoints.length - 1].p : 0;
+
+  const displayValue = hoveredValue ?? currentPnl;
+
+  const handleCrosshairMove = useCallback((value: number | null) => {
+    setHoveredValue(value);
+  }, []);
+
   if (!isMounted) {
     return null;
   }
 
   return (
-    <Card className="relative flex h-full w-full flex-col pb-2">
-      <div className="flex items-center justify-between gap-2 border-b border-brand-stroke bg-brand-background px-3 py-2 text-xs font-bold">
-        <span>PnL History</span>
+    <Card className="relative flex h-full w-full flex-col">
+      <div className="flex items-start justify-between px-3 pt-3 pb-2">
+        <div className="flex flex-col gap-0.5">
+          <span className="text-xs text-muted-foreground">Profit/Loss</span>
+          <span
+            className={cn(
+              "text-2xl font-semibold",
+              getPnlColorClass(displayValue)
+            )}
+          >
+            {formatCurrency(displayValue)}
+          </span>
+          <span className="text-xs text-muted-foreground">
+            {INTERVAL_DISPLAY_LABELS[interval]}
+          </span>
+        </div>
+
         <div className="flex items-center gap-1">
           {INTERVALS.map((int) => (
             <button
@@ -72,6 +106,7 @@ export function UserPnlChartWidgetV2({ userId }: UserPnlChartWidgetV2Props) {
           data={chartData}
           isLoading={isPnlLoading}
           error={pnlError}
+          onCrosshairMove={handleCrosshairMove}
         />
       </div>
     </Card>
