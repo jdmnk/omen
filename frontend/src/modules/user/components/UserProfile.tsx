@@ -15,11 +15,9 @@ import { useUserTradedQuery } from "@/modules/user/lib/queries/user-traded.query
 import { useUserValueQuery } from "@/modules/user/lib/queries/user-value.query";
 import { useIsMounted } from "@/lib/hooks/use-is-mounted";
 import { useUserDataQuery } from "@/modules/user/lib/queries/user-data.query";
-import { useUserPositionsInfiniteQuery } from "@/modules/user/lib/queries/user-positions.query";
 import { useUserLeaderboardQuery } from "@/modules/user/lib/queries/user-leaderboard.query";
 import { fetchUserActivityEntries } from "@/modules/user/lib/queries/user-activity.query";
 import { getPositionKey } from "@/modules/user/lib/position.utils";
-import { POSITIONS_PAGE_SIZE } from "@/modules/user/lib/positions.const";
 import { UserSelectedMarketCharts } from "./UserSelectedMarketCharts";
 import { UserActivityFeed } from "./UserActivityFeed";
 import { Copy } from "lucide-react";
@@ -70,7 +68,6 @@ export function UserProfile({ userId }: { userId: string }) {
   const { data: tradedData } = useUserTradedQuery(userId);
   const { data: valueData } = useUserValueQuery(userId);
   const { data: userData } = useUserDataQuery(userId);
-  const { data: positionsData } = useUserPositionsInfiniteQuery(userId);
   const { data: leaderboardData } = useUserLeaderboardQuery(userId);
 
   const handlePositionToggle = useCallback(
@@ -147,13 +144,6 @@ export function UserProfile({ userId }: { userId: string }) {
     if (!valueData || valueData.length === 0) return 0;
     return valueData[0]?.value || 0;
   }, [valueData]);
-
-  const openPositionsCount = useMemo(() => {
-    if (!positionsData?.pages) return 0;
-    return positionsData.pages.flat().length;
-  }, [positionsData]);
-
-  const hasMorePositions = openPositionsCount >= POSITIONS_PAGE_SIZE;
 
   const [copyMessage, setCopyMessage] = useState<string | null>(null);
 
@@ -250,54 +240,41 @@ export function UserProfile({ userId }: { userId: string }) {
             </div>
           </div>
           {/* Stats */}
-          <div className="mt-4 pt-4 border-t border-brand-stroke space-y-3">
-            <div className="flex items-center gap-4">
-              <div className="flex-1">
-                <div className="text-xs text-muted-foreground">Rank</div>
-                <div className="text-base font-bold">
-                  {isMounted && leaderboardData?.rank
-                    ? `#${Number(leaderboardData.rank).toLocaleString()}`
-                    : "-"}
-                </div>
-              </div>
-              <div className="w-px h-8 bg-brand-stroke" />
-              <div className="flex-1">
-                <div className="text-xs text-muted-foreground">Volume</div>
-                <div className="text-base font-bold">
-                  {isMounted && leaderboardData?.vol
-                    ? formatCompactCurrency(leaderboardData.vol)
-                    : "-"}
-                </div>
-              </div>
-              <div className="w-px h-8 bg-brand-stroke" />
-              <div className="flex-1">
-                <div className="text-xs text-muted-foreground">Positions</div>
-                <div className="text-base font-bold">
-                  {isMounted && totalValue !== 0
-                    ? formatCompactCurrency(totalValue)
-                    : "-"}
-                </div>
+          <div className="flex items-center gap-4 mt-4 pt-4 border-t border-brand-stroke">
+            <div className="flex-1">
+              <div className="text-xs text-muted-foreground">Rank</div>
+              <div className="text-base font-bold">
+                {isMounted && leaderboardData?.rank
+                  ? `#${Number(leaderboardData.rank).toLocaleString()}`
+                  : "-"}
               </div>
             </div>
-            <div className="flex items-center gap-4">
-              <div className="flex-1">
-                <div className="text-xs text-muted-foreground">Open</div>
-                <div className="text-base font-bold">
-                  {isMounted && openPositionsCount > 0
-                    ? `${openPositionsCount}${hasMorePositions ? "+" : ""}`
-                    : "-"}
-                </div>
+            <div className="w-px h-8 bg-brand-stroke" />
+            <div className="flex-1">
+              <div className="text-xs text-muted-foreground">Volume</div>
+              <div className="text-base font-bold">
+                {isMounted && leaderboardData?.vol
+                  ? formatCompactCurrency(leaderboardData.vol)
+                  : "-"}
               </div>
-              <div className="w-px h-8 bg-brand-stroke" />
-              <div className="flex-1">
-                <div className="text-xs text-muted-foreground">Predictions</div>
-                <div className="text-base font-bold">
-                  {isMounted && tradedData?.traded
-                    ? tradedData.traded.toLocaleString()
-                    : "-"}
-                </div>
+            </div>
+            <div className="w-px h-8 bg-brand-stroke" />
+            <div className="flex-1">
+              <div className="text-xs text-muted-foreground">Positions</div>
+              <div className="text-base font-bold">
+                {isMounted && totalValue !== 0
+                  ? formatCompactCurrency(totalValue)
+                  : "-"}
               </div>
-              <div className="flex-1" />
+            </div>
+            <div className="w-px h-8 bg-brand-stroke" />
+            <div className="flex-1">
+              <div className="text-xs text-muted-foreground">Predictions</div>
+              <div className="text-base font-bold">
+                {isMounted && tradedData?.traded
+                  ? tradedData.traded.toLocaleString()
+                  : "-"}
+              </div>
             </div>
           </div>
         </Card>
