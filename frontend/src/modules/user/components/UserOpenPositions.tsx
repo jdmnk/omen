@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import Image from "next/image";
 import { useUserPositionsInfiniteQuery } from "@/modules/user/lib/queries/user-positions.query";
 import { LoadingSpinner, Spinner } from "@/components/ui/spinner";
 import {
@@ -24,7 +25,7 @@ import { PositionActivitySubRow } from "./positions/PositionActivitySubRow";
 import { PositionMarketLinkButton } from "./positions/PositionMarketLinkButton";
 
 const POSITION_ROW_GRID_CLASSES =
-  "grid grid-cols-[18px_minmax(220px,2fr)_minmax(80px,0.8fr)_minmax(80px,0.8fr)_minmax(80px,0.8fr)_minmax(80px,0.8fr)_minmax(100px,1fr)_minmax(110px,1fr)_36px] items-center gap-4";
+  "grid grid-cols-[18px_1fr_60px_60px_minmax(100px,auto)_32px] items-center gap-3";
 
 type PositionRowProps = {
   position: OpenPosition;
@@ -40,6 +41,7 @@ function PositionRow({
   activityState,
 }: PositionRowProps) {
   const size = position.size || 0;
+  const avgPrice = position.avgPrice || 0;
   const currentPrice = position.curPrice || 0;
   const pnlColor =
     position.cashPnl > 0
@@ -88,39 +90,65 @@ function PositionRow({
             onCheckedChange={(checked) => toggleSelection(Boolean(checked))}
           />
         </div>
-        <div className="flex min-w-0 overflow-hidden">
-          <span className="inline-flex max-w-full truncate font-medium">
-            {position.title}
+        {/* Market info: icon, title, outcome badge, shares */}
+        <div className="flex items-center gap-2 min-w-0">
+          {position.icon && (
+            <div className="relative h-8 w-8 shrink-0">
+              <Image
+                src={position.icon}
+                alt=""
+                fill
+                className="rounded object-cover"
+              />
+            </div>
+          )}
+          <div className="flex flex-col min-w-0">
+            <span className="truncate font-medium text-sm leading-tight">
+              {position.title}
+            </span>
+            <div className="flex items-center gap-2 text-xs text-muted-foreground">
+              <span
+                className={cn(
+                  "px-1.5 py-0.5 rounded text-[10px] font-medium",
+                  position.outcome === "Yes"
+                    ? "bg-outcome-yes/15 text-outcome-yes"
+                    : "bg-outcome-no/15 text-outcome-no"
+                )}
+              >
+                {position.outcome}
+              </span>
+              <span>
+                {formatNumber(size, 1)} shares at{" "}
+                {formatPrice(avgPrice, { maximumFractionDigits: 0 })}
+              </span>
+            </div>
+          </div>
+        </div>
+        {/* AVG price */}
+        <div className="text-center">
+          <span className="font-semibold text-sm">
+            {formatPrice(avgPrice, { maximumFractionDigits: 0 })}
           </span>
         </div>
-        <div>
-          <div className="font-semibold truncate">{position.outcome}</div>
+        {/* CURRENT price */}
+        <div className="text-center">
+          <span className="font-semibold text-sm">
+            {formatPrice(currentPrice, { maximumFractionDigits: 0 })}
+          </span>
         </div>
-        <div>
-          <div className="font-semibold">{formatNumber(size, 0)}</div>
-        </div>
-        <div>
-          <div className="font-semibold">
-            {formatPrice(currentPrice, { maximumFractionDigits: 1 })}
-          </div>
-        </div>
-        <div>
-          <div className="font-semibold">
+        {/* VALUE with PnL */}
+        <div className="text-right">
+          <div className="font-semibold text-sm">
             {formatCompactCurrency(position.currentValue)}
           </div>
-        </div>
-        <div className={cn("flex items-center gap-1", pnlColor)}>
-          <div className="font-semibold">
-            {formatCompactCurrency(position.cashPnl)}
-          </div>
-          <div className="opacity-75">
-            {position.percentPnl > 0 ? "+" : ""}
-            {formatNumber(position.percentPnl, 1)}%
+          <div className={cn("text-xs", pnlColor)}>
+            {position.cashPnl >= 0 ? "+" : ""}
+            {formatCompactCurrency(position.cashPnl)} (
+            {position.percentPnl >= 0 ? "+" : ""}
+            {formatNumber(position.percentPnl, 2)}%)
           </div>
         </div>
-        <div className="text-right text-xs text-muted-foreground">
-          {position.endDate ? new Date(position.endDate).toLocaleString() : "-"}
-        </div>
+        {/* Link */}
         <div className="flex justify-end">
           <PositionMarketLinkButton slug={position.eventSlug} />
         </div>
@@ -195,13 +223,10 @@ export function UserOpenPositions({
         <div className={cn(POSITION_ROW_GRID_CLASSES, TABLE_HEADER_CLASSES)}>
           <div></div>
           <div>Market</div>
-          <div>Outcome</div>
-          <div>Size</div>
-          <div>Price</div>
-          <div>Value</div>
-          <div>PnL</div>
-          <div className="text-right">End date</div>
-          <div className="text-right">Link</div>
+          <div className="text-center">Avg</div>
+          <div className="text-center">Current</div>
+          <div className="text-right">Value</div>
+          <div></div>
         </div>
       </div>
       <div className={TABLE_CONTENT_CONTAINER_CLASSES}>
