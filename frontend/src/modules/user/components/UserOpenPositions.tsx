@@ -142,9 +142,7 @@ function PositionRow({
             {formatCompactCurrency(position.currentValue)}
           </div>
           <div className={cn("text-xs", pnlColor)}>
-            {position.cashPnl >= 0 ? "+" : ""}
             {formatCompactCurrency(position.cashPnl)} (
-            {position.percentPnl >= 0 ? "+" : ""}
             {formatNumber(position.percentPnl, 2)}%)
           </div>
         </div>

@@ -149,10 +149,8 @@ function ClosedPositionRow({
             {formatCompactCurrency(totalBought + realizedPnl)}
           </div>
           <div className={cn("text-xs", pnlColor)}>
-            {realizedPnl >= 0 ? "+" : ""}
-            {formatCompactCurrency(realizedPnl)} (
-            {pnlPercent >= 0 ? "+" : ""}
-            {formatNumber(pnlPercent, 0)}%)
+            {formatCompactCurrency(realizedPnl)} ({formatNumber(pnlPercent, 2)}
+            %)
           </div>
         </div>
         {/* Link */}
@@ -229,10 +227,10 @@ export function UserClosedPositions({
       <div className={TABLE_HEADER_CONTAINER_CLASSES}>
         <div className={cn(POSITION_ROW_GRID_CLASSES, TABLE_HEADER_CLASSES)}>
           <div></div>
-          <div></div>
+          <div>Result</div>
           <div>Market</div>
-          <div className="text-center">Cost</div>
-          <div className="text-right">Value</div>
+          <div className="text-center">Total Bet</div>
+          <div className="text-right">Amount Won</div>
           <div></div>
         </div>
       </div>
