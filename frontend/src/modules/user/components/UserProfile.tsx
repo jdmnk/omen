@@ -11,14 +11,14 @@ import { UserOpenPositions } from "./UserOpenPositions";
 import { UserClosedPositions } from "./UserClosedPositions";
 import { UserPnlChartWidgetV2 } from "./UserPnlChartWidgetV2";
 import { formatAddress, formatCompactCurrency } from "@/lib/ui/format.utils";
-import { cn } from "@/lib/utils";
 import { useUserTradedQuery } from "@/modules/user/lib/queries/user-traded.query";
 import { useUserValueQuery } from "@/modules/user/lib/queries/user-value.query";
 import { useIsMounted } from "@/lib/hooks/use-is-mounted";
 import { useUserDataQuery } from "@/modules/user/lib/queries/user-data.query";
-import { useUserPnlQuery } from "@/modules/user/lib/queries/user-pnl.query";
+import { useUserPositionsInfiniteQuery } from "@/modules/user/lib/queries/user-positions.query";
 import { fetchUserActivityEntries } from "@/modules/user/lib/queries/user-activity.query";
 import { getPositionKey } from "@/modules/user/lib/position.utils";
+import { POSITIONS_PAGE_SIZE } from "@/modules/user/lib/positions.const";
 import { UserSelectedMarketCharts } from "./UserSelectedMarketCharts";
 import { UserActivityFeed } from "./UserActivityFeed";
 import { Copy } from "lucide-react";
@@ -69,7 +69,7 @@ export function UserProfile({ userId }: { userId: string }) {
   const { data: tradedData } = useUserTradedQuery(userId);
   const { data: valueData } = useUserValueQuery(userId);
   const { data: userData } = useUserDataQuery(userId);
-  const { data: pnlPoints } = useUserPnlQuery(userId, "1w");
+  const { data: positionsData } = useUserPositionsInfiniteQuery(userId);
 
   const handlePositionToggle = useCallback(
     (position: Position, checked: boolean) => {
@@ -146,19 +146,19 @@ export function UserProfile({ userId }: { userId: string }) {
     return valueData[0]?.value || 0;
   }, [valueData]);
 
-  const currentPnl = useMemo(() => {
-    if (!pnlPoints || pnlPoints.length === 0) return 0;
-    return pnlPoints[pnlPoints.length - 1].p;
-  }, [pnlPoints]);
+  const openPositionsCount = useMemo(() => {
+    if (!positionsData?.pages) return 0;
+    return positionsData.pages.flat().length;
+  }, [positionsData]);
 
-  const isPnlPositive = currentPnl >= 0;
+  const hasMorePositions = openPositionsCount >= POSITIONS_PAGE_SIZE;
 
   const [copyMessage, setCopyMessage] = useState<string | null>(null);
 
   const handleCopy = useCallback(async () => {
     if (!userId) return;
     const ok = await copyToClipboard(userId);
-    setCopyMessage(ok ? "Copied address" : "Copy failed");
+    setCopyMessage(ok ? "Copied wallet" : "Copy failed");
     setTimeout(() => setCopyMessage(null), 2000);
   }, [userId]);
 
@@ -232,7 +232,6 @@ export function UserProfile({ userId }: { userId: string }) {
               ) : null}
             </div>
           </div>
-
           {/* Stats Row */}
           <div className="flex items-center gap-4 mt-4 pt-4 border-t border-brand-stroke">
             <div className="flex-1">
@@ -247,25 +246,20 @@ export function UserProfile({ userId }: { userId: string }) {
             </div>
             <div className="w-px h-10 bg-brand-stroke" />
             <div className="flex-1">
-              <div className="text-xs text-muted-foreground">PnL</div>
-              <div
-                className={cn(
-                  "text-xl font-bold mt-0.5",
-                  isMounted && currentPnl !== 0
-                    ? isPnlPositive
-                      ? "text-outcome-yes"
-                      : "text-outcome-no"
-                    : ""
-                )}
-              >
-                {isMounted && currentPnl !== 0
-                  ? formatCompactCurrency(currentPnl)
+              <div className="text-xs text-muted-foreground">
+                Open Positions
+              </div>
+              <div className="text-xl font-bold mt-0.5">
+                {isMounted && openPositionsCount > 0
+                  ? `${openPositionsCount}${hasMorePositions ? "+" : ""}`
                   : "-"}
               </div>
             </div>
             <div className="w-px h-10 bg-brand-stroke" />
             <div className="flex-1">
-              <div className="text-xs text-muted-foreground">Predictions</div>
+              <div className="text-xs text-muted-foreground">
+                Total Predictions
+              </div>
               <div className="text-xl font-bold mt-0.5">
                 {isMounted && tradedData?.traded
                   ? tradedData.traded.toLocaleString()

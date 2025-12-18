@@ -3,8 +3,7 @@
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { OpenPosition } from "../../../../lib/models/api.models";
 import { DATA_API_HOST } from "../../../../lib/api.const";
-
-const PAGE_SIZE = 50;
+import { POSITIONS_PAGE_SIZE } from "../positions.const";
 
 export function useUserPositionsInfiniteQuery(userId: string) {
   return useInfiniteQuery<OpenPosition[], Error>({
@@ -15,10 +14,10 @@ export function useUserPositionsInfiniteQuery(userId: string) {
       url.searchParams.set("sizeThreshold", "1");
       url.searchParams.set("sortBy", "CURRENT");
       url.searchParams.set("sortDirection", "DESC");
-      url.searchParams.set("limit", PAGE_SIZE.toString());
+      url.searchParams.set("limit", POSITIONS_PAGE_SIZE.toString());
       url.searchParams.set(
         "offset",
-        ((pageParam as number) * PAGE_SIZE).toString()
+        ((pageParam as number) * POSITIONS_PAGE_SIZE).toString()
       );
 
       const response = await fetch(url.toString());
@@ -29,7 +28,7 @@ export function useUserPositionsInfiniteQuery(userId: string) {
       return data;
     },
     getNextPageParam: (lastPage, allPages) => {
-      if (lastPage.length < PAGE_SIZE) return undefined;
+      if (lastPage.length < POSITIONS_PAGE_SIZE) return undefined;
       return allPages.length;
     },
     initialPageParam: 0,
