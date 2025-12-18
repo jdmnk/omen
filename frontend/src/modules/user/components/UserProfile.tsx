@@ -11,10 +11,12 @@ import { UserOpenPositions } from "./UserOpenPositions";
 import { UserClosedPositions } from "./UserClosedPositions";
 import { UserPnlChartWidgetV2 } from "./UserPnlChartWidgetV2";
 import { formatAddress, formatCompactCurrency } from "@/lib/ui/format.utils";
+import { cn } from "@/lib/utils";
 import { useUserTradedQuery } from "@/modules/user/lib/queries/user-traded.query";
 import { useUserValueQuery } from "@/modules/user/lib/queries/user-value.query";
 import { useIsMounted } from "@/lib/hooks/use-is-mounted";
 import { useUserDataQuery } from "@/modules/user/lib/queries/user-data.query";
+import { useUserPnlQuery } from "@/modules/user/lib/queries/user-pnl.query";
 import { fetchUserActivityEntries } from "@/modules/user/lib/queries/user-activity.query";
 import { getPositionKey } from "@/modules/user/lib/position.utils";
 import { UserSelectedMarketCharts } from "./UserSelectedMarketCharts";
@@ -67,6 +69,7 @@ export function UserProfile({ userId }: { userId: string }) {
   const { data: tradedData } = useUserTradedQuery(userId);
   const { data: valueData } = useUserValueQuery(userId);
   const { data: userData } = useUserDataQuery(userId);
+  const { data: pnlPoints } = useUserPnlQuery(userId, "1w");
 
   const handlePositionToggle = useCallback(
     (position: Position, checked: boolean) => {
@@ -143,6 +146,13 @@ export function UserProfile({ userId }: { userId: string }) {
     return valueData[0]?.value || 0;
   }, [valueData]);
 
+  const currentPnl = useMemo(() => {
+    if (!pnlPoints || pnlPoints.length === 0) return 0;
+    return pnlPoints[pnlPoints.length - 1].p;
+  }, [pnlPoints]);
+
+  const isPnlPositive = currentPnl >= 0;
+
   const [copyMessage, setCopyMessage] = useState<string | null>(null);
 
   const handleCopy = useCallback(async () => {
@@ -159,83 +169,116 @@ export function UserProfile({ userId }: { userId: string }) {
       {/* User Watchlist */}
       <UserWatchlist />
 
-      {/* Compact Header + Inline Stats */}
-      <div className="flex items-start justify-between gap-3 flex-wrap">
-        <img
-          src={userData?.profileImage || "/logo.svg"}
-          alt=""
-          className="h-8 w-8 rounded-full border border-brand-stroke object-cover"
-        />
-        <div className="min-w-0 flex-1">
-          <div className="flex items-center gap-2">
-            <h1 className="text-sm font-bold truncate max-w-[60vw]">
-              <a
-                href={`https://polymarket.com/profile/${userId}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="hover:underline"
-              >
-                {userData?.name || userData?.pseudonym || formatAddress(userId)}
-              </a>
-            </h1>
-            <UserWatchlistButton
-              proxyWallet={userId}
-              name={
-                userData?.name || userData?.pseudonym || formatAddress(userId)
-              }
+      {/* Two-column Header: User Info + PnL */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        {/* Left Card: User Info */}
+        <Card className="p-4 flex flex-col">
+          <div className="flex items-start gap-4">
+            <img
+              src={userData?.profileImage || "/logo.svg"}
+              alt=""
+              className="h-16 w-16 rounded-full border border-brand-stroke object-cover shrink-0"
             />
-            <Button
-              size="icon"
-              variant="ghost"
-              className="h-6 w-6 text-muted-foreground p-0 [&_svg]:h-3 [&_svg]:w-3"
-              onClick={handleCopy}
-              aria-label="Copy address"
-            >
-              <Copy />
-            </Button>
-            {copyMessage && (
-              <span className="text-[11px] text-muted-foreground">
-                {copyMessage}
-              </span>
-            )}
+            <div className="min-w-0 flex-1">
+              <div className="flex items-center gap-2 flex-wrap">
+                <h1 className="text-lg font-bold truncate">
+                  <a
+                    href={`https://polymarket.com/profile/${userId}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="hover:underline"
+                  >
+                    {userData?.name ||
+                      userData?.pseudonym ||
+                      formatAddress(userId)}
+                  </a>
+                </h1>
+                <UserWatchlistButton
+                  proxyWallet={userId}
+                  name={
+                    userData?.name ||
+                    userData?.pseudonym ||
+                    formatAddress(userId)
+                  }
+                />
+                <Button
+                  size="icon"
+                  variant="ghost"
+                  className="h-6 w-6 text-muted-foreground p-0 [&_svg]:h-3 [&_svg]:w-3"
+                  onClick={handleCopy}
+                  aria-label="Copy address"
+                >
+                  <Copy />
+                </Button>
+                {copyMessage && (
+                  <span className="text-[11px] text-muted-foreground">
+                    {copyMessage}
+                  </span>
+                )}
+              </div>
+              <div className="text-sm text-muted-foreground mt-0.5">
+                Joined{" "}
+                {userData?.createdAt
+                  ? new Date(userData.createdAt).toLocaleDateString("en-US", {
+                      month: "short",
+                      year: "numeric",
+                    })
+                  : "-"}
+              </div>
+              {userData?.bio ? (
+                <p className="text-sm text-muted-foreground mt-1 line-clamp-2">
+                  {userData.bio}
+                </p>
+              ) : null}
+            </div>
           </div>
-          <div className="text-[11px] text-muted-foreground">
-            Joined{" "}
-            {userData?.createdAt
-              ? new Date(userData.createdAt).toLocaleDateString()
-              : "-"}
-          </div>
-          {userData?.bio ? (
-            <p className="text-xs text-muted-foreground truncate">
-              {userData.bio}
-            </p>
-          ) : null}
-        </div>
-        {/* Inline Stats */}
-        <div className="flex items-center gap-3 text-xs shrink-0">
-          <div className="flex items-center gap-1">
-            <span className="text-muted-foreground">Markets</span>
-            <span className="font-bold">
-              {isMounted && tradedData?.traded
-                ? tradedData.traded.toLocaleString()
-                : "-"}
-            </span>
-          </div>
-          <div className="h-3 w-px bg-brand-stroke" />
-          <div className="flex items-center gap-1">
-            <span className="text-muted-foreground">Portfolio</span>
-            <span className="font-bold">
-              {isMounted && totalValue !== 0
-                ? formatCompactCurrency(totalValue)
-                : "-"}
-            </span>
-          </div>
-        </div>
-      </div>
 
-      {/* PnL Chart */}
-      <div className="h-96">
-        <UserPnlChartWidgetV2 userId={userId} />
+          {/* Stats Row */}
+          <div className="flex items-center gap-4 mt-4 pt-4 border-t border-brand-stroke">
+            <div className="flex-1">
+              <div className="text-xs text-muted-foreground">
+                Positions Value
+              </div>
+              <div className="text-xl font-bold mt-0.5">
+                {isMounted && totalValue !== 0
+                  ? formatCompactCurrency(totalValue)
+                  : "-"}
+              </div>
+            </div>
+            <div className="w-px h-10 bg-brand-stroke" />
+            <div className="flex-1">
+              <div className="text-xs text-muted-foreground">PnL</div>
+              <div
+                className={cn(
+                  "text-xl font-bold mt-0.5",
+                  isMounted && currentPnl !== 0
+                    ? isPnlPositive
+                      ? "text-outcome-yes"
+                      : "text-outcome-no"
+                    : ""
+                )}
+              >
+                {isMounted && currentPnl !== 0
+                  ? formatCompactCurrency(currentPnl)
+                  : "-"}
+              </div>
+            </div>
+            <div className="w-px h-10 bg-brand-stroke" />
+            <div className="flex-1">
+              <div className="text-xs text-muted-foreground">Markets</div>
+              <div className="text-xl font-bold mt-0.5">
+                {isMounted && tradedData?.traded
+                  ? tradedData.traded.toLocaleString()
+                  : "-"}
+              </div>
+            </div>
+          </div>
+        </Card>
+
+        {/* Right Card: PnL Chart */}
+        <div className="h-64 lg:h-auto">
+          <UserPnlChartWidgetV2 userId={userId} />
+        </div>
       </div>
 
       {/* Selected Market Charts */}

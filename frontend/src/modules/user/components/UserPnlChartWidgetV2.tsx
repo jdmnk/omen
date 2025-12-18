@@ -25,9 +25,8 @@ const INTERVAL_LABELS: Record<UserPnlInterval, string> = {
   "1d": "1D",
   "1w": "1W",
   "1m": "1M",
-  max: "MAX",
+  max: "ALL",
 };
-
 function toChartTime(value?: number | string | null): Time | null {
   if (value === undefined || value === null) return null;
   if (typeof value === "number") {
@@ -73,7 +72,6 @@ export function UserPnlChartWidgetV2({ userId }: UserPnlChartWidgetV2Props) {
 
   const currentPnl =
     pnlPoints && pnlPoints.length > 0 ? pnlPoints[pnlPoints.length - 1].p : 0;
-  const isPositive = currentPnl >= 0;
 
   const openPositions = useMemo(
     () => flattenInfiniteResult<OpenPosition>(openPositionsData?.pages),
@@ -118,20 +116,7 @@ export function UserPnlChartWidgetV2({ userId }: UserPnlChartWidgetV2Props) {
   return (
     <Card className="relative flex h-full w-full flex-col pb-2">
       <div className="flex items-center justify-between gap-2 border-b border-brand-stroke bg-brand-background px-3 py-2 text-xs font-bold">
-        <span className="flex flex-1 items-center gap-2">
-          <span>PnL History</span>
-          <span className="text-muted-foreground font-normal">
-            Current:
-            <span
-              className={cn(
-                "ml-1 font-bold",
-                isPositive ? "text-outcome-yes" : "text-outcome-no"
-              )}
-            >
-              {formatCompactCurrency(currentPnl)}
-            </span>
-          </span>
-        </span>
+        <span>PnL History</span>
         <div className="flex items-center gap-1">
           {INTERVALS.map((int) => (
             <button
