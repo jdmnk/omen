@@ -73,7 +73,7 @@ export function PositionActivitySubRow({
   const pageEntries = entries.slice(startIndex, endIndex);
 
   return (
-    <div className="ml-7 rounded-md border border-brand-stroke/70 bg-brand-background/40 px-3 py-2 text-[11px]">
+    <div className="ml-7 rounded-md border border-brand-stroke px-3 py-2 text-[11px]">
       <div className="mb-1 flex items-center justify-between uppercase tracking-wide text-muted-foreground">
         <span className="font-semibold">Position Activity</span>
         <span className="text-[10px]">
@@ -118,7 +118,7 @@ export function PositionActivitySubRow({
               className="flex flex-wrap items-center gap-3 py-1 text-[11px]"
             >
               <span className="text-muted-foreground">{timestamp}</span>
-              <span className="rounded-full bg-brand-background/60 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
+              <span className="rounded-full px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-muted-foreground bg-brand-highlight/20">
                 {typeLabel}
               </span>
               {primaryLabel && (

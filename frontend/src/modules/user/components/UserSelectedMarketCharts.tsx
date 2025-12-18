@@ -115,12 +115,7 @@ function PositionChartCard({
   };
 
   return (
-    <Card
-      className={cn(
-        "flex min-h-72 flex-col gap-2 border border-brand-stroke/70 bg-brand-background/40 p-3",
-        className
-      )}
-    >
+    <Card className={cn("flex min-h-72 flex-col gap-2 border p-3", className)}>
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
           <div className="flex items-center">
@@ -161,10 +156,10 @@ function PositionChartCard({
             <button
               key={int}
               onClick={() => setInterval(int)}
-              className={`rounded border border-brand-stroke px-2 py-0.5 text-[11px] ${
+              className={`rounded border border-brand-stroke px-2.5 py-0.5 text-[11px] ${
                 interval === int
                   ? "bg-brand-highlight text-secondary-foreground"
-                  : "bg-brand-background text-brand-foreground hover:bg-brand-highlight/40"
+                  : "text-brand-foreground hover:bg-brand-highlight/50"
               }`}
             >
               {INTERVAL_LABELS[int]}
@@ -221,7 +216,7 @@ export function UserSelectedMarketCharts({
 
   return (
     <>
-      <Card className="flex flex-col border border-brand-stroke/80 bg-brand-background/60">
+      <Card className="flex flex-col border border-brand-stroke">
         <div className="flex items-center justify-between px-3 py-2 text-xs font-semibold">
           <span>Selected Market Charts ({activities.length})</span>
           <button
