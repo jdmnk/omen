@@ -174,7 +174,7 @@ export function UserPnlChartV2({
   }
 
   return (
-    <div className="relative w-full h-full">
+    <div className="relative w-full h-[80px]">
       {isLoading && (
         <div className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-3 bg-background/50 backdrop-blur-sm">
           <Spinner size="md" />
