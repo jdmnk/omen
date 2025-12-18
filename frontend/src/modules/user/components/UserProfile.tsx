@@ -242,10 +242,19 @@ export function UserProfile({ userId }: { userId: string }) {
           {/* Stats */}
           <div className="flex items-center gap-4 mt-4 pt-4 border-t border-brand-stroke">
             <div className="flex-1">
-              <div className="text-xs text-muted-foreground">Rank</div>
+              <div className="text-xs text-muted-foreground">Positions</div>
               <div className="text-base font-bold">
-                {isMounted && leaderboardData?.rank
-                  ? `#${Number(leaderboardData.rank).toLocaleString()}`
+                {isMounted && totalValue !== 0
+                  ? formatCompactCurrency(totalValue)
+                  : "-"}
+              </div>
+            </div>
+            <div className="w-px h-8 bg-brand-stroke" />
+            <div className="flex-1">
+              <div className="text-xs text-muted-foreground">Predictions</div>
+              <div className="text-base font-bold">
+                {isMounted && tradedData?.traded
+                  ? tradedData.traded.toLocaleString()
                   : "-"}
               </div>
             </div>
@@ -260,19 +269,10 @@ export function UserProfile({ userId }: { userId: string }) {
             </div>
             <div className="w-px h-8 bg-brand-stroke" />
             <div className="flex-1">
-              <div className="text-xs text-muted-foreground">Positions</div>
+              <div className="text-xs text-muted-foreground">Rank</div>
               <div className="text-base font-bold">
-                {isMounted && totalValue !== 0
-                  ? formatCompactCurrency(totalValue)
-                  : "-"}
-              </div>
-            </div>
-            <div className="w-px h-8 bg-brand-stroke" />
-            <div className="flex-1">
-              <div className="text-xs text-muted-foreground">Predictions</div>
-              <div className="text-base font-bold">
-                {isMounted && tradedData?.traded
-                  ? tradedData.traded.toLocaleString()
+                {isMounted && leaderboardData?.rank
+                  ? `#${Number(leaderboardData.rank).toLocaleString()}`
                   : "-"}
               </div>
             </div>
