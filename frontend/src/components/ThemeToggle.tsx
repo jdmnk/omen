@@ -14,16 +14,8 @@ export function ThemeToggle() {
   }, []);
 
   if (!mounted) {
-    return (
-      <Button
-        variant="ghost"
-        size="icon"
-        className="h-10 w-10 text-muted-foreground hover:text-foreground hover:bg-muted cursor-pointer [&_svg]:size-5"
-        aria-label="Toggle theme"
-      >
-        <Sun />
-      </Button>
-    );
+    // Render invisible placeholder to prevent layout shift
+    return <div className="h-10 w-10" />;
   }
 
   return (
