@@ -38,7 +38,7 @@ export function PositionActivitySubRow({
   if (!activityState) {
     return (
       <div className="ml-7 rounded-md border border-dashed border-brand-stroke/60 px-4 py-2 text-[11px] text-muted-foreground">
-        Select a position to show its recent activity.
+        Select a position to show its activity.
       </div>
     );
   }
@@ -75,7 +75,7 @@ export function PositionActivitySubRow({
   return (
     <div className="ml-7 rounded-md border border-brand-stroke/70 bg-brand-background/40 px-3 py-2 text-[11px]">
       <div className="mb-1 flex items-center justify-between uppercase tracking-wide text-muted-foreground">
-        <span className="font-semibold">Recent Activity</span>
+        <span className="font-semibold">Position Activity</span>
         <span className="text-[10px]">
           Showing {entries.length === 0 ? 0 : startIndex + 1}-{endIndex} of{" "}
           {entries.length}
