@@ -159,7 +159,7 @@ export function UserProfile({ userId }: { userId: string }) {
   }, [userId]);
 
   return (
-    <div className="container mx-auto max-w-7xl p-6 space-y-5">
+    <div className="container mx-auto p-6 space-y-5">
       {/* Header Row: Logo + Search Bar + Controls */}
       <div className="flex items-center gap-5">
         <Link href="/" className="shrink-0">
@@ -338,7 +338,11 @@ export function UserProfile({ userId }: { userId: string }) {
               </TabsList>
             </div>
 
-            <TabsContent value="positions">
+            <TabsContent
+              value="positions"
+              forceMount
+              className="data-[state=inactive]:hidden"
+            >
               <div className="h-[700px]">
                 <UserOpenPositions
                   userId={userId}
@@ -349,7 +353,11 @@ export function UserProfile({ userId }: { userId: string }) {
               </div>
             </TabsContent>
 
-            <TabsContent value="closed">
+            <TabsContent
+              value="closed"
+              forceMount
+              className="data-[state=inactive]:hidden"
+            >
               <div className="h-[700px]">
                 <UserClosedPositions
                   userId={userId}
