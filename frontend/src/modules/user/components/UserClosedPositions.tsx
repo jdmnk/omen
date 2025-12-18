@@ -1,13 +1,14 @@
 "use client";
 
 import React from "react";
+import Image from "next/image";
+import { Check, X } from "lucide-react";
 import { useClosedPositionsInfiniteQuery } from "@/modules/user/lib/queries/closed-positions.query";
 import { LoadingSpinner, Spinner } from "@/components/ui/spinner";
 import {
   formatCompactCurrency,
   formatPrice,
   formatNumber,
-  formatRelativeTime,
 } from "@/lib/ui/format.utils";
 import { cn } from "@/lib/utils";
 import { ClosedPosition, Position } from "@/lib/models/frontend.models";
@@ -25,7 +26,7 @@ import { PositionActivitySubRow } from "./positions/PositionActivitySubRow";
 import { PositionMarketLinkButton } from "./positions/PositionMarketLinkButton";
 
 const POSITION_ROW_GRID_CLASSES =
-  "grid grid-cols-[18px_minmax(220px,2fr)_minmax(80px,0.8fr)_minmax(80px,0.8fr)_minmax(80px,0.8fr)_minmax(80px,0.8fr)_minmax(100px,1fr)_minmax(110px,1fr)_36px] items-center gap-4";
+  "grid grid-cols-[18px_60px_1fr_80px_minmax(100px,auto)_32px] items-center gap-3";
 
 type ClosedPositionRowProps = {
   position: ClosedPosition;
@@ -43,17 +44,15 @@ function ClosedPositionRow({
   const totalBought = position.totalBought || 0;
   const avgPrice = position.avgPrice || 0;
   const realizedPnl = position.realizedPnl || 0;
-  const relativeTime = position.timestamp
-    ? formatRelativeTime(position.timestamp)
-    : "-";
 
   const pnlPercent = totalBought > 0 ? (realizedPnl / totalBought) * 100 : 0;
-  const pnlColor =
-    realizedPnl > 0
-      ? "text-outcome-yes"
-      : realizedPnl < 0
-      ? "text-outcome-no"
-      : "text-muted-foreground";
+  const isWin = realizedPnl > 0;
+  const isLoss = realizedPnl < 0;
+  const pnlColor = isWin
+    ? "text-outcome-yes"
+    : isLoss
+    ? "text-outcome-no"
+    : "text-muted-foreground";
 
   const toggleSelection = (next: boolean) => {
     onTogglePosition?.(position, next);
@@ -69,6 +68,9 @@ function ClosedPositionRow({
       toggleSelection(!isSelected);
     }
   };
+
+  // Calculate shares from totalBought and avgPrice
+  const shares = avgPrice > 0 ? totalBought / avgPrice : 0;
 
   return (
     <div className="flex flex-col gap-2">
@@ -95,42 +97,65 @@ function ClosedPositionRow({
             onCheckedChange={(checked) => toggleSelection(Boolean(checked))}
           />
         </div>
-        <div className="flex min-w-0 overflow-hidden">
-          <span className="inline-flex max-w-full truncate font-medium">
-            {position.title}
+        {/* Won/Lost status */}
+        <div className="flex items-center gap-1">
+          {isWin ? (
+            <>
+              <Check className="h-4 w-4 text-outcome-yes" />
+              <span className="text-xs font-medium text-outcome-yes">Won</span>
+            </>
+          ) : isLoss ? (
+            <>
+              <X className="h-4 w-4 text-outcome-no" />
+              <span className="text-xs font-medium text-outcome-no">Lost</span>
+            </>
+          ) : (
+            <span className="text-xs font-medium text-muted-foreground">
+              Even
+            </span>
+          )}
+        </div>
+        {/* Market info: icon, title, shares */}
+        <div className="flex items-center gap-2 min-w-0">
+          {position.icon && (
+            <div className="relative h-8 w-8 shrink-0">
+              <Image
+                src={position.icon}
+                alt=""
+                fill
+                className="rounded object-cover"
+              />
+            </div>
+          )}
+          <div className="flex flex-col min-w-0">
+            <span className="truncate font-medium text-sm leading-tight">
+              {position.title}
+            </span>
+            <span className="text-xs text-muted-foreground">
+              {formatNumber(shares, 1)} {position.outcome} at{" "}
+              {formatPrice(avgPrice, { maximumFractionDigits: 0 })}
+            </span>
+          </div>
+        </div>
+        {/* Cost */}
+        <div className="text-center">
+          <span className="font-semibold text-sm">
+            {formatCompactCurrency(totalBought)}
           </span>
         </div>
-        <div>
-          <div className="font-semibold truncate">{position.outcome}</div>
-        </div>
-        <div>
-          <div className="font-semibold">
-            {formatPrice(avgPrice, { maximumFractionDigits: 1 })}
+        {/* Value + Realized PnL */}
+        <div className="text-right">
+          <div className="font-semibold text-sm">
+            {formatCompactCurrency(totalBought + realizedPnl)}
+          </div>
+          <div className={cn("text-xs", pnlColor)}>
+            {realizedPnl >= 0 ? "+" : ""}
+            {formatCompactCurrency(realizedPnl)} (
+            {pnlPercent >= 0 ? "+" : ""}
+            {formatNumber(pnlPercent, 0)}%)
           </div>
         </div>
-        <div>
-          <div className="font-semibold">
-            {/* {formatPrice(position.curPrice, { maximumFractionDigits: 1 })} */}
-            N/A
-          </div>
-        </div>
-        <div>
-          <div className="font-semibold">
-            {formatCompactCurrency(totalBought)}
-          </div>
-        </div>
-        <div className={cn("flex items-center gap-1", pnlColor)}>
-          <div className="font-semibold">
-            {formatCompactCurrency(realizedPnl)}
-          </div>
-          <div className="opacity-75">
-            {pnlPercent > 0 ? "+" : ""}
-            {formatNumber(pnlPercent, 1)}%
-          </div>
-        </div>
-        <div className="text-xs text-muted-foreground text-right">
-          {relativeTime}
-        </div>
+        {/* Link */}
         <div className="flex justify-end">
           <PositionMarketLinkButton slug={position.eventSlug} />
         </div>
@@ -204,14 +229,11 @@ export function UserClosedPositions({
       <div className={TABLE_HEADER_CONTAINER_CLASSES}>
         <div className={cn(POSITION_ROW_GRID_CLASSES, TABLE_HEADER_CLASSES)}>
           <div></div>
+          <div></div>
           <div>Market</div>
-          <div>Outcome</div>
-          <div>Avg Price</div>
-          <div>Final Price</div>
-          <div>Total Bought</div>
-          <div>Realized PnL</div>
-          <div className="text-right">Time</div>
-          <div className="text-right">Link</div>
+          <div className="text-center">Cost</div>
+          <div className="text-right">Value</div>
+          <div></div>
         </div>
       </div>
       <div className={TABLE_CONTENT_CONTAINER_CLASSES}>
