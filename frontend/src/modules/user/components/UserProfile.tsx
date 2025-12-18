@@ -371,7 +371,7 @@ export function UserProfile({ userId }: { userId: string }) {
         </Card>
 
         {/* Right Column: Activity */}
-        <Card className="flex flex-col max-h-[800px] overflow-hidden">
+        <Card className="flex flex-col max-h-[800px] overflow-hidden gap-2">
           <div className="px-3 pt-3 pb-2 border-b border-brand-stroke">
             <h2 className="text-sm font-bold uppercase text-brand-primary pb-[3px]">
               Activity
