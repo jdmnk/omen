@@ -101,7 +101,7 @@ export function UserPnlChartWidgetV2({ userId }: UserPnlChartWidgetV2Props) {
         </div>
       </div>
 
-      <div className="flex-1 min-h-0 w-full">
+      <div className="flex-1 min-h-0 w-full px-3 pb-3">
         <UserPnlChartV2
           data={chartData}
           isLoading={isPnlLoading}

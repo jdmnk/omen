@@ -265,7 +265,7 @@ export function UserProfile({ userId }: { userId: string }) {
             </div>
             <div className="w-px h-10 bg-brand-stroke" />
             <div className="flex-1">
-              <div className="text-xs text-muted-foreground">Markets</div>
+              <div className="text-xs text-muted-foreground">Predictions</div>
               <div className="text-xl font-bold mt-0.5">
                 {isMounted && tradedData?.traded
                   ? tradedData.traded.toLocaleString()
