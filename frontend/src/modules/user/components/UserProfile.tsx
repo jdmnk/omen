@@ -287,54 +287,60 @@ export function UserProfile({ userId }: { userId: string }) {
         onTogglePosition={handlePositionToggle}
       />
 
-      {/* Main Content */}
-      <Card className="flex flex-col max-h-[800px] overflow-hidden">
-        <Tabs
-          value={activeTab}
-          onValueChange={setActiveTab}
-          className="w-full flex flex-col"
-        >
-          <TabsList className="px-3 pt-2">
-            <TabsTrigger value="positions" className="uppercase">
-              Open Positions
-            </TabsTrigger>
-            <TabsTrigger value="closed" className="uppercase">
-              Closed Positions
-            </TabsTrigger>
-            <TabsTrigger value="activity" className="uppercase">
+      {/* Main Content: Two Columns */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        {/* Left Column: Positions */}
+        <Card className="flex flex-col max-h-[800px] overflow-hidden">
+          <Tabs
+            value={activeTab}
+            onValueChange={setActiveTab}
+            className="w-full flex flex-col"
+          >
+            <TabsList className="px-3 pt-2">
+              <TabsTrigger value="positions" className="uppercase">
+                Open
+              </TabsTrigger>
+              <TabsTrigger value="closed" className="uppercase">
+                Closed
+              </TabsTrigger>
+            </TabsList>
+
+            <TabsContent value="positions">
+              <div className="h-[700px]">
+                <UserOpenPositions
+                  userId={userId}
+                  selectedPositionKeys={selectedPositionKeys}
+                  onTogglePosition={handlePositionToggle}
+                  positionActivities={positionActivitiesLookup}
+                />
+              </div>
+            </TabsContent>
+
+            <TabsContent value="closed">
+              <div className="h-[700px]">
+                <UserClosedPositions
+                  userId={userId}
+                  selectedPositionKeys={selectedPositionKeys}
+                  onTogglePosition={handlePositionToggle}
+                  positionActivities={positionActivitiesLookup}
+                />
+              </div>
+            </TabsContent>
+          </Tabs>
+        </Card>
+
+        {/* Right Column: Activity */}
+        <Card className="flex flex-col max-h-[800px] overflow-hidden">
+          <div className="px-3 pt-3 pb-2 border-b border-brand-stroke">
+            <h2 className="text-sm font-medium uppercase text-muted-foreground">
               Activity
-            </TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="positions">
-            <div className="h-[800px]">
-              <UserOpenPositions
-                userId={userId}
-                selectedPositionKeys={selectedPositionKeys}
-                onTogglePosition={handlePositionToggle}
-                positionActivities={positionActivitiesLookup}
-              />
-            </div>
-          </TabsContent>
-
-          <TabsContent value="closed">
-            <div className="h-[800px]">
-              <UserClosedPositions
-                userId={userId}
-                selectedPositionKeys={selectedPositionKeys}
-                onTogglePosition={handlePositionToggle}
-                positionActivities={positionActivitiesLookup}
-              />
-            </div>
-          </TabsContent>
-
-          <TabsContent value="activity">
-            <div className="h-[800px]">
-              <UserActivityFeed userId={userId} />
-            </div>
-          </TabsContent>
-        </Tabs>
-      </Card>
+            </h2>
+          </div>
+          <div className="h-[700px]">
+            <UserActivityFeed userId={userId} />
+          </div>
+        </Card>
+      </div>
     </div>
   );
 }
