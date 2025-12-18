@@ -16,6 +16,7 @@ import { useUserValueQuery } from "@/modules/user/lib/queries/user-value.query";
 import { useIsMounted } from "@/lib/hooks/use-is-mounted";
 import { useUserDataQuery } from "@/modules/user/lib/queries/user-data.query";
 import { useUserPositionsInfiniteQuery } from "@/modules/user/lib/queries/user-positions.query";
+import { useUserLeaderboardQuery } from "@/modules/user/lib/queries/user-leaderboard.query";
 import { fetchUserActivityEntries } from "@/modules/user/lib/queries/user-activity.query";
 import { getPositionKey } from "@/modules/user/lib/position.utils";
 import { POSITIONS_PAGE_SIZE } from "@/modules/user/lib/positions.const";
@@ -70,6 +71,7 @@ export function UserProfile({ userId }: { userId: string }) {
   const { data: valueData } = useUserValueQuery(userId);
   const { data: userData } = useUserDataQuery(userId);
   const { data: positionsData } = useUserPositionsInfiniteQuery(userId);
+  const { data: leaderboardData } = useUserLeaderboardQuery(userId);
 
   const handlePositionToggle = useCallback(
     (position: Position, checked: boolean) => {
@@ -216,14 +218,29 @@ export function UserProfile({ userId }: { userId: string }) {
                   </span>
                 )}
               </div>
-              <div className="text-sm text-muted-foreground mt-0.5">
-                Joined{" "}
-                {userData?.createdAt
-                  ? new Date(userData.createdAt).toLocaleDateString("en-US", {
-                      month: "short",
-                      year: "numeric",
-                    })
-                  : "-"}
+              <div className="flex items-center gap-2 text-xs text-muted-foreground mt-0.5">
+                {leaderboardData?.xUsername && (
+                  <>
+                    <a
+                      href={`https://x.com/${leaderboardData.xUsername}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="hover:text-foreground transition-colors"
+                    >
+                      @{leaderboardData.xUsername}
+                    </a>
+                    <span>·</span>
+                  </>
+                )}
+                <span>
+                  Joined{" "}
+                  {userData?.createdAt
+                    ? new Date(userData.createdAt).toLocaleDateString("en-US", {
+                        month: "short",
+                        year: "numeric",
+                      })
+                    : "-"}
+                </span>
               </div>
               {userData?.bio ? (
                 <p className="text-sm text-muted-foreground mt-1 line-clamp-2">
@@ -232,39 +249,55 @@ export function UserProfile({ userId }: { userId: string }) {
               ) : null}
             </div>
           </div>
-          {/* Stats Row */}
-          <div className="flex items-center gap-4 mt-4 pt-4 border-t border-brand-stroke">
-            <div className="flex-1">
-              <div className="text-xs text-muted-foreground">
-                Positions Value
+          {/* Stats */}
+          <div className="mt-4 pt-4 border-t border-brand-stroke space-y-3">
+            <div className="flex items-center gap-4">
+              <div className="flex-1">
+                <div className="text-xs text-muted-foreground">Rank</div>
+                <div className="text-base font-bold">
+                  {isMounted && leaderboardData?.rank
+                    ? `#${Number(leaderboardData.rank).toLocaleString()}`
+                    : "-"}
+                </div>
               </div>
-              <div className="text-xl font-bold mt-0.5">
-                {isMounted && totalValue !== 0
-                  ? formatCompactCurrency(totalValue)
-                  : "-"}
+              <div className="w-px h-8 bg-brand-stroke" />
+              <div className="flex-1">
+                <div className="text-xs text-muted-foreground">Volume</div>
+                <div className="text-base font-bold">
+                  {isMounted && leaderboardData?.vol
+                    ? formatCompactCurrency(leaderboardData.vol)
+                    : "-"}
+                </div>
+              </div>
+              <div className="w-px h-8 bg-brand-stroke" />
+              <div className="flex-1">
+                <div className="text-xs text-muted-foreground">Positions</div>
+                <div className="text-base font-bold">
+                  {isMounted && totalValue !== 0
+                    ? formatCompactCurrency(totalValue)
+                    : "-"}
+                </div>
               </div>
             </div>
-            <div className="w-px h-10 bg-brand-stroke" />
-            <div className="flex-1">
-              <div className="text-xs text-muted-foreground">
-                Open Positions
+            <div className="flex items-center gap-4">
+              <div className="flex-1">
+                <div className="text-xs text-muted-foreground">Open</div>
+                <div className="text-base font-bold">
+                  {isMounted && openPositionsCount > 0
+                    ? `${openPositionsCount}${hasMorePositions ? "+" : ""}`
+                    : "-"}
+                </div>
               </div>
-              <div className="text-xl font-bold mt-0.5">
-                {isMounted && openPositionsCount > 0
-                  ? `${openPositionsCount}${hasMorePositions ? "+" : ""}`
-                  : "-"}
+              <div className="w-px h-8 bg-brand-stroke" />
+              <div className="flex-1">
+                <div className="text-xs text-muted-foreground">Predictions</div>
+                <div className="text-base font-bold">
+                  {isMounted && tradedData?.traded
+                    ? tradedData.traded.toLocaleString()
+                    : "-"}
+                </div>
               </div>
-            </div>
-            <div className="w-px h-10 bg-brand-stroke" />
-            <div className="flex-1">
-              <div className="text-xs text-muted-foreground">
-                Total Predictions
-              </div>
-              <div className="text-xl font-bold mt-0.5">
-                {isMounted && tradedData?.traded
-                  ? tradedData.traded.toLocaleString()
-                  : "-"}
-              </div>
+              <div className="flex-1" />
             </div>
           </div>
         </Card>
