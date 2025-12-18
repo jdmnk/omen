@@ -29,6 +29,8 @@ import { UserSearchBar } from "./UserSearchBar";
 import { Position } from "@/lib/models/frontend.models";
 import { UserWatchlistButton } from "./UserWatchlistButton";
 import { UserWatchlist } from "./UserWatchlist";
+import Link from "next/link";
+import { LogoIcon } from "@/components/LogoIcon";
 
 async function fetchUserPositionActivity(userId: string, position: Position) {
   // sorted by timestamp DESC
@@ -156,7 +158,20 @@ export function UserProfile({ userId }: { userId: string }) {
 
   return (
     <div className="container mx-auto max-w-7xl p-6 space-y-6">
-      <UserSearchBar />
+      {/* Header Row: Logo + Search Bar */}
+      <div className="flex items-center gap-5">
+        <Link href="/" className="shrink-0">
+          <div className="flex items-center gap-2">
+            <LogoIcon className="h-8 w-8 text-foreground" />
+            <span className="text-xl font-bold text-foreground tracking-widest">
+              OMEN
+            </span>
+          </div>
+        </Link>
+        <div className="flex-1">
+          <UserSearchBar />
+        </div>
+      </div>
 
       {/* User Watchlist */}
       <UserWatchlist />
