@@ -315,7 +315,7 @@ export function UserProfile({ userId }: { userId: string }) {
             onValueChange={setActiveTab}
             className="w-full flex flex-col"
           >
-            <div className="px-3 pt-3 pb-2 border-b border-brand-stroke">
+            <div className="px-3 pt-2 pb-2 border-b border-brand-stroke">
               <TabsList>
                 <TabsTrigger
                   value="positions"
@@ -359,7 +359,7 @@ export function UserProfile({ userId }: { userId: string }) {
         {/* Right Column: Activity */}
         <Card className="flex flex-col max-h-[800px] overflow-hidden">
           <div className="px-3 pt-3 pb-2 border-b border-brand-stroke">
-            <h2 className="text-sm font-medium uppercase text-muted-foreground">
+            <h2 className="text-sm font-bold uppercase text-brand-primary pb-[3px]">
               Activity
             </h2>
           </div>
