@@ -66,7 +66,7 @@ export function UserPnlChartWidgetV2({ userId }: UserPnlChartWidgetV2Props) {
 
   return (
     <Card className="relative flex h-full w-full flex-col">
-      <div className="flex items-start justify-between px-3 pt-3 pb-2">
+      <div className="flex items-start justify-between px-4 pt-4 pb-2">
         <div className="flex flex-col gap-0.5">
           <span className="text-xs text-muted-foreground">Profit/Loss</span>
           <span
