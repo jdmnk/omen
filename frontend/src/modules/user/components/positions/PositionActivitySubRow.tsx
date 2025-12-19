@@ -73,7 +73,7 @@ export function PositionActivitySubRow({
   const pageEntries = entries.slice(startIndex, endIndex);
 
   return (
-    <div className="ml-7 rounded-md border border-brand-stroke px-3 py-2 text-[11px]">
+    <div className="md:ml-7 rounded-md border border-brand-stroke px-3 py-2 text-[11px]">
       <div className="mb-1 flex items-center justify-between uppercase tracking-wide text-muted-foreground">
         <span className="font-semibold">Position Activity</span>
         <span className="text-[10px]">
@@ -150,7 +150,7 @@ export function PositionActivitySubRow({
         })}
       </div>
       {totalPages > 1 ? (
-        <div className="mt-2 flex items-center justify-center gap-1 text-[10px]">
+        <div className="mt-2 flex items-center justify-center gap-1 text-[10px] flex-wrap">
           {Array.from({ length: totalPages }, (_, pageIdx) => pageIdx + 1).map(
             (pageNumber) => (
               <button

@@ -159,9 +159,9 @@ export function UserProfile({ userId }: { userId: string }) {
   }, [userId]);
 
   return (
-    <div className="container mx-auto p-6 space-y-5">
+    <div className="container mx-auto p-3 md:p-6 space-y-3 md:space-y-5">
       {/* Header Row: Logo + Search Bar + Controls */}
-      <div className="flex items-center gap-5">
+      <div className="flex items-center gap-3 md:gap-5">
         <Link href="/" className="shrink-0">
           <div className="flex items-center gap-2">
             <LogoIcon className="h-8 w-8 text-foreground" />
