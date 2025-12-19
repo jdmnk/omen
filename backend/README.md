@@ -16,7 +16,9 @@ docker compose exec app python -m src.db.db_populate_trades
 docker compose exec app python -m src.db.db_populate_positions
 docker compose exec app python -m src.db.db_populate_price_history
 
-# update in a loop (currently unused)
+# update in a loop
+docker compose exec app python -m src.workers.price_history_updater
+# current unused
 docker compose exec app python -m src.update_markets
 ```
 
