@@ -10,8 +10,9 @@ import {
 import { SearchWidget } from "./SearchWidget";
 import { useMarketBySlugQuery } from "../lib/queries/market-by-slug.query";
 import { PriceChartWidget } from "./PriceChartWidget";
-import { EmptyState, LoadingState, ErrorState } from "./WidgetHelpers";
+import { LoadingState, ErrorState } from "./WidgetHelpers";
 import { TopHoldersWidget } from "./TopHoldersWidget";
+import { TopMoversWidget } from "./TopMoversWidget";
 import { Market } from "@/lib/models/api.models";
 
 export function TerminalLayout({
@@ -44,33 +45,35 @@ export function TerminalLayout({
           {/* Main content */}
           <ResizableHandle />
           <ResizablePanel defaultSize={50} minSize={20}>
-            <ResizablePanelGroup direction="vertical" className="h-full">
-              <ResizablePanel defaultSize={40} minSize={20}>
-                <div className="h-full px-3 pb-3">
-                  {!marketSlug ? (
-                    <EmptyState />
-                  ) : isLoading ? (
-                    <LoadingState />
-                  ) : error || !market ? (
+            {!marketSlug ? (
+              <div className="h-full ">
+                <TopMoversWidget />
+              </div>
+            ) : (
+              <ResizablePanelGroup direction="vertical" className="h-full">
+                <ResizablePanel defaultSize={40} minSize={20}>
+                  <div className="h-full px-3 pb-3">
+                    {isLoading ? (
+                      <LoadingState />
+                    ) : error || !market ? (
+                      <ErrorState />
+                    ) : (
+                      <PriceChartWidget market={market} />
+                    )}
+                  </div>
+                </ResizablePanel>
+                <ResizableHandle />
+                <ResizablePanel defaultSize={60} minSize={20}>
+                  {error ? (
                     <ErrorState />
                   ) : (
-                    <PriceChartWidget market={market} />
+                    <div className="h-full pt-3 px-3 flex flex-col min-h-0">
+                      <TopHoldersWidget market={market} isLoading={isLoading} />
+                    </div>
                   )}
-                </div>
-              </ResizablePanel>
-              <ResizableHandle />
-              <ResizablePanel defaultSize={60} minSize={20}>
-                {!marketSlug && !isLoading ? (
-                  <EmptyState />
-                ) : error ? (
-                  <ErrorState />
-                ) : (
-                  <div className="h-full pt-3 px-3 flex flex-col min-h-0">
-                    <TopHoldersWidget market={market} isLoading={isLoading} />
-                  </div>
-                )}
-              </ResizablePanel>
-            </ResizablePanelGroup>
+                </ResizablePanel>
+              </ResizablePanelGroup>
+            )}
           </ResizablePanel>
 
           {/* Right sidebar */}
