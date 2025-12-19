@@ -4,6 +4,7 @@ from sqlalchemy import select, text
 
 from src.db.db_core import DbCore
 from src.models.market import Market, MarketDB
+from src.models.price_history import PriceHistory, PriceHistoryDB
 
 
 class SelectsClient:
@@ -42,3 +43,59 @@ class SelectsClient:
         async with self.core.engine.connect() as conn:
             rows = (await conn.execute(text(sql), params or {})).scalars().all()
             return [str(r) for r in rows]
+
+    async def get_price_histories_by_token_ids(
+        self, token_ids: list[str]
+    ) -> dict[str, PriceHistory]:
+        """Fetch existing price histories keyed by clob_token_id."""
+        if not token_ids:
+            return {}
+        async with self.core.async_session() as session:
+            stmt = select(PriceHistoryDB).where(PriceHistoryDB.clob_token_id.in_(token_ids))
+            result = await session.execute(stmt)
+            rows = result.scalars().all()
+            return {row.clob_token_id: PriceHistory.model_validate(row) for row in rows}
+
+    async def get_top_movers(self, limit: int = 30) -> tuple[list[dict], str | None]:
+        """
+        Get markets with highest absolute price delta.
+        Returns list of dicts with market + price info and the fetched_at timestamp.
+        """
+        sql = text("""
+            SELECT
+                ph.clob_token_id,
+                ph.last_price,
+                ph.price_delta,
+                ph.fetched_at,
+                m.question,
+                m.slug,
+                m.icon
+            FROM price_histories ph
+            JOIN markets m ON m.token1 = ph.clob_token_id
+            WHERE ph.price_delta IS NOT NULL
+            ORDER BY ABS(ph.price_delta) DESC
+            LIMIT :limit
+        """)
+        async with self.core.engine.connect() as conn:
+            result = await conn.execute(sql, {"limit": limit})
+            rows = result.fetchall()
+
+        if not rows:
+            return [], None
+
+        # Get the most recent fetched_at from the results
+        fetched_at = max(row.fetched_at for row in rows).isoformat() if rows else None
+
+        movers = [
+            {
+                "clob_token_id": row.clob_token_id,
+                "last_price": row.last_price,
+                "price_delta": row.price_delta,
+                "fetched_at": row.fetched_at.isoformat(),
+                "question": row.question,
+                "slug": row.slug,
+                "icon": row.icon,
+            }
+            for row in rows
+        ]
+        return movers, fetched_at

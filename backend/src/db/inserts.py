@@ -22,11 +22,23 @@ class InsertsClient:
     async def insert_markets(self, markets: list[Market], chunk_size: int = 1000) -> int:
         if not markets:
             return 0
+
+        # Only include fields that exist in MarketDB table
+        db_columns = set(MarketDB.__table__.columns.keys())
+
         total = 0
         async with self.core.async_session() as session:
             for start in range(0, len(markets), chunk_size):
                 batch = markets[start : start + chunk_size]
-                values = [m.model_dump() for m in batch]
+                # Filter to only DB columns, map conditionId -> condition_id
+                values = []
+                for m in batch:
+                    row = m.model_dump()
+                    # Map conditionId to condition_id (DB uses snake_case for PK)
+                    row["condition_id"] = row.pop("conditionId", row.get("condition_id"))
+                    # Keep only columns that exist in the DB table
+                    filtered = {k: v for k, v in row.items() if k in db_columns}
+                    values.append(filtered)
 
                 stmt = pg_insert(MarketDB).values(values)
                 update_fields = {

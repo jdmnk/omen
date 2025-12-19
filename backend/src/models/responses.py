@@ -64,3 +64,22 @@ class MarkerTradeInfo(BaseModel):
 class PnlWithMarkersResponse(BaseModel):
     points: list[PnlPoint]
     markers: list[PnlMarker]
+
+
+class TopMover(BaseModel):
+    """Market with price movement data."""
+
+    clob_token_id: str
+    question: str
+    slug: str
+    icon: str
+    last_price: float | None
+    price_delta: float | None
+    fetched_at: str  # ISO timestamp
+
+
+class TopMoversResponse(BaseModel):
+    """Response for top movers endpoint."""
+
+    movers: list[TopMover]
+    fetched_at: str  # ISO timestamp of when data was last updated

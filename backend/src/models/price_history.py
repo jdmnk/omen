@@ -3,7 +3,7 @@ from __future__ import annotations
 from datetime import datetime
 
 from pydantic import BaseModel
-from sqlalchemy import DateTime, String, func
+from sqlalchemy import DateTime, Float, String, func
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import Mapped, mapped_column
 
@@ -20,11 +20,15 @@ class PriceHistoryDB(Base):
         DateTime, server_default=func.now(), onupdate=func.now()
     )
     points: Mapped[list[dict]] = mapped_column(JSONB, nullable=False)
+    last_price: Mapped[float | None] = mapped_column(Float, nullable=True)
+    price_delta: Mapped[float | None] = mapped_column(Float, nullable=True)
 
 
 class PriceHistory(BaseModel):
     clob_token_id: str
     points: list[dict]
+    last_price: float | None = None
+    price_delta: float | None = None
 
     class Config:
         from_attributes = True

@@ -19,6 +19,8 @@ from src.models.responses import (
     PnlMarker,
     PnlPoint,
     PnlWithMarkersResponse,
+    TopMover,
+    TopMoversResponse,
 )
 from src.models.search import SearchResponse
 from src.models.top_holders import (
@@ -73,6 +75,22 @@ def home() -> MessageResponse:
 @app.get("/health", response_model=HealthResponse)
 def health() -> HealthResponse:
     return HealthResponse(status="ok")
+
+
+@app.get("/markets/top-movers", response_model=TopMoversResponse)
+async def get_top_movers_endpoint(
+    limit: int = Query(default=30, ge=1, le=100),
+) -> TopMoversResponse:
+    """
+    Get markets with highest absolute price delta (top movers).
+    Returns markets sorted by absolute price change since last refresh.
+    """
+    movers_data, fetched_at = await selects.get_top_movers(limit=limit)
+    movers = [TopMover(**m) for m in movers_data]
+    return TopMoversResponse(
+        movers=movers,
+        fetched_at=fetched_at or "",
+    )
 
 
 @app.get("/markets/search-slug", response_model=Market)
