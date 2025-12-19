@@ -46,8 +46,10 @@ async def refresh_price_histories() -> None:
     existing_histories = await selects.get_price_histories_by_token_ids(token_ids)
     logger.info("Found %d existing price histories for delta calculation", len(existing_histories))
 
+    batch_size = 100  # Insert to DB every N markets to avoid losing progress on crash
     price_histories: list[PriceHistory] = []
     failed_fetches = 0
+    total_inserted = 0
     total_markets = len(filtered_markets)
 
     for idx, market in enumerate(filtered_markets, start=1):
@@ -94,12 +96,26 @@ async def refresh_price_histories() -> None:
                     price_delta=price_delta,
                 )
             )
+
+            # Insert batch to DB periodically to avoid losing progress on crash
+            if len(price_histories) >= batch_size:
+                inserted = await inserts.insert_price_histories(price_histories)
+                total_inserted += inserted
+                logger.info(
+                    "Batch inserted %d price histories (total: %d)", inserted, total_inserted
+                )
+                price_histories = []
+
         finally:
             # 10req/s is max allowed by API, this should be safe if we assume requests take >30ms (and not much longer)
             await asyncio.sleep(0.07)
 
-    inserted_price_histories = await inserts.insert_price_histories(price_histories)
-    logger.info("Inserted/updated %d price histories", inserted_price_histories)
+    # Insert any remaining price histories
+    if price_histories:
+        inserted = await inserts.insert_price_histories(price_histories)
+        total_inserted += inserted
+
+    logger.info("Inserted/updated %d price histories total", total_inserted)
     if failed_fetches:
         logger.info("Price history fetch failures: %d", failed_fetches)
 
