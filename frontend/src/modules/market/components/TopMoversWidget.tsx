@@ -32,7 +32,7 @@ function MoverRow({
       onClick={onClick}
       className={cn(
         "w-full text-left px-4 py-3",
-        "transition-colors hover:bg-brand-background cursor-pointer",
+        "transition-colors hover:bg-brand-highlight/30 cursor-pointer",
         "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
         "border-b border-brand-stroke last:border-b-0"
       )}
@@ -122,7 +122,7 @@ export function TopMoversWidget() {
   return (
     <div className="h-full flex flex-col border border-brand-stroke rounded-brand overflow-hidden">
       {/* Header */}
-      <div className="shrink-0 px-4 py-3 border-b border-brand-stroke bg-brand-background/50">
+      <div className="shrink-0 px-4 py-3 border-b border-brand-stroke">
         <div className="flex items-center justify-between">
           <h2 className="text-base font-semibold">Top Movers</h2>
           {lastUpdated && (

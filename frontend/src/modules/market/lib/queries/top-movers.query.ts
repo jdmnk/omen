@@ -37,4 +37,3 @@ export function useTopMoversQuery(limit: number = 30) {
     refetchInterval: 120000, // Refetch every 2 minutes
   });
 }
-
