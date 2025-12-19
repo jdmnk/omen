@@ -150,7 +150,7 @@ export function UserSearchBar() {
               }}
               onFocus={() => setIsOpen(true)}
               placeholder="Search users by name or address..."
-              className="pl-9 pr-20 border border-brand-stroke"
+              className="pl-9 pr-4 border border-brand-stroke"
             />
 
             {isLoading && (
