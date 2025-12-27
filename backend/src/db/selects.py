@@ -73,6 +73,9 @@ class SelectsClient:
             FROM price_histories ph
             JOIN markets m ON m.token1 = ph.clob_token_id
             WHERE ph.price_delta IS NOT NULL
+                AND ph.last_price IS NOT NULL
+                AND ph.last_price >= 0.5
+                AND ph.last_price <= 99.5
             ORDER BY ABS(ph.price_delta) DESC
             LIMIT :limit
         """)
