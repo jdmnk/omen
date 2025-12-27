@@ -17,6 +17,7 @@ const signer = new Wallet(`${getEnv("POLYMARKET_PRIVATE_KEY")}`); //This is your
 const creds = new ClobClient(host, 137, signer).createOrDeriveApiKey();
 
 // 0: Browser Wallet(Metamask, Coinbase Wallet, etc) 1: Magic/Email Login
+// throws 400 if key exists, but we still get the output
 const signatureType = 0;
 
 (async () => {
