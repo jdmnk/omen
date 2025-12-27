@@ -14,7 +14,6 @@ const host = "https://clob.polymarket.com";
 const funder = `${getEnv("POLYMARKET_PROFILE_ADDRESS")}`; //This is your Polymarket Profile Address, where you send UDSC to.
 const signer = new Wallet(`${getEnv("POLYMARKET_PRIVATE_KEY")}`); //This is your Private Key. If using email login export from https://reveal.magic.link/polymarket otherwise export from your Web3 Application
 
-// @ts-ignore
 const creds = new ClobClient(host, 137, signer).createOrDeriveApiKey();
 
 // 0: Browser Wallet(Metamask, Coinbase Wallet, etc) 1: Magic/Email Login

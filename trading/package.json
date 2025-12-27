@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "api-key": "tsx src/utils/getApiKey.ts"
+    "api-key": "tsx src/scripts/getApiKey.ts"
   },
   "keywords": [],
   "author": "",
