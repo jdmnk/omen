@@ -20,47 +20,34 @@ import {
 } from "@/components/ui/popover";
 import { formatAddress } from "@/lib/ui/format.utils";
 import { useUserSearchQuery } from "../lib/queries/user-search.query";
-import {
-  useUserDataQuery,
-  type UserProfileData,
-} from "../lib/queries/user-data.query";
+import { useUserDataQuery } from "../lib/queries/user-data.query";
 import { UserWatchlistButton } from "./UserWatchlistButton";
-import type { SearchProfileItem } from "@/lib/models/api.models";
+import type { SearchProfileItem, UserPublicProfile } from "@/lib/models/api.models";
+
+function isWalletAddress(input: string): boolean {
+  return /^0x[a-fA-F0-9]{40}$/.test(input);
+}
 
 type UserSearchProfile = {
   id: string;
   proxyWallet: string;
   name?: string | null;
   pseudonym?: string | null;
-  profileImage?: string | null;
-  profileImageOptimized?: {
-    imageUrlOptimized: string;
-  } | null;
+  profileImageOptimized?: string | null;
 };
 
-function isWalletAddress(input: string): boolean {
-  return /^0x[a-fA-F0-9]{40}$/.test(input);
-}
-
-function mapSearchProfileToSimple(
-  profile: SearchProfileItem
-): UserSearchProfile {
+function mapSearchProfileToSimple(profile: SearchProfileItem): UserSearchProfile {
   return {
-    id: profile.id,
+    id: profile.proxyWallet,
     proxyWallet: profile.proxyWallet,
     name: profile.name || null,
     pseudonym: profile.pseudonym || null,
-    profileImage: profile.profileImage || null,
-    profileImageOptimized: profile.profileImageOptimized
-      ? {
-          imageUrlOptimized: profile.profileImageOptimized.imageUrlOptimized,
-        }
-      : null,
+    profileImageOptimized: profile.profileImageOptimized?.imageUrlOptimized || null,
   };
 }
 
 function mapUserDataToSimple(
-  userData: UserProfileData,
+  userData: UserPublicProfile,
   address: string
 ): UserSearchProfile {
   return {
@@ -68,12 +55,7 @@ function mapUserDataToSimple(
     proxyWallet: userData.proxyWallet || address,
     name: userData.name || null,
     pseudonym: userData.pseudonym || null,
-    profileImage: userData.profileImage || null,
-    profileImageOptimized: userData.profileImage
-      ? {
-          imageUrlOptimized: userData.profileImage,
-        }
-      : null,
+    profileImageOptimized: userData.profileImage || null,
   };
 }
 
@@ -101,7 +83,7 @@ export function UserSearchBar() {
 
   const isLoading = isSearchLoading || isUserDataLoading;
 
-  const profiles = useMemo(() => {
+  const profiles = useMemo<UserSearchProfile[]>(() => {
     if (isAddressSearch && userData) {
       return [mapUserDataToSimple(userData, trimmedQuery)];
     }
@@ -196,10 +178,7 @@ export function UserSearchBar() {
                       ? formatAddress(proxyWallet)
                       : profile.pseudonym;
 
-                    const image =
-                      profile.profileImageOptimized?.imageUrlOptimized ||
-                      profile.profileImage ||
-                      null;
+                    const image = profile.profileImageOptimized || null;
 
                     return (
                       <CommandItem
