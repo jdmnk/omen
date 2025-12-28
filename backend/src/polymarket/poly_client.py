@@ -11,10 +11,10 @@ from src.models.activity import parse_activity_trade
 from src.models.event import Event, parse_event_from_api
 from src.models.market import Market, parse_market_from_api
 from src.models.search import SearchEventItem, SearchMarketItem, SearchProfileItem, SearchResponse
-from src.models.user_profile import UserPublicProfile
 from src.models.top_holders import TopHolder
 from src.models.trade import Trade, parse_trade_from_api
 from src.models.user_position import UserPosition, parse_user_position_from_api
+from src.models.user_profile import UserPublicProfile
 from src.settings import settings
 from src.utils.logging_config import get_logger
 

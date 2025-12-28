@@ -1,8 +1,8 @@
 import argparse
 import asyncio
 import json
+from collections.abc import Iterable, Sequence
 from dataclasses import dataclass, field
-from typing import Iterable, Sequence
 
 from src.polymarket.poly_client import PolyClient
 from src.polymarket.poly_client_prices import (
@@ -158,7 +158,7 @@ def evaluate_event(event: dict, quotes: list[OutcomeQuote]) -> ArbOpportunity | 
     # total_yes is Σ best YES bids. If markets are efficient this should be ≈1.
     total_yes = sum(q.yes_bid or 0 for q in tradable)
     base_term = total_yes - 1.0
-    # delta expresses how much extra value a single NO conversion would generate: 1 − YES_bid − NO_ask.
+    # delta expresses how much extra value a single NO conversion would generate: 1 - YES_bid - NO_ask.
     for quote in tradable:
         yes_bid = quote.yes_bid or 0.0
         no_ask = quote.no_ask or 0.0
@@ -183,7 +183,10 @@ def evaluate_event(event: dict, quotes: list[OutcomeQuote]) -> ArbOpportunity | 
     derived_profit = base_term + sum(q.delta for q in subset)
     if abs(profit - derived_profit) > 1e-6:
         logger.debug(
-            "Profit mismatch for event %s (direct=%.6f derived=%.6f)", event.get("slug"), profit, derived_profit
+            "Profit mismatch for event %s (direct=%.6f derived=%.6f)",
+            event.get("slug"),
+            profit,
+            derived_profit,
         )
 
     if profit <= 0:

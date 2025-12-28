@@ -29,8 +29,8 @@ from src.models.top_holders import (
     TopHoldersWalletInfoRequest,
     TopHolderWalletInfo,
 )
-from src.models.user_profile import UserPublicProfile
 from src.models.trade import Trade
+from src.models.user_profile import UserPublicProfile
 from src.polymarket.poly_client import PolyClient
 from src.polymarket.poly_client_graphs import PolyClientGraphs
 from src.polymarket.poly_client_onchain import PolyClientOnchain
