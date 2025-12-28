@@ -41,6 +41,49 @@
         }
       }
     },
+    "/markets/top-movers": {
+      "get": {
+        "summary": "Get Top Movers Endpoint",
+        "description": "Get markets with highest absolute price delta (top movers).\nReturns markets sorted by absolute price change since last refresh.",
+        "operationId": "get_top_movers_endpoint_markets_top_movers_get",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 100,
+              "minimum": 1,
+              "default": 30,
+              "title": "Limit"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TopMoversResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/markets/search-slug": {
       "get": {
         "summary": "Get Market By Slug Endpoint",
@@ -191,6 +234,47 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/SearchResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/profiles/public-profile": {
+      "get": {
+        "summary": "Get Public Profile Endpoint",
+        "description": "Get a public profile by address from Polymarket Gamma API.",
+        "operationId": "get_public_profile_endpoint_profiles_public_profile_get",
+        "parameters": [
+          {
+            "name": "address",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "title": "Address"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserPublicProfile"
                 }
               }
             }
@@ -1558,58 +1642,89 @@
       },
       "SearchProfileItem": {
         "properties": {
-          "id": {
-            "type": "string",
-            "title": "Id"
-          },
           "name": {
             "type": "string",
             "title": "Name"
-          },
-          "user": {
-            "type": "integer",
-            "title": "User"
-          },
-          "createdAt": {
-            "type": "string",
-            "title": "Createdat"
-          },
-          "updatedAt": {
-            "type": "string",
-            "title": "Updatedat"
-          },
-          "pseudonym": {
-            "type": "string",
-            "title": "Pseudonym"
-          },
-          "profileImage": {
-            "type": "string",
-            "title": "Profileimage"
-          },
-          "bio": {
-            "type": "string",
-            "title": "Bio"
           },
           "proxyWallet": {
             "type": "string",
             "title": "Proxywallet"
           },
+          "pseudonym": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Pseudonym"
+          },
+          "displayUsernamePublic": {
+            "type": "boolean",
+            "title": "Displayusernamepublic"
+          },
+          "createdAt": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Createdat"
+          },
+          "updatedAt": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Updatedat"
+          },
+          "profileImage": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Profileimage"
+          },
+          "bio": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Bio"
+          },
           "profileImageOptimized": {
-            "$ref": "#/components/schemas/SearchProfileImageOptimized"
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/SearchProfileImageOptimized"
+              },
+              {
+                "type": "null"
+              }
+            ]
           }
         },
         "type": "object",
         "required": [
-          "id",
           "name",
-          "user",
-          "createdAt",
-          "updatedAt",
-          "pseudonym",
-          "profileImage",
-          "bio",
           "proxyWallet",
-          "profileImageOptimized"
+          "displayUsernamePublic"
         ],
         "title": "SearchProfileItem"
       },
@@ -2066,6 +2181,86 @@
         ],
         "title": "TopHoldersWalletInfoRequest"
       },
+      "TopMover": {
+        "properties": {
+          "clob_token_id": {
+            "type": "string",
+            "title": "Clob Token Id"
+          },
+          "question": {
+            "type": "string",
+            "title": "Question"
+          },
+          "slug": {
+            "type": "string",
+            "title": "Slug"
+          },
+          "icon": {
+            "type": "string",
+            "title": "Icon"
+          },
+          "last_price": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Price"
+          },
+          "price_delta": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Price Delta"
+          },
+          "fetched_at": {
+            "type": "string",
+            "title": "Fetched At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "clob_token_id",
+          "question",
+          "slug",
+          "icon",
+          "last_price",
+          "price_delta",
+          "fetched_at"
+        ],
+        "title": "TopMover",
+        "description": "Market with price movement data."
+      },
+      "TopMoversResponse": {
+        "properties": {
+          "movers": {
+            "items": {
+              "$ref": "#/components/schemas/TopMover"
+            },
+            "type": "array",
+            "title": "Movers"
+          },
+          "fetched_at": {
+            "type": "string",
+            "title": "Fetched At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "movers",
+          "fetched_at"
+        ],
+        "title": "TopMoversResponse",
+        "description": "Response for top movers endpoint."
+      },
       "Trade": {
         "properties": {
           "proxyWallet": {
@@ -2168,6 +2363,175 @@
           "transactionHash"
         ],
         "title": "Trade"
+      },
+      "UserProfileUser": {
+        "properties": {
+          "id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Id"
+          },
+          "creator": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Creator"
+          },
+          "mod": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Mod"
+          }
+        },
+        "type": "object",
+        "title": "UserProfileUser"
+      },
+      "UserPublicProfile": {
+        "properties": {
+          "id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Id"
+          },
+          "createdAt": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Createdat"
+          },
+          "proxyWallet": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Proxywallet"
+          },
+          "profileImage": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Profileimage"
+          },
+          "displayUsernamePublic": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Displayusernamepublic"
+          },
+          "bio": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Bio"
+          },
+          "pseudonym": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Pseudonym"
+          },
+          "name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          },
+          "users": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/UserProfileUser"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Users"
+          },
+          "xUsername": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Xusername"
+          },
+          "verifiedBadge": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Verifiedbadge"
+          }
+        },
+        "type": "object",
+        "title": "UserPublicProfile"
       },
       "ValidationError": {
         "properties": {

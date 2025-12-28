@@ -1,37 +1,21 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-
-export type UserProfileData = {
-  id?: string;
-  createdAt?: string;
-  proxyWallet?: string;
-  profileImage?: string;
-  displayUsernamePublic?: boolean;
-  bio?: string | null;
-  pseudonym?: string | null;
-  name?: string | null;
-  users?: Array<{
-    id?: string;
-    creator?: boolean;
-    mod?: boolean;
-  }>;
-  xUsername?: string | null;
-  verifiedBadge?: boolean;
-};
+import { getBaseUrl } from "@/lib/api.const";
+import { UserPublicProfile } from "@/lib/models/api.models";
 
 export function useUserDataQuery(address: string, enabled: boolean = true) {
-  return useQuery<UserProfileData>({
+  return useQuery<UserPublicProfile>({
     queryKey: ["user-data", address],
     queryFn: async () => {
-      const url = new URL("https://polymarket.com/api/profile/userData");
+      const url = new URL(`${getBaseUrl()}/profiles/public-profile`);
       url.searchParams.set("address", address);
 
       const response = await fetch(url.toString());
       if (!response.ok) {
         throw new Error(`Failed to fetch user data: ${response.statusText}`);
       }
-      const data = (await response.json()) as UserProfileData;
+      const data = (await response.json()) as UserPublicProfile;
       return data;
     },
     enabled: enabled && address.trim().length > 0,

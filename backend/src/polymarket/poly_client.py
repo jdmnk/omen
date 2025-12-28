@@ -11,6 +11,7 @@ from src.models.activity import parse_activity_trade
 from src.models.event import Event, parse_event_from_api
 from src.models.market import Market, parse_market_from_api
 from src.models.search import SearchEventItem, SearchMarketItem, SearchProfileItem, SearchResponse
+from src.models.user_profile import UserPublicProfile
 from src.models.top_holders import TopHolder
 from src.models.trade import Trade, parse_trade_from_api
 from src.models.user_position import UserPosition, parse_user_position_from_api
@@ -617,3 +618,24 @@ class PolyClient:
             logger.error(f"search_profiles: error searching profiles: {exc}")
             logger.error(traceback.format_exc())
             raise exc
+
+    async def get_public_profile(self, address: str) -> UserPublicProfile | None:
+        try:
+            async with httpx.AsyncClient() as client:
+                params = {"address": address}
+                response = await client.get(f"{GAMMA_API_HOST}/public-profile", params=params)
+                if response.status_code == 404:
+                    return None
+                response.raise_for_status()
+                data = response.json()
+                return UserPublicProfile(**data)
+        except httpx.HTTPStatusError as exc:
+            if exc.response.status_code == 404:
+                return None
+            logger.error(f"get_public_profile: error fetching profile for address={address}: {exc}")
+            logger.error(traceback.format_exc())
+            raise PolyApiException(f"Failed to fetch public profile: {exc}") from exc
+        except Exception as exc:
+            logger.error(f"get_public_profile: unexpected error for address={address}: {exc}")
+            logger.error(traceback.format_exc())
+            raise exc from exc

@@ -42,6 +42,27 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/markets/top-movers": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Top Movers Endpoint
+         * @description Get markets with highest absolute price delta (top movers).
+         *     Returns markets sorted by absolute price change since last refresh.
+         */
+        get: operations["get_top_movers_endpoint_markets_top_movers_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/markets/search-slug": {
         parameters: {
             query?: never;
@@ -114,6 +135,26 @@ export interface paths {
          * @description Search for profiles using Polymarket Gamma API.
          */
         get: operations["get_search_profiles_endpoint_profiles_search_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/profiles/public-profile": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Public Profile Endpoint
+         * @description Get a public profile by address from Polymarket Gamma API.
+         */
+        get: operations["get_public_profile_endpoint_profiles_public_profile_get"];
         put?: never;
         post?: never;
         delete?: never;
@@ -568,25 +609,23 @@ export interface components {
         };
         /** SearchProfileItem */
         SearchProfileItem: {
-            /** Id */
-            id: string;
             /** Name */
             name: string;
-            /** User */
-            user: number;
-            /** Createdat */
-            createdAt: string;
-            /** Updatedat */
-            updatedAt: string;
-            /** Pseudonym */
-            pseudonym: string;
-            /** Profileimage */
-            profileImage: string;
-            /** Bio */
-            bio: string;
             /** Proxywallet */
             proxyWallet: string;
-            profileImageOptimized: components["schemas"]["SearchProfileImageOptimized"];
+            /** Pseudonym */
+            pseudonym?: string | null;
+            /** Displayusernamepublic */
+            displayUsernamePublic: boolean;
+            /** Createdat */
+            createdAt?: string | null;
+            /** Updatedat */
+            updatedAt?: string | null;
+            /** Profileimage */
+            profileImage?: string | null;
+            /** Bio */
+            bio?: string | null;
+            profileImageOptimized?: components["schemas"]["SearchProfileImageOptimized"] | null;
         };
         /**
          * SearchResponse
@@ -712,6 +751,36 @@ export interface components {
             /** Holders */
             holders: components["schemas"]["TopHolder"][];
         };
+        /**
+         * TopMover
+         * @description Market with price movement data.
+         */
+        TopMover: {
+            /** Clob Token Id */
+            clob_token_id: string;
+            /** Question */
+            question: string;
+            /** Slug */
+            slug: string;
+            /** Icon */
+            icon: string;
+            /** Last Price */
+            last_price: number | null;
+            /** Price Delta */
+            price_delta: number | null;
+            /** Fetched At */
+            fetched_at: string;
+        };
+        /**
+         * TopMoversResponse
+         * @description Response for top movers endpoint.
+         */
+        TopMoversResponse: {
+            /** Movers */
+            movers: components["schemas"]["TopMover"][];
+            /** Fetched At */
+            fetched_at: string;
+        };
         /** Trade */
         Trade: {
             /** Proxywallet */
@@ -752,6 +821,40 @@ export interface components {
             profileImageOptimized: string;
             /** Transactionhash */
             transactionHash: string;
+        };
+        /** UserProfileUser */
+        UserProfileUser: {
+            /** Id */
+            id?: string | null;
+            /** Creator */
+            creator?: boolean | null;
+            /** Mod */
+            mod?: boolean | null;
+        };
+        /** UserPublicProfile */
+        UserPublicProfile: {
+            /** Id */
+            id?: string | null;
+            /** Createdat */
+            createdAt?: string | null;
+            /** Proxywallet */
+            proxyWallet?: string | null;
+            /** Profileimage */
+            profileImage?: string | null;
+            /** Displayusernamepublic */
+            displayUsernamePublic?: boolean | null;
+            /** Bio */
+            bio?: string | null;
+            /** Pseudonym */
+            pseudonym?: string | null;
+            /** Name */
+            name?: string | null;
+            /** Users */
+            users?: components["schemas"]["UserProfileUser"][] | null;
+            /** Xusername */
+            xUsername?: string | null;
+            /** Verifiedbadge */
+            verifiedBadge?: boolean | null;
         };
         /** ValidationError */
         ValidationError: {
@@ -807,6 +910,37 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["HealthResponse"];
+                };
+            };
+        };
+    };
+    get_top_movers_endpoint_markets_top_movers_get: {
+        parameters: {
+            query?: {
+                limit?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TopMoversResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
                 };
             };
         };
@@ -922,6 +1056,37 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["SearchResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_public_profile_endpoint_profiles_public_profile_get: {
+        parameters: {
+            query: {
+                address: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UserPublicProfile"];
                 };
             };
             /** @description Validation Error */
@@ -1192,5 +1357,9 @@ export type TopHolderPnl = components["schemas"]["TopHolderPnl"];
 export type TopHolderWalletInfo = components["schemas"]["TopHolderWalletInfo"];
 export type TopHoldersPnlRequest = components["schemas"]["TopHoldersPnlRequest"];
 export type TopHoldersWalletInfoRequest = components["schemas"]["TopHoldersWalletInfoRequest"];
+export type TopMover = components["schemas"]["TopMover"];
+export type TopMoversResponse = components["schemas"]["TopMoversResponse"];
 export type Trade = components["schemas"]["Trade"];
+export type UserProfileUser = components["schemas"]["UserProfileUser"];
+export type UserPublicProfile = components["schemas"]["UserPublicProfile"];
 export type ValidationError = components["schemas"]["ValidationError"];

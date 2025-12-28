@@ -29,6 +29,7 @@ from src.models.top_holders import (
     TopHoldersWalletInfoRequest,
     TopHolderWalletInfo,
 )
+from src.models.user_profile import UserPublicProfile
 from src.models.trade import Trade
 from src.polymarket.poly_client import PolyClient
 from src.polymarket.poly_client_graphs import PolyClientGraphs
@@ -132,6 +133,17 @@ async def get_search_profiles_endpoint(q: str = Query(min_length=1)) -> SearchRe
     Search for profiles using Polymarket Gamma API.
     """
     return await poly_client.search_profiles(q)
+
+
+@app.get("/profiles/public-profile", response_model=UserPublicProfile)
+async def get_public_profile_endpoint(address: str = Query(min_length=1)) -> UserPublicProfile:
+    """
+    Get a public profile by address from Polymarket Gamma API.
+    """
+    result = await poly_client.get_public_profile(address)
+    if result is None:
+        raise HTTPException(status_code=404, detail="Profile not found")
+    return result
 
 
 @app.get("/markets/by-condition-ids", response_model=list[Market])
