@@ -26,6 +26,7 @@ import {
 } from "@/lib/hooks/use-user-watchlist";
 import { cn } from "@/lib/utils";
 import { formatAddress } from "@/lib/ui/format.utils";
+import { UserWatchlistActivityFeed } from "./UserWatchlistActivityFeed";
 
 const INITIAL_LIMIT = 10;
 const CONFIRM_TIMEOUT_MS = 3000;
@@ -108,6 +109,7 @@ function SortableWatchlistItem({
 
 export function UserWatchlist() {
   const [isExpanded, setIsExpanded] = useState(true);
+  const [isActivityOpen, setIsActivityOpen] = useState(false);
   const [pendingUnwatch, setPendingUnwatch] = useState<string | null>(null);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
   const { watchlist, reorderWatchlist, removeFromWatchlist } =
@@ -182,37 +184,67 @@ export function UserWatchlist() {
       collisionDetection={closestCenter}
       onDragEnd={handleDragEnd}
     >
-      <div className="flex flex-wrap items-center gap-2">
-        <SortableContext
-          items={displayItems.map((item) => item.proxyWallet)}
-          strategy={horizontalListSortingStrategy}
-        >
-          {displayItems.map((user) => (
-            <SortableWatchlistItem
-              key={user.proxyWallet}
-              user={user}
-              pendingUnwatch={pendingUnwatch === user.proxyWallet}
-              onStarClick={handleStarClick}
-            />
-          ))}
-        </SortableContext>
-        {hasMore && (
+      <div className="flex flex-col gap-2">
+        <div className="flex flex-wrap items-center gap-2">
+          <SortableContext
+            items={displayItems.map((item) => item.proxyWallet)}
+            strategy={horizontalListSortingStrategy}
+          >
+            {displayItems.map((user) => (
+              <SortableWatchlistItem
+                key={user.proxyWallet}
+                user={user}
+                pendingUnwatch={pendingUnwatch === user.proxyWallet}
+                onStarClick={handleStarClick}
+              />
+            ))}
+          </SortableContext>
+          {hasMore && (
+            <button
+              onClick={() => setIsExpanded(!isExpanded)}
+              className="inline-flex items-center gap-1 px-2 py-1 text-xs text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+            >
+              {isExpanded ? (
+                <>
+                  <span>Show less</span>
+                  <ChevronUp className="h-3 w-3" />
+                </>
+              ) : (
+                <>
+                  <span>+{remainingCount} more</span>
+                  <ChevronDown className="h-3 w-3" />
+                </>
+              )}
+            </button>
+          )}
           <button
-            onClick={() => setIsExpanded(!isExpanded)}
+            onClick={() => setIsActivityOpen((open) => !open)}
             className="inline-flex items-center gap-1 px-2 py-1 text-xs text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
           >
-            {isExpanded ? (
+            {isActivityOpen ? (
               <>
-                <span>Show less</span>
+                <span>Hide activity</span>
                 <ChevronUp className="h-3 w-3" />
               </>
             ) : (
               <>
-                <span>+{remainingCount} more</span>
+                <span>Watchlist activity</span>
                 <ChevronDown className="h-3 w-3" />
               </>
             )}
           </button>
+        </div>
+        {isActivityOpen && (
+          <div className="w-full rounded-lg border border-brand-stroke bg-background/50 overflow-hidden">
+            <div className="px-3 pt-3 pb-2 border-b border-brand-stroke">
+              <h3 className="text-sm font-bold uppercase text-brand-primary pb-[3px]">
+                Watchlist Activity
+              </h3>
+            </div>
+            <div className="h-[420px]">
+              <UserWatchlistActivityFeed watchlist={watchlist} />
+            </div>
+          </div>
         )}
       </div>
     </DndContext>
