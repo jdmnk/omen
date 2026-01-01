@@ -12,6 +12,7 @@ import { LogoIcon } from "@/components/LogoIcon";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { FontSizeControl } from "@/components/FontSizeControl";
 import { MarketSearchBar } from "./MarketSearchBar";
+import { MarketWatchlist } from "./MarketWatchlist";
 
 export function MarketLayout({
   initialMarket,
@@ -70,6 +71,7 @@ export function MarketLayout({
           <FontSizeControl />
         </div>
       </div>
+      <MarketWatchlist />
 
       <div className="flex flex-col gap-4">
         <div className="h-96">

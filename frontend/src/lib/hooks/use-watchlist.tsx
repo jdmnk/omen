@@ -7,6 +7,7 @@ export interface WatchlistItem {
   slug: string;
   conditionId: string;
   title: string;
+  description?: string;
 }
 
 interface WatchlistState {
@@ -17,6 +18,9 @@ interface WatchlistState {
   isWatchlisted: (slug: string) => boolean;
   // Helper to get conditionIds for queries
   getConditionIds: () => string[];
+  reorderWatchlist: (oldIndex: number, newIndex: number) => void;
+  updateDescription: (slug: string, description?: string) => void;
+  setWatchlist: (items: WatchlistItem[]) => void;
 }
 
 // Migration function to handle old format (array of strings)
@@ -82,6 +86,29 @@ export const useWatchlistStore = create<WatchlistState>()(
       getConditionIds: () => {
         return get().watchlist.map((w) => w.conditionId);
       },
+
+      reorderWatchlist: (oldIndex: number, newIndex: number) => {
+        set((state) => {
+          const items = [...state.watchlist];
+          const [removed] = items.splice(oldIndex, 1);
+          items.splice(newIndex, 0, removed);
+          return { watchlist: items };
+        });
+      },
+
+      updateDescription: (slug: string, description?: string) => {
+        set((state) => ({
+          watchlist: state.watchlist.map((item) =>
+            item.slug === slug
+              ? { ...item, description: description || undefined }
+              : item
+          ),
+        }));
+      },
+
+      setWatchlist: (items: WatchlistItem[]) => {
+        set({ watchlist: items });
+      },
     }),
     {
       name: "omen-watchlist",
@@ -113,6 +140,13 @@ export function useWatchlist() {
   const toggleWatchlist = useWatchlistStore((state) => state.toggleWatchlist);
   const isWatchlisted = useWatchlistStore((state) => state.isWatchlisted);
   const getConditionIds = useWatchlistStore((state) => state.getConditionIds);
+  const reorderWatchlist = useWatchlistStore(
+    (state) => state.reorderWatchlist
+  );
+  const updateDescription = useWatchlistStore(
+    (state) => state.updateDescription
+  );
+  const setWatchlist = useWatchlistStore((state) => state.setWatchlist);
 
   return {
     watchlist,
@@ -121,5 +155,8 @@ export function useWatchlist() {
     toggleWatchlist,
     isWatchlisted,
     getConditionIds,
+    reorderWatchlist,
+    updateDescription,
+    setWatchlist,
   };
 }
