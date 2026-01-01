@@ -18,6 +18,7 @@ interface UserWatchlistState {
   isWatchlisted: (proxyWallet: string) => boolean;
   reorderWatchlist: (oldIndex: number, newIndex: number) => void;
   updateDescription: (proxyWallet: string, description?: string) => void;
+  setWatchlist: (items: UserWatchlistItem[]) => void;
   _hasHydrated: boolean;
   setHasHydrated: (state: boolean) => void;
 }
@@ -85,6 +86,10 @@ export const useUserWatchlistStore = create<UserWatchlistState>()(
           ),
         }));
       },
+
+      setWatchlist: (items: UserWatchlistItem[]) => {
+        set({ watchlist: items });
+      },
     }),
     {
       name: "user-watchlist",
@@ -125,6 +130,7 @@ export function useUserWatchlist() {
   const updateDescription = useUserWatchlistStore(
     (state) => state.updateDescription
   );
+  const setWatchlist = useUserWatchlistStore((state) => state.setWatchlist);
   const isHydrated = useUserWatchlistHydrated();
 
   return {
@@ -136,6 +142,7 @@ export function useUserWatchlist() {
       isHydrated ? isWatchlisted(proxyWallet) : false,
     reorderWatchlist,
     updateDescription,
+    setWatchlist,
     isHydrated,
   };
 }

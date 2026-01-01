@@ -34,6 +34,7 @@ import {
 import { cn } from "@/lib/utils";
 import { formatAddress } from "@/lib/ui/format.utils";
 import { UserWatchlistActivityFeed } from "./UserWatchlistActivityFeed";
+import { UserWatchlistImportExportDialog } from "./UserWatchlistImportExportDialog";
 
 const INITIAL_LIMIT = 10;
 const CONFIRM_TIMEOUT_MS = 3000;
@@ -193,7 +194,12 @@ export function UserWatchlist() {
   );
 
   if (watchlist.length === 0) {
-    return null;
+    return (
+      <div className="flex items-center gap-2 text-xs text-muted-foreground">
+        <span>Click the stars to add to watchlist or import watchlist.</span>
+        <UserWatchlistImportExportDialog />
+      </div>
+    );
   }
 
   const displayItems = isExpanded
@@ -322,6 +328,7 @@ export function UserWatchlist() {
             <Pencil className="h-3 w-3" />
             <span>{isEditing ? "Done" : "Edit"}</span>
           </button>
+          {isEditing && <UserWatchlistImportExportDialog />}
           <button
             onClick={() => setIsActivityOpen((open) => !open)}
             className="inline-flex items-center gap-1 px-2 py-1 text-xs text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
