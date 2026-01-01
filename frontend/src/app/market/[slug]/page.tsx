@@ -1,9 +1,9 @@
-import { TerminalLayout } from "@/modules/market/components/TerminalLayout";
 import type { Metadata } from "next";
 import { Market } from "@/lib/models/api.models";
 import { METADATA } from "@/lib/metadata.const";
 import { getBaseUrl } from "@/lib/api.const";
 import { getSiteUrl } from "@/lib/app.const";
+import { MarketLayout } from "@/modules/market_new/components/MarketLayout";
 
 async function fetchMarket(slug: string): Promise<Market | null> {
   const baseUrl = getBaseUrl();
@@ -41,7 +41,6 @@ export async function generateMetadata({
     };
   }
 
-  // Parse outcomes and prices
   const outcomes = market.outcomes?.split(",") || ["YES", "NO"];
   const outcomePrices = market.outcomePrices?.split(",") || ["0.50", "0.50"];
   const yesPrice = outcomePrices[0]
@@ -79,7 +78,7 @@ export async function generateMetadata({
   };
 }
 
-export default async function MarketPage({
+export default async function MarketNewPage({
   params,
 }: {
   params: Promise<{ slug: string }>;
@@ -87,5 +86,5 @@ export default async function MarketPage({
   const { slug } = await params;
   const market = await fetchMarket(slug);
 
-  return <TerminalLayout initialMarket={market} />;
+  return <MarketLayout initialMarket={market} />;
 }

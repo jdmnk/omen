@@ -244,7 +244,7 @@ export function SearchWidget({ currentMarket }: { currentMarket?: Market }) {
   const eventMarkets = activeEventMarkets;
 
   const handleSelectMarket = (slug: string) => {
-    router.push(`/market/${slug}`);
+    router.push(`/market_old/${slug}`);
   };
 
   const handleSelectEvent = (event: (typeof events)[0]) => {

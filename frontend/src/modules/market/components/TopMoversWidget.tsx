@@ -91,7 +91,7 @@ export function TopMoversWidget() {
   const { data, isLoading, error } = useTopMoversQuery(30);
 
   const handleSelectMarket = (slug: string) => {
-    router.push(`/market/${slug}`);
+    router.push(`/market_old/${slug}`);
   };
 
   if (isLoading) {

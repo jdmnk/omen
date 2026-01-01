@@ -1,5 +1,5 @@
-import { TerminalLayout } from "@/modules/market/components/TerminalLayout";
+import { MarketLayout } from "@/modules/market_new/components/MarketLayout";
 
-export default function Home() {
-  return <TerminalLayout></TerminalLayout>;
+export default function MarketNewRootPage() {
+  return <MarketLayout />;
 }

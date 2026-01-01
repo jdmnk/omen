@@ -113,7 +113,7 @@ export function WatchlistWidget() {
           return (
             <Link
               key={`${market.slug}-${index}`}
-              href={`/market/${market.slug}`}
+              href={`/market_old/${market.slug}`}
               className={cn(
                 "w-full text-left px-3 py-2 text-xs block",
                 "transition-colors",
