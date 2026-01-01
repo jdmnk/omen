@@ -13,7 +13,11 @@ import { ThemeToggle } from "@/components/ThemeToggle";
 import { FontSizeControl } from "@/components/FontSizeControl";
 import { MarketSearchBar } from "./MarketSearchBar";
 
-export function MarketLayout({ initialMarket }: { initialMarket?: Market | null }) {
+export function MarketLayout({
+  initialMarket,
+}: {
+  initialMarket?: Market | null;
+}) {
   const params = useParams();
   const marketSlug = params?.slug as string | undefined;
 
@@ -65,7 +69,7 @@ export function MarketLayout({ initialMarket }: { initialMarket?: Market | null 
       </div>
 
       <div className="flex flex-col gap-4">
-        <div className="min-h-[300px]">
+        <div className="h-96">
           {isLoading ? (
             <LoadingState />
           ) : error || !market ? (

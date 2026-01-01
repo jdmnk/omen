@@ -27,7 +27,7 @@ export function RulesWidget({ market }: RulesWidgetProps) {
   } = useClarificationsQuery(questionId, submitted_by);
 
   return (
-    <div className="space-y-4 p-4">
+    <div className="space-y-3 p-3">
       {/* Market Description Section */}
       {description && (
         <div>
