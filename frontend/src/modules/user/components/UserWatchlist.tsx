@@ -196,7 +196,7 @@ export function UserWatchlist() {
   if (watchlist.length === 0) {
     return (
       <div className="flex items-center gap-2 text-xs text-muted-foreground">
-        <span>Click the stars to add to watchlist or import watchlist.</span>
+        <span>Add users with the star button, or import an existing watchlist.</span>
         <UserWatchlistImportExportDialog />
       </div>
     );
