@@ -15,7 +15,7 @@ import {
 } from "@/lib/ui/format.utils";
 import { cn } from "@/lib/utils";
 import { fetchUserActivityEntries } from "@/modules/user/lib/queries/user-activity.query";
-import { LoadingSpinner } from "@/components/ui/spinner";
+import { LoadingSpinner, Spinner } from "@/components/ui/spinner";
 import { getPolymarketEventUrl } from "@/lib/utils/polymarket.utils";
 import type { Activity } from "@/lib/models/frontend.models";
 import {
@@ -25,6 +25,7 @@ import {
 import type { UserWatchlistItem } from "@/lib/hooks/use-user-watchlist";
 import { MarketInfoCell } from "./positions/MarketInfoCell";
 import { Checkbox } from "@/components/ui/checkbox";
+import { RefreshCw } from "lucide-react";
 
 const ACTIVITY_ROW_GRID_CLASSES =
   "grid grid-cols-[140px_72px_1fr_minmax(80px,auto)] items-center gap-3";
@@ -128,6 +129,12 @@ export function UserWatchlistActivityFeed({
   });
 
   const isLoading = activityQueries.some((query) => query.isLoading);
+  const isRefreshing = activityQueries.some((query) => query.isFetching);
+  const handleRefresh = () => {
+    activityQueries.forEach((query) => {
+      query.refetch();
+    });
+  };
 
   const entries = useMemo(() => {
     const combined = selectedWatchlist.flatMap((user, index) => {
@@ -164,8 +171,22 @@ export function UserWatchlistActivityFeed({
   return (
     <div className="flex h-full flex-col overflow-auto">
       <div className="px-3 py-2 border-b border-brand-stroke">
-        <div className="text-[11px] uppercase text-muted-foreground mb-2">
-          Filter users
+        <div className="flex items-center justify-between gap-3 mb-2">
+          <div className="text-[11px] uppercase text-muted-foreground">
+            Filter users
+          </div>
+          {isRefreshing ? (
+            <Spinner size="sm" />
+          ) : (
+            <button
+              type="button"
+              onClick={handleRefresh}
+              aria-label="Refresh watchlist activity"
+              className="text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+            >
+              <RefreshCw className="h-3.5 w-3.5" />
+            </button>
+          )}
         </div>
         <div className="flex flex-wrap items-center gap-3">
           {watchlist.map((user) => {
