@@ -326,7 +326,7 @@ export function TopHoldersPositions({
   }
 
   return (
-    <div className="grid grid-cols-2">
+    <div className="grid grid-cols-1 divide-y divide-brand-stroke md:grid-cols-2 md:divide-y-0 md:divide-x">
       <OutcomeColumn
         label={outcome0Label}
         bgColor=""
