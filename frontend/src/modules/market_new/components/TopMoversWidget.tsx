@@ -6,6 +6,12 @@ import { TrendingUp, TrendingDown, Clock } from "lucide-react";
 import { useTopMoversQuery, TopMover } from "../lib/queries/top-movers.query";
 import { Spinner } from "@/components/ui/spinner";
 import { cn } from "@/lib/utils";
+import {
+  TABLE_HEADER_CLASSES,
+  TABLE_HEADER_CONTAINER_CLASSES,
+  TABLE_CONTENT_CONTAINER_CLASSES,
+  TABLE_ROW_CLASSES,
+} from "../../../components/shared-table-styles";
 
 function formatPriceDelta(delta: number | null): string {
   if (delta === null) return "—";
@@ -31,10 +37,10 @@ function MoverRow({
     <button
       onClick={onClick}
       className={cn(
-        "w-full text-left px-4 py-3",
+        "w-full text-left",
         "transition-colors hover:bg-brand-highlight/30 cursor-pointer",
         "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
-        "border-b border-brand-stroke last:border-b-0"
+        TABLE_ROW_CLASSES
       )}
     >
       <div className="flex items-center gap-3">
@@ -69,7 +75,7 @@ function MoverRow({
         <div
           className={cn(
             "shrink-0 flex items-center gap-1 w-20 justify-end",
-            isPositive ? "text-green-500" : "text-red-500"
+            isPositive ? "text-outcome-yes" : "text-outcome-no"
           )}
         >
           {isPositive ? (
@@ -137,29 +143,17 @@ export function TopMoversWidget() {
       </div>
 
       {/* Column Headers */}
-      <div className="shrink-0 px-3 py-2 border-b border-brand-stroke bg-muted/30">
-        <div className="flex items-center gap-3">
-          <div className="w-8" /> {/* Icon spacer */}
-          <div className="flex-1 min-w-0">
-            <span className="text-[11px] text-muted-foreground uppercase tracking-wide">
-              Market
-            </span>
-          </div>
-          <div className="w-16 text-right">
-            <span className="text-[11px] text-muted-foreground uppercase tracking-wide">
-              Price
-            </span>
-          </div>
-          <div className="w-20 text-right">
-            <span className="text-[11px] text-muted-foreground uppercase tracking-wide">
-              Change
-            </span>
-          </div>
+      <div className={TABLE_HEADER_CONTAINER_CLASSES}>
+        <div className={cn("flex items-center gap-3", TABLE_HEADER_CLASSES)}>
+          <div className="w-8" />
+          <div className="flex-1 min-w-0">Market</div>
+          <div className="w-16 text-right">Price</div>
+          <div className="w-20 text-right">Change</div>
         </div>
       </div>
 
       {/* Movers List */}
-      <div className="flex-1 overflow-auto">
+      <div className={cn("flex-1 overflow-auto", TABLE_CONTENT_CONTAINER_CLASSES)}>
         {data.movers.length === 0 ? (
           <div className="h-full flex items-center justify-center">
             <span className="text-sm text-muted-foreground italic">
