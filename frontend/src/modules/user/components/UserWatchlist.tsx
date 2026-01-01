@@ -1,7 +1,14 @@
 "use client";
 
 import { useState, useRef } from "react";
-import { ChevronDown, ChevronUp, GripVertical, Star } from "lucide-react";
+import {
+  ChevronDown,
+  ChevronUp,
+  GripVertical,
+  Pencil,
+  Plus,
+  Star,
+} from "lucide-react";
 import Link from "next/link";
 import {
   DndContext,
@@ -35,10 +42,24 @@ function SortableWatchlistItem({
   user,
   pendingUnwatch,
   onStarClick,
+  isEditing,
+  isEditingDescription,
+  descriptionValue,
+  onStartEditDescription,
+  onChangeDescription,
+  onSaveDescription,
+  onCancelDescription,
 }: {
   user: UserWatchlistItem;
   pendingUnwatch: boolean;
   onStarClick: (user: UserWatchlistItem) => void;
+  isEditing: boolean;
+  isEditingDescription: boolean;
+  descriptionValue: string;
+  onStartEditDescription: (user: UserWatchlistItem) => void;
+  onChangeDescription: (value: string) => void;
+  onSaveDescription: () => void;
+  onCancelDescription: () => void;
 }) {
   const {
     attributes,
@@ -47,7 +68,7 @@ function SortableWatchlistItem({
     transform,
     transition,
     isDragging,
-  } = useSortable({ id: user.proxyWallet });
+  } = useSortable({ id: user.proxyWallet, disabled: !isEditing });
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -73,13 +94,15 @@ function SortableWatchlistItem({
         isDragging && "opacity-50 z-50"
       )}
     >
-      <div
-        {...attributes}
-        {...listeners}
-        className="shrink-0 cursor-grab active:cursor-grabbing touch-none"
-      >
-        <GripVertical className="h-3 w-3 text-muted-foreground" />
-      </div>
+      {isEditing && (
+        <div
+          {...attributes}
+          {...listeners}
+          className="shrink-0 cursor-grab active:cursor-grabbing touch-none"
+        >
+          <GripVertical className="h-3 w-3 text-muted-foreground" />
+        </div>
+      )}
       <button
         onClick={handleStarClick}
         className={cn(
@@ -103,6 +126,44 @@ function SortableWatchlistItem({
       >
         {user.name || formatAddress(user.proxyWallet)}
       </Link>
+      {isEditingDescription ? (
+        <input
+          value={descriptionValue}
+          onChange={(event) => onChangeDescription(event.target.value)}
+          onBlur={onSaveDescription}
+          onKeyDown={(event) => {
+            if (event.key === "Enter") {
+              onSaveDescription();
+            }
+            if (event.key === "Escape") {
+              onCancelDescription();
+            }
+          }}
+          placeholder="Add note"
+          className="h-6 rounded-md border border-brand-stroke bg-transparent px-2 text-[11px] text-foreground outline-none placeholder:text-muted-foreground"
+          autoFocus
+        />
+      ) : user.description ? (
+        <button
+          type="button"
+          onClick={() => onStartEditDescription(user)}
+          className={cn(
+            "text-[11px] text-muted-foreground hover:text-foreground transition-colors cursor-pointer",
+            !isEditing && "cursor-default"
+          )}
+          disabled={!isEditing}
+        >
+          {user.description}
+        </button>
+      ) : isEditing ? (
+        <button
+          type="button"
+          onClick={() => onStartEditDescription(user)}
+          className="text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+        >
+          <Plus className="h-3 w-3" />
+        </button>
+      ) : null}
     </div>
   );
 }
@@ -110,9 +171,14 @@ function SortableWatchlistItem({
 export function UserWatchlist() {
   const [isExpanded, setIsExpanded] = useState(true);
   const [isActivityOpen, setIsActivityOpen] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+  const [editingDescriptionId, setEditingDescriptionId] = useState<
+    string | null
+  >(null);
+  const [editingDescriptionValue, setEditingDescriptionValue] = useState("");
   const [pendingUnwatch, setPendingUnwatch] = useState<string | null>(null);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
-  const { watchlist, reorderWatchlist, removeFromWatchlist } =
+  const { watchlist, reorderWatchlist, removeFromWatchlist, updateDescription } =
     useUserWatchlist();
 
   const sensors = useSensors(
@@ -137,6 +203,7 @@ export function UserWatchlist() {
   const remainingCount = watchlist.length - INITIAL_LIMIT;
 
   function handleDragEnd(event: DragEndEvent) {
+    if (!isEditing) return;
     const { active, over } = event;
 
     if (over && active.id !== over.id) {
@@ -178,6 +245,25 @@ export function UserWatchlist() {
     }
   }
 
+  function handleStartEditDescription(user: UserWatchlistItem) {
+    if (!isEditing) return;
+    setEditingDescriptionId(user.proxyWallet);
+    setEditingDescriptionValue(user.description || "");
+  }
+
+  function handleSaveDescription() {
+    if (!editingDescriptionId) return;
+    const nextValue = editingDescriptionValue.trim();
+    updateDescription(editingDescriptionId, nextValue || undefined);
+    setEditingDescriptionId(null);
+    setEditingDescriptionValue("");
+  }
+
+  function handleCancelDescription() {
+    setEditingDescriptionId(null);
+    setEditingDescriptionValue("");
+  }
+
   return (
     <DndContext
       sensors={sensors}
@@ -196,6 +282,13 @@ export function UserWatchlist() {
                 user={user}
                 pendingUnwatch={pendingUnwatch === user.proxyWallet}
                 onStarClick={handleStarClick}
+                isEditing={isEditing}
+                isEditingDescription={editingDescriptionId === user.proxyWallet}
+                descriptionValue={editingDescriptionValue}
+                onStartEditDescription={handleStartEditDescription}
+                onChangeDescription={setEditingDescriptionValue}
+                onSaveDescription={handleSaveDescription}
+                onCancelDescription={handleCancelDescription}
               />
             ))}
           </SortableContext>
@@ -217,6 +310,18 @@ export function UserWatchlist() {
               )}
             </button>
           )}
+          <button
+            type="button"
+            onClick={() => {
+              setIsEditing((prev) => !prev);
+              setEditingDescriptionId(null);
+              setEditingDescriptionValue("");
+            }}
+            className="inline-flex items-center gap-1 px-2 py-1 text-xs text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+          >
+            <Pencil className="h-3 w-3" />
+            <span>{isEditing ? "Done" : "Edit"}</span>
+          </button>
           <button
             onClick={() => setIsActivityOpen((open) => !open)}
             className="inline-flex items-center gap-1 px-2 py-1 text-xs text-muted-foreground hover:text-foreground transition-colors cursor-pointer"

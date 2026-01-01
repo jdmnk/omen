@@ -7,6 +7,7 @@ import { persist, createJSONStorage } from "zustand/middleware";
 export interface UserWatchlistItem {
   proxyWallet: string;
   name: string;
+  description?: string;
 }
 
 interface UserWatchlistState {
@@ -16,6 +17,7 @@ interface UserWatchlistState {
   toggleWatchlist: (item: UserWatchlistItem) => void;
   isWatchlisted: (proxyWallet: string) => boolean;
   reorderWatchlist: (oldIndex: number, newIndex: number) => void;
+  updateDescription: (proxyWallet: string, description?: string) => void;
   _hasHydrated: boolean;
   setHasHydrated: (state: boolean) => void;
 }
@@ -73,6 +75,16 @@ export const useUserWatchlistStore = create<UserWatchlistState>()(
           return { watchlist: items };
         });
       },
+
+      updateDescription: (proxyWallet: string, description?: string) => {
+        set((state) => ({
+          watchlist: state.watchlist.map((item) =>
+            item.proxyWallet === proxyWallet
+              ? { ...item, description: description || undefined }
+              : item
+          ),
+        }));
+      },
     }),
     {
       name: "user-watchlist",
@@ -110,6 +122,9 @@ export function useUserWatchlist() {
   const reorderWatchlist = useUserWatchlistStore(
     (state) => state.reorderWatchlist
   );
+  const updateDescription = useUserWatchlistStore(
+    (state) => state.updateDescription
+  );
   const isHydrated = useUserWatchlistHydrated();
 
   return {
@@ -120,6 +135,7 @@ export function useUserWatchlist() {
     isWatchlisted: (proxyWallet: string) =>
       isHydrated ? isWatchlisted(proxyWallet) : false,
     reorderWatchlist,
+    updateDescription,
     isHydrated,
   };
 }
