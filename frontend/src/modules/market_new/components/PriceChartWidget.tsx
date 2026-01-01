@@ -81,78 +81,80 @@ export function PriceChartWidget({ market }: { market: Market }) {
   }
 
   return (
-    <Card className="relative w-full h-full flex flex-col pb-2">
-      <div className="text-xs bg-brand-background px-3 py-2 rounded-t-brand border-b border-brand-stroke font-bold flex items-center justify-between gap-2">
-        <span className="flex-1 truncate">{market.question}</span>
-        <WatchlistButton
-          slug={market.slug}
-          conditionId={market.conditionId}
-          title={market.question}
-        />
-      </div>
-      <div className="flex items-center gap-12 mb-4 text-xs px-3 py-2 border-b border-brand-stroke bg-brand-background">
-        <div className="text-outcome-yes">
-          {outcomes[0].toLowerCase()}:{" "}
-          <span className="font-bold">
-            {formatNumber(Number(outcomePrices[0]) * 100)}%
-          </span>
-        </div>
-        <div className="text-outcome-no">
-          {outcomes[1].toLowerCase()}:{" "}
-          <span className="font-bold">
-            {formatNumber(Number(outcomePrices[1]) * 100)}%
-          </span>
-        </div>
-        <div>
-          s:{" "}
-          <span className="font-bold">
-            {formatPrice(spread, { fromCents: true })}
-          </span>
-        </div>
-        <div>
-          oi:{" "}
-          <span className="font-bold">
-            {formatCompactNumber(market.liquidity)}
-          </span>
-        </div>
-        <div>
-          vol:{" "}
-          <span className="font-bold">
-            {formatCompactNumber(market.volume)}
-          </span>
-        </div>
-        {timeDelta > 0 && (
-          <div>
-            ends:{" "}
-            <span className="font-bold">
-              {/* {autoFormatDuration(timeDelta)} ( */}
-              {new Date(market.endDate).toLocaleDateString()}
+    <Card className="relative w-full h-full flex flex-col gap-3 border border-brand-stroke p-3">
+      <div className="flex items-start justify-between gap-3">
+        <div className="min-w-0">
+          <div className="flex items-center gap-2">
+            <span className="flex-1 truncate text-sm font-semibold">
+              {market.question}
             </span>
+            <WatchlistButton
+              slug={market.slug}
+              conditionId={market.conditionId}
+              title={market.question}
+            />
           </div>
-        )}
-      </div>
-
-      {/* Interval Selector */}
-      <div className="flex items-center gap-1 mb-3 px-2 justify-end">
-        {INTERVALS.map((int) => (
-          <button
-            key={int}
-            onClick={() => setInterval(int)}
-            disabled={isLoading}
-            className={cn(
-              "px-2.5 py-0.5 text-xs rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer",
-              "border border-brand-stroke",
-              interval === int
-                ? "bg-brand-highlight text-secondary-foreground"
-                : "bg-brand-background text-brand-foreground hover:bg-brand-highlight/50"
+          <div className="mt-1 flex flex-wrap items-center gap-3 text-xs text-muted-foreground">
+            <div className="text-outcome-yes">
+              {outcomes[0].toLowerCase()}:{" "}
+              <span className="font-bold">
+                {formatNumber(Number(outcomePrices[0]) * 100)}%
+              </span>
+            </div>
+            <div className="text-outcome-no">
+              {outcomes[1].toLowerCase()}:{" "}
+              <span className="font-bold">
+                {formatNumber(Number(outcomePrices[1]) * 100)}%
+              </span>
+            </div>
+            <div>
+              s:{" "}
+              <span className="font-bold">
+                {formatPrice(spread, { fromCents: true })}
+              </span>
+            </div>
+            <div>
+              oi:{" "}
+              <span className="font-bold">
+                {formatCompactNumber(market.liquidity)}
+              </span>
+            </div>
+            <div>
+              vol:{" "}
+              <span className="font-bold">
+                {formatCompactNumber(market.volume)}
+              </span>
+            </div>
+            {timeDelta > 0 && (
+              <div>
+                ends:{" "}
+                <span className="font-bold">
+                  {new Date(market.endDate).toLocaleDateString()}
+                </span>
+              </div>
             )}
-          >
-            {INTERVAL_LABELS[int]}
-          </button>
-        ))}
+          </div>
+        </div>
+        <div className="flex flex-wrap items-center gap-1">
+          {INTERVALS.map((int) => (
+            <button
+              key={int}
+              onClick={() => setInterval(int)}
+              disabled={isLoading}
+              className={cn(
+                "rounded border border-brand-stroke px-2.5 py-0.5 text-[11px]",
+                "transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer",
+                interval === int
+                  ? "bg-brand-highlight text-secondary-foreground"
+                  : "text-brand-foreground hover:bg-brand-highlight/50"
+              )}
+            >
+              {INTERVAL_LABELS[int]}
+            </button>
+          ))}
+        </div>
       </div>
 
-      {/* Chart */}
       <div className="flex-1 w-full min-h-0">
         <PriceChart data={chartData} isLoading={isLoading} error={error} />
       </div>

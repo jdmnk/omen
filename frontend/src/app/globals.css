@@ -108,6 +108,13 @@
   --brand-background-deeper: #0a0514;
   --share-gray: #505d7c;
   --brand-dark: #240f5a;
+  --market-chart-text: #8778ae;
+  --market-chart-grid: #c5c5c5;
+  --market-chart-crosshair: #c5c5c5;
+  --market-chart-crosshair-label: rgba(99, 34, 254, 0.35);
+  --market-chart-line: #6322fe;
+  --market-chart-top: rgba(99, 34, 254, 0.25);
+  --market-chart-bottom: rgba(99, 34, 254, 0);
 
   /* custom other variables */
   --brand-radius: var(--radius);
@@ -149,6 +156,13 @@
   /* custom colors */
   --brand-stroke: #382e52;
   --brand-highlight: #651fff;
+  --market-chart-text: #8778ae;
+  --market-chart-grid: #382e52;
+  --market-chart-crosshair: #382e52;
+  --market-chart-crosshair-label: rgba(99, 34, 254, 0.35);
+  --market-chart-line: #6322fe;
+  --market-chart-top: rgba(99, 34, 254, 0.25);
+  --market-chart-bottom: rgba(99, 34, 254, 0);
 }
 
 @layer base {

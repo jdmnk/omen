@@ -12,7 +12,6 @@ import {
   Time,
 } from "lightweight-charts";
 import { Spinner } from "@/components/ui/spinner";
-import { areaSeriesBaseOptions } from "@/lib/ui/chart.config";
 
 type PriceChartProps = {
   data: ChartPoint[];
@@ -20,48 +19,83 @@ type PriceChartProps = {
   isLoading?: boolean;
 };
 
-const chartOptions: DeepPartial<ChartOptions> = {
-  layout: {
-    background: { type: ColorType.Solid, color: "transparent" },
-    textColor: "#9ca3af",
-    attributionLogo: false,
-  },
-  grid: {
-    vertLines: { color: "#27272a", visible: false },
-    horzLines: { color: "#27272a", visible: false },
-  },
-  timeScale: {
-    borderColor: "transparent",
-    timeVisible: true,
-    rightBarStaysOnScroll: false,
-    fixLeftEdge: true,
-    fixRightEdge: true,
-  },
-  rightPriceScale: {
-    borderColor: "transparent",
-    scaleMargins: {
-      top: 0.1,
-      bottom: 0,
-    },
-  },
-  handleScale: false,
-  handleScroll: false,
-  crosshair: {
-    mode: 1, // Normal crosshair
-    vertLine: {
-      color: "#52525b",
-      width: 1,
-      style: 3,
-      labelBackgroundColor: "#3f3f46",
-    },
-    horzLine: {
-      color: "#52525b",
-      width: 1,
-      style: 3,
-      labelBackgroundColor: "#3f3f46",
-    },
-  },
+type ChartTheme = {
+  textColor: string;
+  gridColor: string;
+  crosshairColor: string;
+  crosshairLabelBg: string;
+  lineColor: string;
+  topColor: string;
+  bottomColor: string;
 };
+
+function getThemeColors(): ChartTheme {
+  const styles = getComputedStyle(document.documentElement);
+  return {
+    textColor:
+      styles.getPropertyValue("--market-chart-text").trim() || "#8778ae",
+    gridColor:
+      styles.getPropertyValue("--market-chart-grid").trim() || "#c5c5c5",
+    crosshairColor:
+      styles.getPropertyValue("--market-chart-crosshair").trim() || "#c5c5c5",
+    crosshairLabelBg:
+      styles.getPropertyValue("--market-chart-crosshair-label").trim() ||
+      "rgba(99, 34, 254, 0.35)",
+    lineColor:
+      styles.getPropertyValue("--market-chart-line").trim() || "#6322fe",
+    topColor:
+      styles.getPropertyValue("--market-chart-top").trim() ||
+      "rgba(99, 34, 254, 0.25)",
+    bottomColor:
+      styles.getPropertyValue("--market-chart-bottom").trim() ||
+      "rgba(99, 34, 254, 0)",
+  };
+}
+
+function getChartOptions(theme: ChartTheme): DeepPartial<ChartOptions> {
+  return {
+    layout: {
+      background: { type: ColorType.Solid, color: "transparent" },
+      textColor: theme.textColor,
+      attributionLogo: false,
+    },
+    grid: {
+      vertLines: { color: theme.gridColor, visible: false },
+      horzLines: { color: theme.gridColor, visible: false },
+    },
+    timeScale: {
+      borderColor: "transparent",
+      timeVisible: true,
+      rightBarStaysOnScroll: false,
+      fixLeftEdge: true,
+      fixRightEdge: true,
+    },
+    rightPriceScale: {
+      borderColor: "transparent",
+      scaleMargins: {
+        top: 0.1,
+        bottom: 0,
+      },
+    },
+    handleScale: false,
+    handleScroll: false,
+    crosshair: {
+      mode: 1, // Normal crosshair
+      vertLine: {
+        color: theme.crosshairColor,
+        width: 1,
+        style: 3,
+        labelBackgroundColor: theme.crosshairLabelBg,
+      },
+      horzLine: {
+        color: theme.crosshairColor,
+        width: 1,
+        style: 3,
+        labelBackgroundColor: theme.crosshairLabelBg,
+      },
+    },
+  };
+}
 
 type ChartPoint = {
   time: string | number; // utc data or timestamp in seconds
@@ -80,9 +114,10 @@ export function PriceChart({ data, error, isLoading }: PriceChartProps) {
     const initialWidth = chartContainerRef.current.clientWidth || 800;
     const initialHeight = chartContainerRef.current.clientHeight || 400;
 
-    // Create chart
+    const theme = getThemeColors();
+
     const chart = createChart(chartContainerRef.current, {
-      ...chartOptions,
+      ...getChartOptions(theme),
       width: initialWidth,
       height: initialHeight,
     });
@@ -91,7 +126,10 @@ export function PriceChart({ data, error, isLoading }: PriceChartProps) {
 
     // Create area series with gradient fill
     const lineSeries = chart.addSeries(AreaSeries, {
-      ...areaSeriesBaseOptions,
+      lineColor: theme.lineColor,
+      topColor: theme.topColor,
+      bottomColor: theme.bottomColor,
+      priceLineColor: theme.lineColor,
       priceFormat: {
         type: "price",
         precision: 2,
@@ -122,9 +160,26 @@ export function PriceChart({ data, error, isLoading }: PriceChartProps) {
     // Also listen to window resize as fallback
     window.addEventListener("resize", handleResize);
 
+    const observer = new MutationObserver(() => {
+      if (!chartRef.current || !seriesRef.current) return;
+      const nextTheme = getThemeColors();
+      chartRef.current.applyOptions(getChartOptions(nextTheme));
+      seriesRef.current.applyOptions({
+        lineColor: nextTheme.lineColor,
+        topColor: nextTheme.topColor,
+        bottomColor: nextTheme.bottomColor,
+        priceLineColor: nextTheme.lineColor,
+      });
+    });
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["class", "style"],
+    });
+
     return () => {
       resizeObserver.disconnect();
       window.removeEventListener("resize", handleResize);
+      observer.disconnect();
       chart.remove();
       seriesRef.current = null;
     };
