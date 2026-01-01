@@ -17,6 +17,8 @@ import { cn } from "@/lib/utils";
 import { Card } from "../../../components/ui/card";
 import { WatchlistButton } from "./WatchlistButton";
 import { useIsMounted } from "@/lib/hooks/use-is-mounted";
+import { getPolymarketEventUrl } from "@/lib/utils/polymarket.utils";
+import { ExternalLink } from "lucide-react";
 
 const INTERVALS: Interval[] = ["1h", "6h", "1d", "1w", "1m", "max"];
 
@@ -80,14 +82,28 @@ export function PriceChartWidget({ market }: { market: Market }) {
     return null;
   }
 
+  const marketUrl = getPolymarketEventUrl(market.events?.[0]?.slug ?? undefined);
+
   return (
     <Card className="relative w-full h-full flex flex-col gap-3 border border-brand-stroke p-3">
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
           <div className="flex items-center gap-2">
-            <span className="flex-1 truncate text-sm font-semibold">
-              {market.question}
-            </span>
+            {marketUrl ? (
+              <a
+                href={marketUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex-1 truncate text-sm font-semibold hover:underline"
+              >
+                {market.question}
+                <ExternalLink className="inline-block ml-1 h-3 w-3 opacity-50" />
+              </a>
+            ) : (
+              <span className="flex-1 truncate text-sm font-semibold">
+                {market.question}
+              </span>
+            )}
             <WatchlistButton
               slug={market.slug}
               conditionId={market.conditionId}
