@@ -30,7 +30,7 @@ import {
 } from "@/components/shared-table-styles";
 
 const HOLDER_ROW_GRID_CLASSES =
-  "grid grid-cols-[24px_2.5fr_minmax(3rem,1fr)_minmax(6.5rem,2fr)] items-center gap-3";
+  "grid grid-cols-[24px_2.5fr_minmax(3rem,1fr)_minmax(6.5rem,2fr)] items-center gap-3 text-[13px]";
 
 function OutcomeColumn({
   label,
@@ -60,8 +60,8 @@ function OutcomeColumn({
       >
         <div className="text-center">{label.toUpperCase()}</div>
         <div className="">Trader</div>
-        <div className="">~Size</div>
-        <div className="">~PnL</div>
+        <div className="text-right">Size</div>
+        <div className="text-right">PnL</div>
       </div>
       <div className="space-y-0">
         {holders.length === 0 ? (
@@ -266,20 +266,22 @@ export function TopHoldersPositions({
             // href={`${POLYMARKET_URL}/profile/${holder.proxyWallet}`}
             href={`/user/${holder.proxyWallet}`}
             target="_blank"
-            className="block truncate hover:underline cursor-pointer"
+            className="block truncate text-sm font-medium hover:underline cursor-pointer"
           >
             {displayName}
           </Link>
         </div>
-        <div className="">
-          <div className="font-semibold">
+        <div className="text-right">
+          <div className="font-semibold text-sm">
             {formatCompactNumber(+sharesAmount, 1)}
           </div>
         </div>
-        <div className="">
+        <div className="text-right">
           {pnl !== null ? (
-            <div className={cn("flex items-center gap-1", pnlColor)}>
-              <div>{formatCompactCurrency(pnl, 1)}</div>
+            <div className={cn("flex items-center justify-end gap-1", pnlColor)}>
+              <div className="font-semibold text-sm">
+                {formatCompactCurrency(pnl, 1)}
+              </div>
               {pnlPercent !== null && (
                 <div className="text-xs opacity-75">
                   {pnlPercent > 0 ? "+" : ""}
