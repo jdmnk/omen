@@ -94,10 +94,10 @@ export function PriceChartWidget({ market }: { market: Market }) {
                 href={marketUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex-1 truncate text-sm font-semibold hover:underline"
+                className="flex-1 inline-flex items-center gap-1 truncate text-sm font-semibold hover:underline"
               >
                 {market.question}
-                <ExternalLink className="inline-block ml-1 h-3 w-3 opacity-50" />
+                <ExternalLink className="h-3 w-3 opacity-50" />
               </a>
             ) : (
               <span className="flex-1 truncate text-sm font-semibold">
