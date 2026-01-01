@@ -62,6 +62,9 @@ export function MarketLayout({
             </span>
           </div>
         </Link>
+        <div className="flex-1 max-w-2xl">
+          <MarketSearchBar />
+        </div>
         <div className="flex items-center gap-1 ml-auto">
           <ThemeToggle />
           <FontSizeControl />
