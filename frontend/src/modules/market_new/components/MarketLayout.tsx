@@ -88,14 +88,14 @@ export function MarketLayout({
             <PriceChartWidget market={market} />
           )}
         </div>
-        <div className="min-h-[320px]">
+        <div>
           {error ? (
             <ErrorState />
           ) : (
             <MarketRulesSection market={market} isLoading={isLoading} />
           )}
         </div>
-        <div className="min-h-[520px]">
+        <div>
           {error ? (
             <ErrorState />
           ) : (
