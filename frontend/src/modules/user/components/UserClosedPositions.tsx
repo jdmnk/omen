@@ -26,6 +26,7 @@ const POSITION_ROW_GRID_CLASSES =
 type ClosedPositionRowProps = {
   position: ClosedPosition;
   isSelected: boolean;
+  isCompact: boolean;
   onTogglePosition?: (position: Position, checked: boolean) => void;
   activityState?: PositionActivityLookup[string];
 };
@@ -33,6 +34,7 @@ type ClosedPositionRowProps = {
 function ClosedPositionRow({
   position,
   isSelected,
+  isCompact,
   onTogglePosition,
   activityState,
 }: ClosedPositionRowProps) {
@@ -93,7 +95,7 @@ function ClosedPositionRow({
           />
         </div>
         <MarketInfoCell
-          icon={position.icon}
+          icon={isCompact ? null : position.icon}
           title={position.title}
           outcome={position.outcome}
           outcomeIndex={position.outcomeIndex}
@@ -133,6 +135,7 @@ function ClosedPositionRow({
 
 type UserClosedPositionsProps = {
   userId: string;
+  isCompact?: boolean;
   selectedPositionKeys?: Set<string>;
   onTogglePosition?: (position: Position, checked: boolean) => void;
   positionActivities?: PositionActivityLookup;
@@ -140,6 +143,7 @@ type UserClosedPositionsProps = {
 
 export function UserClosedPositions({
   userId,
+  isCompact = false,
   selectedPositionKeys = new Set(),
   onTogglePosition,
   positionActivities,
@@ -204,6 +208,7 @@ export function UserClosedPositions({
               key={key}
               position={position}
               isSelected={selectedPositionKeys.has(key)}
+              isCompact={isCompact}
               onTogglePosition={onTogglePosition}
               activityState={positionActivities?.[key]}
             />

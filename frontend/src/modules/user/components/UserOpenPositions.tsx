@@ -25,11 +25,12 @@ import { PositionMarketLinkButton } from "./positions/PositionMarketLinkButton";
 import { MarketInfoCell } from "./positions/MarketInfoCell";
 
 const POSITION_ROW_GRID_CLASSES =
-  "grid grid-cols-[18px_1fr_60px_60px_minmax(100px,auto)_24px] items-center gap-3";
+  "grid grid-cols-[18px_1fr_60px_60px_minmax(120px,auto)_24px] items-center gap-3";
 
 type PositionRowProps = {
   position: OpenPosition;
   isSelected: boolean;
+  isCompact: boolean;
   onTogglePosition?: (position: Position, checked: boolean) => void;
   activityState?: PositionActivityLookup[string];
 };
@@ -37,6 +38,7 @@ type PositionRowProps = {
 function PositionRow({
   position,
   isSelected,
+  isCompact,
   onTogglePosition,
   activityState,
 }: PositionRowProps) {
@@ -91,7 +93,7 @@ function PositionRow({
           />
         </div>
         <MarketInfoCell
-          icon={position.icon}
+          icon={isCompact ? null : position.icon}
           title={position.title ?? ""}
           outcome={position.outcome}
           outcomeIndex={position.outcomeIndex}
@@ -137,6 +139,7 @@ function PositionRow({
 
 type UserPositionsProps = {
   userId: string;
+  isCompact?: boolean;
   selectedPositionKeys?: Set<string>;
   onTogglePosition?: (position: Position, checked: boolean) => void;
   positionActivities?: PositionActivityLookup;
@@ -144,6 +147,7 @@ type UserPositionsProps = {
 
 export function UserOpenPositions({
   userId,
+  isCompact = false,
   selectedPositionKeys = new Set(),
   onTogglePosition,
   positionActivities,
@@ -209,6 +213,7 @@ export function UserOpenPositions({
               key={key}
               position={position}
               isSelected={selectedPositionKeys.has(key)}
+              isCompact={isCompact}
               onTogglePosition={onTogglePosition}
               activityState={positionActivities?.[key]}
             />

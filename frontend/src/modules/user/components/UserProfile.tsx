@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useMemo, useCallback } from "react";
+import React, { useState, useMemo, useCallback, useEffect } from "react";
 import type {
   PositionActivity,
   PositionActivityLookup,
@@ -33,6 +33,7 @@ import Link from "next/link";
 import { LogoIcon } from "@/components/LogoIcon";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { FontSizeControl } from "@/components/FontSizeControl";
+import { Checkbox } from "@/components/ui/checkbox";
 
 async function fetchUserPositionActivity(userId: string, position: Position) {
   // sorted by timestamp DESC
@@ -64,6 +65,7 @@ async function fetchUserPositionActivity(userId: string, position: Position) {
 
 export function UserProfile({ userId }: { userId: string }) {
   const [activeTab, setActiveTab] = useState("positions");
+  const [isCompact, setIsCompact] = useState(false);
   const [selectedPositions, setSelectedPositions] = useState<
     Record<string, Position>
   >({});
@@ -157,6 +159,18 @@ export function UserProfile({ userId }: { userId: string }) {
     setCopyMessage(ok ? "Copied wallet" : "Copy failed");
     setTimeout(() => setCopyMessage(null), 2000);
   }, [userId]);
+
+  useEffect(() => {
+    const stored = localStorage.getItem("user-positions-compact");
+    if (stored) {
+      setIsCompact(stored === "true");
+    }
+  }, []);
+
+  const handleCompactToggle = (checked: boolean) => {
+    setIsCompact(checked);
+    localStorage.setItem("user-positions-compact", String(checked));
+  };
 
   return (
     <div className="container mx-auto p-3 md:p-6 space-y-3 md:space-y-5">
@@ -321,7 +335,7 @@ export function UserProfile({ userId }: { userId: string }) {
             onValueChange={setActiveTab}
             className="w-full flex flex-col"
           >
-            <div className="px-3 pt-2 pb-2 border-b border-brand-stroke">
+            <div className="px-3 pt-2 pb-2 border-b border-brand-stroke flex items-center justify-between">
               <TabsList>
                 <TabsTrigger
                   value="positions"
@@ -336,6 +350,15 @@ export function UserProfile({ userId }: { userId: string }) {
                   Closed
                 </TabsTrigger>
               </TabsList>
+              <label className="inline-flex items-center gap-2 text-xs text-muted-foreground cursor-pointer">
+                <Checkbox
+                  checked={isCompact}
+                  onCheckedChange={(checked) =>
+                    handleCompactToggle(Boolean(checked))
+                  }
+                />
+                <span className="uppercase">Compact</span>
+              </label>
             </div>
 
             <TabsContent
@@ -346,6 +369,7 @@ export function UserProfile({ userId }: { userId: string }) {
               <div className="h-[700px]">
                 <UserOpenPositions
                   userId={userId}
+                  isCompact={isCompact}
                   selectedPositionKeys={selectedPositionKeys}
                   onTogglePosition={handlePositionToggle}
                   positionActivities={positionActivitiesLookup}
@@ -361,6 +385,7 @@ export function UserProfile({ userId }: { userId: string }) {
               <div className="h-[700px]">
                 <UserClosedPositions
                   userId={userId}
+                  isCompact={isCompact}
                   selectedPositionKeys={selectedPositionKeys}
                   onTogglePosition={handlePositionToggle}
                   positionActivities={positionActivitiesLookup}
@@ -378,7 +403,7 @@ export function UserProfile({ userId }: { userId: string }) {
             </h2>
           </div>
           <div className="h-[700px]">
-            <UserActivityFeed userId={userId} />
+            <UserActivityFeed userId={userId} isCompact={isCompact} />
           </div>
         </Card>
       </div>

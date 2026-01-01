@@ -28,7 +28,7 @@ const ACTIVITY_ROW_GRID_CLASSES =
   "grid grid-cols-[72px_1fr_minmax(80px,auto)] items-center gap-3";
 const PAGE_SIZE = 100;
 
-function ActivityRow({ entry }: { entry: Activity }) {
+function ActivityRow({ entry, isCompact }: { entry: Activity; isCompact: boolean }) {
   const size = entry.size ?? 0;
   const price = entry.price ?? 0;
   const amount =
@@ -66,7 +66,7 @@ function ActivityRow({ entry }: { entry: Activity }) {
       {/* Type */}
       <div className={cn("text-[13px] font-medium", "")}>{typeLabel}</div>
       <MarketInfoCell
-        icon={iconUrl}
+        icon={isCompact ? null : iconUrl}
         title={marketLabel}
         outcome={hideSharesAndPrice ? undefined : entry.outcome}
         outcomeIndex={entry.outcomeIndex}
@@ -85,7 +85,13 @@ function ActivityRow({ entry }: { entry: Activity }) {
   );
 }
 
-export function UserActivityFeed({ userId }: { userId: string }) {
+export function UserActivityFeed({
+  userId,
+  isCompact = false,
+}: {
+  userId: string;
+  isCompact?: boolean;
+}) {
   const {
     data,
     isLoading,
@@ -160,6 +166,7 @@ export function UserActivityFeed({ userId }: { userId: string }) {
           <ActivityRow
             key={`${entry.transactionHash ?? entry.type}-${index}`}
             entry={entry}
+            isCompact={isCompact}
           />
         ))}
         {hasNextPage && <div ref={sentinelRef} className="h-4" />}
