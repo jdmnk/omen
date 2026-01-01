@@ -25,10 +25,16 @@ import { useInfiniteScroll } from "@/lib/hooks/use-infinite-scroll";
 import { MarketInfoCell } from "./positions/MarketInfoCell";
 
 const ACTIVITY_ROW_GRID_CLASSES =
-  "grid grid-cols-[72px_1fr_minmax(80px,auto)] items-center gap-3";
+  "grid grid-cols-[60px_1fr_minmax(80px,auto)] items-center gap-3";
 const PAGE_SIZE = 100;
 
-function ActivityRow({ entry, isCompact }: { entry: Activity; isCompact: boolean }) {
+function ActivityRow({
+  entry,
+  isCompact,
+}: {
+  entry: Activity;
+  isCompact: boolean;
+}) {
   const size = entry.size ?? 0;
   const price = entry.price ?? 0;
   const amount =
@@ -64,7 +70,7 @@ function ActivityRow({ entry, isCompact }: { entry: Activity; isCompact: boolean
   return (
     <div className={cn(ACTIVITY_ROW_GRID_CLASSES, TABLE_ROW_CLASSES)}>
       {/* Type */}
-      <div className={cn("text-[13px] font-medium", "")}>{typeLabel}</div>
+      <div className={cn("text-xs font-medium", "")}>{typeLabel}</div>
       <MarketInfoCell
         icon={isCompact ? null : iconUrl}
         title={marketLabel}
