@@ -19,17 +19,8 @@ import {
 import Link from "next/link";
 import { Market, TopHolderAnalysis } from "@/lib/models/api.models";
 import { useOrderbookQuery } from "../lib/queries/orderbook.query";
-import { useTopHoldersPositionsQuery } from "../lib/queries/top-holders-positions.query";
-import { generateHolderTagsMap } from "../lib/holder-tags.utils";
-import type { HolderTagIcon } from "../lib/holder-tags.utils";
 import { formatAddress } from "@/lib/ui/format.utils";
 import { cn } from "@/lib/utils";
-import {
-  TooltipProvider,
-  TooltipTrigger,
-  TooltipContent,
-} from "@/components/ui/tooltip";
-import * as TooltipPrimitive from "@radix-ui/react-tooltip";
 import Image from "next/image";
 import {
   TABLE_CONTENT_CONTAINER_CLASSES,
@@ -39,13 +30,7 @@ import {
 } from "@/components/shared-table-styles";
 
 const HOLDER_ROW_GRID_CLASSES =
-  // "grid grid-cols-[24px_auto_3rem_6.5rem_4.5rem] items-center gap-3";
-  "grid grid-cols-[24px_2.5fr_minmax(3rem,1fr)_minmax(6.5rem,2fr)_minmax(4.5rem,1.5fr)] items-center gap-3";
-
-function HolderTagIcon({ icon }: { icon: HolderTagIcon }) {
-  const iconPath = `/icons/${icon}.svg`;
-  return <img src={iconPath} alt={icon} className="w-4 h-4" />;
-}
+  "grid grid-cols-[24px_2.5fr_minmax(3rem,1fr)_minmax(6.5rem,2fr)] items-center gap-3";
 
 function OutcomeColumn({
   label,
@@ -77,7 +62,6 @@ function OutcomeColumn({
         <div className="">Trader</div>
         <div className="">~Size</div>
         <div className="">~PnL</div>
-        <div className="">Tags</div>
       </div>
       <div className="space-y-0">
         {holders.length === 0 ? (
@@ -166,53 +150,8 @@ export function TopHoldersPositions({
   const isLoadingEnrichment = isLoadingPnl || isLoadingWalletInfo;
   const error = holdersError;
 
-  const { data: topHoldersPositions } = useTopHoldersPositionsQuery(
-    topHolders?.map((h) => h.proxyWallet),
-    100
-  );
-
   // Fetch orderbook to get live prices for PnL calculation
   const { data: orderbookData } = useOrderbookQuery(market.token1);
-
-  // Generate tags for all holders (only works with enriched holders)
-  const holderTagsMap = useMemo(() => {
-    if (!pnlHolders || !walletInfoHolders) return {};
-    // Create merged holders for tag generation
-    const mergedForTags =
-      rawHolders?.map((raw) => {
-        const key = `${raw.proxyWallet}-${raw.outcomeIndex}`;
-        const pnl = pnlHolders.find(
-          (h) => `${h.proxyWallet}-${h.outcomeIndex}` === key
-        );
-        const wallet = walletInfoHolders.find(
-          (h) => `${h.proxyWallet}-${h.outcomeIndex}` === key
-        );
-        return {
-          ...raw,
-          ...(pnl && {
-            avgPrice: pnl.avgPrice,
-            realizedPnl: pnl.realizedPnl,
-            totalBought: pnl.totalBought,
-          }),
-          ...(wallet && {
-            walletCreatedAt: wallet.walletCreatedAt,
-            walletLastTransfer: wallet.walletLastTransfer,
-            walletBalance: wallet.walletBalance,
-          }),
-        } as TopHolderAnalysis;
-      }) || [];
-    return generateHolderTagsMap(
-      mergedForTags,
-      topHoldersPositions,
-      market.token1
-    );
-  }, [
-    pnlHolders,
-    walletInfoHolders,
-    rawHolders,
-    topHoldersPositions,
-    market.token1,
-  ]);
 
   // TopHolders already have outcomeIndex, no transformation needed
   const holdersByOutcome = (topHolders || []).reduce((acc, holder) => {
@@ -293,10 +232,6 @@ export function TopHoldersPositions({
     // Check if enrichment is still loading for this holder
     const isEnrichmentLoading =
       isLoadingEnrichment && (!pnlHolders || !walletInfoHolders);
-    const hasTags =
-      holderTagsMap[holder.proxyWallet] &&
-      holderTagsMap[holder.proxyWallet].length > 0;
-
     return (
       <div
         key={`${holder.proxyWallet}-${holder.outcomeIndex}-${index}`}
@@ -360,28 +295,6 @@ export function TopHoldersPositions({
             <div className="text-muted-foreground">-</div>
           )}
         </div>
-        <div>
-          <div className="flex gap-1">
-            {isEnrichmentLoading && !hasTags ? (
-              <Spinner size="sm" />
-            ) : (
-              holderTagsMap[holder.proxyWallet]?.map((tag, tagIndex) => {
-                return (
-                  <TooltipPrimitive.Root key={tagIndex}>
-                    <TooltipTrigger asChild>
-                      <div className="cursor-help">
-                        <HolderTagIcon icon={tag.icon} />
-                      </div>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p>{tag.label}</p>
-                    </TooltipContent>
-                  </TooltipPrimitive.Root>
-                );
-              })
-            )}
-          </div>
-        </div>
       </div>
     );
   };
@@ -411,23 +324,21 @@ export function TopHoldersPositions({
   }
 
   return (
-    <TooltipProvider delayDuration={0}>
-      <div className="grid grid-cols-2">
-        <OutcomeColumn
-          label={outcome0Label}
-          bgColor=""
-          holders={outcome0Holders}
-          renderHolderRow={renderHolderRow}
-          outcomeIndex={0}
-        />
-        <OutcomeColumn
-          label={outcome1Label}
-          bgColor=""
-          holders={outcome1Holders}
-          renderHolderRow={renderHolderRow}
-          outcomeIndex={1}
-        />
-      </div>
-    </TooltipProvider>
+    <div className="grid grid-cols-2">
+      <OutcomeColumn
+        label={outcome0Label}
+        bgColor=""
+        holders={outcome0Holders}
+        renderHolderRow={renderHolderRow}
+        outcomeIndex={0}
+      />
+      <OutcomeColumn
+        label={outcome1Label}
+        bgColor=""
+        holders={outcome1Holders}
+        renderHolderRow={renderHolderRow}
+        outcomeIndex={1}
+      />
+    </div>
   );
 }
