@@ -47,13 +47,15 @@ function MoverRow({
         {/* Icon */}
         <div className="shrink-0">
           {mover.icon ? (
-            <Image
-              src={mover.icon}
-              alt=""
-              width={32}
-              height={32}
-              className="rounded-md border object-contain"
-            />
+            <div className="relative w-8 h-8">
+              <Image
+                src={mover.icon}
+                alt=""
+                fill
+                sizes="32px"
+                className="rounded-md border object-cover"
+              />
+            </div>
           ) : (
             <div className="w-8 h-8 rounded-md border bg-muted/30" />
           )}
