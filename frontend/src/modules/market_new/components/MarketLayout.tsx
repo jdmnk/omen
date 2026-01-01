@@ -1,10 +1,12 @@
 "use client";
 
 import { useParams } from "next/navigation";
+import { useState } from "react";
 import Link from "next/link";
 import { Market } from "@/lib/models/api.models";
 import { useMarketBySlugQuery } from "../lib/queries/market-by-slug.query";
 import { PriceChartWidget } from "./PriceChartWidget";
+import { MarketOrderBookSection } from "./MarketOrderBookSection";
 import { MarketPositionsSection } from "./MarketPositionsSection";
 import { MarketRulesSection } from "./MarketRulesSection";
 import { ErrorState, LoadingState } from "./WidgetHelpers";
@@ -20,6 +22,7 @@ export function MarketLayout({
 }: {
   initialMarket?: Market | null;
 }) {
+  const [isOrderBookOpen, setIsOrderBookOpen] = useState(false);
   const params = useParams();
   const marketSlug = params?.slug as string | undefined;
 
@@ -79,15 +82,40 @@ export function MarketLayout({
       <MarketWatchlist />
 
       <div className="flex flex-col gap-4">
-        <div className="h-96">
-          {isLoading ? (
-            <LoadingState />
-          ) : error || !market ? (
-            <ErrorState />
-          ) : (
-            <PriceChartWidget market={market} />
-          )}
+        <div className="flex flex-col gap-4 md:flex-row">
+          <div className="min-h-[300px] md:flex-[2]">
+            {isLoading ? (
+              <LoadingState />
+            ) : error || !market ? (
+              <ErrorState />
+            ) : (
+              <PriceChartWidget market={market} />
+            )}
+          </div>
+          <div className="hidden min-h-[300px] md:block md:flex-1">
+            {error || !market ? (
+              <ErrorState />
+            ) : (
+              <MarketOrderBookSection market={market} />
+            )}
+          </div>
         </div>
+        {!error && market && (
+          <div className="md:hidden">
+            <button
+              type="button"
+              onClick={() => setIsOrderBookOpen((open) => !open)}
+              className="w-full rounded-md border border-brand-stroke px-3 py-2 text-xs font-semibold uppercase text-brand-primary hover:bg-brand-highlight/20 transition-colors cursor-pointer"
+            >
+              {isOrderBookOpen ? "Hide Order Book" : "Show Order Book"}
+            </button>
+          </div>
+        )}
+        {!error && market && isOrderBookOpen && (
+          <div className="md:hidden min-h-[300px]">
+            <MarketOrderBookSection market={market} />
+          </div>
+        )}
         <div>
           {error ? (
             <ErrorState />
