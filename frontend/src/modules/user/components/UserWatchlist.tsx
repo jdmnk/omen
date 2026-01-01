@@ -179,8 +179,12 @@ export function UserWatchlist() {
   const [editingDescriptionValue, setEditingDescriptionValue] = useState("");
   const [pendingUnwatch, setPendingUnwatch] = useState<string | null>(null);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
-  const { watchlist, reorderWatchlist, removeFromWatchlist, updateDescription } =
-    useUserWatchlist();
+  const {
+    watchlist,
+    reorderWatchlist,
+    removeFromWatchlist,
+    updateDescription,
+  } = useUserWatchlist();
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -196,7 +200,9 @@ export function UserWatchlist() {
   if (watchlist.length === 0) {
     return (
       <div className="flex items-center gap-2 text-xs text-muted-foreground">
-        <span>Add users with the star button, or import an existing watchlist.</span>
+        <span>
+          Add users with the star button, or import an existing watchlist.
+        </span>
         <UserWatchlistImportExportDialog />
       </div>
     );
@@ -276,7 +282,7 @@ export function UserWatchlist() {
       collisionDetection={closestCenter}
       onDragEnd={handleDragEnd}
     >
-      <div className="flex flex-col gap-2">
+      <div className="flex flex-col gap-4">
         <div className="flex flex-wrap items-center gap-2">
           <SortableContext
             items={displayItems.map((item) => item.proxyWallet)}
@@ -329,35 +335,26 @@ export function UserWatchlist() {
             <span>{isEditing ? "Done" : "Edit"}</span>
           </button>
           {isEditing && <UserWatchlistImportExportDialog />}
+        </div>
+        <div className="w-full rounded-lg border border-brand-stroke bg-background/50 overflow-hidden">
           <button
+            type="button"
             onClick={() => setIsActivityOpen((open) => !open)}
-            className="inline-flex items-center gap-1 px-2 py-1 text-xs text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+            className="w-full px-3 py-2 flex items-center justify-between text-sm font-bold uppercase text-brand-primary cursor-pointer"
           >
+            <span>Watchlist Activity</span>
             {isActivityOpen ? (
-              <>
-                <span>Hide activity</span>
-                <ChevronUp className="h-3 w-3" />
-              </>
+              <ChevronUp className="h-3.5 w-3.5" />
             ) : (
-              <>
-                <span>Watchlist activity</span>
-                <ChevronDown className="h-3 w-3" />
-              </>
+              <ChevronDown className="h-3.5 w-3.5" />
             )}
           </button>
-        </div>
-        {isActivityOpen && (
-          <div className="w-full rounded-lg border border-brand-stroke bg-background/50 overflow-hidden">
-            <div className="px-3 pt-3 pb-2 border-b border-brand-stroke">
-              <h3 className="text-sm font-bold uppercase text-brand-primary pb-[3px]">
-                Watchlist Activity
-              </h3>
-            </div>
+          {isActivityOpen && (
             <div className="h-[420px]">
               <UserWatchlistActivityFeed watchlist={watchlist} />
             </div>
-          </div>
-        )}
+          )}
+        </div>
       </div>
     </DndContext>
   );

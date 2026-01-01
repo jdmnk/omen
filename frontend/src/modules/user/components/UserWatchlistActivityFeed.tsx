@@ -70,10 +70,8 @@ function ActivityRow({ item }: { item: WatchlistActivityRow }) {
 
   return (
     <div className={cn(ACTIVITY_ROW_GRID_CLASSES, TABLE_ROW_CLASSES)}>
-      <div className="text-[13px] font-medium truncate">{displayName}</div>
-      <div className={cn("text-[13px] font-medium", typeColor)}>
-        {typeLabel}
-      </div>
+      <div className="text-xs font-medium truncate">{displayName}</div>
+      <div className={cn("text-xs font-medium", typeColor)}>{typeLabel}</div>
       <MarketInfoCell
         icon={iconUrl}
         title={marketLabel}
