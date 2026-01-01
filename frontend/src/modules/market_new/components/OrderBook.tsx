@@ -71,16 +71,19 @@ export function OrderBook({ tokenId }: OrderBookProps) {
   );
 
   return (
-    <div className="flex flex-col px-3">
+    <div className="flex h-full flex-col px-3">
       {/* Header */}
-      <div className="sticky top-0 bg-background z-10 grid grid-cols-3 gap-4 text-xs text-muted-foreground pb-2 border-b border-border shrink-0">
+      <div className="sticky top-0 bg-background z-10 grid grid-cols-3 gap-4 text-xs text-muted-foreground py-2 border-b border-border shrink-0">
         <div className="text-left">Price</div>
         <div className="text-right">Size</div>
         <div className="text-right">Total</div>
       </div>
 
       {/* Scrollable container */}
-      <div ref={scrollContainerRef} className="overflow-y-auto py-2">
+      <div
+        ref={scrollContainerRef}
+        className="flex-1 min-h-0 overflow-y-auto py-2"
+      >
         <div className="flex flex-col">
           {/* Asks (Sell orders) - shown above midpoint */}
           <div className="space-y-0">
