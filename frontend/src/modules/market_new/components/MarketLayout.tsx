@@ -13,6 +13,7 @@ import { ThemeToggle } from "@/components/ThemeToggle";
 import { FontSizeControl } from "@/components/FontSizeControl";
 import { MarketSearchBar } from "./MarketSearchBar";
 import { MarketWatchlist } from "./MarketWatchlist";
+import { TopMoversWidget } from "./TopMoversWidget";
 
 export function MarketLayout({
   initialMarket,
@@ -47,6 +48,10 @@ export function MarketLayout({
             <ThemeToggle />
             <FontSizeControl />
           </div>
+        </div>
+        <MarketWatchlist />
+        <div className="min-h-[520px]">
+          <TopMoversWidget />
         </div>
       </div>
     );
