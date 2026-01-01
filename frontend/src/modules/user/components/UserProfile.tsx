@@ -350,7 +350,7 @@ export function UserProfile({ userId }: { userId: string }) {
                   Closed
                 </TabsTrigger>
               </TabsList>
-              <label className="inline-flex items-center gap-2 text-xs text-muted-foreground cursor-pointer">
+              <label className="inline-flex items-center gap-2 text-[11px] text-muted-foreground cursor-pointer">
                 <Checkbox
                   checked={isCompact}
                   onCheckedChange={(checked) =>
