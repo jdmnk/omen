@@ -5,7 +5,8 @@ import Link from "next/link";
 import { Market } from "@/lib/models/api.models";
 import { useMarketBySlugQuery } from "../lib/queries/market-by-slug.query";
 import { PriceChartWidget } from "./PriceChartWidget";
-import { TopHoldersWidget } from "./TopHoldersWidget";
+import { MarketPositionsSection } from "./MarketPositionsSection";
+import { MarketRulesSection } from "./MarketRulesSection";
 import { ErrorState, LoadingState } from "./WidgetHelpers";
 import { LogoIcon } from "@/components/LogoIcon";
 import { ThemeToggle } from "@/components/ThemeToggle";
@@ -64,7 +65,7 @@ export function MarketLayout({ initialMarket }: { initialMarket?: Market | null 
       </div>
 
       <div className="flex flex-col gap-4">
-        <div className="min-h-[360px]">
+        <div className="min-h-[300px]">
           {isLoading ? (
             <LoadingState />
           ) : error || !market ? (
@@ -73,11 +74,18 @@ export function MarketLayout({ initialMarket }: { initialMarket?: Market | null 
             <PriceChartWidget market={market} />
           )}
         </div>
+        <div className="min-h-[320px]">
+          {error ? (
+            <ErrorState />
+          ) : (
+            <MarketRulesSection market={market} isLoading={isLoading} />
+          )}
+        </div>
         <div className="min-h-[520px]">
           {error ? (
             <ErrorState />
           ) : (
-            <TopHoldersWidget market={market} isLoading={isLoading} />
+            <MarketPositionsSection market={market} isLoading={isLoading} />
           )}
         </div>
       </div>

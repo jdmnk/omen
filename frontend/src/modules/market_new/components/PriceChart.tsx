@@ -130,6 +130,7 @@ export function PriceChart({ data, error, isLoading }: PriceChartProps) {
       topColor: theme.topColor,
       bottomColor: theme.bottomColor,
       priceLineColor: theme.lineColor,
+      lineWidth: 2,
       priceFormat: {
         type: "price",
         precision: 2,
