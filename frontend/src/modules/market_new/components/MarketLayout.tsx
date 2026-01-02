@@ -23,6 +23,7 @@ export function MarketLayout({
   initialMarket?: Market | null;
 }) {
   const [isOrderBookOpen, setIsOrderBookOpen] = useState(false);
+  const [isRulesOpen, setIsRulesOpen] = useState(false);
   const params = useParams();
   const marketSlug = params?.slug as string | undefined;
 
@@ -116,13 +117,22 @@ export function MarketLayout({
             <MarketOrderBookSection market={market} />
           </div>
         )}
-        <div>
-          {error ? (
-            <ErrorState />
-          ) : (
+        {!error && market && (
+          <div>
+            <button
+              type="button"
+              onClick={() => setIsRulesOpen((open) => !open)}
+              className="w-full rounded-md border border-brand-stroke px-3 py-2 text-xs font-semibold uppercase text-brand-primary hover:bg-brand-highlight/20 transition-colors cursor-pointer"
+            >
+              {isRulesOpen ? "Hide Rules" : "Show Rules"}
+            </button>
+          </div>
+        )}
+        {!error && market && isRulesOpen && (
+          <div>
             <MarketRulesSection market={market} isLoading={isLoading} />
-          )}
-        </div>
+          </div>
+        )}
         <div>
           {error ? (
             <ErrorState />
