@@ -3,15 +3,15 @@
 import { useEffect, useRef } from "react";
 import { LoadingSpinner } from "@/components/ui/spinner";
 import { useOrderbookQuery } from "../lib/queries/orderbook.query";
-import {
-  formatCurrency,
-  formatNumber,
-  formatPrice,
-} from "@/lib/ui/format.utils";
+import { formatNumber, formatPrice } from "@/lib/ui/format.utils";
 
 type OrderBookProps = {
   tokenId: string;
 };
+
+function formatOrderbookTotal(value: number) {
+  return `$${value.toFixed(1)}`;
+}
 
 export function OrderBook({ tokenId }: OrderBookProps) {
   const { data, isLoading, error } = useOrderbookQuery(tokenId);
@@ -135,7 +135,7 @@ export function OrderBook({ tokenId }: OrderBookProps) {
                       {formatNumber(size, 1)}
                     </div>
                     <div className="relative text-right text-muted-foreground pr-1">
-                      {formatCurrency(cumulativeTotal, 1)}
+                      {formatOrderbookTotal(cumulativeTotal)}
                     </div>
                   </div>
                 );
@@ -213,7 +213,7 @@ export function OrderBook({ tokenId }: OrderBookProps) {
                       {formatNumber(size, 2)}
                     </div>
                     <div className="relative text-right text-muted-foreground pr-1">
-                      {formatCurrency(cumulativeTotal, 1)}
+                      {formatOrderbookTotal(cumulativeTotal)}
                     </div>
                   </div>
                 );

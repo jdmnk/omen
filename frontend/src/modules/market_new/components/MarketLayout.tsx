@@ -92,7 +92,7 @@ export function MarketLayout({
               <PriceChartWidget market={market} />
             )}
           </div>
-          <div className="hidden min-h-[300px] md:block md:flex-1">
+          <div className="hidden min-h-[300px] lg:block lg:flex-1">
             {error || !market ? (
               <ErrorState />
             ) : (
@@ -101,7 +101,7 @@ export function MarketLayout({
           </div>
         </div>
         {!error && market && (
-          <div className="md:hidden">
+          <div className="lg:hidden">
             <button
               type="button"
               onClick={() => setIsOrderBookOpen((open) => !open)}
@@ -112,7 +112,7 @@ export function MarketLayout({
           </div>
         )}
         {!error && market && isOrderBookOpen && (
-          <div className="md:hidden min-h-[300px]">
+          <div className="lg:hidden min-h-[300px]">
             <MarketOrderBookSection market={market} />
           </div>
         )}
