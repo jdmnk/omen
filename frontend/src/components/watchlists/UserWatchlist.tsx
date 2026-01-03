@@ -170,7 +170,7 @@ function SortableWatchlistItem({
   );
 }
 
-export function UserWatchlist() {
+export function UserWatchlist({ showEmptyState = true }: { showEmptyState?: boolean }) {
   const [isExpanded, setIsExpanded] = useState(true);
   const [isActivityOpen, setIsActivityOpen] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
@@ -199,6 +199,7 @@ export function UserWatchlist() {
   );
 
   if (watchlist.length === 0) {
+    if (!showEmptyState) return null;
     return (
       <div className="flex items-center gap-2 text-xs text-muted-foreground">
         <span>

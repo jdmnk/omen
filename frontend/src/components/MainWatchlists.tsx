@@ -6,8 +6,8 @@ import { MarketWatchlist } from "@/components/watchlists/MarketWatchlist";
 export function MainWatchlists() {
   return (
     <div className="grid gap-3 md:gap-5">
-      <UserWatchlist />
-      <MarketWatchlist />
+      <UserWatchlist showEmptyState={false} />
+      <MarketWatchlist showEmptyState={false} />
     </div>
   );
 }

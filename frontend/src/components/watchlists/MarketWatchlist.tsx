@@ -154,7 +154,7 @@ function SortableWatchlistItem({
   );
 }
 
-export function MarketWatchlist() {
+export function MarketWatchlist({ showEmptyState = true }: { showEmptyState?: boolean }) {
   const [isExpanded, setIsExpanded] = useState(true);
   const [isEditing, setIsEditing] = useState(false);
   const [editingDescriptionId, setEditingDescriptionId] = useState<string | null>(null);
@@ -176,6 +176,7 @@ export function MarketWatchlist() {
   );
 
   if (watchlist.length === 0) {
+    if (!showEmptyState) return null;
     return (
       <div className="flex items-center gap-2 text-xs text-muted-foreground">
         <span>Add markets with the star button, or import an existing watchlist.</span>
