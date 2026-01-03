@@ -13,7 +13,7 @@ import { ErrorState, LoadingState } from "./WidgetHelpers";
 import { LogoIcon } from "@/components/LogoIcon";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { FontSizeControl } from "@/components/FontSizeControl";
-import { MarketSearchBar } from "./MarketSearchBar";
+import { UnifiedSearchBar } from "@/components/UnifiedSearchBar";
 import { MarketWatchlist } from "./MarketWatchlist";
 import { TopMoversWidget } from "./TopMoversWidget";
 import { CollapsibleCard } from "@/components/ui/collapsible-card";
@@ -48,7 +48,7 @@ export function MarketLayout({
             </div>
           </Link>
           <div className="flex-1 max-w-2xl">
-            <MarketSearchBar />
+            <UnifiedSearchBar />
           </div>
           <div className="flex items-center gap-1 ml-auto">
             <ThemeToggle />
@@ -75,7 +75,7 @@ export function MarketLayout({
           </div>
         </Link>
         <div className="flex-1 max-w-2xl">
-          <MarketSearchBar />
+          <UnifiedSearchBar />
         </div>
         <div className="flex items-center gap-1 ml-auto">
           <ThemeToggle />

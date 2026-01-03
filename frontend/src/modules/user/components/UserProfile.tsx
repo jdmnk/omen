@@ -25,7 +25,7 @@ import { Button } from "@/components/ui/button";
 import { copyToClipboard } from "@/lib/utils/clipboard.utils";
 import { useQueries } from "@tanstack/react-query";
 import { getProcessedPositionActivity } from "../lib/positions-activity-new.utils";
-import { UserSearchBar } from "./UserSearchBar";
+import { UnifiedSearchBar } from "@/components/UnifiedSearchBar";
 import { Position } from "@/lib/models/frontend.models";
 import { UserWatchlistButton } from "./UserWatchlistButton";
 import { UserWatchlist } from "./UserWatchlist";
@@ -186,7 +186,7 @@ export function UserProfile({ userId }: { userId: string }) {
           </div>
         </Link>
         <div className="flex-1 max-w-2xl">
-          <UserSearchBar />
+          <UnifiedSearchBar />
         </div>
         <div className="flex items-center gap-1 ml-auto">
           <ThemeToggle />
