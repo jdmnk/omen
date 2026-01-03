@@ -89,7 +89,7 @@ function SortableWatchlistItem({
       style={style}
       className={cn(
         "inline-flex items-center gap-1.5 pl-1 pr-2 py-1 text-xs rounded-md",
-        "border border-brand-stroke",
+        "border border-brand-stroke bg-card/80",
         "transition-colors",
         "hover:bg-brand-highlight/20",
         "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
