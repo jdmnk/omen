@@ -50,7 +50,7 @@ export function MarketLayout({
 
       <div className="flex flex-col gap-4">
         <div className="flex flex-col gap-4 md:flex-row">
-          <div className="min-h-[300px] md:flex-[2]">
+          <div className="min-h-[300px] md:flex-2">
             {isLoading ? (
               <LoadingState />
             ) : error || !market ? (
