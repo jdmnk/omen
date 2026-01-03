@@ -13,16 +13,13 @@ import {
   formatRelativeTime,
 } from "@/lib/ui/format.utils";
 import { cn } from "@/lib/utils";
-import { fetchUserActivityPage } from "@/modules/user/lib/queries/user-activity.query";
+import { fetchUserActivityPage } from "@/lib/queries/user-activity.query";
 import { LoadingSpinner } from "@/components/ui/spinner";
 import { getPolymarketEventUrl } from "@/lib/utils/polymarket.utils";
 import type { Activity } from "@/lib/models/frontend.models";
-import {
-  getActivityMarketLabel,
-  getActivityTypeLabel,
-} from "@/modules/user/lib/activity.utils";
+import { getActivityMarketLabel, getActivityTypeLabel } from "@/lib/activity.utils";
 import { useInfiniteScroll } from "@/lib/hooks/use-infinite-scroll";
-import { MarketInfoCell } from "./positions/MarketInfoCell";
+import { MarketInfoCell } from "@/components/positions/MarketInfoCell";
 
 const ACTIVITY_ROW_GRID_CLASSES =
   "grid grid-cols-[60px_1fr_minmax(80px,auto)] items-center gap-3";

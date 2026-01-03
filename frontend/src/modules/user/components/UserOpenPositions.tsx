@@ -22,7 +22,7 @@ import type { PositionActivityLookup } from "../userActivity.types";
 import { getPositionKey } from "@/modules/user/lib/position.utils";
 import { PositionActivitySubRow } from "./positions/PositionActivitySubRow";
 import { PositionMarketLinkButton } from "./positions/PositionMarketLinkButton";
-import { MarketInfoCell } from "./positions/MarketInfoCell";
+import { MarketInfoCell } from "@/components/positions/MarketInfoCell";
 
 const POSITION_ROW_GRID_CLASSES =
   "grid grid-cols-[18px_1fr_minmax(120px,auto)_24px] lg:grid-cols-[18px_1fr_60px_60px_minmax(120px,auto)_24px] items-center gap-3";

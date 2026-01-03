@@ -16,7 +16,7 @@ import { useUserValueQuery } from "@/modules/user/lib/queries/user-value.query";
 import { useIsMounted } from "@/lib/hooks/use-is-mounted";
 import { useUserDataQuery } from "@/modules/user/lib/queries/user-data.query";
 import { useUserLeaderboardQuery } from "@/modules/user/lib/queries/user-leaderboard.query";
-import { fetchUserActivityEntries } from "@/modules/user/lib/queries/user-activity.query";
+import { fetchUserActivityEntries } from "@/lib/queries/user-activity.query";
 import { getPositionKey } from "@/modules/user/lib/position.utils";
 import { UserSelectedMarketCharts } from "./UserSelectedMarketCharts";
 import { UserActivityFeed } from "./UserActivityFeed";
@@ -25,16 +25,12 @@ import { Button } from "@/components/ui/button";
 import { copyToClipboard } from "@/lib/utils/clipboard.utils";
 import { useQueries } from "@tanstack/react-query";
 import { getProcessedPositionActivity } from "../lib/positions-activity-new.utils";
-import { UnifiedSearchBar } from "@/components/UnifiedSearchBar";
 import { Position } from "@/lib/models/frontend.models";
 import { UserWatchlistButton } from "./UserWatchlistButton";
-import { UserWatchlist } from "./UserWatchlist";
-import Link from "next/link";
-import { LogoIcon } from "@/components/LogoIcon";
-import { ThemeToggle } from "@/components/ThemeToggle";
-import { FontSizeControl } from "@/components/FontSizeControl";
 import { PageLayout } from "@/components/PageLayout";
 import { Checkbox } from "@/components/ui/checkbox";
+import { MainHeader } from "@/components/MainHeader";
+import { MainWatchlists } from "@/components/MainWatchlists";
 
 async function fetchUserPositionActivity(userId: string, position: Position) {
   // sorted by timestamp DESC
@@ -175,27 +171,8 @@ export function UserProfile({ userId }: { userId: string }) {
 
   return (
     <PageLayout>
-      {/* Header Row: Logo + Search Bar + Controls */}
-      <div className="flex items-center gap-3 md:gap-5">
-        <Link href="/" className="shrink-0">
-          <div className="flex items-center gap-2">
-            <LogoIcon className="h-8 w-8 text-foreground" />
-            <span className="text-xl font-bold text-foreground tracking-widest">
-              OMEN
-            </span>
-          </div>
-        </Link>
-        <div className="flex-1 max-w-2xl">
-          <UnifiedSearchBar />
-        </div>
-        <div className="flex items-center gap-1 ml-auto">
-          <ThemeToggle />
-          <FontSizeControl />
-        </div>
-      </div>
-
-      {/* User Watchlist */}
-      <UserWatchlist />
+      <MainHeader />
+      <MainWatchlists />
 
       {/* Two-column Header: User Info + PnL */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">

@@ -7,23 +7,20 @@ import {
   TABLE_ROW_CLASSES,
   TABLE_HEADER_CONTAINER_CLASSES,
   TABLE_CONTENT_CONTAINER_CLASSES,
-} from "../../../components/shared-table-styles";
+} from "@/components/shared-table-styles";
 import {
   formatAddress,
   formatCompactCurrency,
   formatRelativeTime,
 } from "@/lib/ui/format.utils";
 import { cn } from "@/lib/utils";
-import { fetchUserActivityEntries } from "@/modules/user/lib/queries/user-activity.query";
+import { fetchUserActivityEntries } from "@/lib/queries/user-activity.query";
 import { LoadingSpinner, Spinner } from "@/components/ui/spinner";
 import { getPolymarketEventUrl } from "@/lib/utils/polymarket.utils";
 import type { Activity } from "@/lib/models/frontend.models";
-import {
-  getActivityMarketLabel,
-  getActivityTypeLabel,
-} from "@/modules/user/lib/activity.utils";
+import { getActivityMarketLabel, getActivityTypeLabel } from "@/lib/activity.utils";
 import type { UserWatchlistItem } from "@/lib/hooks/use-user-watchlist";
-import { MarketInfoCell } from "./positions/MarketInfoCell";
+import { MarketInfoCell } from "@/components/positions/MarketInfoCell";
 import { Checkbox } from "@/components/ui/checkbox";
 import { RefreshCw } from "lucide-react";
 

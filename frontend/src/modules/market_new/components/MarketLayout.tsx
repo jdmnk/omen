@@ -2,7 +2,6 @@
 
 import { useParams } from "next/navigation";
 import { useState } from "react";
-import Link from "next/link";
 import { Market } from "@/lib/models/api.models";
 import { useMarketBySlugQuery } from "../lib/queries/market-by-slug.query";
 import { PriceChartWidget } from "./PriceChartWidget";
@@ -10,14 +9,11 @@ import { MarketOrderBookSection } from "./MarketOrderBookSection";
 import { MarketPositionsSection } from "./MarketPositionsSection";
 import { MarketRulesSection } from "./MarketRulesSection";
 import { ErrorState, LoadingState } from "./WidgetHelpers";
-import { LogoIcon } from "@/components/LogoIcon";
-import { ThemeToggle } from "@/components/ThemeToggle";
-import { FontSizeControl } from "@/components/FontSizeControl";
-import { UnifiedSearchBar } from "@/components/UnifiedSearchBar";
-import { MarketWatchlist } from "./MarketWatchlist";
 import { TopMoversWidget } from "./TopMoversWidget";
 import { CollapsibleCard } from "@/components/ui/collapsible-card";
 import { PageLayout } from "@/components/PageLayout";
+import { MainHeader } from "@/components/MainHeader";
+import { MainWatchlists } from "@/components/MainWatchlists";
 
 export function MarketLayout({
   initialMarket,
@@ -38,24 +34,8 @@ export function MarketLayout({
   if (!marketSlug) {
     return (
       <PageLayout>
-        <div className="flex items-center gap-3 md:gap-5">
-          <Link href="/" className="shrink-0">
-            <div className="flex items-center gap-2">
-              <LogoIcon className="h-8 w-8 text-foreground" />
-              <span className="text-xl font-bold text-foreground tracking-widest">
-                OMEN
-              </span>
-            </div>
-          </Link>
-          <div className="flex-1 max-w-2xl">
-            <UnifiedSearchBar />
-          </div>
-          <div className="flex items-center gap-1 ml-auto">
-            <ThemeToggle />
-            <FontSizeControl />
-          </div>
-        </div>
-        <MarketWatchlist />
+        <MainHeader />
+        <MainWatchlists />
         <div className="min-h-[520px]">
           <TopMoversWidget />
         </div>
@@ -65,24 +45,8 @@ export function MarketLayout({
 
   return (
     <PageLayout>
-      <div className="flex items-center gap-3 md:gap-5">
-        <Link href="/" className="shrink-0">
-          <div className="flex items-center gap-2">
-            <LogoIcon className="h-8 w-8 text-foreground" />
-            <span className="text-xl font-bold text-foreground tracking-widest">
-              OMEN
-            </span>
-          </div>
-        </Link>
-        <div className="flex-1 max-w-2xl">
-          <UnifiedSearchBar />
-        </div>
-        <div className="flex items-center gap-1 ml-auto">
-          <ThemeToggle />
-          <FontSizeControl />
-        </div>
-      </div>
-      <MarketWatchlist />
+      <MainHeader />
+      <MainWatchlists />
 
       <div className="flex flex-col gap-4">
         <div className="flex flex-col gap-4 md:flex-row">
