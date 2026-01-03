@@ -12,10 +12,9 @@ import { getPnlColorClass } from "@/lib/ui/color.utils";
 import { cn } from "@/lib/utils";
 import { UserPnlChartV2 } from "./charts/UserPnlChartV2";
 
-const INTERVALS: UserPnlInterval[] = ["12h", "1d", "1w", "1m", "max"];
+const INTERVALS: UserPnlInterval[] = ["1d", "1w", "1m", "max"];
 
 const INTERVAL_LABELS: Record<UserPnlInterval, string> = {
-  "12h": "12H",
   "1d": "1D",
   "1w": "1W",
   "1m": "1M",
@@ -23,7 +22,6 @@ const INTERVAL_LABELS: Record<UserPnlInterval, string> = {
 };
 
 const INTERVAL_DISPLAY_LABELS: Record<UserPnlInterval, string> = {
-  "12h": "12 Hours",
   "1d": "24 Hours",
   "1w": "7 Days",
   "1m": "30 Days",
@@ -51,10 +49,15 @@ export function UserPnlChartWidgetV2({ userId }: UserPnlChartWidgetV2Props) {
       value: point.p,
     })) ?? [];
 
-  const currentPnl =
-    pnlPoints && pnlPoints.length > 0 ? pnlPoints[pnlPoints.length - 1].p : 0;
+  const intervalPnl =
+    chartData.length > 1
+      ? chartData[chartData.length - 1].value - chartData[0].value
+      : 0;
 
-  const displayValue = hoveredValue ?? currentPnl;
+  const firstValue = chartData.length > 0 ? chartData[0].value : 0;
+  const hoveredDelta =
+    hoveredValue !== null ? hoveredValue - firstValue : null;
+  const displayValue = hoveredDelta ?? intervalPnl;
 
   const handleCrosshairMove = useCallback((value: number | null) => {
     setHoveredValue(value);
