@@ -9,10 +9,9 @@ import { cn } from "@/lib/utils";
 import { Card } from "../../../../components/ui/card";
 import { useIsMounted } from "@/lib/hooks/use-is-mounted";
 
-const INTERVALS: UserPnlInterval[] = ["12h", "1d", "1w", "1m", "max"];
+const INTERVALS: UserPnlInterval[] = ["1d", "1w", "1m", "max"];
 
 const INTERVAL_LABELS: Record<UserPnlInterval, string> = {
-  "12h": "12H",
   "1d": "1D",
   "1w": "1W",
   "1m": "1M",
