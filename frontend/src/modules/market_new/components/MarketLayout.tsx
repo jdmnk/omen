@@ -17,6 +17,7 @@ import { MarketSearchBar } from "./MarketSearchBar";
 import { MarketWatchlist } from "./MarketWatchlist";
 import { TopMoversWidget } from "./TopMoversWidget";
 import { CollapsibleCard } from "@/components/ui/collapsible-card";
+import { PageLayout } from "@/components/PageLayout";
 
 export function MarketLayout({
   initialMarket,
@@ -36,7 +37,7 @@ export function MarketLayout({
 
   if (!marketSlug) {
     return (
-      <div className="container mx-auto p-3 md:p-6 space-y-3 md:space-y-5">
+      <PageLayout>
         <div className="flex items-center gap-3 md:gap-5">
           <Link href="/" className="shrink-0">
             <div className="flex items-center gap-2">
@@ -58,12 +59,12 @@ export function MarketLayout({
         <div className="min-h-[520px]">
           <TopMoversWidget />
         </div>
-      </div>
+      </PageLayout>
     );
   }
 
   return (
-    <div className="container mx-auto p-3 md:p-6 space-y-3 md:space-y-5">
+    <PageLayout>
       <div className="flex items-center gap-3 md:gap-5">
         <Link href="/" className="shrink-0">
           <div className="flex items-center gap-2">
@@ -134,6 +135,6 @@ export function MarketLayout({
           )}
         </div>
       </div>
-    </div>
+    </PageLayout>
   );
 }

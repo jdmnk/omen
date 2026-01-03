@@ -33,6 +33,7 @@ import Link from "next/link";
 import { LogoIcon } from "@/components/LogoIcon";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { FontSizeControl } from "@/components/FontSizeControl";
+import { PageLayout } from "@/components/PageLayout";
 import { Checkbox } from "@/components/ui/checkbox";
 
 async function fetchUserPositionActivity(userId: string, position: Position) {
@@ -173,7 +174,7 @@ export function UserProfile({ userId }: { userId: string }) {
   };
 
   return (
-    <div className="container mx-auto p-3 md:p-6 space-y-3 md:space-y-5">
+    <PageLayout>
       {/* Header Row: Logo + Search Bar + Controls */}
       <div className="flex items-center gap-3 md:gap-5">
         <Link href="/" className="shrink-0">
@@ -315,7 +316,7 @@ export function UserProfile({ userId }: { userId: string }) {
         </Card>
 
         {/* Right Card: PnL Chart */}
-        <div className="h-64 lg:h-auto">
+        <div className="h-48 lg:h-auto">
           <UserPnlChartWidgetV2 userId={userId} />
         </div>
       </div>
@@ -407,6 +408,6 @@ export function UserProfile({ userId }: { userId: string }) {
           </div>
         </Card>
       </div>
-    </div>
+    </PageLayout>
   );
 }
