@@ -251,6 +251,9 @@ export function MarketWatchlist() {
       onDragEnd={handleDragEnd}
     >
       <div className="flex flex-col gap-2">
+        <div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+          Market Watchlist
+        </div>
         <div className="flex flex-wrap items-center gap-2">
           <SortableContext
             items={displayItems.map((item) => item.slug)}

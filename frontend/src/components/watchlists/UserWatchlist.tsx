@@ -35,7 +35,7 @@ import { cn } from "@/lib/utils";
 import { formatAddress } from "@/lib/ui/format.utils";
 import { UserWatchlistActivityFeed } from "./UserWatchlistActivityFeed";
 import { UserWatchlistImportExportDialog } from "./UserWatchlistImportExportDialog";
-import { CollapsibleCard } from "@/components/ui/collapsible-card";
+import { Card } from "@/components/ui/card";
 
 const INITIAL_LIMIT = 10;
 const CONFIRM_TIMEOUT_MS = 3000;
@@ -283,7 +283,25 @@ export function UserWatchlist() {
       collisionDetection={closestCenter}
       onDragEnd={handleDragEnd}
     >
-      <div className="flex flex-col gap-4">
+      <div className="flex flex-col gap-2">
+        <div className="flex items-center gap-2">
+          <div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+            User Watchlist
+          </div>
+          <span className="text-xs text-muted-foreground/60">·</span>
+          <button
+            type="button"
+            onClick={() => setIsActivityOpen((open) => !open)}
+            className="inline-flex items-center gap-1 rounded-full border border-brand-stroke/70 px-2 py-0.5 text-[10px] font-semibold uppercase text-muted-foreground hover:text-foreground transition-colors cursor-pointer bg-background"
+          >
+            <span>Show Activity</span>
+            {isActivityOpen ? (
+              <ChevronUp className="h-3 w-3" />
+            ) : (
+              <ChevronDown className="h-3 w-3" />
+            )}
+          </button>
+        </div>
         <div className="flex flex-wrap items-center gap-2">
           <SortableContext
             items={displayItems.map((item) => item.proxyWallet)}
@@ -337,16 +355,13 @@ export function UserWatchlist() {
           </button>
           {isEditing && <UserWatchlistImportExportDialog />}
         </div>
-        <CollapsibleCard
-          title="Watchlist Activity"
-          isOpen={isActivityOpen}
-          onToggle={() => setIsActivityOpen((open) => !open)}
-          contentClassName="p-0"
-        >
-          <div className="h-[420px]">
-            <UserWatchlistActivityFeed watchlist={watchlist} />
-          </div>
-        </CollapsibleCard>
+        {isActivityOpen && (
+          <Card className="overflow-hidden p-0">
+            <div className="h-[420px]">
+              <UserWatchlistActivityFeed watchlist={watchlist} />
+            </div>
+          </Card>
+        )}
       </div>
     </DndContext>
   );
