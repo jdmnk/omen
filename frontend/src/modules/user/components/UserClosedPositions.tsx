@@ -21,7 +21,7 @@ import { PositionMarketLinkButton } from "./positions/PositionMarketLinkButton";
 import { MarketInfoCell } from "./positions/MarketInfoCell";
 
 const POSITION_ROW_GRID_CLASSES =
-  "grid grid-cols-[18px_1fr_80px_minmax(120px,auto)_24px] items-center gap-3";
+  "grid grid-cols-[18px_1fr_minmax(120px,auto)_24px] lg:grid-cols-[18px_1fr_80px_minmax(120px,auto)_24px] items-center gap-3";
 
 type ClosedPositionRowProps = {
   position: ClosedPosition;
@@ -103,7 +103,7 @@ function ClosedPositionRow({
           price={avgPrice}
         />
         {/* Cost */}
-        <div className="text-right">
+        <div className="text-right hidden lg:block">
           <span className="font-semibold text-sm">
             {formatCompactCurrency(totalBought)}
           </span>
@@ -195,7 +195,7 @@ export function UserClosedPositions({
         <div className={cn(POSITION_ROW_GRID_CLASSES, TABLE_HEADER_CLASSES)}>
           <div></div>
           <div>Market</div>
-          <div className="text-right">Total Bet</div>
+          <div className="text-right hidden lg:block">Total Bet</div>
           <div className="text-right">Value</div>
           <div></div>
         </div>

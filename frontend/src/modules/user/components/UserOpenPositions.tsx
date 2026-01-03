@@ -25,7 +25,7 @@ import { PositionMarketLinkButton } from "./positions/PositionMarketLinkButton";
 import { MarketInfoCell } from "./positions/MarketInfoCell";
 
 const POSITION_ROW_GRID_CLASSES =
-  "grid grid-cols-[18px_1fr_60px_60px_minmax(120px,auto)_24px] items-center gap-3";
+  "grid grid-cols-[18px_1fr_minmax(120px,auto)_24px] lg:grid-cols-[18px_1fr_60px_60px_minmax(120px,auto)_24px] items-center gap-3";
 
 type PositionRowProps = {
   position: OpenPosition;
@@ -101,13 +101,13 @@ function PositionRow({
           price={avgPrice}
         />
         {/* AVG price */}
-        <div className="text-center">
+        <div className="text-center hidden lg:block">
           <span className="font-semibold text-sm">
             {formatPrice(avgPrice, { maximumFractionDigits: 0 })}
           </span>
         </div>
         {/* CURRENT price */}
-        <div className="text-center">
+        <div className="text-center hidden lg:block">
           <span className="font-semibold text-sm">
             {formatPrice(currentPrice, { maximumFractionDigits: 0 })}
           </span>
@@ -199,8 +199,8 @@ export function UserOpenPositions({
         <div className={cn(POSITION_ROW_GRID_CLASSES, TABLE_HEADER_CLASSES)}>
           <div></div>
           <div>Market</div>
-          <div className="text-center">Avg</div>
-          <div className="text-center">Current</div>
+          <div className="text-center hidden lg:block">Avg</div>
+          <div className="text-center hidden lg:block">Current</div>
           <div className="text-right">Value</div>
           <div></div>
         </div>
