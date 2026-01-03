@@ -95,7 +95,7 @@ export function MarketSearchBar() {
               }}
               onFocus={() => setIsOpen(true)}
               placeholder="Search markets..."
-              className="pl-9 pr-4 border border-brand-stroke text-sm md:text-base"
+              className="pl-9 pr-4 border border-brand-stroke text-sm md:text-base bg-card/80"
             />
 
             {isLoading && (
