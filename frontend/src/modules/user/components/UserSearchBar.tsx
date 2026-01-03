@@ -181,11 +181,11 @@ export function UserSearchBar() {
                     const image = profile.profileImageOptimized || null;
 
                     return (
-                      <CommandItem
-                        key={`${profile.id}-${profile.proxyWallet}`}
-                        onSelect={() => handleSelectProfile(proxyWallet)}
-                        className="gap-2.5 px-2.5 py-2 cursor-pointer"
-                      >
+                        <CommandItem
+                          key={`${profile.id}-${profile.proxyWallet}`}
+                          onSelect={() => handleSelectProfile(proxyWallet)}
+                        className="gap-2.5 px-2.5 py-2 cursor-pointer rounded-none"
+                        >
                         <div className="relative h-9 w-9 overflow-hidden rounded-full border bg-muted/40">
                           {image ? (
                             <Image
