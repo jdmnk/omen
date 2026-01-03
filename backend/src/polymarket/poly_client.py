@@ -538,7 +538,7 @@ class PolyClient:
                     "limit_per_type": 50,
                     "keep_closed_markets": 0,
                     "search_tags": False,
-                    "search_profiles": False,
+                    "search_profiles": True,
                     # "sort": "volume",
                     "ascending": False,
                 }
@@ -565,10 +565,8 @@ class PolyClient:
                                 "category": market.get("category"),
                                 "liquidity": market.get("liquidity"),
                                 "volume": market.get("volume"),
-                                "outcomePrices": ",".join(
-                                    json.loads(market.get("outcomePrices", "[]"))
-                                ),
-                                "outcomes": ",".join(json.loads(market.get("outcomes", "[]"))),
+                                "outcomePrices": ",".join(market.get("outcomePrices", [])),
+                                "outcomes": ",".join(market.get("outcomes", [])),
                                 "active": market.get("active", False),
                                 "closed": market.get("closed", False),
                                 "icon": market.get("icon"),

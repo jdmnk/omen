@@ -20,12 +20,18 @@ import {
   PopoverAnchor,
   PopoverContent,
 } from "@/components/ui/popover";
-import { formatAddress, formatCompactCurrency, formatNumber } from "@/lib/ui/format.utils";
+import {
+  formatAddress,
+  formatCompactCurrency,
+  formatNumber,
+} from "@/lib/ui/format.utils";
 import { parseOutcomePrice, parseVolume } from "@/lib/api-parse.utils";
 import { useMarketSearchQuery } from "@/modules/market_new/lib/queries/search.query";
-import { useUserSearchQuery } from "@/modules/user/lib/queries/user-search.query";
 import { useUserDataQuery } from "@/modules/user/lib/queries/user-data.query";
-import type { SearchProfileItem, UserPublicProfile } from "@/lib/models/api.models";
+import type {
+  SearchProfileItem,
+  UserPublicProfile,
+} from "@/lib/models/api.models";
 
 type SearchTab = "markets" | "profiles";
 
@@ -34,20 +40,22 @@ type UserSearchProfile = {
   proxyWallet: string;
   name?: string | null;
   pseudonym?: string | null;
-  profileImageOptimized?: string | null;
+  profileImage?: string | null;
 };
 
 function isWalletAddress(input: string): boolean {
   return /^0x[a-fA-F0-9]{40}$/.test(input);
 }
 
-function mapSearchProfileToSimple(profile: SearchProfileItem): UserSearchProfile {
+function mapSearchProfileToSimple(
+  profile: SearchProfileItem
+): UserSearchProfile {
   return {
     id: profile.proxyWallet,
     proxyWallet: profile.proxyWallet,
     name: profile.name || null,
     pseudonym: profile.pseudonym || null,
-    profileImageOptimized: profile.profileImageOptimized?.imageUrlOptimized || null,
+    profileImage: profile.profileImage || null,
   };
 }
 
@@ -60,7 +68,7 @@ function mapUserDataToSimple(
     proxyWallet: userData.proxyWallet || address,
     name: userData.name || null,
     pseudonym: userData.pseudonym || null,
-    profileImageOptimized: userData.profileImage || null,
+    profileImage: userData.profileImage || null,
   };
 }
 
@@ -77,13 +85,8 @@ export function UnifiedSearchBar() {
   const shouldQuery = trimmedQuery.length > 0;
   const isAddressSearch = isWalletAddress(trimmedQuery);
 
-  const { data: marketData, isLoading: isMarketsLoading } = useMarketSearchQuery(
-    trimmedQuery,
-    shouldQuery && activeTab === "markets"
-  );
-
-  const { data: searchProfiles, isLoading: isProfilesLoading } =
-    useUserSearchQuery(trimmedQuery, shouldQuery && activeTab === "profiles" && !isAddressSearch);
+  const { data: marketData, isLoading: isMarketsLoading } =
+    useMarketSearchQuery(trimmedQuery, shouldQuery && !isAddressSearch);
 
   const { data: userData, isLoading: isUserDataLoading } = useUserDataQuery(
     trimmedQuery,
@@ -98,15 +101,16 @@ export function UnifiedSearchBar() {
     if (isAddressSearch && userData) {
       return [mapUserDataToSimple(userData, trimmedQuery)];
     }
-    if (searchProfiles?.profiles) {
-      return searchProfiles.profiles.map(mapSearchProfileToSimple);
+    if (marketData?.profiles) {
+      return marketData.profiles.map(mapSearchProfileToSimple);
     }
     return [];
-  }, [activeTab, isAddressSearch, userData, searchProfiles, trimmedQuery]);
+  }, [activeTab, isAddressSearch, marketData, userData, trimmedQuery]);
 
   const isLoading =
     (activeTab === "markets" && isMarketsLoading) ||
-    (activeTab === "profiles" && (isProfilesLoading || isUserDataLoading));
+    (activeTab === "profiles" &&
+      (isAddressSearch ? isUserDataLoading : isMarketsLoading));
 
   useEffect(() => {
     if (!containerRef.current) return;
@@ -233,8 +237,12 @@ export function UnifiedSearchBar() {
                           const odds = parseOutcomePrice(market.outcomePrices);
                           const volume = parseVolume(market.volume || "0");
                           const secondaryLabel = [
-                            odds !== null ? `${formatNumber(odds * 100, 1)}%` : null,
-                            volume > 0 ? `vol ${formatCompactCurrency(volume, 0)}` : null,
+                            odds !== null
+                              ? `${formatNumber(odds * 100, 1)}%`
+                              : null,
+                            volume > 0
+                              ? `vol ${formatCompactCurrency(volume, 0)}`
+                              : null,
                           ]
                             .filter(Boolean)
                             .join(" · ");
@@ -288,9 +296,13 @@ export function UnifiedSearchBar() {
                           const marketCount = event.markets?.length || 0;
                           const secondaryLabel = [
                             marketCount > 0
-                              ? `${marketCount} ${marketCount === 1 ? "market" : "markets"}`
+                              ? `${marketCount} ${
+                                  marketCount === 1 ? "market" : "markets"
+                                }`
                               : null,
-                            volume > 0 ? `vol ${formatCompactCurrency(volume, 0)}` : null,
+                            volume > 0
+                              ? `vol ${formatCompactCurrency(volume, 0)}`
+                              : null,
                           ]
                             .filter(Boolean)
                             .join(" · ");
@@ -343,18 +355,20 @@ export function UnifiedSearchBar() {
                   No profiles found.
                 </CommandEmpty>
                 {profiles.length > 0 && (
-                  <CommandGroup heading="Profiles">
+                  <CommandGroup>
                     {profiles.map((profile) => {
                       const proxyWallet = profile.proxyWallet;
                       const primaryLabel =
                         profile.name ||
                         profile.pseudonym ||
-                        (proxyWallet ? formatAddress(proxyWallet) : "Unknown user");
+                        (proxyWallet
+                          ? formatAddress(proxyWallet)
+                          : "Unknown user");
                       const secondaryLabel = proxyWallet
                         ? formatAddress(proxyWallet)
                         : profile.pseudonym;
 
-                      const image = profile.profileImageOptimized || null;
+                      const image = profile.profileImage || null;
 
                       return (
                         <CommandItem
