@@ -64,7 +64,7 @@ export default async function UserPage({
   const { userId } = await params;
 
   return (
-    <div className="bg-background">
+    <div>
       {/* <Header /> */}
       <main className="w-full">
         <UserProfile userId={userId} />

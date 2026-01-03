@@ -175,6 +175,21 @@
   body {
     @apply bg-background text-foreground;
     letter-spacing: 0.03em;
+    background-image:
+      radial-gradient(760px 380px at 20% -10%, rgba(99, 34, 254, 0.16), transparent 60%),
+      radial-gradient(820px 460px at 90% 0%, rgba(34, 197, 93, 0.12), transparent 60%),
+      repeating-linear-gradient(120deg, rgba(99, 34, 254, 0.06) 0 1px, transparent 1px 12px),
+      linear-gradient(180deg, rgba(255, 255, 255, 0.78) 0%, rgba(255, 255, 255, 0) 40%);
+    background-attachment: fixed;
+  }
+
+  .dark body {
+    background-image:
+      radial-gradient(760px 380px at 20% -10%, rgba(99, 34, 254, 0.34), transparent 60%),
+      radial-gradient(820px 460px at 90% 0%, rgba(34, 197, 93, 0.22), transparent 60%),
+      repeating-linear-gradient(120deg, rgba(99, 34, 254, 0.12) 0 1px, transparent 1px 12px),
+      linear-gradient(180deg, rgba(10, 5, 20, 0.84) 0%, rgba(10, 5, 20, 0) 40%);
+    background-attachment: fixed;
   }
 
   /* Custom scrollbar styles for WebKit browsers (Chrome, Safari, Edge) */

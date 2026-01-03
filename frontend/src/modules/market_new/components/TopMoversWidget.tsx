@@ -6,6 +6,7 @@ import { TrendingUp, TrendingDown, Clock } from "lucide-react";
 import { useTopMoversQuery, TopMover } from "../lib/queries/top-movers.query";
 import { Spinner } from "@/components/ui/spinner";
 import { cn } from "@/lib/utils";
+import { Card } from "@/components/ui/card";
 import {
   TABLE_HEADER_CLASSES,
   TABLE_HEADER_CONTAINER_CLASSES,
@@ -128,7 +129,7 @@ export function TopMoversWidget() {
   const lastUpdated = new Date(data.fetched_at).toLocaleString();
 
   return (
-    <div className="h-full flex flex-col border border-brand-stroke rounded-brand overflow-hidden">
+    <Card className="h-full flex flex-col overflow-hidden">
       {/* Header */}
       <div className="shrink-0 px-3 pt-3 pb-2 border-b border-brand-stroke">
         <div className="flex items-center justify-between gap-3">
@@ -172,6 +173,6 @@ export function TopMoversWidget() {
           ))
         )}
       </div>
-    </div>
+    </Card>
   );
 }

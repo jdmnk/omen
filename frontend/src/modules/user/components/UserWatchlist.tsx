@@ -35,6 +35,7 @@ import { cn } from "@/lib/utils";
 import { formatAddress } from "@/lib/ui/format.utils";
 import { UserWatchlistActivityFeed } from "./UserWatchlistActivityFeed";
 import { UserWatchlistImportExportDialog } from "./UserWatchlistImportExportDialog";
+import { CollapsibleCard } from "@/components/ui/collapsible-card";
 
 const INITIAL_LIMIT = 10;
 const CONFIRM_TIMEOUT_MS = 3000;
@@ -336,25 +337,16 @@ export function UserWatchlist() {
           </button>
           {isEditing && <UserWatchlistImportExportDialog />}
         </div>
-        <div className="w-full rounded-lg border border-brand-stroke bg-background/50 overflow-hidden">
-          <button
-            type="button"
-            onClick={() => setIsActivityOpen((open) => !open)}
-            className="w-full px-3 py-2 flex items-center justify-between text-sm font-bold uppercase text-brand-primary cursor-pointer"
-          >
-            <span>Watchlist Activity</span>
-            {isActivityOpen ? (
-              <ChevronUp className="h-3.5 w-3.5" />
-            ) : (
-              <ChevronDown className="h-3.5 w-3.5" />
-            )}
-          </button>
-          {isActivityOpen && (
-            <div className="h-[420px]">
-              <UserWatchlistActivityFeed watchlist={watchlist} />
-            </div>
-          )}
-        </div>
+        <CollapsibleCard
+          title="Watchlist Activity"
+          isOpen={isActivityOpen}
+          onToggle={() => setIsActivityOpen((open) => !open)}
+          contentClassName="p-0"
+        >
+          <div className="h-[420px]">
+            <UserWatchlistActivityFeed watchlist={watchlist} />
+          </div>
+        </CollapsibleCard>
       </div>
     </DndContext>
   );

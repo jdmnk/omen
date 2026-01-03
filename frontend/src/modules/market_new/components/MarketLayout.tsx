@@ -16,6 +16,7 @@ import { FontSizeControl } from "@/components/FontSizeControl";
 import { MarketSearchBar } from "./MarketSearchBar";
 import { MarketWatchlist } from "./MarketWatchlist";
 import { TopMoversWidget } from "./TopMoversWidget";
+import { CollapsibleCard } from "@/components/ui/collapsible-card";
 
 export function MarketLayout({
   initialMarket,
@@ -103,35 +104,27 @@ export function MarketLayout({
         </div>
         {!error && market && (
           <div className="lg:hidden">
-            <button
-              type="button"
-              onClick={() => setIsOrderBookOpen((open) => !open)}
-              className="w-full rounded-md border border-brand-stroke px-3 py-2 text-xs font-semibold uppercase text-brand-primary hover:bg-brand-highlight/20 transition-colors cursor-pointer"
+            <CollapsibleCard
+              title="Order Book"
+              isOpen={isOrderBookOpen}
+              onToggle={() => setIsOrderBookOpen((open) => !open)}
+              contentClassName="p-0"
             >
-              {isOrderBookOpen ? "Hide Order Book" : "Show Order Book"}
-            </button>
-          </div>
-        )}
-        {!error && market && isOrderBookOpen && (
-          <div className="lg:hidden min-h-[300px]">
-            <MarketOrderBookSection market={market} />
+              <div className="min-h-[300px]">
+                <MarketOrderBookSection market={market} />
+              </div>
+            </CollapsibleCard>
           </div>
         )}
         {!error && market && (
-          <div>
-            <button
-              type="button"
-              onClick={() => setIsRulesOpen((open) => !open)}
-              className="w-full rounded-md border border-brand-stroke px-3 py-2 text-xs font-semibold uppercase text-brand-primary hover:bg-brand-highlight/20 transition-colors cursor-pointer"
-            >
-              {isRulesOpen ? "Hide Rules" : "Show Rules"}
-            </button>
-          </div>
-        )}
-        {!error && market && isRulesOpen && (
-          <div>
+          <CollapsibleCard
+            title="Rules"
+            isOpen={isRulesOpen}
+            onToggle={() => setIsRulesOpen((open) => !open)}
+            contentClassName="p-0"
+          >
             <MarketRulesSection market={market} isLoading={isLoading} />
-          </div>
+          </CollapsibleCard>
         )}
         <div>
           {error ? (
