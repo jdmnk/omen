@@ -529,7 +529,6 @@ class PolyClient:
         Search for markets, events, and profiles using Gamma API public-search endpoint.
 
         Returns top 10 markets and top 10 events, sorted by volume (descending).
-        Only includes active markets and events.
         """
         try:
             async with httpx.AsyncClient() as client:
@@ -548,31 +547,29 @@ class PolyClient:
 
                 # Extract and process events
                 raw_events = data.get("events", []) or []
-                active_events = [e for e in raw_events if e.get("active") and not e.get("closed")]
 
                 # Extract markets from events and flatten
                 all_markets = []
-                for event in active_events:
+                for event in raw_events:
                     event_markets = event.get("markets", []) or []
                     for market in event_markets:
-                        if market.get("active") and not market.get("closed"):
-                            # Only include fields that SearchMarketItem expects
-                            market_clean = {
-                                "id": market.get("id", ""),
-                                "question": market.get("question", ""),
-                                "conditionId": market.get("conditionId", ""),
-                                "slug": market.get("slug", ""),
-                                "category": market.get("category"),
-                                "liquidity": market.get("liquidity"),
-                                "volume": market.get("volume"),
-                                "outcomePrices": ",".join(market.get("outcomePrices", [])),
-                                "outcomes": ",".join(market.get("outcomes", [])),
-                                "active": market.get("active", False),
-                                "closed": market.get("closed", False),
-                                "icon": market.get("icon"),
-                                "image": market.get("image"),
-                            }
-                            all_markets.append(market_clean)
+                        # Only include fields that SearchMarketItem expects
+                        market_clean = {
+                            "id": market.get("id", ""),
+                            "question": market.get("question", ""),
+                            "conditionId": market.get("conditionId", ""),
+                            "slug": market.get("slug", ""),
+                            "category": market.get("category"),
+                            "liquidity": market.get("liquidity"),
+                            "volume": market.get("volume"),
+                            "outcomePrices": ",".join(market.get("outcomePrices", [])),
+                            "outcomes": ",".join(market.get("outcomes", [])),
+                            "active": market.get("active", False),
+                            "closed": market.get("closed", False),
+                            "icon": market.get("icon"),
+                            "image": market.get("image"),
+                        }
+                        all_markets.append(market_clean)
 
                 # Sort markets by volume (descending) - only events were sorted by volume
                 # all_markets.sort(
@@ -582,7 +579,7 @@ class PolyClient:
 
                 # Return all sorted results (frontend will handle top 10 and expand/collapse)
                 return SearchResponse(
-                    events=[SearchEventItem(**e) for e in active_events],
+                    events=[SearchEventItem(**e) for e in raw_events],
                     markets=[SearchMarketItem(**m) for m in all_markets],
                     tags=data.get("tags"),
                     profiles=data.get("profiles"),
