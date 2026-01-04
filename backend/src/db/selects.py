@@ -75,8 +75,8 @@ class SelectsClient:
             WHERE ph.price_delta IS NOT NULL
                 AND ph.last_price IS NOT NULL
                 -- Filter out near-0/1 prices (stored as 0-1 not 0-100)
-                AND ph.last_price >= 0.005
-                AND ph.last_price <= 0.995
+                AND ph.last_price >= 0.01
+                AND ph.last_price <= 0.9
             ORDER BY ABS(ph.price_delta) DESC
             LIMIT :limit
         """)

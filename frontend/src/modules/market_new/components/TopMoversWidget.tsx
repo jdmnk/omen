@@ -17,12 +17,14 @@ import {
 function formatPriceDelta(delta: number | null): string {
   if (delta === null) return "—";
   const sign = delta >= 0 ? "+" : "";
-  return `${sign}${(delta * 100).toFixed(1)}%`;
+  const truncated = Math.trunc(delta * 1000) / 10;
+  return `${sign}${truncated.toFixed(1)}%`;
 }
 
 function formatPrice(price: number | null): string {
   if (price === null) return "—";
-  return `${(price * 100).toFixed(1)}¢`;
+  const truncated = Math.trunc(price * 1000) / 10;
+  return `${truncated.toFixed(1)}¢`;
 }
 
 function MoverRow({
