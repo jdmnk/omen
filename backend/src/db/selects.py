@@ -74,8 +74,9 @@ class SelectsClient:
             JOIN markets m ON m.token1 = ph.clob_token_id
             WHERE ph.price_delta IS NOT NULL
                 AND ph.last_price IS NOT NULL
-                AND ph.last_price >= 0.5
-                AND ph.last_price <= 99.5
+                -- Filter out near-0/1 prices (stored as 0-1 not 0-100)
+                AND ph.last_price >= 0.005
+                AND ph.last_price <= 0.995
             ORDER BY ABS(ph.price_delta) DESC
             LIMIT :limit
         """)
