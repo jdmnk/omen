@@ -265,7 +265,6 @@ export function TopHoldersPositions({
           <Link
             // href={`${POLYMARKET_URL}/profile/${holder.proxyWallet}`}
             href={`/user/${holder.proxyWallet}`}
-            target="_blank"
             className="block truncate text-sm font-medium hover:underline cursor-pointer"
           >
             {displayName}
