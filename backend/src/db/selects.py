@@ -34,6 +34,13 @@ class SelectsClient:
             markets = result.scalars().all()
             return [Market.model_validate(m) for m in markets]
 
+    async def get_all_markets(self) -> list[Market]:
+        async with self.core.async_session() as session:
+            stmt = select(MarketDB).order_by(MarketDB.volume.desc())
+            result = await session.execute(stmt)
+            markets = result.scalars().all()
+            return [Market.model_validate(m) for m in markets]
+
     async def get_distinct_trade_wallets(self, limit: int | None = None) -> list[str]:
         sql = 'SELECT DISTINCT "proxyWallet" FROM trades ORDER BY "proxyWallet"'
         params: dict | None = None
