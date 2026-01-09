@@ -30,12 +30,10 @@ class InsertsClient:
         async with self.core.async_session() as session:
             for start in range(0, len(markets), chunk_size):
                 batch = markets[start : start + chunk_size]
-                # Filter to only DB columns, map conditionId -> condition_id
+                # Filter to only DB columns
                 values = []
                 for m in batch:
                     row = m.model_dump()
-                    # Map conditionId to condition_id (DB uses snake_case for PK)
-                    row["condition_id"] = row.pop("conditionId", row.get("condition_id"))
                     # Keep only columns that exist in the DB table
                     filtered = {k: v for k, v in row.items() if k in db_columns}
                     values.append(filtered)
@@ -44,11 +42,11 @@ class InsertsClient:
                 update_fields = {
                     col: stmt.excluded[col]
                     for col in MarketDB.__table__.columns.keys()
-                    if col not in ["condition_id", "fetched_at"]
+                    if col not in ["conditionId", "fetched_at"]
                 }
                 update_fields["fetched_at"] = text("now()")
                 stmt = stmt.on_conflict_do_update(
-                    index_elements=["condition_id"], set_=update_fields
+                    index_elements=["conditionId"], set_=update_fields
                 )
 
                 await session.execute(stmt)
@@ -121,7 +119,7 @@ class InsertsClient:
                 cid = mk.get("conditionId") or mk.get("condition_id")
                 if not cid:
                     continue
-                mappings.append({"event_id": str(ev_id), "condition_id": str(cid), "position": idx})
+                mappings.append({"event_id": str(ev_id), "conditionId": str(cid), "position": idx})
 
         if not mappings:
             return 0
@@ -132,7 +130,7 @@ class InsertsClient:
                 batch = mappings[start : start + chunk_size]
                 stmt = pg_insert(EventMarket).values(batch)
                 stmt = stmt.on_conflict_do_update(
-                    index_elements=["event_id", "condition_id"],
+                    index_elements=["event_id", "conditionId"],
                     set_={"position": stmt.excluded.position},
                 )
                 await session.execute(stmt)
