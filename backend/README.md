@@ -30,6 +30,13 @@ docker compose ps
 docker compose logs
 docker compose logs --tail 100 app
 
+# main
+docker compose up -d --build --no-deps app
+
+# price history worker
+docker compose up -d --build price-history-worker
+docker compose restart price-history-worker
+
 # wipe it all and start fresh (run where docker compose file is):
 docker compose down --rmi all --volumes --remove-orphans
 
