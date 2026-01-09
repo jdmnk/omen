@@ -13,7 +13,7 @@ class SelectsClient:
 
     async def get_market_by_condition_id(self, condition_id: str) -> Market | None:
         async with self.core.async_session() as session:
-            stmt = select(MarketDB).where(MarketDB.condition_id == condition_id)
+            stmt = select(MarketDB).where(MarketDB.conditionId == condition_id)
             result = await session.execute(stmt)
             market_orm = result.scalar_one_or_none()
             return Market.model_validate(market_orm) if market_orm else None
@@ -30,6 +30,13 @@ class SelectsClient:
             if limit is not None and limit > 0:
                 stmt = stmt.limit(limit)
 
+            result = await session.execute(stmt)
+            markets = result.scalars().all()
+            return [Market.model_validate(m) for m in markets]
+
+    async def get_all_markets(self) -> list[Market]:
+        async with self.core.async_session() as session:
+            stmt = select(MarketDB).order_by(MarketDB.volume.desc())
             result = await session.execute(stmt)
             markets = result.scalars().all()
             return [Market.model_validate(m) for m in markets]

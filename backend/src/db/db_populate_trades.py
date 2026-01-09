@@ -46,7 +46,7 @@ async def main() -> None:
 
         # Fetch trades for this batch
         trades_batch = await poly_client.get_market_trades(
-            [m.condition_id for m in batch_markets], min_amount=GLOBAL_MIN_TRADE_USD, count=500
+            [m.conditionId for m in batch_markets], min_amount=GLOBAL_MIN_TRADE_USD, count=500
         )
         fetched_count = len(trades_batch)
         total_trades_fetched += fetched_count

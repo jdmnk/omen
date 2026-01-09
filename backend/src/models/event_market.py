@@ -12,7 +12,7 @@ class EventMarket(Base):
     event_id: Mapped[str] = mapped_column(
         String, ForeignKey("events.id", ondelete="CASCADE"), primary_key=True
     )
-    condition_id: Mapped[str] = mapped_column(
-        String, ForeignKey("markets.condition_id", ondelete="CASCADE"), primary_key=True
+    conditionId: Mapped[str] = mapped_column(
+        String, ForeignKey("markets.conditionId", ondelete="CASCADE"), primary_key=True
     )
     position: Mapped[int] = mapped_column(Integer, nullable=False, default=0)

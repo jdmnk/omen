@@ -29,7 +29,7 @@ class MarketDB(Base):
 
     __tablename__ = "markets"
 
-    condition_id: Mapped[str] = mapped_column(String, primary_key=True)
+    conditionId: Mapped[str] = mapped_column(String, primary_key=True)
     fetched_at: Mapped[datetime] = mapped_column(
         DateTime, server_default=func.now(), onupdate=func.now()
     )
@@ -38,6 +38,7 @@ class MarketDB(Base):
     marketMakerAddress: Mapped[str] = mapped_column(String, nullable=False)
     submitted_by: Mapped[str] = mapped_column(String, nullable=False)
     icon: Mapped[str] = mapped_column(String, nullable=False)
+    image: Mapped[str] = mapped_column(String, nullable=False)
     outcomes: Mapped[str] = mapped_column(String, nullable=False)
     outcomePrices: Mapped[str] = mapped_column(String, nullable=False)
     slug: Mapped[str] = mapped_column(String, nullable=False, index=True)
@@ -54,6 +55,9 @@ class MarketDB(Base):
     bestBid: Mapped[Decimal] = mapped_column(Numeric, nullable=False)
     bestAsk: Mapped[Decimal] = mapped_column(Numeric, nullable=False)
     endDate: Mapped[str] = mapped_column(String, nullable=False)
+    active: Mapped[bool] = mapped_column(Boolean, nullable=False)
+    closed: Mapped[bool] = mapped_column(Boolean, nullable=False)
+    groupItemTitle: Mapped[str] = mapped_column(String, nullable=False)
     resolutionSource: Mapped[str] = mapped_column(String, nullable=False)
 
 

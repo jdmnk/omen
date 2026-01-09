@@ -1,4 +1,5 @@
 import asyncio
+import os
 import time
 
 from src.db.inserts import InsertsClient
@@ -22,6 +23,13 @@ def _get_latest_price(points: list[dict]) -> float | None:
     return float(sorted_points[-1].get("p", 0)) if sorted_points else None
 
 
+def _market_fetch_timeout_seconds() -> float:
+    try:
+        return max(30.0, float(os.getenv("MARKETS_FETCH_TIMEOUT_SECONDS", "180")))
+    except ValueError:
+        return 180.0
+
+
 async def refresh_price_histories() -> None:
     start_time = time.time()
     poly_client = PolyClient()
@@ -30,11 +38,26 @@ async def refresh_price_histories() -> None:
     selects = SelectsClient()
 
     # Find eligible markets (by DB query)
-    markets = await poly_client.get_active_markets_by_events()
-    logger.info("Eligible markets for price history fetch: %d", len(markets))
-
-    # Insert/update all markets in DB
-    inserted_markets = await inserts.insert_markets(markets)
+    inserted_markets = 0
+    try:
+        markets = await asyncio.wait_for(
+            poly_client.get_active_markets_by_events(),
+            timeout=_market_fetch_timeout_seconds(),
+        )
+        logger.info("Eligible markets for price history fetch: %d", len(markets))
+        # Insert/update all markets in DB
+        inserted_markets = await inserts.insert_markets(markets)
+    except Exception as exc:
+        logger.warning(
+            "Failed to fetch markets from API, falling back to stored markets: %s",
+            exc,
+        )
+        notify_ops(
+            f":rotating_light: Market fetch failed for price history refresh "
+            f"({exc.__class__.__name__}: {exc})"
+        )
+        markets = await selects.get_all_markets()
+        logger.info("Using %d stored markets for price history fetch", len(markets))
     logger.info("Inserted/updated %d markets", inserted_markets)
 
     markets_sorted_by_volume = sorted(markets, key=lambda x: x.volume1mo, reverse=True)
