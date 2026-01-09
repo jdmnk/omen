@@ -81,7 +81,7 @@ class PolyClient:
         Fetch active events from Gamma API, mirroring params used by get_active_markets_by_events,
         but return the raw events payload (including markets) instead of flattening to markets.
         """
-        limit = 500
+        limit = 250
         offset = 0
         all_events: list[dict] = []
         final_excluded_tag_ids: list[int] = []
