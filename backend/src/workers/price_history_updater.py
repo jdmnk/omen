@@ -6,7 +6,6 @@ import time
 
 from src.db.db_populate_price_history import refresh_price_histories
 from src.utils.logging_config import get_logger, quiet_httpx_logging
-from src.utils.notifications import notify_ops
 
 logger = get_logger(__name__)
 quiet_httpx_logging()
@@ -21,12 +20,7 @@ def _refresh_interval_seconds() -> int:
 
 async def _run_cycle() -> None:
     logger.info("Starting price history refresh cycle")
-    market_fetch_error = await refresh_price_histories()
-    if market_fetch_error:
-        notify_ops(
-            f":rotating_light: Market fetch failed for price history refresh "
-            f"({market_fetch_error.__class__.__name__}: {market_fetch_error})"
-        )
+    await refresh_price_histories()
     logger.info("Completed price history refresh cycle")
 
 
