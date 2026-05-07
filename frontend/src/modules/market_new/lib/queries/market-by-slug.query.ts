@@ -20,9 +20,7 @@ export function useMarketBySlugQuery(
         throw new Error(`Failed to fetch market: ${response.statusText}`);
       }
 
-      const data = (await response.json()) as Market;
-      console.log(data);
-      return data;
+      return (await response.json()) as Market;
     },
     enabled: !!slug && slug.length > 0,
     initialData: initialData || undefined,

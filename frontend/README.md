@@ -1,17 +1,32 @@
-## Getting Started
+# Frontend
 
-First, run the development server:
+Next.js app for Omen. It contains the market analytics interface, user profiles, watchlists, charts, order books, and share-card UI.
+
+## Local Development
 
 ```bash
+cp .env.example .env
+pnpm install
 pnpm dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open `http://localhost:3000`.
 
-## Types
-
-To generate Typescript type files from backend models, run
+## Scripts
 
 ```bash
+pnpm lint
+pnpm type-check
+pnpm build
 pnpm type-gen
+```
+
+`pnpm type-gen` reads the backend OpenAPI schema and updates generated frontend API types.
+
+## Environment
+
+Set `NEXT_PUBLIC_API_URL` to the backend URL. For local Docker development this is usually:
+
+```bash
+NEXT_PUBLIC_API_URL=http://localhost:8000
 ```

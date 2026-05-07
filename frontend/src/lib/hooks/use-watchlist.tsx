@@ -114,7 +114,7 @@ export const useWatchlistStore = create<WatchlistState>()(
       name: "omen-watchlist",
       storage: createJSONStorage(() => localStorage),
       // Migration: handle old format (array of strings) to new format (array of objects)
-      migrate: (persistedState: any, version: number) => {
+      migrate: (persistedState: any) => {
         if (persistedState?.state?.watchlist) {
           return {
             ...persistedState,

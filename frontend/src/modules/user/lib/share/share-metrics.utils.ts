@@ -25,7 +25,6 @@ const REDEMPTION_PRICE = 1;
 function getEntriesVwap(entries: ProcessedActivity[], side: "BUY" | "SELL") {
   let totalSize = 0;
   let totalCost = 0;
-  console.log("entries", entries);
   if (!entries || entries.length === 0) return null;
 
   const isSideMatch = side === "BUY" ? isBuyTrade : isSellTrade;
@@ -53,11 +52,7 @@ export function getPositionEntryPrice(position: Position) {
   return position.avgPrice;
 }
 
-export function getPositionAvgBuyPrice(
-  position: Position,
-  entries: ProcessedActivity[]
-) {
-  //   return getEntriesVwap(entries, "BUY");
+export function getPositionAvgBuyPrice(position: Position) {
   return getPositionEntryPrice(position); // avg buy price
 }
 
@@ -71,8 +66,6 @@ export function getPositionApr(
   position: Position,
   entries: ProcessedActivity[]
 ): number | null {
-  console.log("entries", entries);
-  console.log("position", position);
   // Guard: need at least one entry
   if (!entries || entries.length === 0) return null;
 
@@ -95,15 +88,12 @@ export function getPositionApr(
   if (!endTime || !Number.isFinite(endTime)) return null;
 
   const durationMs = endTime - startTime;
-  console.log("startTime", startTime, new Date(startTime).toISOString());
-  console.log("endTime", endTime, new Date(endTime).toISOString());
-  console.log("durationMs", durationMs);
 
   // Guard: duration must be positive and at least 1 hour to avoid extreme APR
   // const MIN_DURATION_MS = 60 * 60 * 1000; // 1 hour
   // if (durationMs < MIN_DURATION_MS) return null;
 
-  const entryPrice = getPositionAvgBuyPrice(position, entries);
+  const entryPrice = getPositionAvgBuyPrice(position);
 
   // Guard: entry price must be valid and > 0
   if (!entryPrice || entryPrice <= 0) return null;

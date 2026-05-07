@@ -143,7 +143,7 @@ export function UnifiedSearchBar() {
       });
       handleSelectMarket(marketWithMostVolume.slug);
     },
-    [events, handleSelectMarket]
+    [handleSelectMarket]
   );
 
   const handleSelectProfile = useCallback(

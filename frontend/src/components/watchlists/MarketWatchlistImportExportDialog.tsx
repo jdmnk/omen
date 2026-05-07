@@ -40,7 +40,7 @@ export function MarketWatchlistImportExportDialog() {
       setWatchlist(items);
       setImportValue("");
       toast.success("Watchlist imported");
-    } catch (error) {
+    } catch {
       toast.error("Invalid JSON");
     }
   };

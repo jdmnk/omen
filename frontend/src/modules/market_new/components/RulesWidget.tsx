@@ -20,11 +20,7 @@ function isUrl(str: string): boolean {
 
 export function RulesWidget({ market }: RulesWidgetProps) {
   const { questionId, submitted_by, description } = market;
-  const {
-    data: updates,
-    isLoading,
-    error,
-  } = useClarificationsQuery(questionId, submitted_by);
+  const { data: updates } = useClarificationsQuery(questionId, submitted_by);
 
   return (
     <div className="space-y-3 p-3">

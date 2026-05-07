@@ -43,16 +43,9 @@ function ActivityRow({
   const marketUrl = entry.eventSlug
     ? getPolymarketEventUrl(entry.eventSlug)
     : undefined;
-  const isTrade = entry.type === "TRADE";
   const typeLabel = getActivityTypeLabel(entry);
   const marketLabel = getActivityMarketLabel(entry);
   const typeUpper = entry.type?.toUpperCase() ?? "";
-  const typeColor =
-    isTrade && entry.side?.toUpperCase() === "BUY"
-      ? "text-outcome-yes"
-      : isTrade && entry.side?.toUpperCase() === "SELL"
-      ? "text-outcome-no"
-      : "text-muted-foreground";
 
   // Get icon URL - activity entries might have an icon field
   const iconUrl = (entry as Activity & { icon?: string }).icon;
