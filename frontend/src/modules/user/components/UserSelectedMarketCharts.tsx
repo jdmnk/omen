@@ -169,13 +169,6 @@ function PositionChartCard({
       </div>
       <div className="flex-1">
         {tokenId ? (
-          // <PositionPriceChart
-          //   data={chartData}
-          //   markers={markers}
-          //   volumeBars={volumeBars}
-          //   isLoading={isLoading}
-          //   error={error}
-          // />
           <PositionPriceChartApex
             data={chartData}
             markers={markers}

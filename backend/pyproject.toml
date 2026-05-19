@@ -7,11 +7,6 @@ packages = [{ include = "src" }]
 
 [tool.poetry.dependencies]
 python = "^3.11"
-pandas = "^2.3.2"
-numpy = "^2.3.3"
-matplotlib = "^3.10.7"
-python-dotenv = "^1.1.1"
-aiogram = "^3.22.0"
 fastapi = {extras = ["standard"], version = "^0.119.1"}
 py-clob-client = "^0.25.0"
 uvicorn = "^0.38.0"
