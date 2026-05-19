@@ -2,8 +2,6 @@
 
 Omen is a full-stack Polymarket analytics app. It combines a Next.js frontend, a FastAPI backend, Postgres/Redis-backed ingestion jobs, and a Graph Protocol subgraph to explore markets, users, positions, price history, order books, and holder behavior.
 
-This repo is meant to be a public example of a production-shaped analytics product. It is not a packaged SDK. The useful parts to study are the app structure, API contracts, ingestion jobs, generated frontend types, charting flows, and UI patterns around market and wallet analysis.
-
 ## Product Surface
 
 - Search for Polymarket markets and wallets from one command-style search bar.
@@ -87,7 +85,7 @@ pnpm prepare
 
 See `subgraphs/README.md` for Graph CLI commands.
 
-## Useful Demo Flow
+## Using the App
 
 1. Start the backend and frontend.
 2. Populate markets, trades, positions, and price history.
@@ -124,9 +122,9 @@ This repo intentionally does not include secrets. Start from:
 
 Most read-only product flows use public Polymarket APIs. Backend jobs that need authenticated CLOB access require `POLYMARKET_PRIVATE_KEY`; leave it empty unless you are intentionally running those flows with a dedicated development wallet.
 
-## Public Use Notes
+## Notes
 
-- This is an example application, not investment advice or an automated trading system.
+- Omen is an analytics app, not investment advice or an automated trading system.
 - Data quality depends on third-party APIs and indexed subgraphs.
 - Local watchlists and dismissed UI hints are stored in browser local storage.
 - If you fork this repo, rotate any local keys you previously used and run a secret scan before publishing your own copy.
