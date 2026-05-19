@@ -4,7 +4,6 @@ Graph Protocol mappings used by Omen to index Polymarket activity.
 
 ## Structure
 
-- `polymarket-users/` indexes user wallet creation and related conditional-token activity.
 - `pnl-subgraph/` indexes events used to calculate position PnL and average prices.
 - `common/` contains shared constants and AssemblyScript utilities.
 - `abis/` contains contract ABIs used by the mappings.
@@ -31,14 +30,7 @@ For hosted deployments, authenticate with The Graph:
 graph auth <api-key>
 ```
 
-For local development, use the scripts inside each subgraph package:
-
-```bash
-cd polymarket-users
-npm run codegen
-npm run build
-npm run test
-```
+For local development, use the Graph CLI inside the subgraph package:
 
 ```bash
 cd pnl-subgraph

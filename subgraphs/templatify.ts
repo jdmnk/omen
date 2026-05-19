@@ -5,7 +5,6 @@ import * as path from "path";
 
 const config = {
   templatedFiles: [
-    "polymarket-users/subgraph.yaml",
     "pnl-subgraph/subgraph.yaml",
 
     "common/constants.ts",
