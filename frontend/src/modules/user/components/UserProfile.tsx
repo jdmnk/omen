@@ -32,6 +32,7 @@ import { PageLayout } from "@/components/PageLayout";
 import { Checkbox } from "@/components/ui/checkbox";
 import { MainHeader } from "@/components/MainHeader";
 import { MainWatchlists } from "@/components/MainWatchlists";
+import { DismissibleHint } from "@/components/DismissibleHint";
 
 async function fetchUserPositionActivity(userId: string, position: Position) {
   // sorted by timestamp DESC
@@ -297,6 +298,15 @@ export function UserProfile({ userId }: { userId: string }) {
         activities={positionActivities}
         onTogglePosition={handlePositionToggle}
       />
+
+      <DismissibleHint
+        storageKey="omen-user-profile-hint-dismissed"
+        title="Inspect trades"
+      >
+        Click a position row or its checkbox to add that market to the chart
+        area. The row expands with trade history for that user, and the selected
+        chart shows their buys, sells, and exposure over the market price.
+      </DismissibleHint>
 
       {/* Main Content: Two Columns */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">

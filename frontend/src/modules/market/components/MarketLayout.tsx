@@ -14,6 +14,7 @@ import { CollapsibleCard } from "@/components/ui/collapsible-card";
 import { PageLayout } from "@/components/PageLayout";
 import { MainHeader } from "@/components/MainHeader";
 import { MainWatchlists } from "@/components/MainWatchlists";
+import { DismissibleHint } from "@/components/DismissibleHint";
 
 export function MarketLayout({
   initialMarket,
@@ -36,6 +37,11 @@ export function MarketLayout({
       <PageLayout>
         <MainHeader />
         <MainWatchlists />
+        <DismissibleHint storageKey="omen-home-hint-dismissed" title="How to use">
+          Search for a market or wallet to open a detailed view. Add markets
+          and users to your watchlists from their pages, then use Top Movers
+          below to spot active markets worth checking first.
+        </DismissibleHint>
         <div className="min-h-[520px]">
           <TopMoversWidget />
         </div>
