@@ -56,7 +56,7 @@ function PositionRow({
     onTogglePosition?.(position, next);
   };
 
-  const handleRowClick = (event: React.MouseEvent<HTMLDivElement>) => {
+  const handleRowClick = () => {
     toggleSelection(!isSelected);
   };
 

@@ -4,8 +4,6 @@ import { create } from "zustand";
 import type { Interval, ProcessedActivity } from "@/lib/models/frontend.models";
 import { Position } from "@/lib/models/frontend.models";
 
-type ChartPoint = { time: number | string; value: number };
-
 export type SharedMarketSnapshot = {
   interval: Interval;
   position: Position;

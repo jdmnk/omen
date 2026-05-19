@@ -1,8 +1,6 @@
 import { UserProfile } from "@/modules/user/components/UserProfile";
 import type { Metadata } from "next";
-import { METADATA } from "@/lib/metadata.const";
 import { getSiteUrl } from "@/lib/app.const";
-import { Header } from "@/components/Header";
 
 type UserProfileData = {
   name?: string | null;
@@ -37,7 +35,7 @@ export async function generateMetadata({
   const displayName =
     userData?.name || userData?.pseudonym || formatAddressShort(userId);
   const title = `Omen | @${displayName}`;
-  const description = `View trading profile and positions`;
+  const description = "View trading profile and positions";
 
   return {
     metadataBase: new URL(getSiteUrl()),
@@ -65,7 +63,6 @@ export default async function UserPage({
 
   return (
     <div>
-      {/* <Header /> */}
       <main className="w-full">
         <UserProfile userId={userId} />
       </main>

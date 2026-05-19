@@ -12,12 +12,10 @@ import {
   getPositionAvgSellPrice,
   getPositionVolume,
 } from "../../lib/share/share-metrics.utils";
-import { MarketShareChart } from "./MarketShareChart";
 import Image from "next/image";
 import {
   formatAddress,
   formatCompactCurrency,
-  formatCurrency,
   formatNumber,
   formatPrice,
 } from "@/lib/ui/format.utils";
@@ -42,7 +40,7 @@ export function MarketShareCard({
     if (value === 0) return formatted;
     return `${value > 0 ? "+" : "-"} ${formatted}`;
   };
-  const avgBuyPrice = getPositionAvgBuyPrice(position, snapshot.entries);
+  const avgBuyPrice = getPositionAvgBuyPrice(position);
   const avgSellPrice = getPositionAvgSellPrice(snapshot.entries);
   const tradesCount = snapshot.entries.length;
   const apr = getPositionApr(position, snapshot.entries);

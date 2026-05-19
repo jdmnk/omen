@@ -4,7 +4,6 @@ import { useEffect, useMemo, useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Interval } from "@/lib/models/frontend.models";
 import type { PositionActivity } from "../userActivity.types";
-import { PositionPriceChart } from "./charts/PositionPriceChart";
 import { formatCompactCurrency } from "@/lib/ui/format.utils";
 import { getPositionKey } from "@/modules/user/lib/position.utils";
 import { getPolymarketEventUrl } from "@/lib/utils/polymarket.utils";
@@ -91,7 +90,7 @@ function PositionChartCard({
   );
   const volumeBars = useMemo(
     () => getExposureArea(activity.entries, activity.position, fidelitySeconds),
-    [activity.entries, fidelitySeconds]
+    [activity.entries, activity.position, fidelitySeconds]
   );
   const marketUrl = getPolymarketEventUrl(
     activity.position.eventSlug ?? undefined
@@ -170,13 +169,6 @@ function PositionChartCard({
       </div>
       <div className="flex-1">
         {tokenId ? (
-          // <PositionPriceChart
-          //   data={chartData}
-          //   markers={markers}
-          //   volumeBars={volumeBars}
-          //   isLoading={isLoading}
-          //   error={error}
-          // />
           <PositionPriceChartApex
             data={chartData}
             markers={markers}

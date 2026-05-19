@@ -2,6 +2,20 @@
 .pnpm-store/
 .env.prod
 
+# Local development/editor state
+.cursor/
+.vscode/
+.idea/
+
+# JavaScript/Next.js artifacts
+node_modules/
+.next/
+out/
+.turbo/
+.vercel/
+*.tsbuildinfo
+next-env.d.ts
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[codz]

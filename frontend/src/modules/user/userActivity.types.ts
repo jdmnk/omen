@@ -1,7 +1,5 @@
 import type {
-  ClosedPosition,
   ProcessedActivity,
-  OpenPosition,
   Position,
 } from "@/lib/models/frontend.models";
 

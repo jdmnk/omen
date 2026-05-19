@@ -1,6 +1,5 @@
 specVersion: 0.0.4
-description: PnL Subgraph
-repository: https://github.com/polymarket/polymarket-subgraph
+description: Omen PnL Subgraph
 schema:
   file: ./schema.graphql
 features:

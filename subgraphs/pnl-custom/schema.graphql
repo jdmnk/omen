@@ -1,6 +1,0 @@
-type ExampleEntity @entity(immutable: true) {
-  id: Bytes!
-  count: BigInt!
-  conditionId: Bytes! # bytes32
-  oracle: Bytes! # address
-}

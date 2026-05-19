@@ -26,7 +26,7 @@ import {
   formatNumber,
 } from "@/lib/ui/format.utils";
 import { parseOutcomePrice, parseVolume } from "@/lib/api-parse.utils";
-import { useMarketSearchQuery } from "@/modules/market_new/lib/queries/search.query";
+import { useMarketSearchQuery } from "@/modules/market/lib/queries/search.query";
 import { useUserDataQuery } from "@/modules/user/lib/queries/user-data.query";
 import type {
   SearchProfileItem,
@@ -143,7 +143,7 @@ export function UnifiedSearchBar() {
       });
       handleSelectMarket(marketWithMostVolume.slug);
     },
-    [events, handleSelectMarket]
+    [handleSelectMarket]
   );
 
   const handleSelectProfile = useCallback(

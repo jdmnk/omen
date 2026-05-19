@@ -8,7 +8,6 @@ from src.analytics.top_holders_analysis import (
     get_top_holders_pnl,
     get_top_holders_wallet_info,
 )
-from src.analytics.user_pnl_markers import build_user_pnl_and_markers
 from src.db.selects import SelectsClient
 from src.models.event import Event
 from src.models.market import Market
@@ -16,9 +15,6 @@ from src.models.onchain.ancillary_data import AncillaryDataUpdate
 from src.models.responses import (
     HealthResponse,
     MessageResponse,
-    PnlMarker,
-    PnlPoint,
-    PnlWithMarkersResponse,
     TopMover,
     TopMoversResponse,
 )
@@ -261,46 +257,4 @@ async def get_clarifications_endpoint(
         return updates
     except Exception as exc:
         logger.error(f"Error in get_clarifications endpoint: {exc!s}", exc_info=True)
-        raise HTTPException(status_code=500, detail=f"Internal server error: {exc!s}") from exc
-
-
-@app.get("/users/{user_address}/pnl-with-markers", response_model=PnlWithMarkersResponse)
-async def get_user_pnl_with_markers(
-    user_address: str,
-    interval: str = Query("1m"),
-) -> PnlWithMarkersResponse:
-    """
-    Returns user PnL points and chart-aligned markers (swings and trade clusters).
-    """
-    try:
-        cache_key = f"user-pnl-markers:{user_address}:{interval}"
-        cached = redis_client.get(cache_key)
-        if cached is not None:
-            logger.info("Cache hit for %s", cache_key)
-            return PnlWithMarkersResponse(**cached)
-
-        result = await build_user_pnl_and_markers(
-            user_address=user_address, interval=interval, max_trades=5000
-        )
-        # Map raw dicts to response models
-        points = [PnlPoint(t=int(p["t"]), p=float(p["p"])) for p in result["points"]]
-        markers = [
-            PnlMarker(
-                t=int(m["t"]),
-                kind=m["kind"],
-                delta=m.get("delta"),
-                direction=m.get("direction"),
-                severity=m.get("severity"),
-                tradesCount=m.get("tradesCount"),
-                notional=m.get("notional"),
-                markets=m.get("markets"),
-                trades=m.get("trades"),
-            )
-            for m in result["markers"]
-        ]
-        response = PnlWithMarkersResponse(points=points, markers=markers)
-        redis_client.set(cache_key, response.model_dump(), expiry_seconds=300)
-        return response
-    except Exception as exc:
-        logger.error(f"Error in get_user_pnl_with_markers: {exc!s}", exc_info=True)
         raise HTTPException(status_code=500, detail=f"Internal server error: {exc!s}") from exc

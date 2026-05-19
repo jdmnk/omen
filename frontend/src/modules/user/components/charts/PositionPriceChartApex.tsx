@@ -2,6 +2,7 @@
 
 import { useMemo } from "react";
 import dynamic from "next/dynamic";
+import type { ApexOptions } from "apexcharts";
 import type { Time } from "lightweight-charts";
 import type { MarkerWithPrice } from "../../lib/chart/new-marker.utils";
 import { Spinner } from "@/components/ui/spinner";
@@ -11,6 +12,7 @@ import type { ExposureAreaPoint } from "../../lib/chart/exposure-area.utils";
 const Chart = dynamic(() => import("react-apexcharts"), { ssr: false });
 
 type ChartPoint = { time: number | string; value: number };
+type ApexAreaSeries = NonNullable<ApexOptions["series"]>;
 
 type ChartColors = {
   /** Main price line color */
@@ -185,7 +187,7 @@ export function PositionPriceChartApex({
   }, [markers, chartData, colors]);
 
   const series = useMemo(() => {
-    const seriesArray: ApexAxisChartSeries = [
+    const seriesArray: ApexAreaSeries = [
       {
         name: "Price",
         type: "area",
@@ -204,7 +206,7 @@ export function PositionPriceChartApex({
     return seriesArray;
   }, [chartData]);
 
-  const options: ApexCharts.ApexOptions = useMemo(
+  const options: ApexOptions = useMemo(
     () => ({
       chart: {
         type: "line",

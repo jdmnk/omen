@@ -1,4 +1,4 @@
-import { ProcessedActivity, Activity, Position } from "@/lib/models/api.models";
+import { ProcessedActivity, Activity } from "@/lib/models/api.models";
 import {
   isBuyTrade,
   isConversion,
@@ -9,15 +9,10 @@ import {
 } from "./activity-type.utils";
 
 export function getProcessedPositionActivity({
-  position,
   activity,
 }: {
-  position: Position;
   activity: Activity[];
 }): ProcessedActivity[] {
-  console.log("position", position);
-  console.log("activity", activity);
-
   // create a full projection of the position activity timeline
   let exposure = 0;
   // sort by timestamp ASC
@@ -37,14 +32,14 @@ export function getProcessedPositionActivity({
         exposure += entry.size;
         countNumExposureChanges++;
       } else {
-        console.log("entry.size is 0 or undefined", entry);
+        console.warn("entry.size is 0 or undefined", entry);
       }
     } else if (isSplit(entry)) {
       if (entry.size && entry.size !== 0) {
         exposure += entry.size / 2;
         countNumExposureChanges++;
       } else {
-        console.log("entry.size is 0 or undefined", entry);
+        console.warn("entry.size is 0 or undefined", entry);
       }
     }
 
@@ -54,21 +49,21 @@ export function getProcessedPositionActivity({
         exposure -= entry.size;
         countNumExposureChanges++;
       } else {
-        console.log("entry.size is 0 or undefined", entry);
+        console.warn("entry.size is 0 or undefined", entry);
       }
     } else if (isMerge(entry)) {
       if (entry.size && entry.size !== 0) {
         exposure -= entry.size / 2;
         countNumExposureChanges++;
       } else {
-        console.log("entry.size is 0 or undefined", entry);
+        console.warn("entry.size is 0 or undefined", entry);
       }
     } else if (isRedeem(entry)) {
       if (entry.size && entry.size !== 0) {
         exposure = 0;
         countNumExposureChanges++;
       } else {
-        console.log("entry.size is 0 or undefined", entry);
+        console.warn("entry.size is 0 or undefined", entry);
       }
     }
     // TODO: INCOMPLETE - this also results in an increase on other outcomes
@@ -78,7 +73,7 @@ export function getProcessedPositionActivity({
         exposure -= entry.size;
         countNumExposureChanges++;
       } else {
-        console.log("entry.size is 0 or undefined", entry);
+        console.warn("entry.size is 0 or undefined", entry);
       }
     }
 
@@ -90,8 +85,6 @@ export function getProcessedPositionActivity({
 
   // reverse back to timestamp DESC
   const reversedNewActivityEntries = newActivityEntries.reverse();
-
-  console.log("countNumExposureChanges", countNumExposureChanges);
 
   if (countNumExposureChanges !== activity.length) {
     console.warn(

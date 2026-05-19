@@ -1,87 +1,56 @@
-## Local dev
+# Backend
+
+FastAPI service for Omen market analytics. It exposes the API consumed by the frontend, stores normalized Polymarket data in Postgres, uses Redis for worker/cache support, and includes jobs for market, trade, position, and price-history ingestion.
+
+## Local Development
 
 ```bash
-# spin up services
-docker compose up --build
-# spinds up services in dev mode
+cp .env.example .env
 docker compose -f docker-compose.dev.yml up --build
-
-# rebuild just app + reinstall in dev
-docker compose -f docker-compose.dev.yml up -d --build --no-deps app
-
-# fresh start
-docker compose exec app python -m src.db.db_init --reset
-docker compose exec app python -m src.db.db_populate_markets
-docker compose exec app python -m src.db.db_populate_trades
-docker compose exec app python -m src.db.db_populate_positions
-docker compose exec app python -m src.db.db_populate_price_history
-
-# update in a loop
-docker compose exec app python -m src.workers.price_history_updater
-# current unused
-docker compose exec app python -m src.update_markets
 ```
 
-Docker VPS:
+Reset and populate the local database:
 
 ```bash
-docker compose up -d
-docker compose ps
-docker compose logs
-docker compose logs --tail 100 app
-
-# main
-docker compose up -d --build --no-deps app
-
-# price history worker
-docker compose up -d --build price-history-worker
-docker compose restart price-history-worker
-
-# wipe it all and start fresh (run where docker compose file is):
-docker compose down --rmi all --volumes --remove-orphans
-
-# rebuild/redeploy app
-git pull
-docker compose up -d --build --no-deps app
+docker compose -f docker-compose.dev.yml exec app python -m src.db.db_init --reset
+docker compose -f docker-compose.dev.yml exec app python -m src.db.db_populate_markets
+docker compose -f docker-compose.dev.yml exec app python -m src.db.db_populate_trades
+docker compose -f docker-compose.dev.yml exec app python -m src.db.db_populate_positions
+docker compose -f docker-compose.dev.yml exec app python -m src.db.db_populate_price_history
 ```
 
-Database Management:
+Run the price-history worker manually:
 
 ```bash
-docker compose exec db psql -U user -d mydb -c "SELECT count(condition_id) FROM markets;"
-docker compose exec db psql -U user -d mydb -c "SELECT count(clob_token_id) FROM price_histories;"
-
-docker compose exec db psql -U user -d mydb -c 'SELECT COUNT(DISTINCT "proxyWallet") FROM trades;'
+docker compose -f docker-compose.dev.yml exec app python -m src.workers.price_history_updater
 ```
 
-VPS general:
+## Database Checks
 
 ```bash
-scp .env.prod jure@46.224.29.26:/home/jure/polyapp/backend/.env
+docker compose -f docker-compose.dev.yml exec db psql -U user -d mydb -c "SELECT count(condition_id) FROM markets;"
+docker compose -f docker-compose.dev.yml exec db psql -U user -d mydb -c "SELECT count(clob_token_id) FROM price_histories;"
+docker compose -f docker-compose.dev.yml exec db psql -U user -d mydb -c 'SELECT COUNT(DISTINCT "proxyWallet") FROM trades;'
 ```
 
-Workflows:
+## Linting
+
+Ruff is configured via `ruff.toml`.
 
 ```bash
-# Reset database (drop all tables, recreate from models, and populate)
-docker compose exec app python -m src.db.db_init --reset
-
-# Populate
-docker compose exec app python -m src.db.db_populate
-```
-
-## Linting (Ruff)
-
-Ruff is configured via `ruff.toml` and installed as a dev dependency.
-
-Run locally (from `backend/`):
-
-```bash
-# Lint
 poetry run ruff check .
-
-# Format
 poetry run ruff format .
-
-poetry run ruff check --fix .
 ```
+
+## API Schema
+
+The generated OpenAPI schema lives at `openapi.json`. When backend response models change, regenerate the schema and then run the frontend type generation command:
+
+```bash
+cd ../frontend
+pnpm type-gen
+```
+
+## Environment
+
+Start from `.env.example`. Keep local `.env` files and private keys out of Git.

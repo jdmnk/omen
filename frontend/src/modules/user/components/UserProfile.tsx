@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useMemo, useCallback, useEffect } from "react";
+import Image from "next/image";
 import type {
   PositionActivity,
   PositionActivityLookup,
@@ -31,6 +32,7 @@ import { PageLayout } from "@/components/PageLayout";
 import { Checkbox } from "@/components/ui/checkbox";
 import { MainHeader } from "@/components/MainHeader";
 import { MainWatchlists } from "@/components/MainWatchlists";
+import { DismissibleHint } from "@/components/DismissibleHint";
 
 async function fetchUserPositionActivity(userId: string, position: Position) {
   // sorted by timestamp DESC
@@ -39,21 +41,12 @@ async function fetchUserPositionActivity(userId: string, position: Position) {
     position.conditionId,
     1000
   );
-  const splits = activity.filter((entry) => entry.type === "SPLIT");
-  const merges = activity.filter((entry) => entry.type === "MERGE");
-  const redeems = activity.filter((entry) => entry.type === "REDEEM");
-  const converts = activity.filter((entry) => entry.type === "CONVERSION");
-  console.log("splits", splits);
-  console.log("merges", merges);
-  console.log("redeems", redeems);
-  console.log("converts", converts);
   // we want only the activity for the specific outcome (and other non-outcome activities like SPLIT, MERGE, etc.)
   const activityForOutcome = activity.filter(
     (entry) => entry.outcomeIndex === position.outcomeIndex || !entry.outcome // e.g. REDEEM has no outcome
   );
 
   const positionActivity = getProcessedPositionActivity({
-    position,
     activity: activityForOutcome,
   });
 
@@ -179,9 +172,11 @@ export function UserProfile({ userId }: { userId: string }) {
         {/* Left Card: User Info */}
         <Card className="p-4 flex flex-col">
           <div className="flex items-start gap-4">
-            <img
+            <Image
               src={userData?.profileImage || "/logo.svg"}
               alt=""
+              width={64}
+              height={64}
               className="h-16 w-16 rounded-full border border-brand-stroke object-cover shrink-0"
             />
             <div className="min-w-0 flex-1">
@@ -303,6 +298,15 @@ export function UserProfile({ userId }: { userId: string }) {
         activities={positionActivities}
         onTogglePosition={handlePositionToggle}
       />
+
+      <DismissibleHint
+        storageKey="omen-user-profile-hint-dismissed"
+        title="Inspect trades"
+      >
+        Click a position row or its checkbox to add that market to the chart
+        area. The row expands with trade history for that user, and the selected
+        chart shows their buys, sells, and exposure over the market price.
+      </DismissibleHint>
 
       {/* Main Content: Two Columns */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">

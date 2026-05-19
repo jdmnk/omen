@@ -3,7 +3,7 @@ import { Market } from "@/lib/models/api.models";
 import { METADATA } from "@/lib/metadata.const";
 import { getBaseUrl } from "@/lib/api.const";
 import { getSiteUrl } from "@/lib/app.const";
-import { MarketLayout } from "@/modules/market_new/components/MarketLayout";
+import { MarketLayout } from "@/modules/market/components/MarketLayout";
 
 async function fetchMarket(slug: string): Promise<Market | null> {
   const baseUrl = getBaseUrl();
