@@ -8,4 +8,4 @@ This subgraph watches the following events for updates to PnL and average prices
 - Conversions
 - OrdersMatched
 
-Note that transfers outside of these 5 event type are _not_ tracked.
+Transfers outside of these event types are _not_ tracked.

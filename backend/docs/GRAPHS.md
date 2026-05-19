@@ -1,6 +1,11 @@
-## Subgraphs
+## Subgraph Queries
 
-Positions subgraph:
+The backend uses subgraph data from two places:
+
+- An external Polymarket positions subgraph for holder balances.
+- The Omen PnL subgraph in `subgraphs/pnl-subgraph` for realized PnL, average prices, and bought amounts.
+
+### External positions subgraph
 
 ```graphql
 query GetMarketHolders($first: Int!, $skip: Int!, $tokenIds: [String!]!) {
@@ -21,7 +26,7 @@ query GetMarketHolders($first: Int!, $skip: Int!, $tokenIds: [String!]!) {
 }
 ```
 
-Pnl subgraph:
+### Omen PnL subgraph
 
 ```graphql
 query GetMarketHolders($first: Int!, $skip: Int!, $tokenIds: [BigInt!]!) {

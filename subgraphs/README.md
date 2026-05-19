@@ -1,6 +1,6 @@
 # Subgraphs
 
-Graph Protocol mappings used by Omen to index Polymarket activity.
+Graph Protocol mappings used by Omen to index Polymarket activity for PnL and average-price calculations.
 
 ## Structure
 
@@ -37,6 +37,8 @@ cd pnl-subgraph
 graph codegen
 graph build
 ```
+
+The generated `subgraph.yaml` is derived from `subgraph.template.yaml` and `networks.yaml` through `pnpm prepare`.
 
 ## Environment
 

@@ -2,14 +2,23 @@
 
 FastAPI service for Omen market analytics. It exposes the API consumed by the frontend, stores normalized Polymarket data in Postgres, uses Redis for worker/cache support, and includes jobs for market, trade, position, and price-history ingestion.
 
-## Local Development
+## Requirements
+
+- Docker and Docker Compose for the recommended local setup.
+- Python 3.11 and Poetry for local linting or non-Docker scripts.
+
+## Run Locally
 
 ```bash
 cp .env.example .env
 docker compose -f docker-compose.dev.yml up --build
 ```
 
-Reset and populate the local database:
+The API runs on `http://localhost:8000`. Interactive API docs are available at `http://localhost:8000/docs`.
+
+## Populate Local Data
+
+Reset the schema and populate the main tables:
 
 ```bash
 docker compose -f docker-compose.dev.yml exec app python -m src.db.db_init --reset
@@ -18,6 +27,15 @@ docker compose -f docker-compose.dev.yml exec app python -m src.db.db_populate_t
 docker compose -f docker-compose.dev.yml exec app python -m src.db.db_populate_positions
 docker compose -f docker-compose.dev.yml exec app python -m src.db.db_populate_price_history
 ```
+
+The order matters:
+
+- `db_init --reset` creates a clean local schema.
+- `db_populate_markets` loads active markets and event links.
+- `db_populate_trades` and `db_populate_positions` support user profile and holder views.
+- `db_populate_price_history` powers market charts and Top Movers.
+
+Top Movers require price deltas. Run `db_populate_price_history` once to create baseline prices, then run it again later to compute `price_delta` values used by `/markets/top-movers`.
 
 Run the price-history worker manually:
 
@@ -54,3 +72,5 @@ pnpm type-gen
 ## Environment
 
 Start from `.env.example`. Keep local `.env` files and private keys out of Git.
+
+Most read-only flows work without `POLYMARKET_PRIVATE_KEY`. Only set it for authenticated CLOB flows, and use a dedicated development wallet.

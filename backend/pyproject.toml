@@ -1,8 +1,12 @@
-[tool.poetry]
+[project]
 name = "polyapp-backend"
 version = "0.1.0"
-description = ""
-authors = ["Jure D"]
+description = "FastAPI backend for the Omen Polymarket analytics example app"
+authors = [{ name = "Omen contributors" }]
+requires-python = ">=3.11,<4.0"
+dynamic = ["dependencies"]
+
+[tool.poetry]
 packages = [{ include = "src" }]
 
 [tool.poetry.dependencies]
