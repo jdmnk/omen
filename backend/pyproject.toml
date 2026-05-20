@@ -15,7 +15,7 @@ fastapi = {version = "^0.136.1", extras = ["standard"]}
 py-clob-client = "^0.25.0"
 uvicorn = "^0.38.0"
 gunicorn = "^23.0.0"
-sqlalchemy = {extras = ["asyncio"], version = "^2.0.44"}
+sqlalchemy = {extras = ["asyncio"], version = "^2.0.49"}
 psycopg2-binary = "^2.9.11"
 asyncpg = "^0.30.0"
 httpx = "^0.28.1"
