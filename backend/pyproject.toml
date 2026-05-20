@@ -11,7 +11,7 @@ packages = [{ include = "src" }]
 
 [tool.poetry.dependencies]
 python = "^3.11"
-fastapi = {extras = ["standard"], version = "^0.119.1"}
+fastapi = {version = "^0.136.1", extras = ["standard"]}
 py-clob-client = "^0.25.0"
 uvicorn = "^0.38.0"
 gunicorn = "^23.0.0"
@@ -32,5 +32,6 @@ build-backend = "poetry.core.masonry.api"
 [dependency-groups]
 dev = [
     "ruff (>=0.14.2,<0.15.0)",
-    "datamodel-code-generator (>=0.35.0,<0.36.0)"
+    "datamodel-code-generator (>=0.35.0,<0.36.0)",
+    "pip-audit (>=2.10.0,<3.0.0)"
 ]
