@@ -61,19 +61,22 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: "3.11"
-          cache: poetry
 
-      - name: Install Poetry
-        run: pipx install poetry
+      - name: Setup uv
+        uses: astral-sh/setup-uv@v6
+        with:
+          version: "0.8.15"
+          enable-cache: true
+          cache-dependency-glob: backend/uv.lock
 
       - name: Install dependencies
-        run: poetry install --with dev
+        run: uv sync --frozen --dev
 
       - name: Validate package metadata
-        run: poetry check
+        run: uv lock --check
 
       - name: Lint
-        run: poetry run ruff check .
+        run: uv run ruff check .
 
       - name: Audit dependencies
-        run: poetry run pip-audit
+        run: uv run pip-audit

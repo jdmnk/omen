@@ -9,7 +9,7 @@
     "start": "next start",
     "type-check": "tsc --noEmit",
     "lint": "eslint",
-    "type-gen": "cd ../backend && poetry run python scripts/generate_types.py"
+    "type-gen": "cd ../backend && uv run python scripts/generate_types.py"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",

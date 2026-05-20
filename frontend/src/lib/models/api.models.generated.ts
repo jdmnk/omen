@@ -1,5 +1,5 @@
 // This file is auto-generated. Do not edit manually.
-// Run: pnpm generate-types
+// Run: pnpm type-gen
 // Source: FastAPI OpenAPI schema
 
 /**
@@ -764,6 +764,10 @@ export interface components {
             msg: string;
             /** Error Type */
             type: string;
+            /** Input */
+            input?: unknown;
+            /** Context */
+            ctx?: Record<string, never>;
         };
     };
     responses: never;
