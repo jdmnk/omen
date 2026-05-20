@@ -24,7 +24,7 @@ package = false
 
 [dependency-groups]
 dev = [
-    "ruff>=0.14.2,<0.15.0",
+    "ruff>=0.15.13,<0.16.0",
     "datamodel-code-generator>=0.35.0,<0.36.0",
     "pip-audit>=2.10.0,<3.0.0",
 ]
