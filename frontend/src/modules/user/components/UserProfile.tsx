@@ -33,6 +33,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { MainHeader } from "@/components/MainHeader";
 import { MainWatchlists } from "@/components/MainWatchlists";
 import { DismissibleHint } from "@/components/DismissibleHint";
+import { LogoIcon } from "@/components/LogoIcon";
 
 async function fetchUserPositionActivity(userId: string, position: Position) {
   // sorted by timestamp DESC
@@ -172,13 +173,19 @@ export function UserProfile({ userId }: { userId: string }) {
         {/* Left Card: User Info */}
         <Card className="p-4 flex flex-col">
           <div className="flex items-start gap-4">
-            <Image
-              src={userData?.profileImage || "/logo.svg"}
-              alt=""
-              width={64}
-              height={64}
-              className="h-16 w-16 rounded-full border border-brand-stroke object-cover shrink-0"
-            />
+            {userData?.profileImage ? (
+              <Image
+                src={userData.profileImage}
+                alt=""
+                width={64}
+                height={64}
+                className="h-16 w-16 rounded-full border border-brand-stroke object-cover shrink-0"
+              />
+            ) : (
+              <div className="h-16 w-16 shrink-0 overflow-hidden rounded-full border border-brand-stroke">
+                <LogoIcon className="h-full w-full text-black dark:text-white" />
+              </div>
+            )}
             <div className="min-w-0 flex-1">
               <div className="flex items-center gap-2 flex-wrap">
                 <h1 className="text-lg font-bold truncate">
