@@ -21,6 +21,7 @@ import {
 } from "@/lib/ui/format.utils";
 import { useUserDataQuery } from "../../lib/queries/user-data.query";
 import { LogoIcon } from "@/components/LogoIcon";
+import { getSiteHost } from "@/lib/app.const";
 import { useChartData } from "../../lib/chart/useChartData";
 import { getMarkersForShareChart } from "../../lib/chart/new-marker.utils";
 import { getExposureArea } from "../../lib/chart/exposure-area.utils";
@@ -43,6 +44,7 @@ export function MarketShareCard({
   const avgBuyPrice = getPositionAvgBuyPrice(position);
   const avgSellPrice = getPositionAvgSellPrice(snapshot.entries);
   const tradesCount = snapshot.entries.length;
+  const siteHost = getSiteHost();
   const apr = getPositionApr(position, snapshot.entries);
   const volume = getPositionVolume(position, snapshot.entries);
 
@@ -182,7 +184,7 @@ export function MarketShareCard({
           <div className="flex items-center gap-2 mt-2">
             <LogoIcon className="h-6 w-6 text-share-gray" />
             <div className="text-base font-bold text-share-gray">
-              omeninsight.com
+              {siteHost}
             </div>
           </div>
         </div>
