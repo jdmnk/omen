@@ -1150,6 +1150,7 @@ wheels = [
 name = "greenlet"
 version = "3.5.1"
 source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/6d/6e/802acd792aebb2256fbbee8cacf2727faaeb6f240ac11008f09eae4414bc/greenlet-3.5.1.tar.gz", hash = "sha256:5a56aeb7d5d9cc4b3a735efb5095bd4b4f6f0e4f93e5ca876d0e2315137b7829", size = 197356, upload-time = "2026-05-20T15:05:03.917Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/42/3c/ff890b466eaba2b0f5e6bdfff025f8c75f41b8ffdc3dbc3d24ad261e764a/greenlet-3.5.1-cp311-cp311-macosx_11_0_universal2.whl", hash = "sha256:73f78f9b9f0a5c06e5c946ba1e8e36f5114923b6be109ee618c54f079c3ea14f", size = 284764, upload-time = "2026-05-20T13:09:10.204Z" },
     { url = "https://files.pythonhosted.org/packages/81/0e/5e5457be3d256918f6a4756f073548a3f0190836e2cc94aa6d0d617a940b/greenlet-3.5.1-cp311-cp311-manylinux_2_24_aarch64.manylinux_2_28_aarch64.whl", hash = "sha256:a0cbed8bb44e23c5b199f888f4e4ce096b45ad9f25ff74a7ad0213875e936bb2", size = 603479, upload-time = "2026-05-20T14:00:04.757Z" },
@@ -1776,20 +1777,6 @@ wheels = [
 ]
 
 [[package]]
-name = "poly-eip712-structs"
-version = "0.0.1"
-source = { registry = "https://pypi.org/simple" }
-dependencies = [
-    { name = "eth-utils" },
-    { name = "pycryptodome" },
-    { name = "pytest" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/39/18/9fc1be6ac78bff14f56b88dedd019b2a669a5ff570cc40f055dccef294fe/poly_eip712_structs-0.0.1.tar.gz", hash = "sha256:d9193766fde497b1ee01c79a50092733a34b7a94bed090deb5d3c1b1e41f6d8c", size = 18091, upload-time = "2024-07-18T18:33:24.84Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/5a/d7/ff1cfba1c3a3d5d6851d7bef5e4ad19710ed6d03e149dc183111d103acab/poly_eip712_structs-0.0.1-py3-none-any.whl", hash = "sha256:11e714e8c25c64d22dcb8a606c87cf052e7154caf701652d29687ddaf7dee342", size = 12380, upload-time = "2024-07-18T18:33:23.43Z" },
-]
-
-[[package]]
 name = "polyapp-backend"
 version = "0.1.0"
 source = { virtual = "." }
@@ -1799,7 +1786,6 @@ dependencies = [
     { name = "gunicorn" },
     { name = "httpx" },
     { name = "psycopg2-binary" },
-    { name = "py-clob-client" },
     { name = "pydantic" },
     { name = "pydantic-settings" },
     { name = "redis" },
@@ -1812,6 +1798,8 @@ dependencies = [
 dev = [
     { name = "datamodel-code-generator" },
     { name = "pip-audit" },
+    { name = "pytest" },
+    { name = "pytest-asyncio" },
     { name = "ruff" },
 ]
 
@@ -1822,7 +1810,6 @@ requires-dist = [
     { name = "gunicorn", specifier = ">=23.0.0,<24.0.0" },
     { name = "httpx", specifier = ">=0.28.1,<0.29.0" },
     { name = "psycopg2-binary", specifier = ">=2.9.11,<3.0.0" },
-    { name = "py-clob-client", specifier = ">=0.25.0,<0.26.0" },
     { name = "pydantic", specifier = ">=2.11,<3.0" },
     { name = "pydantic-settings", specifier = ">=2.11.0,<3.0.0" },
     { name = "redis", specifier = ">=7.0.1,<8.0.0" },
@@ -1835,6 +1822,8 @@ requires-dist = [
 dev = [
     { name = "datamodel-code-generator", specifier = ">=0.35.0,<0.36.0" },
     { name = "pip-audit", specifier = ">=2.10.0,<3.0.0" },
+    { name = "pytest", specifier = ">=9.0.3,<10.0.0" },
+    { name = "pytest-asyncio", specifier = ">=1.3.0,<2.0.0" },
     { name = "ruff", specifier = ">=0.14.2,<0.15.0" },
 ]
 
@@ -1999,38 +1988,6 @@ wheels = [
     { url = "https://files.pythonhosted.org/packages/56/ad/44b06659949b243ae10112cd3b20a197f9bf3e81d5651379b9eb889bfaad/psycopg2_binary-2.9.12-cp314-cp314-musllinux_1_2_riscv64.whl", hash = "sha256:77b348775efd4cdab410ec6609d81ccecd1139c90265fa583a7255c8064bc03d", size = 3048977, upload-time = "2026-04-20T23:35:41.806Z" },
     { url = "https://files.pythonhosted.org/packages/1d/f2/10a1bcebadb6aa55e280e1f58975c36a7b560ea525184c7aa4064c466633/psycopg2_binary-2.9.12-cp314-cp314-musllinux_1_2_x86_64.whl", hash = "sha256:527e6342b3e44c2f0544f6b8e927d60de7f163f5723b8f1dfa7d2a84298738cd", size = 3351466, upload-time = "2026-04-20T23:35:43.993Z" },
     { url = "https://files.pythonhosted.org/packages/20/be/b732c8418ffa5bcfda002890f5dc4c869fc17db66ff11f53b17cfe44afc0/psycopg2_binary-2.9.12-cp314-cp314-win_amd64.whl", hash = "sha256:f12ae41fcafadb39b2785e64a40f9db05d6de2ac114077457e0e7c597f3af980", size = 2848762, upload-time = "2026-04-20T23:35:46.421Z" },
-]
-
-[[package]]
-name = "py-clob-client"
-version = "0.25.0"
-source = { registry = "https://pypi.org/simple" }
-dependencies = [
-    { name = "eth-account" },
-    { name = "eth-utils" },
-    { name = "poly-eip712-structs" },
-    { name = "py-order-utils" },
-    { name = "python-dotenv" },
-    { name = "requests" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/7a/24/92eb4ccf28d492649b1636ad6c15311067eef34a23720b10a43ad2db0846/py_clob_client-0.25.0.tar.gz", hash = "sha256:f6d111f9b8155c1f43e5156e87e6d2088b38d6f8844f1fb435c91fbb1cfc0df1", size = 27263, upload-time = "2025-08-27T20:04:46.048Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/74/c9/3ded150e22cdfeba55fac38919d257bdcb091153a49aab70ccd12a2e99de/py_clob_client-0.25.0-py3-none-any.whl", hash = "sha256:ab66c50a17850889fdfcccb9f469358b14b9d59bcbf3fe6f07394bb8e8c4feac", size = 31018, upload-time = "2025-08-27T20:04:44.756Z" },
-]
-
-[[package]]
-name = "py-order-utils"
-version = "0.3.2"
-source = { registry = "https://pypi.org/simple" }
-dependencies = [
-    { name = "eth-account" },
-    { name = "eth-utils" },
-    { name = "poly-eip712-structs" },
-    { name = "pytest" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/5b/b8/9125d3960748f4f2d41f0e10ae42c29e60f6d3a37b8a758df7375346bf01/py_order_utils-0.3.2.tar.gz", hash = "sha256:4c0ecb939f4ce0313cd8a4ca32f2ba9a72449a6fc9ee17b9ce1937f594662988", size = 10378, upload-time = "2024-07-29T22:54:36.932Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/29/68/b0a971b064b3236fce7307bd5c180409cccd9b207ec459274bdb4e401ec0/py_order_utils-0.3.2-py3-none-any.whl", hash = "sha256:5ab780e61ed532ddda852a6a12d470be7bbdaae01213ced3ebc6c887cedb1d3e", size = 12630, upload-time = "2024-07-29T22:54:35.239Z" },
 ]
 
 [[package]]
@@ -2256,6 +2213,19 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/7d/0d/549bd94f1a0a402dc8cf64563a117c0f3765662e2e668477624baeec44d5/pytest-9.0.3.tar.gz", hash = "sha256:b86ada508af81d19edeb213c681b1d48246c1a91d304c6c81a427674c17eb91c", size = 1572165, upload-time = "2026-04-07T17:16:18.027Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/d4/24/a372aaf5c9b7208e7112038812994107bc65a84cd00e0354a88c2c77a617/pytest-9.0.3-py3-none-any.whl", hash = "sha256:2c5efc453d45394fdd706ade797c0a81091eccd1d6e4bccfcd476e2b8e0ab5d9", size = 375249, upload-time = "2026-04-07T17:16:16.13Z" },
+]
+
+[[package]]
+name = "pytest-asyncio"
+version = "1.3.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "pytest" },
+    { name = "typing-extensions", marker = "python_full_version < '3.13'" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/90/2c/8af215c0f776415f3590cac4f9086ccefd6fd463befeae41cd4d3f193e5a/pytest_asyncio-1.3.0.tar.gz", hash = "sha256:d7f52f36d231b80ee124cd216ffb19369aa168fc10095013c6b014a34d3ee9e5", size = 50087, upload-time = "2025-11-10T16:07:47.256Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/e5/35/f8b19922b6a25bc0880171a2f1a003eaeb93657475193ab516fd87cac9da/pytest_asyncio-1.3.0-py3-none-any.whl", hash = "sha256:611e26147c7f77640e6d0a92a38ed17c3e9848063698d5c93d5aa7aa11cebff5", size = 15075, upload-time = "2025-11-10T16:07:45.537Z" },
 ]
 
 [[package]]

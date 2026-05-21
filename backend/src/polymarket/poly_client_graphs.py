@@ -2,14 +2,23 @@ import httpx
 
 from src.models.graph.position import Position, parse_position_from_api
 from src.models.graph.wallet import Wallet, parse_wallet_from_api
+from src.polymarket.api_config import (
+    GOLDSKY_API_HOST,
+    GOLDSKY_API_PNL_SUBGRAPH,
+    GOLDSKY_API_WALLET_SUBGRAPH,
+)
 from src.utils.logging_config import get_logger
 from src.utils.usdc import to_usdc
 
 logger = get_logger(__name__)
 
-GOLDSKY_API_HOST = "https://api.goldsky.com/api/public/project_cl6mb8i9h0003e201j6li0diw"
-GOLDSKY_API_PNL_SUBGRAPH = "/subgraphs/pnl-subgraph/0.0.14/gn"
-GOLDSKY_API_WALLET_SUBGRAPH = "/subgraphs/wallet-subgraph/0.0.4/gn"
+
+def parse_positions(raw_positions: list[dict]) -> list[Position]:
+    return [
+        position
+        for position in (parse_position_from_api(position) for position in raw_positions)
+        if position is not None
+    ]
 
 
 class PolyClientGraphs:
@@ -64,9 +73,7 @@ class PolyClientGraphs:
             response = await client.post(GOLDSKY_API_HOST + GOLDSKY_API_PNL_SUBGRAPH, json=payload)
             data = response.json()
             user_positions = data.get("data", {}).get("userPositions", [])
-            parsed_positions: list[Position] = [
-                parse_position_from_api(position) for position in user_positions
-            ]
+            parsed_positions = parse_positions(user_positions)
 
             # sort by total amount desc (amount * avg price)
             parsed_positions.sort(key=lambda x: x.amount * x.avgPrice, reverse=True)
@@ -126,9 +133,7 @@ class PolyClientGraphs:
             response = await client.post(GOLDSKY_API_HOST + GOLDSKY_API_PNL_SUBGRAPH, json=payload)
             data = response.json()
             user_positions = data.get("data", {}).get("userPositions", [])
-            parsed_positions: list[Position] = [
-                parse_position_from_api(position) for position in user_positions
-            ]
+            parsed_positions = parse_positions(user_positions)
 
             return parsed_positions
 
@@ -218,9 +223,7 @@ class PolyClientGraphs:
             response = await client.post(GOLDSKY_API_HOST + GOLDSKY_API_PNL_SUBGRAPH, json=payload)
             data = response.json()
             user_positions = data.get("data", {}).get("userPositions", [])
-            parsed_positions: list[Position] = [
-                parse_position_from_api(position) for position in user_positions
-            ]
+            parsed_positions = parse_positions(user_positions)
 
             # sort by total amount desc (amount * avg price)
             parsed_positions.sort(key=lambda x: x.amount * x.avgPrice, reverse=True)

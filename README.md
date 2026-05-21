@@ -114,6 +114,7 @@ cd backend
 uv sync --dev
 uv run ruff check .
 uv run ruff format .
+uv run pytest
 uv run pip-audit
 uv run python scripts/generate_types.py
 
@@ -130,7 +131,7 @@ This repo intentionally does not include secrets. Start from:
 - `backend/.env.example`
 - `subgraphs/.env.example`
 
-Most read-only product flows use public Polymarket APIs. Backend jobs that need authenticated CLOB access require `POLYMARKET_PRIVATE_KEY`; leave it empty unless you are intentionally running those flows with a dedicated development wallet.
+The app currently uses public Polymarket APIs only. It does not require an authenticated CLOB key for local analytics workflows.
 
 ## Notes
 

@@ -19,9 +19,6 @@ class Settings(BaseSettings):
     # API Configuration
     api_env: str = "dev"
 
-    # Polymarket
-    polymarket_private_key: str | None = None
-
     # CORS
     cors_allow_origin: str | None = None
 

@@ -71,6 +71,12 @@ uv run ruff check .
 uv run ruff format .
 ```
 
+## Tests
+
+```bash
+uv run pytest
+```
+
 ## Dependency Audit
 
 ```bash
@@ -90,4 +96,4 @@ pnpm type-gen
 
 Start from `.env.example`. Keep local `.env` files and private keys out of Git.
 
-Most read-only flows work without `POLYMARKET_PRIVATE_KEY`. Only set it for authenticated CLOB flows, and use a dedicated development wallet.
+The backend currently uses public Polymarket APIs only. It does not require an authenticated CLOB key for local analytics workflows.

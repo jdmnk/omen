@@ -2,9 +2,8 @@ import traceback
 from typing import Literal, TypedDict
 
 import httpx
-from py_clob_client.exceptions import PolyApiException
 
-from src.polymarket.poly_client import CLOB_HOST
+from src.polymarket.api_config import CLOB_API_HOST, USER_PNL_API_HOST, PolymarketApiError
 from src.utils.logging_config import get_logger
 
 logger = get_logger(__name__)
@@ -46,8 +45,6 @@ class PriceHistoryApiResponse(TypedDict, total=False):
 
 
 class PolyClientPrices:
-    USER_PNL_HOST = "https://user-pnl-api.polymarket.com"
-
     async def get_market_prices_by_request(
         self, requests: list[PriceRequest]
     ) -> dict[str, dict[str, str]]:
@@ -62,7 +59,7 @@ class PolyClientPrices:
         try:
             async with httpx.AsyncClient() as client:
                 response = await client.post(
-                    f"{CLOB_HOST}/prices",
+                    f"{CLOB_API_HOST}/prices",
                     json=requests,
                     headers={"Content-Type": "application/json"},
                 )
@@ -73,10 +70,10 @@ class PolyClientPrices:
                     return {}
                 data: dict[str, dict[str, str]] = response.json() or {}
                 return data
-        except PolyApiException as exc:
+        except httpx.HTTPError as exc:
             logger.error(f"get_market_prices_by_request: error: {exc}")
             logger.error(traceback.format_exc())
-            raise exc
+            raise PolymarketApiError(f"Failed to fetch market prices: {exc}") from exc
 
     async def get_order_books_by_request(
         self, requests: list[BookRequest]
@@ -92,7 +89,7 @@ class PolyClientPrices:
         try:
             async with httpx.AsyncClient() as client:
                 response = await client.post(
-                    f"{CLOB_HOST}/books",
+                    f"{CLOB_API_HOST}/books",
                     json=requests,
                     headers={"Content-Type": "application/json"},
                 )
@@ -103,10 +100,10 @@ class PolyClientPrices:
                     return []
                 data: list[OrderBookSummaryResponse] = response.json() or []
                 return data
-        except PolyApiException as exc:
+        except httpx.HTTPError as exc:
             logger.error(f"get_order_books_by_request: error: {exc}")
             logger.error(traceback.format_exc())
-            raise exc
+            raise PolymarketApiError(f"Failed to fetch order books: {exc}") from exc
 
     async def get_price_history_for_token(
         self,
@@ -142,7 +139,7 @@ class PolyClientPrices:
 
         try:
             async with httpx.AsyncClient() as client:
-                response = await client.get(f"{CLOB_HOST}/prices-history", params=params)
+                response = await client.get(f"{CLOB_API_HOST}/prices-history", params=params)
         except httpx.HTTPError:
             logger.exception(
                 "get_price_history_for_token: request exception for %s", token_id
@@ -190,7 +187,7 @@ class PolyClientPrices:
         }
         try:
             async with httpx.AsyncClient() as client:
-                response = await client.get(f"{self.USER_PNL_HOST}/user-pnl", params=params)
+                response = await client.get(f"{USER_PNL_API_HOST}/user-pnl", params=params)
                 if response.status_code != 200:
                     logger.error(
                         f"get_user_pnl_points: non-200 status {response.status_code}: {response.text}"
@@ -210,7 +207,7 @@ class PolyClientPrices:
                         # replace previous point at same timestamp
                         deduped[-1] = {"t": t, "p": float(pt.get("p", 0))}
                 return deduped
-        except PolyApiException as exc:
+        except httpx.HTTPError as exc:
             logger.error(f"get_user_pnl_points: error: {exc}")
             logger.error(traceback.format_exc())
-            raise exc
+            raise PolymarketApiError(f"Failed to fetch user PnL: {exc}") from exc
