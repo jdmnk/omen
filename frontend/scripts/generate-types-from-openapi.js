@@ -23,7 +23,7 @@ console.log(`📡 Looking for OpenAPI schema at ${OPENAPI_SCHEMA_FILE}...`);
 if (!fs.existsSync(OPENAPI_SCHEMA_FILE)) {
   console.error(`❌ OpenAPI schema not found at ${OPENAPI_SCHEMA_FILE}`);
   console.error(
-    `   Run: cd backend && poetry run python scripts/generate_types.py`
+    `   Run: cd backend && uv run python scripts/generate_types.py`
   );
   process.exit(1);
 }
@@ -56,7 +56,7 @@ try {
   const schemaNames = Object.keys(schemas);
 
   let output = `// This file is auto-generated. Do not edit manually.
-// Run: pnpm generate-types
+// Run: pnpm type-gen
 // Source: FastAPI OpenAPI schema
 
 ${generatedContent}
