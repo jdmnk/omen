@@ -1,6 +1,6 @@
 # Omen
 
-Omen is a full-stack Polymarket analytics app. It combines a Next.js frontend, a FastAPI backend, Postgres/Redis-backed ingestion jobs, and hosted Goldsky subgraph data to explore markets, users, positions, price history, order books, and holder behavior.
+Omen is a full-stack Polymarket analytics app. It combines a Next.js frontend, a FastAPI backend, Postgres/Redis-backed ingestion jobs, and subgraph data to explore markets, users, positions, price history, order books, and holder behavior.
 
 ## Product Surface
 
@@ -14,7 +14,7 @@ Omen is a full-stack Polymarket analytics app. It combines a Next.js frontend, a
 
 - `frontend/` - Next.js app with the main product UI.
 - `backend/` - FastAPI service, API routes, Polymarket clients, DB models, and ingestion jobs.
-- `backend/docs/` - notes for the upstream Polymarket APIs and hosted Goldsky subgraph queries used by the backend.
+- `backend/docs/` - notes for the upstream Polymarket APIs and subgraph queries used by the backend.
 - `backend/openapi.json` - generated OpenAPI schema used for frontend API types.
 
 ## Architecture
@@ -25,10 +25,10 @@ Next.js frontend
     -> Postgres
     -> Redis
     -> Polymarket Gamma/CLOB/Data APIs
-    -> Hosted Goldsky GraphQL endpoints
+    -> GraphQL subgraphs
 ```
 
-The frontend talks to the backend through `NEXT_PUBLIC_API_URL`. The backend stores market, trade, position, profile, and price-history data in Postgres, uses Redis for cached/worker data, and calls public Polymarket APIs plus hosted Goldsky endpoints for enriched analytics.
+The frontend talks to the backend through `NEXT_PUBLIC_API_URL`. The backend stores market, trade, position, profile, and price-history data in Postgres, uses Redis for cached/worker data, and calls public Polymarket APIs plus subgraph endpoints for enriched analytics.
 
 ## Quick Start
 
@@ -123,6 +123,6 @@ Most read-only product flows use public Polymarket APIs. Backend jobs that need 
 ## Notes
 
 - Omen is an analytics app, not investment advice or an automated trading system.
-- Data quality depends on third-party APIs and hosted Goldsky indexes.
+- Data quality depends on third-party APIs and indexed subgraphs.
 - Local watchlists and dismissed UI hints are stored in browser local storage.
 - If you fork this repo, rotate any local keys you previously used and run a secret scan before publishing your own copy.
