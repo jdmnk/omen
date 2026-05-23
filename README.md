@@ -37,7 +37,7 @@ Requirements:
 
 - Docker and Docker Compose for the backend, Postgres, and Redis.
 - Node.js plus `pnpm` for the frontend and subgraph tooling.
-- Python 3.11 plus Poetry if you want to run backend commands outside Docker.
+- Python 3.11 plus `uv` if you want to run backend commands outside Docker.
 
 ### Backend
 
@@ -48,6 +48,13 @@ docker compose -f docker-compose.dev.yml up --build
 ```
 
 The API will be available at `http://localhost:8000`.
+
+For backend commands outside Docker, install/sync the Python environment with:
+
+```bash
+cd backend
+uv sync --dev
+```
 
 Populate local data from a second terminal:
 
@@ -104,8 +111,11 @@ pnpm build
 
 # backend
 cd backend
-poetry run ruff check .
-poetry run ruff format .
+uv sync --dev
+uv run ruff check .
+uv run ruff format .
+uv run pip-audit
+uv run python scripts/generate_types.py
 
 # regenerate frontend API types from backend/openapi.json
 cd frontend
