@@ -7,17 +7,18 @@ RUN apt-get update && apt-get install -y --no-install-recommends curl build-esse
 # Set workdir
 WORKDIR /app
 
-# Install Poetry
-ENV POETRY_VERSION=2.2.1 \
-    POETRY_NO_INTERACTION=1 \
-    POETRY_VIRTUALENVS_CREATE=false
-RUN pip install --no-cache-dir "poetry==$POETRY_VERSION"
+# Install uv
+COPY --from=ghcr.io/astral-sh/uv:0.8.15 /uv /uvx /bin/
+ENV UV_COMPILE_BYTECODE=1 \
+    UV_LINK_MODE=copy \
+    UV_PROJECT_ENVIRONMENT=/opt/venv \
+    PATH="/opt/venv/bin:$PATH"
 
 # Copy dependency files first (for caching)
-COPY pyproject.toml poetry.lock ./
+COPY pyproject.toml uv.lock ./
 
 # Install dependencies only
-RUN poetry install --no-root
+RUN uv sync --frozen --no-dev --no-install-project
 
 # Copy source
 COPY . .

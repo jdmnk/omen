@@ -5,7 +5,7 @@ FastAPI service for Omen market analytics. It exposes the API consumed by the fr
 ## Requirements
 
 - Docker and Docker Compose for the recommended local setup.
-- Python 3.11 and Poetry for local linting or non-Docker scripts.
+- Python 3.11 and `uv` for local linting, audits, or non-Docker scripts.
 
 ## Run Locally
 
@@ -15,6 +15,16 @@ docker compose -f docker-compose.dev.yml up --build
 ```
 
 The API runs on `http://localhost:8000`. Interactive API docs are available at `http://localhost:8000/docs`.
+
+## Local uv Environment
+
+Docker is the recommended runtime because the API expects Postgres and Redis.
+For local scripts, linting, audits, and schema generation:
+
+```bash
+uv sync --dev
+uv run python scripts/generate_types.py
+```
 
 ## Populate Local Data
 
@@ -56,8 +66,15 @@ docker compose -f docker-compose.dev.yml exec db psql -U user -d mydb -c 'SELECT
 Ruff is configured via `ruff.toml`.
 
 ```bash
-poetry run ruff check .
-poetry run ruff format .
+uv sync --dev
+uv run ruff check .
+uv run ruff format .
+```
+
+## Dependency Audit
+
+```bash
+uv run pip-audit
 ```
 
 ## API Schema
