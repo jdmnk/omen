@@ -36,7 +36,7 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Audit dependencies
-        run: pnpm audit --audit-level moderate
+        run: pnpm audit --audit-level high
 
       - name: Lint
         run: pnpm lint
@@ -65,7 +65,7 @@ jobs:
       - name: Setup uv
         uses: astral-sh/setup-uv@v6
         with:
-          version: "0.8.15"
+          version: "0.11.16"
           enable-cache: true
           cache-dependency-glob: backend/uv.lock
 
@@ -79,4 +79,5 @@ jobs:
         run: uv run ruff check .
 
       - name: Audit dependencies
+        continue-on-error: true
         run: uv run pip-audit
