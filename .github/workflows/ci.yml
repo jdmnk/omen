@@ -77,3 +77,7 @@ jobs:
 
       - name: Lint
         run: uv run ruff check .
+
+      - name: Audit dependencies
+        continue-on-error: true
+        run: uv run pip-audit
