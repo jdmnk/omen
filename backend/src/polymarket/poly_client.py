@@ -2,7 +2,6 @@ import asyncio
 import traceback
 
 import httpx
-from py_clob_client_v2 import ClobClient
 
 from src.models.activity import parse_activity_trade
 from src.models.event import Event, parse_event_from_api
@@ -12,7 +11,6 @@ from src.models.top_holders import TopHolder
 from src.models.trade import Trade, parse_trade_from_api
 from src.models.user_position import UserPosition, parse_user_position_from_api
 from src.models.user_profile import UserPublicProfile
-from src.settings import settings
 from src.utils.logging_config import get_logger
 
 logger = get_logger(__name__)
@@ -22,7 +20,6 @@ DATA_API_HOST = "https://data-api.polymarket.com"
 GAMMA_API_HOST = "https://gamma-api.polymarket.com"
 GOLDSKY_API_HOST = "https://api.goldsky.com/api/public/project_cl6mb8i9h0003e201j6li0diw"
 GOLDSKY_API_PNL_SUBGRAPH = "/subgraphs/pnl-subgraph/0.0.14/gn"
-POLYGON_CHAIN_ID = 137
 POLYMARKET_HTTP_TIMEOUT = httpx.Timeout(30.0, connect=30.0)
 
 BLACKLISTED_MARKET_TAGS = [
@@ -63,23 +60,6 @@ class PolyClient:
     Data API (General)	200 requests / 10s	(Throttle requests over the maximum configured rate)
     """
 
-    def __init__(self):
-        # self.clob_client = self.get_clob_client()
-        pass
-
-    def get_clob_client(self) -> ClobClient:
-        if not settings.polymarket_private_key:
-            raise ValueError("POLYMARKET_PRIVATE_KEY is required for authenticated CLOB flows")
-
-        client = ClobClient(
-            host=CLOB_HOST,
-            chain_id=POLYGON_CHAIN_ID,
-            key=settings.polymarket_private_key,
-        )
-        api_creds = client.create_or_derive_api_key()
-        client.set_api_creds(api_creds)
-        return client
-
     async def _get_active_events_keyset(
         self,
         client: httpx.AsyncClient,
@@ -87,7 +67,6 @@ class PolyClient:
         exclude_tag_ids: list[str],
         count: int | None,
         limit: int,
-        api_params: dict | None = None,
     ) -> list[dict]:
         all_events: list[dict] = []
         after_cursor: str | None = None
@@ -108,9 +87,6 @@ class PolyClient:
             }
             if after_cursor:
                 params["after_cursor"] = after_cursor
-            if api_params is not None:
-                params.update(api_params)
-                params.pop("offset", None)
 
             response = await client.get(f"{GAMMA_API_HOST}/events/keyset", params=params)
             response.raise_for_status()
@@ -175,7 +151,6 @@ class PolyClient:
         self,
         exclude_tag_ids: list[int] | None = None,
         count: int | None = None,
-        api_params: dict | None = None,
     ) -> list[Market]:
         limit = 500
         final_excluded_tag_ids: list[str] = []
@@ -197,7 +172,6 @@ class PolyClient:
                     exclude_tag_ids=final_excluded_tag_ids,
                     count=count,
                     limit=limit,
-                    api_params=api_params,
                 )
         except httpx.HTTPError as exc:
             logger.error(f"get_active_markets_by_events: error fetching markets: {exc}")

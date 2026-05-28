@@ -90,4 +90,4 @@ pnpm type-gen
 
 Start from `.env.example`. Keep local `.env` files and private keys out of Git.
 
-Most read-only flows work without `POLYMARKET_PRIVATE_KEY`. Only set it for authenticated CLOB flows, and use a dedicated development wallet.
+The backend uses public Polymarket APIs for analytics data. It does not require a Polymarket private key.
