@@ -2,7 +2,6 @@ import traceback
 from typing import Literal, TypedDict
 
 import httpx
-from py_clob_client.exceptions import PolyApiException
 
 from src.polymarket.poly_client import CLOB_HOST
 from src.utils.logging_config import get_logger
@@ -73,7 +72,7 @@ class PolyClientPrices:
                     return {}
                 data: dict[str, dict[str, str]] = response.json() or {}
                 return data
-        except PolyApiException as exc:
+        except httpx.HTTPError as exc:
             logger.error(f"get_market_prices_by_request: error: {exc}")
             logger.error(traceback.format_exc())
             raise exc
@@ -103,7 +102,7 @@ class PolyClientPrices:
                     return []
                 data: list[OrderBookSummaryResponse] = response.json() or []
                 return data
-        except PolyApiException as exc:
+        except httpx.HTTPError as exc:
             logger.error(f"get_order_books_by_request: error: {exc}")
             logger.error(traceback.format_exc())
             raise exc
@@ -210,7 +209,7 @@ class PolyClientPrices:
                         # replace previous point at same timestamp
                         deduped[-1] = {"t": t, "p": float(pt.get("p", 0))}
                 return deduped
-        except PolyApiException as exc:
+        except httpx.HTTPError as exc:
             logger.error(f"get_user_pnl_points: error: {exc}")
             logger.error(traceback.format_exc())
             raise exc
