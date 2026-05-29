@@ -2,9 +2,6 @@ import asyncio
 import traceback
 
 import httpx
-from py_clob_client.client import ClobClient
-from py_clob_client.constants import POLYGON
-from py_clob_client.exceptions import PolyApiException
 
 from src.models.activity import parse_activity_trade
 from src.models.event import Event, parse_event_from_api
@@ -14,7 +11,6 @@ from src.models.top_holders import TopHolder
 from src.models.trade import Trade, parse_trade_from_api
 from src.models.user_position import UserPosition, parse_user_position_from_api
 from src.models.user_profile import UserPublicProfile
-from src.settings import settings
 from src.utils.logging_config import get_logger
 
 logger = get_logger(__name__)
@@ -24,6 +20,7 @@ DATA_API_HOST = "https://data-api.polymarket.com"
 GAMMA_API_HOST = "https://gamma-api.polymarket.com"
 GOLDSKY_API_HOST = "https://api.goldsky.com/api/public/project_cl6mb8i9h0003e201j6li0diw"
 GOLDSKY_API_PNL_SUBGRAPH = "/subgraphs/pnl-subgraph/0.0.14/gn"
+POLYMARKET_HTTP_TIMEOUT = httpx.Timeout(30.0, connect=30.0)
 
 BLACKLISTED_MARKET_TAGS = [
     {
@@ -63,15 +60,56 @@ class PolyClient:
     Data API (General)	200 requests / 10s	(Throttle requests over the maximum configured rate)
     """
 
-    def __init__(self):
-        # self.clob_client = self.get_clob_client()
-        pass
+    async def _get_active_events_keyset(
+        self,
+        client: httpx.AsyncClient,
+        *,
+        exclude_tag_ids: list[str],
+        count: int | None,
+        limit: int,
+    ) -> list[dict]:
+        all_events: list[dict] = []
+        after_cursor: str | None = None
 
-    def get_clob_client(self) -> ClobClient:
-        client = ClobClient(CLOB_HOST, key=settings.polymarket_private_key, chain_id=POLYGON)
-        api_creds = client.create_or_derive_api_creds()
-        client.set_api_creds(api_creds)
-        return client
+        while True:
+            remaining = count - len(all_events) if count is not None else limit
+            if count is not None and remaining <= 0:
+                break
+
+            params: dict[str, object] = {
+                "closed": False,
+                "limit": min(limit, remaining) if count is not None else limit,
+                "include_chat": False,
+                "include_template": False,
+                "exclude_tag_id": exclude_tag_ids,
+                "order": "id",
+                "ascending": False,
+            }
+            if after_cursor:
+                params["after_cursor"] = after_cursor
+
+            response = await client.get(f"{GAMMA_API_HOST}/events/keyset", params=params)
+            response.raise_for_status()
+            payload = response.json() or {}
+            events = payload.get("events", [])
+            if not events:
+                break
+
+            all_events.extend(events)
+            logger.info(
+                "Fetched %s events (after_cursor: %s)...",
+                len(events),
+                after_cursor or "initial",
+            )
+
+            next_cursor = payload.get("next_cursor")
+            if not next_cursor or next_cursor == after_cursor or len(events) < params["limit"]:
+                break
+            after_cursor = next_cursor
+
+        if count is not None:
+            return all_events[:count]
+        return all_events
 
     async def get_active_events(
         self, exclude_tag_ids: list[int] | None = None, count: int | None = None
@@ -81,44 +119,27 @@ class PolyClient:
         but return the raw events payload (including markets) instead of flattening to markets.
         """
         limit = 500
-        offset = 0
-        all_events: list[dict] = []
-        final_excluded_tag_ids: list[int] = []
+        final_excluded_tag_ids: list[str] = []
         if exclude_tag_ids is None or len(exclude_tag_ids) == 0:
             final_excluded_tag_ids = [tag["id"] for tag in BLACKLISTED_MARKET_TAGS]
+        else:
+            final_excluded_tag_ids = [str(tag_id) for tag_id in exclude_tag_ids]
 
-        if count is not None and count < limit:
+        if count is not None and 0 < count < limit:
             limit = count
 
         try:
-            async with httpx.AsyncClient() as client:
-                while True:
-                    params = {
-                        "closed": False,
-                        "limit": limit,
-                        "offset": offset,
-                        "include_chat": False,
-                        "include_template": False,
-                        "exclude_tag_id": final_excluded_tag_ids,
-                        "order": "id",
-                        "ascending": False,
-                    }
-                    response = await client.get(f"{GAMMA_API_HOST}/events", params=params)
-                    events = response.json()
-                    if not events:
-                        break
-
-                    all_events.extend(events)
-                    logger.info(f"Fetched {len(events)} events (offset: {offset})...")
-
-                    if count is not None and len(all_events) >= count:
-                        break
-
-                    if len(events) < limit:
-                        break
-
-                    offset += limit
-        except PolyApiException as exc:
+            async with httpx.AsyncClient(
+                timeout=POLYMARKET_HTTP_TIMEOUT,
+                trust_env=False,
+            ) as client:
+                all_events = await self._get_active_events_keyset(
+                    client,
+                    exclude_tag_ids=final_excluded_tag_ids,
+                    count=count,
+                    limit=limit,
+                )
+        except httpx.HTTPError as exc:
             logger.error(f"get_active_events: error fetching events: {exc}")
             logger.error(traceback.format_exc())
             raise exc
@@ -130,52 +151,29 @@ class PolyClient:
         self,
         exclude_tag_ids: list[int] | None = None,
         count: int | None = None,
-        api_params: dict | None = None,
     ) -> list[Market]:
-        limit = 250
-        offset = 0
-        all_events = []
-        final_excluded_tag_ids = []
+        limit = 500
+        final_excluded_tag_ids: list[str] = []
         if exclude_tag_ids is None or len(exclude_tag_ids) == 0:
             final_excluded_tag_ids = [tag["id"] for tag in BLACKLISTED_MARKET_TAGS]
+        else:
+            final_excluded_tag_ids = [str(tag_id) for tag_id in exclude_tag_ids]
 
-        if count is not None and count < limit:
+        if count is not None and 0 < count < limit:
             limit = count
 
         try:
-            async with httpx.AsyncClient() as client:
-                while True:
-                    params = {
-                        "closed": False,
-                        "limit": limit,
-                        "offset": offset,
-                        "include_chat": False,
-                        "include_template": False,
-                        # filter out annoying markets like crypto 15min/1h/...
-                        "exclude_tag_id": final_excluded_tag_ids,
-                        # order by id - newest first
-                        "order": "id",
-                        "ascending": False,
-                    }
-                    if api_params is not None:
-                        params.update(api_params)
-
-                    response = await client.get(f"{GAMMA_API_HOST}/events", params=params)
-                    events = response.json()
-                    if not events:
-                        break
-
-                    all_events.extend(events)
-                    logger.info(f"Fetched {len(events)} events (offset: {offset})...")
-
-                    if count is not None and len(all_events) >= count:
-                        break
-
-                    if len(events) < limit:
-                        break
-
-                    offset += limit
-        except PolyApiException as exc:
+            async with httpx.AsyncClient(
+                timeout=POLYMARKET_HTTP_TIMEOUT,
+                trust_env=False,
+            ) as client:
+                all_events = await self._get_active_events_keyset(
+                    client,
+                    exclude_tag_ids=final_excluded_tag_ids,
+                    count=count,
+                    limit=limit,
+                )
+        except httpx.HTTPError as exc:
             logger.error(f"get_active_markets_by_events: error fetching markets: {exc}")
             logger.error(traceback.format_exc())
             raise exc
@@ -183,7 +181,7 @@ class PolyClient:
         markets: list[Market] = []
 
         for event in all_events:
-            for market in event["markets"]:
+            for market in event.get("markets", []):
                 # Skip closed markets
                 if market.get("closed") or market.get("closed") == "true":
                     continue
@@ -381,7 +379,7 @@ class PolyClient:
 
                 return []
 
-        except PolyApiException as exc:
+        except httpx.HTTPError as exc:
             logger.error(f"get_active_markets: error fetching markets: {exc}")
             logger.error(traceback.format_exc())
             raise exc
@@ -425,7 +423,7 @@ class PolyClient:
             MarketSchema if found, None otherwise
 
         Raises:
-            PolyApiException: If API request fails (non-404 errors)
+            httpx.HTTPStatusError: If API request fails (non-404 errors)
         """
         try:
             async with httpx.AsyncClient() as client:
@@ -440,7 +438,7 @@ class PolyClient:
                 return None
             logger.error(f"get_market_by_slug: error fetching market by slug={slug}: {exc}")
             logger.error(traceback.format_exc())
-            raise PolyApiException(f"Failed to fetch market by slug: {exc}") from exc
+            raise
         except Exception as exc:
             logger.error(f"get_market_by_slug: unexpected error for slug={slug}: {exc}")
             logger.error(traceback.format_exc())
@@ -459,7 +457,7 @@ class PolyClient:
             EventSchema if found, None otherwise
 
         Raises:
-            PolyApiException: If API request fails (non-404 errors)
+            httpx.HTTPStatusError: If API request fails (non-404 errors)
         """
         try:
             async with httpx.AsyncClient() as client:
@@ -474,7 +472,7 @@ class PolyClient:
                 return None
             logger.error(f"get_event_by_id: error fetching event by id={event_id}: {exc}")
             logger.error(traceback.format_exc())
-            raise PolyApiException(f"Failed to fetch event by id: {exc}") from exc
+            raise
         except Exception as exc:
             logger.error(f"get_event_by_id: unexpected error for id={event_id}: {exc}")
             logger.error(traceback.format_exc())
@@ -493,7 +491,7 @@ class PolyClient:
             List of MarketSchema objects
 
         Raises:
-            PolyApiException: If API request fails
+            httpx.HTTPStatusError: If API request fails
         """
         if not condition_ids or len(condition_ids) == 0:
             return []
@@ -517,7 +515,7 @@ class PolyClient:
         except httpx.HTTPStatusError as exc:
             logger.error(f"get_markets_by_condition_ids: error fetching markets: {exc}")
             logger.error(traceback.format_exc())
-            raise PolyApiException(f"Failed to fetch markets by condition IDs: {exc}") from exc
+            raise
         except Exception as exc:
             logger.error(f"get_markets_by_condition_ids: unexpected error: {exc}")
             logger.error(traceback.format_exc())
@@ -628,7 +626,7 @@ class PolyClient:
                 return None
             logger.error(f"get_public_profile: error fetching profile for address={address}: {exc}")
             logger.error(traceback.format_exc())
-            raise PolyApiException(f"Failed to fetch public profile: {exc}") from exc
+            raise
         except Exception as exc:
             logger.error(f"get_public_profile: unexpected error for address={address}: {exc}")
             logger.error(traceback.format_exc())

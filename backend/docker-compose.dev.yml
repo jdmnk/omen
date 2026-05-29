@@ -7,7 +7,6 @@ services:
       API_ENV: "${API_ENV}"
       DATABASE_URL: "${DATABASE_URL}"
       REDIS_URL: "${REDIS_URL}"
-      POLYMARKET_PRIVATE_KEY: "${POLYMARKET_PRIVATE_KEY}"
       # Force watchfiles (used by Uvicorn reload) to poll for file changes
       # Needed for Docker bind mounts on macOS/WSL where inotify events don't propagate
       WATCHFILES_FORCE_POLLING: "true"
@@ -69,7 +68,6 @@ services:
   #     API_ENV: "${API_ENV}"
   #     DATABASE_URL: "${DATABASE_URL}"
   #     REDIS_URL: "${REDIS_URL}"
-  #     POLYMARKET_PRIVATE_KEY: "${POLYMARKET_PRIVATE_KEY}"
   #     WATCHFILES_FORCE_POLLING: "true"
   #   depends_on:
   #     db:

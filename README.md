@@ -118,7 +118,7 @@ This repo intentionally does not include secrets. Start from:
 - `frontend/.env.example`
 - `backend/.env.example`
 
-Most read-only product flows use public Polymarket APIs. Backend jobs that need authenticated CLOB access require `POLYMARKET_PRIVATE_KEY`; leave it empty unless you are intentionally running those flows with a dedicated development wallet.
+The app uses public Polymarket APIs for analytics data. It does not require a Polymarket private key.
 
 ## Notes
 
