@@ -1,6 +1,6 @@
 # Omen
 
-Omen is a full-stack Polymarket analytics app. It combines a Next.js frontend, a FastAPI backend, Postgres/Redis-backed ingestion jobs, and a Graph Protocol subgraph to explore markets, users, positions, price history, order books, and holder behavior.
+Omen is a full-stack Polymarket analytics app. It combines a Next.js frontend, a FastAPI backend, Postgres/Redis-backed ingestion jobs, and subgraph data to explore markets, users, positions, price history, order books, and holder behavior.
 
 ## Product Surface
 
@@ -15,7 +15,6 @@ Omen is a full-stack Polymarket analytics app. It combines a Next.js frontend, a
 - `frontend/` - Next.js app with the main product UI.
 - `backend/` - FastAPI service, API routes, Polymarket clients, DB models, and ingestion jobs.
 - `backend/docs/` - notes for the upstream Polymarket APIs and subgraph queries used by the backend.
-- `subgraphs/` - Graph Protocol PnL subgraph and shared mapping utilities.
 - `backend/openapi.json` - generated OpenAPI schema used for frontend API types.
 
 ## Architecture
@@ -36,8 +35,8 @@ The frontend talks to the backend through `NEXT_PUBLIC_API_URL`. The backend sto
 Requirements:
 
 - Docker and Docker Compose for the backend, Postgres, and Redis.
-- Node.js plus `pnpm` for the frontend and subgraph tooling.
-- Python 3.11 plus Poetry if you want to run backend commands outside Docker.
+- Node.js plus `pnpm` for the frontend.
+- Python 3.11 plus `uv` if you want to run backend commands outside Docker.
 
 ### Backend
 
@@ -48,6 +47,13 @@ docker compose -f docker-compose.dev.yml up --build
 ```
 
 The API will be available at `http://localhost:8000`.
+
+For backend commands outside Docker, install/sync the Python environment with:
+
+```bash
+cd backend
+uv sync --dev
+```
 
 Populate local data from a second terminal:
 
@@ -75,16 +81,6 @@ Open `http://localhost:3000`.
 
 If port `3000` is busy, run `pnpm dev -- --port 3001` and update `NEXT_PUBLIC_SITE_URL` if you need exact local metadata URLs.
 
-### Subgraphs
-
-```bash
-cd subgraphs
-pnpm install
-pnpm prepare
-```
-
-See `subgraphs/README.md` for Graph CLI commands.
-
 ## Using the App
 
 1. Start the backend and frontend.
@@ -104,8 +100,11 @@ pnpm build
 
 # backend
 cd backend
-poetry run ruff check .
-poetry run ruff format .
+uv sync --dev
+uv run ruff check .
+uv run ruff format .
+uv run pip-audit
+uv run python scripts/generate_types.py
 
 # regenerate frontend API types from backend/openapi.json
 cd frontend
@@ -118,7 +117,6 @@ This repo intentionally does not include secrets. Start from:
 
 - `frontend/.env.example`
 - `backend/.env.example`
-- `subgraphs/.env.example`
 
 Most read-only product flows use public Polymarket APIs. Backend jobs that need authenticated CLOB access require `POLYMARKET_PRIVATE_KEY`; leave it empty unless you are intentionally running those flows with a dedicated development wallet.
 

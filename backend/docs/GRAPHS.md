@@ -1,11 +1,11 @@
 ## Subgraph Queries
 
-The backend uses subgraph data from two places:
+The backend uses hosted Goldsky subgraph data from two places:
 
-- An external Polymarket positions subgraph for holder balances.
-- The Omen PnL subgraph in `subgraphs/pnl-subgraph` for realized PnL, average prices, and bought amounts.
+- The wallet subgraph for holder balances.
+- The PnL subgraph for realized PnL, average prices, and bought amounts.
 
-### External positions subgraph
+### Wallet subgraph
 
 ```graphql
 query GetMarketHolders($first: Int!, $skip: Int!, $tokenIds: [String!]!) {
@@ -26,7 +26,7 @@ query GetMarketHolders($first: Int!, $skip: Int!, $tokenIds: [String!]!) {
 }
 ```
 
-### Omen PnL subgraph
+### PnL subgraph
 
 ```graphql
 query GetMarketHolders($first: Int!, $skip: Int!, $tokenIds: [BigInt!]!) {
