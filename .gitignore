@@ -69,6 +69,7 @@ coverage.xml
 .hypothesis/
 .pytest_cache/
 .pip-audit-cache/
+.uv-cache/
 cover/
 
 # Translations

@@ -6,13 +6,7 @@ updates:
       interval: weekly
     open-pull-requests-limit: 5
 
-  - package-ecosystem: npm
-    directory: /subgraphs
-    schedule:
-      interval: weekly
-    open-pull-requests-limit: 5
-
-  - package-ecosystem: pip
+  - package-ecosystem: uv
     directory: /backend
     schedule:
       interval: weekly
@@ -23,4 +17,3 @@ updates:
     schedule:
       interval: weekly
     open-pull-requests-limit: 5
-
